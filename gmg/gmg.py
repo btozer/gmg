@@ -5,8 +5,9 @@ Written by Brook Tozer, University of Oxford 2015-17.
 Includes ability to import seismic reflection, well, surface outcrop and xy points into the model frame.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**Dependencies**
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Dependencies**
+
 SciPy
 NumPy
 Matplotlib
@@ -17,46 +18,45 @@ obspy
 wx
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-**References**
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**References**
 
+***
 polygons from Fatiando a Terra.
 
 Uieda, L., V. C. Oliveira Jr and V. C. F. Barbosa (2013), Modeling the Earth with Fatiando a Terra, Proceedings
 of the 12th Python in Science Conference
 
 www.fatiando.org/
+***
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+***
 Gravity algorithm written using NumPy by Brook Tozer (2015).
 
-CODE MODIFIED FROM: Bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
+CODE MODIFIED FROM: bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
+***
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+***
 Magnetic algorithm written using NumPy by Brook Tozer (2015)
 
-CODE MODIFIED FROM: Won, I. J., & Bevis, M. (1987). Computing the gravitational and magnetic anomalies due to a
-polygon: Algorithms and Fortran subroutines. Geophysics, 52(2), 232-238.
+CODE MODIFIED FROM: Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused by two dimensional
+structures of arbitrary shape, in Parks, G. A., Ed., Computers in the mineral industries, Part 1: Stanford Univ. Publ.,
+Geological Sciences, 9, 464-480.
+***
 
-Based on Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused by two dimensional structures
-of arbitrary shape, in Parks, G. A., Ed., Computers in the mineral industries, Part 1: Stanford Univ. Publ., Geological
-Sciences, 9, 464-480.
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+***
 SEGY plotting from ObsPy.
 
 ObsPy; a python toolbox for seismology Seismological Research Letters(May 2010), 81(3):530-533
 
 obspy.org
+***
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+***
 Icons where designed using the Free icon Maker.
-https://freeiconmaker.com/
 
+https://freeiconmaker.com/
+***
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Documentation created using Sphinx.
@@ -90,17 +90,16 @@ from obspy.segy.core import readSEGY
 # from obspy.io.segy.segy import _read_segy  # FUTURE
 import cPickle as Pickle
 from scipy import signal
-from fatiando.gravmag import Bott
-from fatiando.gravmag import talwani_and_heirtzler
 from fatiando.mesher import Polygon
-from plot_model import plot_fig
-from model_stats import rms
+from gmg import bott
+from gmg import talwani_and_heirtzler
+from gmg.plot_model import plot_fig
+from gmg.model_stats import rms
 import struct
 import gc
 import webbrowser
 
 matplotlib.use('WXAgg')
-
 
 # FUTURE
 # import wx.EnhancedStatusBar as ESB
@@ -193,7 +192,7 @@ class FaT(wx.Frame):
         '# %ADD THE PANES TO THE AUI MANAGER'
         self.mgr.AddPane(self.leftPanel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
-        self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
+        self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').bottom().Caption("Console"))
         self.mgr.Update()
 
         '# %CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)'
@@ -541,10 +540,7 @@ class FaT(wx.Frame):
         self.toolbar.SetSize((1790, 36))
 
     def start(self, area, xp, zp):
-
-        """
-        #% CREATE MPL FIGURE CANVAS
-        """
+        """# %CREATE MPL FIGURE CANVAS"""
 
         self.fig = plt.figure()  # %CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # %CREATE FIGURE CANVAS
@@ -579,7 +575,7 @@ class FaT(wx.Frame):
         self.Show()
 
     def initalise_model(self):
-        """#% INITALISE OBSERVED DATA AND LAYERS"""
+        """# %INITALISE OBSERVED DATA AND LAYERS"""
 
         self.pinch = False
         self.showverts = True
@@ -850,7 +846,7 @@ class FaT(wx.Frame):
         self.draw()
 
     def frame_adjustment(self, event):
-        """#% FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
+        """# %FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
 
         self.current_xlim = self.mcanvas.get_xlim()
         self.current_ylim = self.mcanvas.get_ylim()
@@ -1040,7 +1036,7 @@ class FaT(wx.Frame):
                                                                 color=self.colors[self.colors_index], s=5, gid=x)
 
     def size_handler(self):
-        """#% CREATE CANVAS BOX"""
+        """# %CREATE CANVAS BOX"""
         self.canvas_box = wx.BoxSizer(wx.HORIZONTAL)
         self.canvas_box.Add(self.canvas, 1, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, border=2)
 
@@ -3145,6 +3141,7 @@ class FaT(wx.Frame):
             self.susceptibilities.append(0.)
             self.remanence.append(0)
             self.angle_a.append(0.)
+            self.angle_b.append(0.)
             self.layer_lock_list.append(1)
             self.boundary_lock_list.append(1)
             self.layer_lock_status.append('unlocked')
@@ -3177,7 +3174,7 @@ class FaT(wx.Frame):
             self.update()
             self.draw()
         else:
-            'USER CHANGED THEIR MIND - NO NEW LAYER'
+            '# %USER CHANGED THEIR MIND - NO NEW LAYER'
             pass
 
     def load_layer(self, event):
@@ -3191,9 +3188,9 @@ class FaT(wx.Frame):
 
         '# %INCREMENT THE LAYER COUNT'
         self.i = self.layer_count
-        self.i = self.i + 1
+        self.i += 1
         '#% Increment the total layer count'
-        self.layer_count = self.layer_count + 1
+        self.layer_count += 1
         '#% add a new blank layer to the plot lists'
         self.polygon_fills.append([])
         self.layer_lines.append([])
@@ -3204,7 +3201,9 @@ class FaT(wx.Frame):
         self.densities.append(0.)
         self.reference_densities.append(0.)
         self.susceptibilities.append(0.)
+        self.remanence.append(0)
         self.angle_a.append(0.)
+        self.angle_b.append(0.)
         self.layer_lock_list.append(1)
         self.boundary_lock_list.append(1)
         self.layer_lock_status.append('unlocked')
@@ -3261,13 +3260,15 @@ class FaT(wx.Frame):
             self.ploty = self.ploty_list[self.i + 1]
         self.draw()
 
-        # % REMOVE META DATA
+        '# %REMOVE META DATA'
         del self.plotx_list[self.i]
         del self.ploty_list[self.i]
         del self.densities[self.i]
         del self.reference_densities[self.i]
         del self.susceptibilities[self.i]
         del self.angle_a[self.i]
+        del self.angle_b[self.i]
+        del self.remanence[self.i]
         del self.layer_lock_list[self.i]
         del self.boundary_lock_list[self.i]
         del self.layer_lock_status[self.i]
@@ -3371,13 +3372,6 @@ class FaT(wx.Frame):
 
     def model_rms(self, xp):
         if self.obs_gravity_data_for_rms != [] and self.calc_switch is True:
-            x = xp * 0.001
-            y = self.predgz
-            self.grav_rms_value, self.grav_residuals = rms(self.obs_gravity_data_for_rms[:, 0],
-                                                           self.obs_gravity_data_for_rms[:, 1], x, y)
-
-        elif self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
-            # print "BOTT RMS"
             x = xp * 0.001
             y = self.predgz
             self.grav_rms_value, self.grav_residuals = rms(self.obs_gravity_data_for_rms[:, 0],
@@ -3614,7 +3608,7 @@ class FaT(wx.Frame):
             polys = []
             for p, d in zip(polygons_to_use, densities_to_use):
                 polys.append(Polygon(1000 * np.array(p), {'density': d}))
-            self.predgz = Bott.Gz(self.xp, self.zp, polys)
+            self.predgz = bott.Gz(self.xp, self.zp, polys)
         else:
             self.predgz = np.zeros_like(self.xp)
         self.predplot.set_data(self.xp * 0.001, self.predgz)
@@ -3742,17 +3736,17 @@ class FaT(wx.Frame):
         area = np.array([xmin, xmax, ymin, ymax])
 
         '#% RUN PLOT MODEL CODE'
-        fig_plot = plot_fig(self.file_path, area, self.xp, self.obs_grav, self.predgz, self.obs_mag, self.prednt,
-                            self.layer_count, self.layer_lock_list, self.plotx_list, self.ploty_list,
+        fig_plot = plot_fig(self.file_path, area, self.xp, self.obs_topo, self.obs_grav, self.predgz, self.obs_mag,
+                            self.prednt, self.layer_count, self.layer_lock_list, self.plotx_list, self.ploty_list,
                             self.densities, self.absolute_densities, self.reference_densities, self.segy_plot_list,
                             self.well_list, self.well_name_list, self.t_canvas, self.d_canvas,
                             self.nt_canvas, self.aspect_ratio, self.use_tight_layout, self.poly_alpha, self.fs,
                             self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons, self.draw_layers,
                             self.floating_layers, self.draw_colorbar, self.draw_xy_data, self.xy_size, self.xy_color,
                             self.colorbar_x, self.colorbar_y, self.colorbar_size_x, self.colorbar_size_y,
-                            self.layer_line_width,
-                            self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min, self.grav_y_max,
-                            self.xy_list_save, self.draw_wells, self.wells, self.well_fs, self.well_line_width)
+                            self.layer_line_width, self.layer_alpha, self.grav_rms_value, self.mag_rms_value,
+                            self.grav_y_min, self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells,
+                            self.well_fs, self.well_line_width)
         del fig_plot
 
         '# %IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER'
@@ -4898,8 +4892,8 @@ class AttributeEditor(wx.Frame):
         # If selection is block...
         if attribute_edit.attr_grid.GetSelectionBlockTopLeft():
             print "Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft())
-        if attribute_edit.attr_grid.GetSelectionBlockBottomRight():
-            print "Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockBottomRight())
+        if attribute_edit.attr_grid.GetSelectionBlockbottomRight():
+            print "Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight())
 
         # If selection is col...
         if attribute_edit.attr_grid.GetSelectedCols():
@@ -4918,9 +4912,9 @@ class AttributeEditor(wx.Frame):
 
     def copy(attribute_edit):
         # Number of rows and cols
-        rows = attribute_edit.attr_grid.GetSelectionBlockBottomRight()[0][0] - \
+        rows = attribute_edit.attr_grid.GetSelectionBlockbottomRight()[0][0] - \
                attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][0] + 1
-        cols = attribute_edit.attr_grid.GetSelectionBlockBottomRight()[0][1] - \
+        cols = attribute_edit.attr_grid.GetSelectionBlockbottomRight()[0][1] - \
                attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][1] + 1
 
         # data variable contain text that must be set in the clipboard

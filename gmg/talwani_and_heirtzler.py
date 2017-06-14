@@ -1,6 +1,6 @@
 """
 Calculate the two-dimensional magnetic field strength of a n-sided polygon using the formula from Talwani, M., &
-Heirtzler, J. R. (1964).
+Heirtzler, J. R. (1964). Polygon is infinte orthogonal to the model cross section.
 
 Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
@@ -9,13 +9,16 @@ Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
 **Components**
 
-* :func:`~fatiando.gravmag.talwani_and_heirtzler.ntz`
+* :func:`~gmg.gravmag.talwani_and_heirtzler.ntz`
 
 **References**
 
 Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused by two dimensional structures of
 arbitrary shape. In: Computers in the mineral industries, Part 1 (ed.) Parks G A, Stanford Univ. Publ., Geol. Sci.
 9 464-480.
+
+Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package 
+for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 ----
 
 """
@@ -37,13 +40,13 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
     * xp, zp : arrays
         The x and z coordinates of the computation points.
     * polygons : list of :func:`~fatiando.mesher.Polygon`
-        The density model used.
-        Polygons must have the property ``'density'``. Polygons that don't have
+        The susceptibility model used.
+        Polygons must have the property ``'susceptibility'``. Polygons that don't have
         this property will be ignored in the computations. Elements of
         *polygons* that are None will also be ignored.
     * susceptibility : float or None
-        If not None, will use this value instead of the ``'susceptibility'`` property
-        of the polygons. Use this, e.g., for sensitivity matrix building.
+    * angle_a : float or None
+    * angle_b : float or None
 
         .. note:: The y coordinate of the polygons is used as z!
         .. note:: Data are numpy arrays
@@ -51,7 +54,7 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
                   at all Xp observation points simultaneously
     Returns:
 
-    * ntT : array
+    * nt_T : array
         The :math:`nt_T` component calculated on the computation points
 
     """

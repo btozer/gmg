@@ -1,6 +1,7 @@
 """
-Calculate the gravitational attraction of a 2D body with polygonal vertical
-cross-section using the formula of Bott et al. (1965)
+Calculate the gravitational attraction of a 2D body defined as a polygon of
+infinte extent orthogonal to the cross section using the method of 
+Bott (1965).
 
 Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
@@ -9,10 +10,14 @@ Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
 **Components**
 
-* :func:`~fatiando.gravmag.bott.gz`
+* :func:`~gmg.gravmag.bott.gz`
 
 **References**
 
+Bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
+
+Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package 
+for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 
 """
 import numpy
@@ -39,8 +44,6 @@ def Gz(xp, zp, polygons, dens=None):
         this property will be ignored in the computations. Elements of
         *polygons* that are None will also be ignored.
     * dens : float or None
-        If not None, will use this value instead of the ``'density'`` property
-        of the polygons. Use this, e.g., for sensitivity matrix building.
 
         .. note:: The y coordinate of the polygons is used as z!
         .. note:: Data are numpy arrays
@@ -53,7 +56,7 @@ def Gz(xp, zp, polygons, dens=None):
 
     """
 
-    anomaly = numpy.zeros_like(xp)
+    g_z = numpy.zeros_like(xp)
     for polygon in polygons:
         if polygon is None or ('density' not in polygon.props and dens is None):
             continue
@@ -76,7 +79,7 @@ def Gz(xp, zp, polygons, dens=None):
                 xvp1 = x[v + 1] - xp
                 zvp1 = z[v + 1] - zp
 
-            # %Bott ALGORITHM
+            # %RUN Bott ALGORITHM
             theta = -1*arctan2((zvp1 - zv), (xvp1 - xv))
             phi_1 = arctan2(zv, xv)
             phi_2 = arctan2(zvp1, xvp1)
@@ -85,6 +88,7 @@ def Gz(xp, zp, polygons, dens=None):
 
             tmp = -(((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2/r1)) +
                     (cos(theta)) * (phi_2-phi_1)) + ((zvp1*phi_2) - (zv*phi_1)))
-            anomaly = anomaly + tmp * density
-    anomaly = anomaly * SI2MGAL * 2.0 * G
-    return anomaly
+
+            g_z = g_z + tmp * density
+    g_z = g_z * SI2MGAL * 2.0 * G
+    return g_z

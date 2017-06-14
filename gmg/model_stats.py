@@ -9,17 +9,17 @@ import numpy as np
 from numpy import mean, sqrt, square
 
 def rms(obs_x, obs_y, calc_x, calc_y):
-    """#% CALCUATE RMS MISFIT BETWEEN OBSERVED AND CALCULATED VALUES"""
+    """#% CALCULATE RMS MISFIT BETWEEN OBSERVED AND CALCULATED VALUES"""
 
-    '# % interpolate the values of the calculated anomaly at the observed sample points'
+    '# %INTERPOLATE THE VALUES OF THE CALCULATED ANOMALY AT THE OBSERVED SAMPLE POINTS'
     f = interpolate.interp1d(calc_x, calc_y)  # %create interpolation func for calculated data
     intp_calc_y = f(obs_x)  # %interpolate calc data onto obs X points
 
-    '# %calculate the residuals'
+    '# %CALCULATE THE RESIDUALS'
     res = (obs_y - intp_calc_y)
     residuals = np.column_stack((obs_x, res))
 
-    '# %calculate the rms value'
+    '# %CALCULATE THE RMS VALUE'
     rms = round(sqrt(mean(square(res))), 2)
 
     return rms, residuals
