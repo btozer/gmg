@@ -59,12 +59,12 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
 
     """
 
-    # %INITIALISE ARRAYS
+    '# %INITIALISE ARRAYS'
     VASUM = np.zeros_like(xp)
     HASUM = np.zeros_like(xp)
     TASUM = np.zeros_like(xp)
 
-    # %SET POLYGON NUMBER
+    '# %SET POLYGON NUMBER'
     i = 0
     for polygon in polygons:
 
@@ -75,7 +75,7 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
         if C == 0.0:  # %IF C = 0 THEN SKIP THIS POLYGON; ELSE RUN THE CODE
             continue
         else:
-            # %DETERMINE ANGLES IN RADIANS
+            '# %DETERMINE ANGLES IN RADIANS'
             print remanence[i]
             if remanence[i] == 1:
                 inclination = angle_a[i]
@@ -95,11 +95,11 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
             PSUM  = np.zeros_like(xp)
             QSUM  = np.zeros_like(xp)
 
-            # %SET VERTICE
+            '# %SET VERTICE'
             for v in range(0, nverts):
                 xv = x[v] - xp
                 zv = z[v] - zp
-                # %SET NEXT VERT: THE LAST VERTICE PAIRS WITH THE FIRST ONE
+                '# %SET NEXT VERT: THE LAST VERTICE PAIRS WITH THE FIRST ONE'
                 if v == nverts - 1:
                     xv2 = x[0] - xp
                     zv2 = z[0] - zp
@@ -107,7 +107,7 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
                     xv2 = x[v + 1] - xp
                     zv2 = z[v + 1] - zp
 
-                # %RUN ALGORITHM
+                '# %RUN ALGORITHM'
                 R1s = (xv**2)+(zv**2)
                 theta = np.arctan2(zv, xv)
                 R2s = (xv2**2)+(zv2**2)
@@ -115,13 +115,13 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
                 thetad = theta-thetab
                 X1_2 = xv-xv2
                 Z2_1 = zv2-zv
-                XSQ  = X1_2**2
-                ZSQ  = Z2_1**2
-                XZ   = Z2_1 * X1_2
-                GL   =0.5 * np.log(R2s/R1s)
+                XSQ = X1_2**2
+                ZSQ = Z2_1**2
+                XZ = Z2_1 * X1_2
+                GL = 0.5 * np.log(R2s/R1s)
 
-                P    = ((ZSQ/(XSQ+ZSQ))*thetad)+((XZ/(XSQ+ZSQ))*GL)
-                Q    = ((XZ/(XSQ+ZSQ))*thetad)-((ZSQ/(XSQ+ZSQ))*GL)
+                P = ((ZSQ/(XSQ+ZSQ))*thetad)+((XZ/(XSQ+ZSQ))*GL)
+                Q = ((XZ/(XSQ+ZSQ))*thetad)-((ZSQ/(XSQ+ZSQ))*GL)
                 P[zv == zv2] = 0
                 Q[zv == zv2] = 0
 

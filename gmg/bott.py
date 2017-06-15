@@ -20,12 +20,13 @@ Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), F
 for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 
 """
+
 import numpy
 from numpy import arctan2, sin, cos, log
 from fatiando.constants import G, SI2MGAL
 
-def Gz(xp, zp, polygons, dens=None):
 
+def Gz(xp, zp, polygons, dens=None):
 
     """
     Calculates the :math:`g_z` gravity acceleration component.
@@ -68,10 +69,10 @@ def Gz(xp, zp, polygons, dens=None):
         z = polygon.y
         nverts = polygon.nverts
         for v in xrange(nverts):
-            # %Change the coordinates of this vertice
+            '# %CHANGE THE COORDINATES OF THIS VERTICE'
             xv = x[v] - xp
             zv = z[v] - zp
-            # %The last vertice pairs with the first one
+            '# %THE LAST VERTICE PAIRS WITH THE FIRST ONE'
             if v == nverts - 1:
                 xvp1 = x[0] - xp
                 zvp1 = z[0] - zp
@@ -79,14 +80,14 @@ def Gz(xp, zp, polygons, dens=None):
                 xvp1 = x[v + 1] - xp
                 zvp1 = z[v + 1] - zp
 
-            # %RUN Bott ALGORITHM
+            '# %RUN BOTT ALGORITHM'
             theta = -1*arctan2((zvp1 - zv), (xvp1 - xv))
             phi_1 = arctan2(zv, xv)
             phi_2 = arctan2(zvp1, xvp1)
             r1 = numpy.sqrt(zv**2 + xv**2)
             r2 = numpy.sqrt(zvp1**2 + xvp1**2)
 
-            tmp = -(((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2/r1)) +
+            tmp = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2/r1)) +
                     (cos(theta)) * (phi_2-phi_1)) + ((zvp1*phi_2) - (zv*phi_1)))
 
             g_z = g_z + tmp * density

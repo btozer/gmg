@@ -86,15 +86,15 @@ import math as m
 import os
 import sys
 import subprocess
-from obspy.segy.core import readSEGY
-# from obspy.io.segy.segy import _read_segy  # FUTURE
+#from obspy.segy.core import readSEGY
+from obspy.io.segy.segy import _read_segy  # FUTURE
 import cPickle as Pickle
 from scipy import signal
 from fatiando.mesher import Polygon
-from gmg import bott
-from gmg import talwani_and_heirtzler
-from gmg.plot_model import plot_fig
-from gmg.model_stats import rms
+import plot_model
+import bott
+import talwani_and_heirtzler
+import model_stats
 import struct
 import gc
 import webbrowser
@@ -111,7 +111,7 @@ matplotlib.use('WXAgg')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-class FaT(wx.Frame):
+class gmg(wx.Frame):
     """
     Master class for program. Most functions are contained in this Class.
     Sets Panels, sizer's and event bindings.
@@ -123,7 +123,7 @@ class FaT(wx.Frame):
     gui_icons_dir = os.path.dirname(__file__) + '/icons/'
 
     def __init__(self, *args, **kwds):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 'FaT-FM: 2D Geophysical Modelling', size=(1800, 1050))
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg-FM: 2D Geophysical Modelling', size=(1800, 1050))
 
         '# %START AUI WINDOW MANAGER'
         self.mgr = aui.AuiManager()
@@ -182,17 +182,17 @@ class FaT(wx.Frame):
         '# %CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)'
         self.ConsolePanel = wx.Panel(self, -1, size=(1800, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         intro = "###############################################################\r" \
-                "!USE import sys; then sys.FaT.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
+                "!USE import sys; then sys.gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
                 "ctrl+up FOR COMMAND HISTORY                                    \r" \
                 "###############################################################"
-        py_local = {'__app__': 'FaT-FM Application'}
-        sys.FaT = self
+        py_local = {'__app__': 'gmg-FM Application'}
+        sys.gmg = self
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
 
         '# %ADD THE PANES TO THE AUI MANAGER'
         self.mgr.AddPane(self.leftPanel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
-        self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').bottom().Caption("Console"))
+        self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
         self.mgr.Update()
 
         '# %CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)'
@@ -466,7 +466,7 @@ class FaT(wx.Frame):
         help_file = wx.Menu()
         m_help = help_file.Append(-1, "&Documentation...", "Open Documentation html...")
         self.Bind(wx.EVT_MENU, self.open_documentation, m_help)
-        m_about = help_file.Append(-1, "&About...", "About FaT-FM...")
+        m_about = help_file.Append(-1, "&About...", "About gmg-FM...")
         self.Bind(wx.EVT_MENU, self.about_fat, m_about)
         m_legal = help_file.Append(-1, "&Legal...", "Legal...")
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
@@ -640,7 +640,7 @@ class FaT(wx.Frame):
         self.obs_grav_count = 0
         self.background_density = 0
         self.absolute_densities = True
-        self.calc_switch = False
+        self.calc_grav_switch = False
         self.obs_gravity_data_for_rms = []  # %OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.grav_rms_value = 0.  # %TOTAL RMS MISFIT VALUE
         self.grav_residuals = []  # %CALCULATED RESIDUAL
@@ -712,6 +712,7 @@ class FaT(wx.Frame):
         '#%GRAV CANVAS'
         self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=3, colspan=12)
         self.dcanvas.set_ylabel("Grav (mGal)")
+        self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.dcanvas.grid()
         self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         '#%MAG CANVAS'
@@ -886,9 +887,11 @@ class FaT(wx.Frame):
             self.tcanvas.set_ylabel("Topo (m)")
             self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.tcanvas.grid()
+            self.tcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
             '#%GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=3, colspan=12)
             self.dcanvas.set_ylabel("Grav An. (mGal)")
+            self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
             '#%MAG CANVAS'
@@ -1023,14 +1026,14 @@ class FaT(wx.Frame):
 
         if self.dcanvas is not None:
             for x in range(0, len(self.obs_grav_list_save)):
-                if self.obs_grav_list_save[x]:
+                if self.obs_grav_list_save[x] is not None:
                     grav = self.obs_grav_list_save[x]
                     self.obs_grav_list[x] = self.dcanvas.scatter(grav[:, 0], grav[:, 1], marker='o',
                                                                  color=self.colors[self.colors_index], s=5, gid=x)
 
         if self.ntcanvas is not None:
             for x in range(0, len(self.obs_mag_list_save)):
-                if self.obs_mag_list_save[x]:
+                if self.obs_mag_list_save is not None:
                     mag = self.obs_mag_list_save[x]
                     self.obs_mag_list[x] = self.dcanvas.scatter(mag[:, 0], mag[:, 1], marker='o',
                                                                 color=self.colors[self.colors_index], s=5, gid=x)
@@ -1336,7 +1339,6 @@ class FaT(wx.Frame):
                 self.grav_residuals[:, 1] = np.zeros(len(self.obs_gravity_data_for_rms[:, 0]))
                 self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         else:
-            self.calc_switch = False
             self.calc_grav_switch = True
         self.update_layer_data()
         self.update()
@@ -1788,7 +1790,7 @@ class FaT(wx.Frame):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'topography')
         self.load_window.Show(True)
 
-    def open_obs_t(self):
+    def open_obs_t(self, event):
         # % GET VALUES FROM LOAD WINDOW
         obs_t_input = self.load_window.file_path
         self.obs_name = self.load_window.observed_name
@@ -1826,7 +1828,7 @@ class FaT(wx.Frame):
 
     # GRAVITY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def load_obs_g(self):
+    def load_obs_g(self, event):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'gravity')
         self.load_window.Show(True)
 
@@ -1900,7 +1902,7 @@ class FaT(wx.Frame):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'magnetics')
         self.load_window.Show(True)
 
-    def open_obs_m(self, event):
+    def open_obs_m(self):
         # % GET VALUES FROM LOAD WINDOW
         obs_m_input = self.load_window.file_path
         self.obs_mag_name = self.load_window.observed_name
@@ -2106,7 +2108,7 @@ class FaT(wx.Frame):
         open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # the user changed idea
+            return  # %USER CHANGED THEIR MIND
         else:
             well_in = open_file_dialog.GetPath()
             well_name_box = wx.TextEntryDialog(None, 'Name for the new well:')
@@ -2114,7 +2116,7 @@ class FaT(wx.Frame):
 
         self.well_name = well_name_box.GetValue()
         self.well_name_list.append(str(self.well_name))
-        well_data = []
+
         with open(well_in, 'r') as f:
             well_data = [line.strip().split(' ') for line in f]
         self.well_list.append(well_data)
@@ -2122,20 +2124,18 @@ class FaT(wx.Frame):
         '#% CREATE FILE MENU DATA'
         self.well_name_submenu = wx.Menu()
         self.m_wells_submenu.AppendMenu(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
-        print "self.well_count = %s" % self.well_count
         self.well_name_submenu.Append(int(self.well_count) + 2000, 'hide/show')
         self.well_name_submenu.Append(int(self.well_count) + 3000, 'delete well')
         self.Bind(wx.EVT_MENU, self.show_hide_well, id=int(self.well_count) + 2000)
         self.Bind(wx.EVT_MENU, self.delete_well, id=int(self.well_count) + 3000)
-        print "delete ID = %s" % (int(self.well_count) + 3000)
         self.well_count += 1
 
         '#% DRAW WELL'
-        print "length of well_list = %s" % len(self.well_list)
-        print "self.well_count = %s" % self.well_count
-        well_data = np.array(self.well_list[self.well_count - 1])
-        y1 = well_data[0, 1].astype(float) * -1.
-        y2 = well_data[-1, -1].astype(float) + (y1.astype(float))
+        well_data = np.array(self.well_list[self.well_count - 1][1:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
+        y1 = well_data[0, 1].astype(float)
+        y2 = well_data[-1, -1].astype(float)
+        print "y1 = %s" % y1
+        print "y2 = %s" % y2
         well_x_location = well_data[1, 1]
         wellx = (well_x_location, well_x_location)
         welly = (y1, y2)
@@ -2152,7 +2152,7 @@ class FaT(wx.Frame):
         self.well_name_text.append([])
 
         '''#% PLOT WELL HORIZONS'''
-        # % SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
+        '# % SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS'
         self.well_labels.append([])
         self.horizons.append([])
         self.well_labels[self.well_count - 1] = [None] * len(well_data)
@@ -2214,9 +2214,9 @@ class FaT(wx.Frame):
                 self.well_labels_list.append([])
                 continue
             else:
-                well_data = np.array(self.well_list[w])
+                well_data = np.array(self.well_list[w][1:])
                 y1 = well_data[0, 1].astype(float) * -1.
-                y2 = well_data[-1, -1].astype(float) + (y1.astype(float))
+                y2 = well_data[-1, -1].astype(float)
                 well_x_location = well_data[1, 1]
                 wellx = (well_x_location, well_x_location)
                 welly = (y1, y2)
@@ -2275,9 +2275,7 @@ class FaT(wx.Frame):
     def show_hide_well(self, event):
 
         if self.wells[event.Id - 2000][0].get_visible():
-            '''HIDE WELL'''
-            # self.well_list[event.Id-2000] = None
-            # self.well_list_switch[event.Id-2000] = 1
+            '# %HIDE WELL'
             self.wells[event.Id - 2000][0].set_visible(False)
             self.well_name_text[event.Id - 2000].set_visible(False)
             horizons = self.horizons[event.Id - 2000]
@@ -2289,14 +2287,9 @@ class FaT(wx.Frame):
 
             self.update_layer_data()
         else:
-            '''SHOW WELL'''
-            print "event.Id = %s" % event.Id
-            print "currently hidden"
-            # self.well_list[event.Id-2000] = self.well_list_hidden[event.Id-2000]
-            # self.well_list_switch[event.Id-2000] = 0
+            '# %SHOW WELL'
             self.wells[event.Id - 2000][0].set_visible(True)
             self.well_name_text[event.Id - 2000].set_visible(True)
-            print "self.horizons[event.Id-2000] = %s" % self.horizons[event.Id - 2000]
             horizons = self.horizons[event.Id - 2000]
             for i in range(2, len(horizons)):
                 horizons[i][0].set_visible(True)
@@ -2307,7 +2300,6 @@ class FaT(wx.Frame):
             self.update_layer_data()
 
     def delete_well(self, event):
-
         """#% REMOVE PLOT GRAPHICS"""
 
         self.wells[event.Id - 3000][0].set_visible(False)
@@ -2320,12 +2312,12 @@ class FaT(wx.Frame):
         for i in range(2, len(labels)):
             labels[i].set_visible(False)
             labels[i] = "None"
-        '#% SET DATA TO NONEs'
+        '# %SET DATA TO NONEs'
         self.well_list[event.Id - 3000] = "None"
         self.well_name_list[event.Id - 3000] = "None"
         self.wells[event.Id - 3000][0] = "None"
         self.well_name_text[event.Id - 3000] = "None"
-        '#% REMOVE SUBMENU'
+        '# %REMOVE SUBMENU'
         self.m_wells_submenu.DestroyId(event.Id)
         self.update_layer_data()
 
@@ -3371,10 +3363,13 @@ class FaT(wx.Frame):
         self.obs_mag_data_for_rms = set_values.obs_mag_data_for_rms
 
     def model_rms(self, xp):
-        if self.obs_gravity_data_for_rms != [] and self.calc_switch is True:
+        """# %CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
+        print self.obs_gravity_data_for_rms
+        print self.calc_grav_switch
+        if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
             x = xp * 0.001
             y = self.predgz
-            self.grav_rms_value, self.grav_residuals = rms(self.obs_gravity_data_for_rms[:, 0],
+            self.grav_rms_value, self.grav_residuals = model_stats.rms(self.obs_gravity_data_for_rms[:, 0],
                                                            self.obs_gravity_data_for_rms[:, 1], x, y)
         else:
             pass
@@ -3382,11 +3377,12 @@ class FaT(wx.Frame):
         if self.obs_mag_data_for_rms != [] and self.calc_mag_switch is True:
             x = self.xp * 0.001
             y = self.prednt
-            self.mag_rms_value, self.mag_residuals = rms(self.obs_mag_data_for_rms[:, 0],
+            self.mag_rms_value, self.mag_residuals = model_stats.rms(self.obs_mag_data_for_rms[:, 0],
                                                          self.obs_mag_data_for_rms[:, 1], x, y)
         else:
             pass
-
+        print self.grav_rms_value
+        print self.grav_residuals
     # LAYER ATTRIBUTE TABLE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_attribute_table(self, event):
@@ -3579,7 +3575,7 @@ class FaT(wx.Frame):
 
         'REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION'
         '(AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY'
-        if self.calc_switch:
+        if self.calc_grav_switch:
             if len(self.polygons) > 1:
                 for i in range(0, len(self.polygons)):
                     self.polygons[i] = self.polygons[i][::-1]
@@ -3604,7 +3600,8 @@ class FaT(wx.Frame):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     densities_to_use.append(self.density_contrasts[layer])
-            'PASS TO ALGORITHM'
+
+            'PASS TO BOTT ALGORITHM'
             polys = []
             for p, d in zip(polygons_to_use, densities_to_use):
                 polys.append(Polygon(1000 * np.array(p), {'density': d}))
@@ -3624,7 +3621,8 @@ class FaT(wx.Frame):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     susceptibilities_to_use.append(self.susceptibilities[layer])
-            '# %PASS TO ALGORITHM'
+
+            '# %PASS TO TALWANI AND HEIRTZLER ALGORITHM'
             polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
@@ -3637,10 +3635,13 @@ class FaT(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''UPDATE RMS VALUES'''
+        '# %UPDATE RMS VALUES'
+
+        '# % RUN RMS CALC CODE'
         self.model_rms(self.xp)
 
-        if self.obs_gravity_data_for_rms != [] and self.grav_obs_switch is True and self.calc_grav_switch is True \
+        '#% SET GRAV RMS VALUES'
+        if self.obs_gravity_data_for_rms != [] and self.grav_obs_switch == True and self.calc_grav_switch == True \
                 and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         elif self.obs_gravity_data_for_rms is None:
@@ -3648,7 +3649,9 @@ class FaT(wx.Frame):
                                         np.zeros_like(self.obs_gravity_data_for_rms[:, 0]))
         else:
             pass
-        if self.obs_mag_data_for_rms != [] and self.mag_obs_switch is True and self.calc_mag_switch is True \
+
+        '#% SET MAG RMS VALUES'
+        if self.obs_mag_data_for_rms != [] and self.mag_obs_switch == True and self.calc_mag_switch == True \
                 and self.prednt != []:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
         elif self.obs_mag_data_for_rms is None:
@@ -3656,6 +3659,7 @@ class FaT(wx.Frame):
                                        np.zeros_like(self.obs_mag_data_for_rms[:, 0]))
         else:
             pass
+
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3736,17 +3740,19 @@ class FaT(wx.Frame):
         area = np.array([xmin, xmax, ymin, ymax])
 
         '#% RUN PLOT MODEL CODE'
-        fig_plot = plot_fig(self.file_path, area, self.xp, self.obs_topo, self.obs_grav, self.predgz, self.obs_mag,
-                            self.prednt, self.layer_count, self.layer_lock_list, self.plotx_list, self.ploty_list,
-                            self.densities, self.absolute_densities, self.reference_densities, self.segy_plot_list,
-                            self.well_list, self.well_name_list, self.t_canvas, self.d_canvas,
-                            self.nt_canvas, self.aspect_ratio, self.use_tight_layout, self.poly_alpha, self.fs,
-                            self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons, self.draw_layers,
-                            self.floating_layers, self.draw_colorbar, self.draw_xy_data, self.xy_size, self.xy_color,
-                            self.colorbar_x, self.colorbar_y, self.colorbar_size_x, self.colorbar_size_y,
-                            self.layer_line_width, self.layer_alpha, self.grav_rms_value, self.mag_rms_value,
-                            self.grav_y_min, self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells,
-                            self.well_fs, self.well_line_width)
+        fig_plot = plot_model.plot_fig(self.file_path, area, self.xp, self.obs_topo, self.obs_grav, self.predgz,
+                                       self.obs_mag, self.prednt, self.layer_count, self.layer_lock_list,
+                                       self.plotx_list, self.ploty_list, self.densities, self.absolute_densities,
+                                       self.reference_densities, self.segy_plot_list, self.well_list,
+                                       self.well_name_list, self.t_canvas, self.d_canvas, self.nt_canvas,
+                                       self.aspect_ratio, self.use_tight_layout, self.poly_alpha, self.fs,
+                                       self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons,
+                                       self.draw_layers, self.floating_layers, self.draw_colorbar, self.draw_xy_data,
+                                       self.xy_size, self.xy_color, self.colorbar_x, self.colorbar_y,
+                                       self.colorbar_size_x, self.colorbar_size_y, self.layer_line_width,
+                                       self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min,
+                                       self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells, self.well_fs,
+                                       self.well_line_width)
         del fig_plot
 
         '# %IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER'
@@ -3769,7 +3775,7 @@ class FaT(wx.Frame):
 
     def about_fat(self, event):
         """# %SHOW SOFTWARE INFORMATION"""
-        about = "About FaT"
+        about = "About gmg"
         dlg = wx.MessageDialog(self, about, "About", wx.OK | wx.ICON_INFORMATION)
         result = dlg.ShowModal()
         dlg.Destroy()
@@ -3842,9 +3848,10 @@ class FaT(wx.Frame):
         pass
 
     def set_error(self, value):
-        self.error = value
-        self.update_layer_data()
-        self.update()
+        pass
+        # self.error = value
+        # self.update_layer_data()
+        # self.update()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4213,7 +4220,7 @@ class MedianFilterDialog(wx.Dialog):
                                                                           | wx.THICK_FRAME)
         input_panel = wx.Panel(self, -1)
 
-        '# %GET OBSERVED DATA FROM FaT-FM'
+        '# %GET OBSERVED DATA FROM gmg-FM'
         self.obs_grav_name_list = obs_grav_name_list
         self.obs_grav_list_save = obs_grav_list_save
         self.obs_mag_name_list = obs_mag_name_list
@@ -4973,8 +4980,8 @@ class AttributeEditor(wx.Frame):
 '''# %START SOFTWARE'''
 if __name__ == "__main__":
     app = wx.PySimpleApp()
-    fr = wx.Frame(None, title='FaT-FM: 2D Geophysical Forward Modelling')
-    app.frame = FaT()
+    fr = wx.Frame(None, title='gmg-FM: 2D Geophysical Forward Modelling')
+    app.frame = gmg()
     app.frame.CenterOnScreen()
     app.frame.Show()
     app.MainLoop()
