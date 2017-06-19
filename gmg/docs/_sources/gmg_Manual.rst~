@@ -1,0 +1,72 @@
+.. title:: FaT-Foward Modelling
+
+
+.. raw:: html
+
+    <div class="row" style="margin-top: 60px">
+    <div class="col-md-2">
+    </div>
+    <div class="col-md-8">
+    </div>
+    <div class="col-md-2">
+    </div>
+    </div>
+
+    <div class="text-center" style="font-size: 16pt; margin-bottom: 50px;">
+
+
+FaT-Foward Modelling
+
+A Graphical user interface for interpretation and forward modelling of geophysical data
+
+.. raw:: html
+
+    </div>
+
+    <div  align="justify"> 
+    <div class="container-fluid">
+    <div class="row">
+    <div class="col-md-4">
+    <h2>Overview</h2>
+
+
+FaT-FM is designed primarily as a Graphical user interface (GUI) for
+2D forward modelling of gravity and magnetic potential field data.
+FaT-FM can also load SEGY, borehole and point data and hence can be used
+as a full 2D geologic/geophysical profile interpretation package.
+
+FaT-FM is written in python 2.7 using wx.python for GUI implementation.
+FaT-FM makes use of several other open source python packages to preform various 
+tasks (see `References <references.html>`_ for a detailed listing).
+
+.. raw:: html
+
+    </div>
+    <div class="col-md-4">
+    <h2>Documentation</h2>
+
+.. toctree::
+   :maxdepth: 1
+
+   installation
+   gui_manual
+   tutorial
+   references
+   licence
+.. raw:: html
+
+    </div>
+    <div class="col-md-4">
+    <h2>Realase Notes</h2>
+
+Version: Beta-0.1
+
+Urgent bugs:
+
+* 101: New node positions get tangled when there are many nodes in close proximity.
+* 102: Can't delete layers.
+* 103: Adding point data needs work.
+
+Please send comments, feature requests and report all bugs to: bookt@earth.ox.ac.uk
+
+

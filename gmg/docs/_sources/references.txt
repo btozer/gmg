@@ -1,0 +1,48 @@
+.. _references:
+
+**References**
+===============
+
+**Fatiando a Terra**
+
+Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package for
+modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
+
+**Matplotlib**
+
+Hunter, J. D. (2007). Matplotlib: A 2D graphics environment. Computing In Science & Engineering, 9(3),
+90–95. doi:10.5281/zenodo.15423
+
+**SciPy**
+
+Oliphant, T. E. (2007). Python for Scientific Computing Python Overview. Computing In Science & Engineering, 10-20.
+
+**NumPy**
+
+van der Walt, S., Colbert, S. C., and Varoquaux, G. (2011). The NumPy Array: A Structure for Efficient
+Numerical Computation. Computing in Science & Engineering, 13(2):22-30.
+
+**wxPython**
+
+Rappin, N. and Dunn, R. (2006). wxPython in Action. Manning Publications.
+
+**ObsPy**
+
+SEGY viewer from obspy package. obspy.org
+
+Beyreuther, M. R. Barsch, L. Krischer, T. Megies, Y. Behr and J. Wassermann (2010) ObsPy: a python toolbox for
+seismology Seismological Research Letters, 81(3), 530-533
+
+**Gravity Algorithm**
+
+Bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
+
+**Magnetic Algorithm**
+
+Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused by two dimensional structures of
+arbitrary shape, in Parks, G. A., Ed., Computers in the mineral industries, Part 1: Stanford Univ. Publ., Geological
+Sciences, 9, 464-480.
+
+**Icons**
+
+Icons designed using: https://freeiconmaker.com/

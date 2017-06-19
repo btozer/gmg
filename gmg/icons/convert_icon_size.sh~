@@ -1,0 +1,4 @@
+#!/bin/bash
+in=$1
+out=$2
+convert ${in}.png -resize 16x16 ${out}.png

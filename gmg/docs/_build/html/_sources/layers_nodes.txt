@@ -1,0 +1,51 @@
+**3.0 Model Layers**
+====================
+
+3.1 Adding a layer
+------------------
+
+To add a new layer to the model navigate to the *'Layers'* menu and select *'New Layer'*.
+
+.. tip:: the *n* key is the keyboard shortcut for adding a new layer.
+
+You will be prompted with the option of adding a *'New fixed layer'* or a *'New floating layer'*.
+
+**Floating layers:**
+
+Floating layers are polygons that are fully contained within the model space.
+
+.. warning::
+
+    Care must be taken to ensure the start and end nodes of floating layers remain to the left and right of each other respectively.
+    It is possible to cross these nodes over. If this occurs, the calculated potential fields will be erroneous and the sign
+    may be flipped.
+
+**Fixed layers:**
+
+Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basins.
+Fixed layers have fixed boundary nodes that **can only** be moved vertically along the model edges.
+These layers are padded out horizontally from the boundary nodes to 400 km either side of
+the model in order to avoid edge effects.
+
+
+3.2 Adding a New Node to a Layer
+--------------------------------
+
+To add a node to a layer place the mouse cursor at the position where you would like to add the new node and
+press the *'i'* key to insert the new node.
+
+3.3 Deleting a Node From a Layer
+--------------------------------
+
+To delete a node from a layer place the mouse cursor over the node you would like to delete and
+press the *'d'* key to delete the new node.
+
+3.4 Pinching nodes
+------------------
+To pinch a node onto a node of another layer: Press the *p* key to activate pinch mode.
+Now left click to select the node you wish to pinch to another layer, then select the layer which you would like to pinch
+to for editing and then click on the node to pinch to.
+
+Alternatively, multiple nodes can be pinched or depinched simultaneously to either the layer above or layer below
+(as defined in the layer order list) by selecting *'pinch layer'* in the Menubar.
+A distance range over which to pinch/depinch nodes is then required.

@@ -1,0 +1,65 @@
+**1.0 gmg Models**
+=====================
+
+1.1 Creating a New Model
+------------------------
+
+Before creating a new model, it is recommended that you create a directory structure in which you will store and save
+all of the data related to a given model. This can be structured in any way the user wishes but it is recommended that
+you create a new master directory such as::
+
+    mkdir gmg_MODEL
+
+Then open the master directory::
+
+    cd gmg_MODEL
+
+and create the following directory structure::
+
+    mkdir MODELS GRAVITY_DATA MAGNETIC_DATA SEGY_DATA WELL_DATA GEOLOGICAL_DATA POINT_DATA EXPORTS FIGURES
+
+Now you are ready to create your model. Launch gmg and navigate to:
+
+File -> New Model...
+
+You will be prompted by a window in which to enter the new models dimensions and the spacing
+increment at which potential field data is to be calculated (all units are km).
+
+.. Tip::
+
+    The model dimensions and spacing at which potential field data is calculated can be modified later by using the
+    Model View -> Modify current Model Dimensions... option.
+
+.. Tip::
+
+    If a very high spatial resolution is required for predicted anomalies, it may be computationally beneficial to set
+    the  spacing at which  potential field data is to be calculated as a relatively coarse value for initial modelling
+    and later reduce this to the dense spacing that is required for the final model. This will prevent unnecessarily
+    slowing the software down during initial modelling.
+
+
+1.2 Saving a Model
+------------------
+
+To save a model navigate to Files -> Save Model...
+This is prompt a save file menu from which you can navigate to the directory where you would like to dave your model,
+for example gmg_MODEL/MODELS/
+
+gmg models are saved as python Pickle files and must have a ".model" suffix, for example,
+gmg_MODEL/MODELS/gmg_model_1.model
+
+
+.. Tip::
+
+    It is recommended that the user incrementally saves updated models with a new suffix such as model_1.model,
+    model_2.model...etc
+
+This will ensure you can revert back to previous models if your current model becomes corrupted.
+
+1.2 Loading a Model
+-------------------
+
+To load a model navigate to Files -> Load Model...
+Navigate to your required .model and select Open.
+
+Your model will be loaded into the current gmg window.

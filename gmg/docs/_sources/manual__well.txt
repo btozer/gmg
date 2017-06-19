@@ -1,0 +1,15 @@
+**6.0 Well data**
+=================
+
+**6.1 Loading well data**
+-------------------------
+
+To load observed Well horizons select the *Well* menu in the Menubar and select *Load..**. Or select the load well icon.
+Navigate to the file you wish to load.
+
+.. note::
+    These files should be ASCII text files formatted as shown in the *example1.well* well file.
+
+Once well horizons are loaded into your model, you can increase and decrease the label text size using the slider in the
+left hand menu. Each well can be hidden/shown by selecting the well name under *Well...* in the *Wells* menu.
+

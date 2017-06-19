@@ -111,7 +111,7 @@ matplotlib.use('WXAgg')
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-class gmg(wx.Frame):
+class Gmg(wx.Frame):
     """
     Master class for program. Most functions are contained in this Class.
     Sets Panels, sizer's and event bindings.
@@ -123,7 +123,7 @@ class gmg(wx.Frame):
     gui_icons_dir = os.path.dirname(__file__) + '/icons/'
 
     def __init__(self, *args, **kwds):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg-FM: 2D Geophysical Modelling', size=(1800, 1050))
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
         '# %START AUI WINDOW MANAGER'
         self.mgr = aui.AuiManager()
@@ -182,11 +182,11 @@ class gmg(wx.Frame):
         '# %CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)'
         self.ConsolePanel = wx.Panel(self, -1, size=(1800, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         intro = "###############################################################\r" \
-                "!USE import sys; then sys.gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
+                "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
                 "ctrl+up FOR COMMAND HISTORY                                    \r" \
                 "###############################################################"
-        py_local = {'__app__': 'gmg-FM Application'}
-        sys.gmg = self
+        py_local = {'__app__': 'gmg Application'}
+        sys.Gmg = self
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
 
         '# %ADD THE PANES TO THE AUI MANAGER'
@@ -466,7 +466,7 @@ class gmg(wx.Frame):
         help_file = wx.Menu()
         m_help = help_file.Append(-1, "&Documentation...", "Open Documentation html...")
         self.Bind(wx.EVT_MENU, self.open_documentation, m_help)
-        m_about = help_file.Append(-1, "&About...", "About gmg-FM...")
+        m_about = help_file.Append(-1, "&About...", "About gmg...")
         self.Bind(wx.EVT_MENU, self.about_fat, m_about)
         m_legal = help_file.Append(-1, "&Legal...", "Legal...")
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
@@ -1020,23 +1020,32 @@ class gmg(wx.Frame):
         self.update_layer_data()
         self.update()
 
-        '#% PLOT OBSERVED DATA'
+        '#% PLOT OBSERVED TOPO DATA'
         if self.tcanvas is not None:
             pass
-
+            # for x in xrange(len(self.obs_topo_list_save)):
+            #     if self.obs_topo_list_save[x] is not None:
+            #         topo = self.obs_topo_list_save[x]
+            #         self.obs_topo_list[x] = self.dcanvas.scatter(topo[:, 0], topo[:, 1], marker='o',
+            #                                                      color=self.obs_topo_colors[x], s=5, gid=x)
+        '#% PLOT OBSERVED GRAVITY DATA'
         if self.dcanvas is not None:
-            for x in range(0, len(self.obs_grav_list_save)):
-                if self.obs_grav_list_save[x] is not None:
+            for x in xrange(len(self.obs_grav_list_save)):
+                if len(self.obs_grav_list_save[x]) >= 1:
                     grav = self.obs_grav_list_save[x]
-                    self.obs_grav_list[x] = self.dcanvas.scatter(grav[:, 0], grav[:, 1], marker='o',
-                                                                 color=self.colors[self.colors_index], s=5, gid=x)
-
+                    grav_x = grav[:, 0]
+                    grav_y = grav[:, 1]
+                    self.obs_grav_list[x] = self.dcanvas.scatter(grav_x, grav_y, marker='o',
+                                                                 color=self.obs_grav_colors[x], s=5, gid=x)
+        '#% PLOT OBSERVED MAG DATA'
         if self.ntcanvas is not None:
-            for x in range(0, len(self.obs_mag_list_save)):
-                if self.obs_mag_list_save is not None:
+            for x in range(len(self.obs_mag_list_save)):
+                if len(self.obs_mag_list_save[x]) >= 1:
                     mag = self.obs_mag_list_save[x]
-                    self.obs_mag_list[x] = self.dcanvas.scatter(mag[:, 0], mag[:, 1], marker='o',
-                                                                color=self.colors[self.colors_index], s=5, gid=x)
+                    mag_x = mag[:, 0]
+                    mag_y = mag[:, 1]
+                    self.obs_mag_list[x] = self.dcanvas.scatter(mag_x, mag_y, marker='o',
+                                                                color=self.obs_mag_colors[x], s=5, gid=x)
 
     def size_handler(self):
         """# %CREATE CANVAS BOX"""
@@ -1230,6 +1239,7 @@ class gmg(wx.Frame):
         self.remanent_mag_checkbox.SetValue(self.remanence[self.i])
         self.plotx = self.plotx_list[self.i]
         self.ploty = self.ploty_list[self.i]
+        self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
         self.update_layer_data()
         self.update()
 
@@ -1283,14 +1293,14 @@ class gmg(wx.Frame):
         self.update()
         self.draw()
 
-    def full_extent(self):
+    def full_extent(self, event):
         """# %REDRAW MODEL FRAME WITH FULL EXTENT"""
         self.full_extent_adjustment()
         self.update_layer_data()
         self.update()
         self.draw()
 
-    def full_extent_adjustment(self, event):
+    def full_extent_adjustment(self):
         """# %FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
         if not self.tcanvas.get_visible():
             self.tcanvas.set_visible(True)
@@ -2143,6 +2153,7 @@ class gmg(wx.Frame):
         self.wells[self.well_count - 1] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
         self.well_name_text.append([])
+        '# %PLOT WELL NAME'
         self.well_name_text[self.well_count - 1] = self.mcanvas.annotate(self.well_name, xy=(well_x_location, -0.5),
                                                                          xytext=(well_x_location, -0.5),
                                                                          fontsize=self.well_textsize, weight='bold',
@@ -2158,16 +2169,18 @@ class gmg(wx.Frame):
         self.well_labels[self.well_count - 1] = [None] * len(well_data)
         self.horizons[self.well_count - 1] = [None] * len(well_data)
         for i in range(2, len(well_data)):
-            y = [well_data[i, 1].astype(float) - well_data[0, 1].astype(float),
-                 well_data[i, 1].astype(float) - well_data[0, 1].astype(float)]
+            y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
             x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
+            print "y = %s" % y
+            print "x = %s" % x
+            '# %PLOT HORIZON LINE'
             self.horizons[self.well_count - 1][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-            horizon_y_pos = well_data[i, 1].astype(float) - well_data[0, 1].astype(float) + 0.01
+            horizon_y_pos = well_data[i, 1].astype(float)
             horizon = well_data[i, 0].astype(str)
 
             '#% ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
             if i % 2 == 0:
-                horizon_x_pos = well_data[1, 1].astype(float) - 3.05
+                horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2180,7 +2193,7 @@ class gmg(wx.Frame):
                                                                                            fc="0.8", ec='None'),
                                                                                  clip_on=True)
             else:
-                horizon_x_pos = well_data[1, 1].astype(float) + 3.05
+                horizon_x_pos = well_data[1, 1].astype(float) + 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2215,11 +2228,12 @@ class gmg(wx.Frame):
                 continue
             else:
                 well_data = np.array(self.well_list[w][1:])
-                y1 = well_data[0, 1].astype(float) * -1.
+                y1 = well_data[0, 1].astype(float)
                 y2 = well_data[-1, -1].astype(float)
                 well_x_location = well_data[1, 1]
                 wellx = (well_x_location, well_x_location)
                 welly = (y1, y2)
+
                 self.wells[w] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
                 '''#% PLOT WELL NAME'''
@@ -2236,16 +2250,16 @@ class gmg(wx.Frame):
                 self.well_labels[w] = [None] * len(well_data)
                 self.horizons[w] = [None] * len(well_data)
                 for i in range(2, len(well_data)):
-                    y = [well_data[i, 1].astype(float) - well_data[0, 1].astype(float),
-                         well_data[i, 1].astype(float) - well_data[0, 1].astype(float)]
+                    y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
                     x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
+                    '# %PLOT HORIZON LINE'
                     self.horizons[w][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-                    horizon_y_pos = well_data[i, 1].astype(float) - well_data[0, 1].astype(float) + 0.01
+                    horizon_y_pos = well_data[i, 1].astype(float)
                     horizon = well_data[i, 0].astype(str)
 
                     '#% ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
                     if i % 2 == 0:
-                        horizon_x_pos = well_data[1, 1].astype(float) - 3.05
+                        horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                         self.well_labels[w][i] = self.mcanvas.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
                                                                        xytext=(horizon_x_pos, horizon_y_pos),
                                                                        fontsize=self.well_textsize,
@@ -2256,7 +2270,7 @@ class gmg(wx.Frame):
                                                                                  ec='None'),
                                                                        clip_on=True)
                     else:
-                        horizon_x_pos = well_data[1, 1].astype(float) + 3.05
+                        horizon_x_pos = well_data[1, 1].astype(float) + 1.05
                         self.well_labels[w][i] = self.mcanvas.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
                                                                        xytext=(horizon_x_pos, horizon_y_pos),
                                                                        fontsize=self.well_textsize,
@@ -2935,6 +2949,7 @@ class gmg(wx.Frame):
                 self.ploty = self.ploty_list[self.i]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
                 self.update()
             else:
@@ -2951,6 +2966,7 @@ class gmg(wx.Frame):
                 self.ploty = self.ploty_list[self.i]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
                 self.update()
 
@@ -2969,6 +2985,7 @@ class gmg(wx.Frame):
                 self.ploty = self.ploty_list[self.i]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
                 self.update()
             else:
@@ -2985,6 +3002,7 @@ class gmg(wx.Frame):
                 self.ploty = self.ploty_list[self.i]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
                 self.update()
             self.draw()
@@ -4220,7 +4238,7 @@ class MedianFilterDialog(wx.Dialog):
                                                                           | wx.THICK_FRAME)
         input_panel = wx.Panel(self, -1)
 
-        '# %GET OBSERVED DATA FROM gmg-FM'
+        '# %GET OBSERVED DATA FROM gmg'
         self.obs_grav_name_list = obs_grav_name_list
         self.obs_grav_list_save = obs_grav_list_save
         self.obs_mag_name_list = obs_mag_name_list
@@ -4980,8 +4998,8 @@ class AttributeEditor(wx.Frame):
 '''# %START SOFTWARE'''
 if __name__ == "__main__":
     app = wx.PySimpleApp()
-    fr = wx.Frame(None, title='gmg-FM: 2D Geophysical Forward Modelling')
-    app.frame = gmg()
+    fr = wx.Frame(None, title='gmg: 2D Geophysical Modelling GUI')
+    app.frame = Gmg()
     app.frame.CenterOnScreen()
     app.frame.Show()
     app.MainLoop()

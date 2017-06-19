@@ -1,0 +1,98 @@
+.. _installation:
+
+**Installation**
+======================
+.. tip::
+    Following the steps listed below should ensure everything that is required to run gmg is installed on your system correctly.
+
+Operating System
+----------------
+.. note::
+    gmg is (for the time being) is only tested and supported on the Ubuntu 14.04 LINUX operating system.
+    Issues may arise when trying to install on other distributions.
+
+Dependencies
+------------
+GMG depends on several other packages to run. These are:
+
+* `numpy <http://numpy.scipy.org/>`_
+* `scipy <http://scipy.org/>`_
+* `matplotlib <http://matplotlib.sourceforge.net/>`_
+* `fatiando a terra <http://www.fatiando.org/>`_
+* `wxpython <http://wiki.wxpython.org/>`_
+* `ObsPy <http://docs.obspy.org/>`_
+
+Each dependency needs to be installed in the correct directory in order for GMG to run. Following the steps below is
+the simplest way to compete the installation.
+
+Step 1:
+-------
+
+The simplest way to get started is to follow the instructions for installing fatiando via the Anaconda
+python package manager as described here:
+
+`Install fatiando <http://www.fatiando.org/install.html/>`_
+
+As explained in the link above, Anaconda is a compilation of python packages/package 
+managing tool that can be used to install additional packages including fatiando, numpy, scipy and matplotlib.
+
+Step 2:
+-------
+
+Install wxPython. On Ubuntu linux the simplest way to ensure you have everything that is required
+is to copy the command below and paste in the command line of a terminal::
+
+    sudo apt-get install python-wxgtk2.8 python-wxtools wx2.8-i18n libwxgtk2.8-dev libgtk2.0-dev
+
+Step 3:
+-------
+Unzip the gmg package into any directory e.g. *~/Downloads*
+
+Open a terminal and navigate to the directory that contains your fatiando installation.
+This is likely to be::
+
+    cd ~/anaconda/lib/python2.7/site-packages/fatiando
+
+Move the gui directory from gmg into the fatiando directory e.g.::
+
+    mv ~/Downloads/gmg/gui .
+
+This directory should contain:
+
+* 1. The script: forward.py (which contains the gmg package)
+* 2. The script: plot_model.py
+* 3. The script: model_stats.py
+* 3. A directory called icons
+
+Navigate to the fatiando gravmag directory using the command::
+
+    cd gravmag
+
+From the gmg directory *gmg/gravmag* copy the following into the *fatiando/gravmag* directory e.g.::
+
+    cp ~/Downloads/gmg/gravmag/*.py .
+
+This will copy:
+
+* 1. The script: talwani.py (NOTE: This will overwrite the default fatiando talwani.py script with some edits)
+* 2. The script: won_and_bevis_mag2d.py
+
+Step 4:
+-------
+In the gmg directory make the *GMG.py* script executable using the command::
+
+    chmod 777 gmg.py
+    
+Now move gmg.py into you */bin* directory or any other directory that is within your *$PATH* variable e.g.::
+
+    sudo mv GMG.py /bin/GMG.py
+
+DONE!
+------
+You should now be able to launch gmg from a terminal by typing *GMG*
+
+.. tip::
+
+    You can also edit your .bashrc file and create a custom launch command for GMG by adding an alias such as::
+    
+        alias GMG='python /bin/GMG.py'

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3.0 Model Layers &#8212; gmg</title>
+    
+    <link rel="stylesheet" href="_static/basic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootswatch-3.3.6/flatly/bootstrap.min.css" type="text/css" />
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-1.11.0.min.js"></script>
+    <script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="4.0 Layer attributes" href="manual__layer_attributes.html" />
+    <link rel="prev" title="2.0 Potential field data" href="manual__PF.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+  </head>
+  <body>
+
+  <div id="navbar" class="navbar navbar-default navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="documentation_home.html">
+          gmg</a>
+        <span class="navbar-text navbar-version pull-left"><b>1.0.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="installation.html">Installation</a></li>
+                <li><a href="manual.html">Manual</a></li>
+                <li><a href="tutorial.html">Tutorial</a></li>
+                <li><a href="contribute.html">Contribute</a></li>
+                <li><a href="references.html">References</a></li>
+                <li><a href="licence.html">Licencing</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="documentation_home.html">Menu <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html"><strong>Installation</strong></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12 content">
+      
+  <div class="section" id="model-layers">
+<h1><strong>3.0 Model Layers</strong><a class="headerlink" href="#model-layers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="adding-a-layer">
+<h2>3.1 Adding a layer<a class="headerlink" href="#adding-a-layer" title="Permalink to this headline">¶</a></h2>
+<p>To add a new layer to the model navigate to the <em>‘Layers’</em> menu and select <em>‘New Layer’</em>.</p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">the <em>n</em> key is the keyboard shortcut for adding a new layer.</p>
+</div>
+<p>You will be prompted with the option of adding a <em>‘New fixed layer’</em> or a <em>‘New floating layer’</em>.</p>
+<p><strong>Floating layers:</strong></p>
+<p>Floating layers are polygons that are fully contained within the model space.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Care must be taken to ensure the start and end nodes of floating layers remain to the left and right of each other respectively.
+It is possible to cross these nodes over. If this occurs, the calculated potential fields will be erroneous and the sign
+may be flipped.</p>
+</div>
+<p><strong>Fixed layers:</strong></p>
+<p>Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basins.
+Fixed layers have fixed boundary nodes that <strong>can only</strong> be moved vertically along the model edges.
+These layers are padded out horizontally from the boundary nodes to 400 km either side of
+the model in order to avoid edge effects.</p>
+</div>
+<div class="section" id="adding-a-new-node-to-a-layer">
+<h2>3.2 Adding a New Node to a Layer<a class="headerlink" href="#adding-a-new-node-to-a-layer" title="Permalink to this headline">¶</a></h2>
+<p>To add a node to a layer place the mouse cursor at the position where you would like to add the new node and
+press the <em>‘i’</em> key to insert the new node.</p>
+</div>
+<div class="section" id="deleting-a-node-from-a-layer">
+<h2>3.3 Deleting a Node From a Layer<a class="headerlink" href="#deleting-a-node-from-a-layer" title="Permalink to this headline">¶</a></h2>
+<p>To delete a node from a layer place the mouse cursor over the node you would like to delete and
+press the <em>‘d’</em> key to delete the new node.</p>
+</div>
+<div class="section" id="pinching-nodes">
+<h2>3.4 Pinching nodes<a class="headerlink" href="#pinching-nodes" title="Permalink to this headline">¶</a></h2>
+<p>To pinch a node onto a node of another layer: Press the <em>p</em> key to activate pinch mode.
+Now left click to select the node you wish to pinch to another layer, then select the layer which you would like to pinch
+to for editing and then click on the node to pinch to.</p>
+<p>Alternatively, multiple nodes can be pinched or depinched simultaneously to either the layer above or layer below
+(as defined in the layer order list) by selecting <em>‘pinch layer’</em> in the Menubar.
+A distance range over which to pinch/depinch nodes is then required.</p>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2016-2017, B. Tozer.<br/>
+      Last updated on Jun 19, 2017.<br/>
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.2.<br/>
+    </p>
+  </div>
+</footer>
+  </body>
+</html>

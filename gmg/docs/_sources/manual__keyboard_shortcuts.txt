@@ -1,0 +1,19 @@
+.. _keys:
+
+**Keyboard Shortcuts**
+=======================
+
+=========== =====================
+Key         Function
+=========== =====================
+**i**       Insert Node
+**d**       Delete Node
+**p**       Pinch Node^
+**>**       Next Layer
+**<**       Previous Layer
+**z**       Zoom
+**a**       Show All (1:1 aspect)
+**shift+p** Pan
+=========== =====================
+
+^Left click selects node to pinch, now change layer and select the node to pinch onto.
