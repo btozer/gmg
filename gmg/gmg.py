@@ -15,7 +15,7 @@ pylab
 pickle
 fatiando
 obspy
-wx
+wxpython
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -99,8 +99,6 @@ import struct
 import gc
 import webbrowser
 
-matplotlib.use('WXAgg')
-
 # FUTURE
 # import wx.EnhancedStatusBar as ESB
 # import wx.lib.agw.ribbon as RB
@@ -139,36 +137,36 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         '# %CREATE PANELS TO FILL WITH LAYER TREE CONTROL, PARAMETER CONTROLS AND FAULT TREE CONTROL'
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 400), style=wx.SP_NOBORDER | wx.EXPAND)
-        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 400),
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 700), style=wx.SP_NOBORDER | wx.EXPAND)
+        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 600),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
         '# %FIRST PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY,
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 300),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 400),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 300),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
 
         '# %SECOND PANE; LEFT PANEL (=ATTRIBUTES)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY,
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 500),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 500),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Attributes", collapsed=True, foldIcons=images)
 
         '# %THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY,
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 50),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 100),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 50),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
 
         '# %SET SPLITTERS'
-        self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three, 200)
-        self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b, 200)
+        self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three, 400)
+        self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b, 300)
 
         self.splitter_left_panel_sizer = wx.BoxSizer(wx.VERTICAL)
         self.splitter_left_panel_sizer.Add(self.leftPanel, 1, wx.EXPAND)
@@ -189,10 +187,12 @@ class Gmg(wx.Frame):
         sys.Gmg = self
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
 
+
         '# %ADD THE PANES TO THE AUI MANAGER'
         self.mgr.AddPane(self.leftPanel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
         self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
+        self.mgr.GetPaneByName('console').Hide()  # HIDE PYTHON CONSOLE BY DEFAULT
         self.mgr.Update()
 
         '# %CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)'
@@ -234,8 +234,11 @@ class Gmg(wx.Frame):
         self.model_saved = False
         self.newmodel = False
 
-        # %BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
+        '# %BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION'
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+        '# %MAXIMIZE FRAME'
+        self.Maximize(True)
 
     def create_menu(self):
         """# %CREATES GUI MENUBAR"""
@@ -1016,10 +1019,6 @@ class Gmg(wx.Frame):
             self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2)
             self.mag_rms_plot, = self.ntcanvas.plot([], [], color='pink', linewidth=1)
 
-        '#% UPDATE FRAMES'
-        self.update_layer_data()
-        self.update()
-
         '#% PLOT OBSERVED TOPO DATA'
         if self.tcanvas is not None:
             pass
@@ -1046,6 +1045,10 @@ class Gmg(wx.Frame):
                     mag_y = mag[:, 1]
                     self.obs_mag_list[x] = self.dcanvas.scatter(mag_x, mag_y, marker='o',
                                                                 color=self.obs_mag_colors[x], s=5, gid=x)
+
+        '#% UPDATE FRAMES'
+        self.update_layer_data()
+        self.update()
 
     def size_handler(self):
         """# %CREATE CANVAS BOX"""
@@ -1597,7 +1600,8 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             self.update()
             self.draw()
-            self.draw_well()
+            self.draw_well()  # DRAW WELLS
+            self.Restore()  # FIX'S DISPLAY ISSUE
 
         except IOError:
             error_message = "IO ERROR IN LOADING PROCESS - MODEL NOT LOADED"
@@ -1611,6 +1615,7 @@ class Gmg(wx.Frame):
     # PLOTTING FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def plot_segy(self):
+        """ PLOT SEGY DATA"""
         self.segy_count = len(self.segy_file_list)
 
         if self.segy_count >= 1:
@@ -1619,7 +1624,7 @@ class Gmg(wx.Frame):
                 if self.segy_name_list[s] != "NaN":
                     file_in = self.segy_file_list[s]
                     self.sx1, self.sx2, self.sz1, self.sz2 = self.segy_dimension_list[s]
-                    section = readSEGY(file_in, unpack_trace_headers=False)
+                    section = _read_segy(file_in, unpack_trace_headers=False)
                     nsamples = len(section.traces[0].data)
                     ntraces = len(section.traces)
                     self.seis_data = plt.zeros((nsamples, ntraces))
@@ -2008,7 +2013,7 @@ class Gmg(wx.Frame):
             self.segy_dimension_list.append(self.d)
             self.segy_file_list.append(file_in)
             self.segy_name_list.append(self.segy_name)
-            section = readSEGY(file_in, unpack_trace_headers=False)
+            section = _read_segy(file_in, unpack_trace_headers=False)
             nsamples = len(section.traces[0].data)
             ntraces = len(section.traces)
             self.seis_data = plt.zeros((nsamples, ntraces))
@@ -2566,7 +2571,6 @@ class Gmg(wx.Frame):
         """
 
         if self.i == self.node_layer_reference:
-            # print self.index_node
             new_x = float(self.x_input.GetValue())
             new_y = float(self.y_input.GetValue())
             xt = np.array(self.plotx)
@@ -2620,6 +2624,9 @@ class Gmg(wx.Frame):
         self.set_remanence(self)
         self.set_angle_a(self)
         self.set_angle_b(self)
+        '#% COLOR CURRENTLY SELECTED NODE RED'
+        self.current_node.set_offsets([new_x, new_y])
+
         self.update_layer_data()
         self.update()
 

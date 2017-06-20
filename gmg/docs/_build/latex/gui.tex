@@ -38,7 +38,7 @@
 
 
 \title{gui Documentation}
-\date{Jun 19, 2017}
+\date{Jun 20, 2017}
 \release{1}
 \author{B. Tozer}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -412,10 +412,10 @@ Model View -\textgreater{} Modify current Model Dimensions… option.
 \end{sphinxadmonition}
 
 \begin{sphinxadmonition}{tip}{Tip:}
-If a very fine spatial resolution (e.g. \textless{} 0.1 km) is required for predicted anomalies, it may be computationally beneficial to set
-the  spacing at which potential field data is to be calculated as a relatively coarse value for initial modelling
-and later reduce this to the fine spacing required for the final model. This will ensure GMG runs smoothly during
-the initial forward modelling.
+If a very fine spatial resolution relative to the length of the model is required for predicted anomalies, it may
+be computationally beneficial to set the  spacing at which potential field data is to be calculated as a relatively
+coarse value for initial modelling and later reduce this to the fine spacing required for the final model. This will
+ensure GMG runs smoothly during the initial forward modelling.
 \end{sphinxadmonition}
 
 \begin{DUlineblock}{0em}
@@ -452,40 +452,14 @@ Navigate to your required .model and select Open.
 Your model will be loaded into the current gmg window.
 
 
-\section{\sphinxstylestrong{2.0 Potential field data}}
-\label{\detokenize{manual__PF:potential-field-data}}\label{\detokenize{manual__PF::doc}}
-
-\subsection{\sphinxstylestrong{2.1 Potential field calculations}}
-\label{\detokenize{manual__PF:potential-field-calculations}}
-The Menubar contains buttons labelled \sphinxstyleemphasis{G} and \sphinxstyleemphasis{M}.
-These are used for switching the calculations of the potential fields on and off. Turing off the predicted anomalies
-can help speed up the GUI response time if the model becomes complex (many layers and nodes).
-
-\begin{sphinxadmonition}{note}{Note:}
-You must set the magnetic inclination and Earth Field value under the \sphinxstyleemphasis{Magnetic Field} menu before
-\end{sphinxadmonition}
-
-the predicted anomaly can be calculated.
-
-
-\subsection{\sphinxstylestrong{2.2 Loading observed potential field data}}
-\label{\detokenize{manual__PF:loading-observed-potential-field-data}}
-To load observed potential field data click on the \sphinxstyleemphasis{Observed} menu in the Menubar and select either
-\sphinxstyleemphasis{Load observed Gravity anomaly} or \sphinxstyleemphasis{Load observed Magnetic anomaly}.
-Next Navigate to the file you want to load and select it.
-The file will automatically be loaded into the canvas.
-
-\begin{sphinxadmonition}{note}{Note:}
-These files should be ASCII text files with X values in the first column and the anomaly value
-\end{sphinxadmonition}
-
-in the second column. These files may have any suffix.
-
-
-\section{\sphinxstylestrong{3.0 Model Layers}}
+\section{\sphinxstylestrong{2.0 Model Layers}}
 \label{\detokenize{manual__layer_nodes:model-layers}}\label{\detokenize{manual__layer_nodes::doc}}
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
 
-\subsection{3.1 Adding a layer}
+
+\subsection{2.1 Adding a layer}
 \label{\detokenize{manual__layer_nodes:adding-a-layer}}
 To add a new layer to the model navigate to the \sphinxstyleemphasis{‘Layers’} menu and select \sphinxstyleemphasis{‘New Layer’}.
 
@@ -499,33 +473,42 @@ You will be prompted with the option of adding a \sphinxstyleemphasis{‘New fix
 
 Floating layers are polygons that are fully contained within the model space.
 
-\begin{sphinxadmonition}{warning}{Warning:}
-Care must be taken to ensure the start and end nodes of floating layers remain to the left and right of each other respectively.
-It is possible to cross these nodes over. If this occurs, the calculated potential fields will be erroneous and the sign
-may be flipped.
-\end{sphinxadmonition}
-
 \sphinxstylestrong{Fixed layers:}
 
 Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basins.
-Fixed layers have fixed boundary nodes that \sphinxstylestrong{can only} be moved vertically along the model edges.
-These layers are padded out horizontally from the boundary nodes to 400 km either side of
-the model in order to avoid edge effects.
+Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
+These layers are padded horizontally from the boundary nodes an additional 400 km in order to avoid edge effects.
+
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
 
 
-\subsection{3.2 Adding a New Node to a Layer}
+\subsection{2.2 Adding a New Node to a Layer}
 \label{\detokenize{manual__layer_nodes:adding-a-new-node-to-a-layer}}
 To add a node to a layer place the mouse cursor at the position where you would like to add the new node and
 press the \sphinxstyleemphasis{‘i’} key to insert the new node.
 
+\begin{sphinxadmonition}{note}{Note:}
+Nodes are inserted to the right of the currently selected node.
+\end{sphinxadmonition}
 
-\subsection{3.3 Deleting a Node From a Layer}
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
+
+
+\subsection{2.3 Deleting a Node From a Layer}
 \label{\detokenize{manual__layer_nodes:deleting-a-node-from-a-layer}}
 To delete a node from a layer place the mouse cursor over the node you would like to delete and
 press the \sphinxstyleemphasis{‘d’} key to delete the new node.
 
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
 
-\subsection{3.4 Pinching nodes}
+
+\subsection{2.4 Pinching nodes}
 \label{\detokenize{manual__layer_nodes:pinching-nodes}}
 To pinch a node onto a node of another layer: Press the \sphinxstyleemphasis{p} key to activate pinch mode.
 Now left click to select the node you wish to pinch to another layer, then select the layer which you would like to pinch
@@ -536,10 +519,14 @@ Alternatively, multiple nodes can be pinched or depinched simultaneously to eith
 A distance range over which to pinch/depinch nodes is then required.
 
 
-\section{\sphinxstylestrong{4.0 Layer attributes}}
+\section{\sphinxstylestrong{3.0 Layer attributes}}
 \label{\detokenize{manual__layer_attributes:layer-attributes}}\label{\detokenize{manual__layer_attributes::doc}}
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
 
-\subsection{4.1 Density}
+
+\subsection{3.1 Density}
 \label{\detokenize{manual__layer_attributes:density}}
 In gmg gravity modelling is achieved using \sphinxstyleemphasis{density contrasts} relative to a \sphinxstyleemphasis{reference density} model
 see XX for details related to choosing a reference model.
@@ -582,8 +569,12 @@ To set all layer reference densities as a single value (e.g. when only modelling
 
 use the \sphinxstyleemphasis{gravity Field} -\textgreater{} \sphinxstyleemphasis{Set background density} tool.
 
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
 
-\subsection{4.2 Magnetic Susceptibility}
+
+\subsection{3.2 Magnetic Susceptibility}
 \label{\detokenize{manual__layer_attributes:magnetic-susceptibility}}
 Susceptibility must be input using SI units.
 
@@ -601,9 +592,51 @@ If the model is orientated West-East and magnetic north is -22 deg the strike of
 If the model was orientated North-South the angle would be 68 deg.
 \end{sphinxadmonition}
 
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
 
-\subsection{4.3 Remenant Magnetism}
+
+\subsection{3.3 Remenant Magnetism}
 \label{\detokenize{manual__layer_attributes:remenant-magnetism}}
+
+\section{\sphinxstylestrong{4.0 Potential field data}}
+\label{\detokenize{manual__PF:potential-field-data}}\label{\detokenize{manual__PF::doc}}
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
+
+
+\subsection{\sphinxstylestrong{4.1 Potential field calculations}}
+\label{\detokenize{manual__PF:potential-field-calculations}}
+The Menubar contains buttons labelled \sphinxstyleemphasis{G} and \sphinxstyleemphasis{M}.
+These are used for switching the calculations of the potential fields on and off. Turing off the predicted anomalies
+can help speed up the GUI response time if the model becomes complex (many layers and nodes).
+
+\begin{sphinxadmonition}{note}{Note:}
+You must set the magnetic inclination and Earth Field value under the \sphinxstyleemphasis{Magnetic Field} menu before
+\end{sphinxadmonition}
+
+the predicted anomaly can be calculated.
+
+\begin{DUlineblock}{0em}
+\item[] 
+\end{DUlineblock}
+
+
+\subsection{\sphinxstylestrong{4.2 Loading observed potential field data}}
+\label{\detokenize{manual__PF:loading-observed-potential-field-data}}
+To load observed potential field data click on the \sphinxstyleemphasis{Observed} menu in the Menubar and select either
+\sphinxstyleemphasis{Load observed Gravity anomaly} or \sphinxstyleemphasis{Load observed Magnetic anomaly}.
+Next Navigate to the file you want to load and select it.
+The file will automatically be loaded into the canvas.
+
+\begin{sphinxadmonition}{note}{Note:}
+These files should be ASCII text files with X values in the first column and the anomaly value
+\end{sphinxadmonition}
+
+in the second column. These files may have any suffix.
+
 
 \section{\sphinxstylestrong{5.0 SEGY data}}
 \label{\detokenize{manual__segy:segy-data}}\label{\detokenize{manual__segy::doc}}

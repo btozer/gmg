@@ -9,11 +9,12 @@
    manual__icons
    manual__keyboard_shortcuts
    manual__models
-   manual__PF
    manual__layer_nodes
    manual__layer_attributes
+   manual__PF
    manual__segy
    manual__wells
    maual__XY_data
    manual__geology
    manual__export_figure
+   manual__python_console

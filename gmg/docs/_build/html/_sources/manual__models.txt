@@ -36,10 +36,10 @@ increment at which potential field data is to be calculated (all units are km).
 
 .. Tip::
 
-    If a very fine spatial resolution (e.g. < 0.1 km) is required for predicted anomalies, it may be computationally beneficial to set
-    the  spacing at which potential field data is to be calculated as a relatively coarse value for initial modelling
-    and later reduce this to the fine spacing required for the final model. This will ensure GMG runs smoothly during
-    the initial forward modelling.
+    If a very fine spatial resolution relative to the length of the model is required for predicted anomalies, it may
+    be computationally beneficial to set the  spacing at which potential field data is to be calculated as a relatively
+    coarse value for initial modelling and later reduce this to the fine spacing required for the final model. This will
+    ensure GMG runs smoothly during the initial forward modelling.
 
 |
 

@@ -1,7 +1,11 @@
-**4.0 Layer attributes**
+========================
+**3.0 Layer attributes**
 ========================
 
-4.1 Density
+|
+
+-----------
+3.1 Density
 -----------
 
 In gmg gravity modelling is achieved using *density contrasts* relative to a *reference density* model
@@ -30,7 +34,10 @@ To model crustal thickened from a reference crustal thickness of 32 km to 36 km,
 .. tip:: To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure)
 use the *gravity Field* -> *Set background density* tool.
 
-4.2 Magnetic Susceptibility
+|
+
+---------------------------
+3.2 Magnetic Susceptibility
 ---------------------------
 
 Susceptibility must be input using SI units.
@@ -50,5 +57,8 @@ A '*strike*' must also be assigned for each unit.
 
     If the model was orientated North-South the angle would be 68 deg.
 
-4.3 Remenant Magnetism
+|
+
+----------------------
+3.3 Remenant Magnetism
 ----------------------

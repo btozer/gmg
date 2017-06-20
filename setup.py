@@ -25,6 +25,7 @@ setup(name='gmg',
       'numpy',
       'fatiando',
       'obspy',
+      'wxpython'
       ],
       include_package_data=True,
       zip_safe=False)

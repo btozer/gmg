@@ -1,8 +1,10 @@
+=================
 **5.0 SEGY data**
-===================
+=================
 
+-------------------------
 **5.1 Loading SEGY data**
-------------------------------
+-------------------------
 
 To load observed SEGY data select the *'SEGY'* menu in the Menubar and select either
 *'Load observed Gravity anomaly'* or *'Load observed Magnetic anomaly'*.
