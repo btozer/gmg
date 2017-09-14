@@ -87,7 +87,7 @@ import os
 import sys
 import subprocess
 #from obspy.segy.core import readSEGY
-from obspy.io.segy.segy import _read_segy  # FUTURE
+from obspy import read  # FUTURE
 import cPickle as Pickle
 from scipy import signal
 from fatiando.mesher import Polygon
@@ -205,22 +205,22 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.show_controls, self.controls_button)
 
         '# %PYTHON CONSOLE'
-        self.console_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'python_1.png'),
+        self.console_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'python_16.png'),
                                               pos=(24, 0), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_console, self.console_button)
 
         '# %TOPOGRAPHY'
-        self.topography_button = GenBitmapButton(self.statusbar, 601, wx.Bitmap(self.gui_icons_dir + '16_g.png'),
+        self.topography_button = GenBitmapButton(self.statusbar, 601, wx.Bitmap(self.gui_icons_dir + 'T_16.png'),
                                                  pos=(48, 0), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.topography_button)
 
         '# %GRAVITY'
-        self.gravity_button = GenBitmapButton(self.statusbar, 602, wx.Bitmap(self.gui_icons_dir + '16_g.png'),
+        self.gravity_button = GenBitmapButton(self.statusbar, 602, wx.Bitmap(self.gui_icons_dir + 'G_16.png'),
                                               pos=(72, 0), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.gravity_button)
 
         '# %MAGNETIC'
-        self.magnetic_button = GenBitmapButton(self.statusbar, 603, wx.Bitmap(self.gui_icons_dir + '16_m.png'),
+        self.magnetic_button = GenBitmapButton(self.statusbar, 603, wx.Bitmap(self.gui_icons_dir + 'M_16.png'),
                                                pos=(96, 0), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
@@ -377,19 +377,19 @@ class Gmg(wx.Frame):
 
         '# %SEISMIC DATA'
         self.seismic_data = wx.Menu()
-        # % SEGY LOAD
+        '# %SEGY LOAD'
         self.m_load_segy = self.seismic_data.Append(-1, "&Load Segy...\tCtrl-y", "Load Segy Data")
         self.Bind(wx.EVT_MENU, self.segy_input, self.m_load_segy)
-        # % SEGY REMOVE_ALL
+        '# % SEGY REMOVE_ALL'
         self.m_remove_all_segy = self.seismic_data.Append(-1, "&Remove All Segy...\tCtrl-y", "Remove All Segy Data")
         self.Bind(wx.EVT_MENU, self.remove_all_segy, self.m_remove_all_segy)
-        # % SEGY NAME LIST
+        '# % SEGY NAME LIST'
         self.m_segy_submenu = wx.Menu()
         self.seismic_data.AppendMenu(-1, 'SEGY Data...', self.m_segy_submenu)
-        # % GAIN
+        '# % GAIN'
         self.m_gain = wx.Menu()
         self.seismic_data.AppendMenu(-1, 'Gain', self.m_gain)
-        # % COLOR PALETTE
+        '# % COLOR PALETTE'
         self.m_color_palette = wx.Menu()
         self.seismic_data.AppendMenu(-1, 'Color Palette', self.m_color_palette)
         self.m_color_palette.Append(901, 'Grey')
@@ -397,13 +397,13 @@ class Gmg(wx.Frame):
         self.m_color_palette.Append(902, 'Sesimic')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=902)
 
-        # % GAIN INCREASE
+        '# % GAIN INCREASE'
         self.m_gain_increase = self.m_gain.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.gain_increase, self.m_gain_increase)
-        # % GAIN DECREASE
+        '# % GAIN DECREASE'
         self.m_gain_decrease = self.m_gain.Append(-1, "Decrease...", "Decrease...")
         self.Bind(wx.EVT_MENU, self.gain_decrease, self.m_gain_decrease)
-        # % DRAW MENU
+        '# % DRAW MENU'
         self.menubar.Append(self.seismic_data, "&Seismic Data")
 
         '# %WELL DATA'
@@ -482,61 +482,64 @@ class Gmg(wx.Frame):
         self.toolbar = self.CreateToolBar()
 
         t_save_model = self.toolbar.AddTool(wx.ID_ANY,
-                                            wx.Bitmap(self.gui_icons_dir + '1_save.png'))
+                                            wx.Bitmap(self.gui_icons_dir + 'save_24.png'))
         self.Bind(wx.EVT_TOOL, self.save_model, t_save_model)
         t_load_model = self.toolbar.AddLabelTool(wx.ID_ANY, 'Load model',
-                                                 wx.Bitmap(self.gui_icons_dir + '1_load.png'))
+                                                 wx.Bitmap(self.gui_icons_dir + 'load_24.png'))
         self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
+        #t_calc_topo = self.toolbar.AddLabelTool(wx.ID_ANY, 'calculate-topo',
+        #                                       wx.Bitmap(self.gui_icons_dir + 'T_24.png'))
+        #self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)
         t_calc_model_bott = self.toolbar.AddLabelTool(wx.ID_ANY, 'calculate-gravity',
-                                                      wx.Bitmap(self.gui_icons_dir + '1_g.png'))
+                                                      wx.Bitmap(self.gui_icons_dir + 'G_24.png'))
         self.Bind(wx.EVT_TOOL, self.calc_grav_switch, t_calc_model_bott)
         t_calc_mag = self.toolbar.AddLabelTool(wx.ID_ANY, 'calculate-magnetic',
-                                               wx.Bitmap(self.gui_icons_dir + '1_m.png'))
+                                               wx.Bitmap(self.gui_icons_dir + 'M_24.png'))
         self.Bind(wx.EVT_TOOL, self.calc_mag_switch, t_calc_mag)
         t_capture_coordinates = self.toolbar.AddLabelTool(wx.ID_ANY, 't_capture_coordinates',
-                                                          wx.Bitmap(self.gui_icons_dir + '1_c.png'))
+                                                          wx.Bitmap(self.gui_icons_dir + 'C_24.png'))
         self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
         t_fault_pick = self.toolbar.AddLabelTool(wx.ID_ANY, 'fault_pick',
-                                                 wx.Bitmap(self.gui_icons_dir + '1_fault.png'))
-        self.Bind(wx.EVT_TOOL, self.start_fault_picker, t_fault_pick)
+                                                 wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'))
+        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
         t_aspect_increase = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-up',
-                                                      wx.Bitmap(self.gui_icons_dir + '1_up.png'))
+                                                      wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'))
         self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
         t_aspect_decrease = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-down',
-                                                      wx.Bitmap(self.gui_icons_dir + '1_down.png'))
+                                                      wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'))
         self.Bind(wx.EVT_TOOL, self.aspect_decrease, t_aspect_decrease)
         t_aspect_increase2 = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-up-2',
-                                                       wx.Bitmap(self.gui_icons_dir + '1_up2.png'))
+                                                       wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'))
         self.Bind(wx.EVT_TOOL, self.aspect_increase2, t_aspect_increase2)
         t_aspect_decrease2 = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-down-2',
-                                                       wx.Bitmap(self.gui_icons_dir + '1_down2.png'))
+                                                       wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'))
         self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
         t_zoom = self.toolbar.AddLabelTool(wx.ID_ANY, 'zoom',
-                                           wx.Bitmap(self.gui_icons_dir + '1_zoom_in.png'))
+                                           wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'))
         self.Bind(wx.EVT_TOOL, self.zoom, t_zoom)
         t_zoom_out = self.toolbar.AddLabelTool(wx.ID_ANY, 'zoom out',
-                                               wx.Bitmap(self.gui_icons_dir + '1_zoom_out.png'))
+                                               wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'))
         self.Bind(wx.EVT_TOOL, self.zoom_out, t_zoom_out)
         t_full_extent = self.toolbar.AddLabelTool(wx.ID_ANY, 'full_extent',
-                                                  wx.Bitmap(self.gui_icons_dir + '1_extent.png'))
+                                                  wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'))
         self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
         t_pan = self.toolbar.AddLabelTool(wx.ID_ANY, 'pan',
-                                          wx.Bitmap(self.gui_icons_dir + '1_pan.png'))
+                                          wx.Bitmap(self.gui_icons_dir + 'pan_24.png'))
         self.Bind(wx.EVT_TOOL, self.pan, t_pan)
         t_gain_down = self.toolbar.AddLabelTool(wx.ID_ANY, 'gain_down',
-                                                wx.Bitmap(self.gui_icons_dir + '1_down_h.png'))
+                                                wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'))
         self.Bind(wx.EVT_TOOL, self.gain_decrease, t_gain_down)
         t_gain_up = self.toolbar.AddLabelTool(wx.ID_ANY, 'gain_up',
-                                              wx.Bitmap(self.gui_icons_dir + '1_up_h.png'))
+                                              wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'))
         self.Bind(wx.EVT_TOOL, self.gain_increase, t_gain_up)
         t_transparency_down = self.toolbar.AddLabelTool(wx.ID_ANY, 'transparency_down',
-                                                        wx.Bitmap(self.gui_icons_dir + '1_down2_h.png'))
+                                                        wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'))
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
         t_transparency_up = self.toolbar.AddLabelTool(wx.ID_ANY, 'transparency_up',
-                                                      wx.Bitmap(self.gui_icons_dir + '1_up2_h.png'))
+                                                      wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'))
         self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
         t_load_well = self.toolbar.AddLabelTool(wx.ID_ANY, 'Load-well-horizons',
-                                                wx.Bitmap(self.gui_icons_dir + '1_well.png'))
+                                                wx.Bitmap(self.gui_icons_dir + 'well_24.png'))
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
 
         self.toolbar.Realize()
@@ -699,6 +702,8 @@ class Gmg(wx.Frame):
         '#% INITIALIZE FAULTS'
         self.faults = [[]]
         self.fault_count = 0
+        self.current_fault = 0
+        self.fault_colors = ['k']
         '#% INITIALIZE COORDINATE CAPTURE'
         self.capture = False
         self.linex = []
@@ -768,6 +773,10 @@ class Gmg(wx.Frame):
             self.current_node = self.mcanvas.scatter(-40000., 0, s=1, color='r')
         else:
             self.nextpoly = []
+
+        '#% INITALISE FAULTS'
+        self.showing_faultline, = self.mcanvas.plot([], [], marker='o', color=self.fault_colors[0],
+                                           linewidth=1.0, alpha=0.5)
 
         '#% MAKE LAYER TREE'
         self.tree = ct.CustomTreeCtrl(self.fold_panel_one, -1, size=(200, 280),
@@ -1624,7 +1633,7 @@ class Gmg(wx.Frame):
                 if self.segy_name_list[s] != "NaN":
                     file_in = self.segy_file_list[s]
                     self.sx1, self.sx2, self.sz1, self.sz2 = self.segy_dimension_list[s]
-                    section = _read_segy(file_in, unpack_trace_headers=False)
+                    section = read(file_in, unpack_trace_headers=False)
                     nsamples = len(section.traces[0].data)
                     ntraces = len(section.traces)
                     self.seis_data = plt.zeros((nsamples, ntraces))
@@ -1750,23 +1759,28 @@ class Gmg(wx.Frame):
             xy_name_box = wx.TextEntryDialog(None, 'Name for the XY data:')
             answer = xy_name_box.ShowModal()
 
-        self.xy_name = xy_name_box.GetValue()
-        self.xy_name_list.append([])
-        self.xy_name_list[self.xy_count] = str(self.xy_name)
+        try:
+            self.xy_name = xy_name_box.GetValue()
+            self.xy_name_list.append([])
+            self.xy_name_list[self.xy_count] = str(self.xy_name)
 
-        self.xy = np.genfromtxt(xy_in, delimiter=' ', dtype=float)
-        self.xy_list_save.append([])
-        self.xy_list_save[self.xy_count] = self.xy
-        self.xy_list.append([])
-        self.xy_list[self.xy_count] = self.mcanvas.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
-                                                           color='b', s=3, gid=self.xy_count)
-        self.colors_index += 1
+            self.xy = np.genfromtxt(xy_in, delimiter=' ', dtype=float)
+            self.xy_list_save.append([])
+            self.xy_list_save[self.xy_count] = self.xy
+            self.xy_list.append([])
+            self.xy_list[self.xy_count] = self.mcanvas.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
+                                                               color='b', s=3, gid=self.xy_count)
+            self.colors_index += 1
 
-        self.obs_submenu = wx.Menu()
-        self.m_xy_submenu.AppendMenu(self.xy_count, self.xy_name, self.obs_submenu)
-        self.obs_submenu.Append(self.xy_count, 'delete observed data')
-        self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count)
-        self.xy_count += 1
+            self.obs_submenu = wx.Menu()
+            self.m_xy_submenu.AppendMenu(self.xy_count, self.xy_name, self.obs_submenu)
+            self.obs_submenu.Append(self.xy_count, 'delete observed data')
+            self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count)
+            self.xy_count += 1
+        except IndexError:
+            error_message = "ERROR IN LOADING PROCESS - FILE MUST BE ASCII SPACE DELIMITED"
+            MessageDialog(self, -1, error_message, "Load Error")
+            raise
 
         self.update_layer_data()
         self.draw()
@@ -2013,7 +2027,7 @@ class Gmg(wx.Frame):
             self.segy_dimension_list.append(self.d)
             self.segy_file_list.append(file_in)
             self.segy_name_list.append(self.segy_name)
-            section = _read_segy(file_in, unpack_trace_headers=False)
+            section = read(file_in, unpack_trace_headers=False)
             nsamples = len(section.traces[0].data)
             ntraces = len(section.traces)
             self.seis_data = plt.zeros((nsamples, ntraces))
@@ -2147,11 +2161,14 @@ class Gmg(wx.Frame):
 
         '#% DRAW WELL'
         well_data = np.array(self.well_list[self.well_count - 1][1:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
-        y1 = well_data[0, 1].astype(float)
+        y1 = well_data[1, 1].astype(float)
         y2 = well_data[-1, -1].astype(float)
+        well_x_location = well_data[0, 1]
+
         print "y1 = %s" % y1
         print "y2 = %s" % y2
-        well_x_location = well_data[1, 1]
+        print "well_x_location = %s" % well_x_location
+
         wellx = (well_x_location, well_x_location)
         welly = (y1, y2)
         self.wells.append([])
@@ -2175,7 +2192,7 @@ class Gmg(wx.Frame):
         self.horizons[self.well_count - 1] = [None] * len(well_data)
         for i in range(2, len(well_data)):
             y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
-            x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
+            x = [well_data[0, 1].astype(float) - 1, well_data[0, 1].astype(float) + 1]
             print "y = %s" % y
             print "x = %s" % x
             '# %PLOT HORIZON LINE'
@@ -2185,7 +2202,7 @@ class Gmg(wx.Frame):
 
             '#% ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
             if i % 2 == 0:
-                horizon_x_pos = well_data[1, 1].astype(float) - 1.05
+                horizon_x_pos = well_data[0, 1].astype(float) - 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2198,7 +2215,7 @@ class Gmg(wx.Frame):
                                                                                            fc="0.8", ec='None'),
                                                                                  clip_on=True)
             else:
-                horizon_x_pos = well_data[1, 1].astype(float) + 1.05
+                horizon_x_pos = well_data[0, 1].astype(float) + 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2565,7 +2582,6 @@ class Gmg(wx.Frame):
             self.draw()
 
     def b_node_set_button(self, event):
-
         """
         #% CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT THEN PASS THIS PART AND ONLY UPDATE ATTRIBUTES
         """
@@ -2645,57 +2661,64 @@ class Gmg(wx.Frame):
         if self.index_node is None:
             return
 
-        xyt = self.polyline.get_xydata()
-        xt, yt = xyt[:, 0], xyt[:, 1]
-        self.x_input.SetValue(xt[self.index_node])
-        self.y_input.SetValue(yt[self.index_node])
+        if self.pick_new_fault is False:
+            '# %IN LAYER MODE'
+            xyt = self.polyline.get_xydata()
+            xt, yt = xyt[:, 0], xyt[:, 1]
+            self.x_input.SetValue(xt[self.index_node])
+            self.y_input.SetValue(yt[self.index_node])
 
-        '#% COLOR CURRENTLY SELECTED NODE RED'
-        self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
+            '# %COLOR CURRENTLY SELECTED NODE RED'
+            self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
-        'If pinch == TRUE pinch the node to next node'
-        if self.pinch:
-            print "pinch_node = true so doing pinch"
-            'Get the node number and layer number and place them in "pinch_node_list" '
-            if self.pinch_count == 0:
-                print "pinch_count = 0"
+            'If pinch == TRUE pinch the node to next node'
+            if self.pinch:
+                print "pinch_node = true so doing pinch"
+                'Get the node number and layer number and place them in "pinch_node_list" '
+                if self.pinch_count == 0:
+                    print "pinch_count = 0"
 
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
-                x1 = np.array(self.plotx)
-                y1 = np.array(self.ploty)
-                self.index_node = self.get_node_under_point(event)
-                self.pinch_node_list[self.pinch_count] = self.index_node[0]
-                self.pinch_node_list[self.pinch_count + 1] = self.i
-                self.pinch_count = + 1
+                    self.plotx = self.plotx_list[self.i]
+                    self.ploty = self.ploty_list[self.i]
+                    x1 = np.array(self.plotx)
+                    y1 = np.array(self.ploty)
+                    self.index_node = self.get_node_under_point(event)
+                    self.pinch_node_list[self.pinch_count] = self.index_node[0]
+                    self.pinch_node_list[self.pinch_count + 1] = self.i
+                    self.pinch_count = + 1
+                    'Set the x and y of the first node as that of the second node'
+                else:
+                    'set the second node x and y'
+                    self.plotx2 = self.plotx_list[self.i]
+                    self.ploty2 = self.ploty_list[self.i]
+                    x2 = np.array(self.plotx2)
+                    y2 = np.array(self.ploty2)
+                    self.index_node = self.get_node_under_point(event)
+                    new_x = x2[int(self.index_node[0])]
+                    new_y = y2[int(self.index_node[0])]
+                    'Set the first node x and y'
+                    self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
+                    self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
+                    x1 = np.array(self.plotx1)
+                    y1 = np.array(self.ploty1)
+                    'Replace the original node with the new node'
+                    x1[int(self.pinch_node_list[0])] = new_x  # replace old x with new x
+                    y1[int(self.pinch_node_list[0])] = new_y  # replace old y with new y
+                    self.plotx_list[int(self.pinch_node_list[1])] = x1
+                    self.ploty_list[int(self.pinch_node_list[1])] = y1
+                    self.pinch_count = 0
+        else:
+            '# %IN FAULT PICKING MODE'
+            xyt = self.polyline.get_xydata()
+            xt, yt = xyt[:, 0], xyt[:, 1]
+            self.x_input.SetValue(xt[self.index_node])
+            self.y_input.SetValue(yt[self.index_node])
 
-                'Set the x and y of the first node as that of the second node'
-            else:
-                'set the second node x and y'
-                self.plotx2 = self.plotx_list[self.i]
-                self.ploty2 = self.ploty_list[self.i]
-                x2 = np.array(self.plotx2)
-                y2 = np.array(self.ploty2)
-                self.index_node = self.get_node_under_point(event)
-                new_x = x2[int(self.index_node[0])]
-                new_y = y2[int(self.index_node[0])]
-                'Set the first node x and y'
-                self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
-                self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
-                x1 = np.array(self.plotx1)
-                y1 = np.array(self.ploty1)
-                'Replace the original node with the new node'
-                x1[int(self.pinch_node_list[0])] = new_x  # replace old x with new x
-                y1[int(self.pinch_node_list[0])] = new_y  # replace old y with new y
-                self.plotx_list[int(self.pinch_node_list[1])] = x1
-                self.ploty_list[int(self.pinch_node_list[1])] = y1
-                self.pinch_count = 0
+            '# %COLOR CURRENTLY SELECTED NODE RED'
+            self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
     def get_node_under_point(self, event):
-
-        """
-        # %GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
-        """
+        """# %GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
 
         if self.nodes is False:
             return
@@ -3795,7 +3818,7 @@ class Gmg(wx.Frame):
     def open_documentation(self, event):
         """# %OPENS DOCUMENTATION HTML"""
         new = 2
-        doc_url = os.path.dirname(__file__) + '/DOCS/_build/html/Manual.html'
+        doc_url = os.path.dirname(__file__) + '/docs/_build/html/manual.html'
         webbrowser.open(doc_url, new=new)
 
     def about_fat(self, event):
@@ -3869,8 +3892,38 @@ class Gmg(wx.Frame):
         #     output = np.column_stack((x_interp_values, deriv))
         #     return output
 
-    def start_fault_picker(self, event):
+    def pick_new_fault(self, event):
         pass
+        # """# %FAULT PICKING"""
+        # if self.fault_picking_switch is True:
+        #     self.fault_picking_switch = False
+        # else:
+        #     self.fault_picking_switch = True
+        #
+        #     current_fault = self.faults[self.fault_count]
+        #     current_fault_x = current_fault[:, 0]
+        #     current_fault_y = current_fault[:, 1]
+        #
+        #     # %LINES
+        #     self.layer_lines[i][0].set_xdata(self.plotx_list[i])
+        #     self.layer_lines[i][0].set_ydata(self.ploty_list[i])
+        #
+        #      # %SET LINE FOR CURRENT LAYER BEING EDITED
+        #     self.showing_faultline.set_xdata(self.plotx)
+        #     self.showing_faultline.set_ydata(self.ploty)
+        #     self.showing_faultline.set_color(self.layer_colors[self.i])
+        #
+        #     ' #% CREATE LAYER LINE'
+        #     current_fault_pick = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
+        #                                                  color='blue', linewidth=1.0, alpha=1.0)
+        #
+        #     '#% Increment the total layer count'
+        #     self.fault_count += 1
+        #
+        #     '#% UPDATE LAYER DATA'
+        #     self.update_layer_data()
+        #     self.update()
+        #     self.draw()
 
     def set_error(self, value):
         pass

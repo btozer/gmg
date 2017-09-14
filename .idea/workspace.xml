@@ -4,45 +4,85 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c5d0ba6-d345-43fa-98b6-b3576e65b555" name="Default" comment="&quot;updated docs&quot;">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/environment.pickle" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/environment.pickle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/objects.inv" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/objects.inv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/environment.pickle" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/environment.pickle" />
+    <list default="true" id="7c5d0ba6-d345-43fa-98b6-b3576e65b555" name="Default" comment="&quot;bug fixes&quot;">
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_back.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_c.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_disk.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_down.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_down2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_extent.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_eye.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_forward.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_g.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_load.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_m.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_save.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_up.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_up2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_well.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_zoom_in.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_zoom_out.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_back.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_c.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_disk.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_down.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_down2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_extent.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_eye.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_forward.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_g.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_load.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_m.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_save.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_up.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_up2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_well.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_zoom_in.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_zoom_out.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_back.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_c.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_disk.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_down.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_down2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_extent.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_eye.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_forward.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_g.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_load.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_m.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_save.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_up.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_up2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_well.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_zoom_in.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_zoom_out.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_back.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_c.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_disk.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down2_h.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down_h.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_extent.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_eye.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_fault.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_forward.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_g.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_load.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_m.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_pan.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_save.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up2.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up2_h.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up_h.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_well.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_zoom_in.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_zoom_out.png" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__PF.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__PF.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__layer_attributes.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__layer_attributes.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__layer_nodes.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__layer_nodes.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__models.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__models.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__segy.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/.doctrees/manual__segy.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual.txt" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__PF.txt" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__PF.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__layer_attributes.txt" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__layer_attributes.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__layer_nodes.txt" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__layer_nodes.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__models.txt" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__models.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__segy.txt" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/_sources/manual__segy.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/documentation_home.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/documentation_home.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/genindex.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/genindex.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/manual.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/manual.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/manual__PF.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/manual__PF.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/manual__layer_attributes.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/manual__layer_attributes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/manual__layer_nodes.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/manual__layer_nodes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/manual__models.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/manual__models.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/manual__segy.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/manual__segy.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/search.html" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/search.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/html/searchindex.js" afterPath="$PROJECT_DIR$/gmg/docs/_build/html/searchindex.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__PF.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__PF.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__layer_attributes.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__layer_attributes.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__layer_nodes.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__layer_nodes.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__models.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__models.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__segy.doctree" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/.doctrees/manual__segy.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_build/latex/gui.tex" afterPath="$PROJECT_DIR$/gmg/docs/_build/latex/gui.tex" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual__PF.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual__PF.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual__layer_attributes.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual__layer_attributes.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual__layer_nodes.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual__layer_nodes.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual__models.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual__models.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MANIFEST.in" afterPath="$PROJECT_DIR$/MANIFEST.in" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/licence.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/licence.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/gmg.py" afterPath="$PROJECT_DIR$/gmg/gmg.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
@@ -53,6 +93,9 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/gmg$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1498148540878" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -65,14 +108,14 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.86559486">
+    <splitter split-orientation="horizontal" split-proportion="0.18125771">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="gmg.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/gmg/gmg.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="427">
-                  <caret line="2622" column="37" lean-forward="false" selection-start-line="2622" selection-start-column="37" selection-end-line="2622" selection-end-column="37" />
+                <state relative-caret-position="458">
+                  <caret line="2585" column="8" lean-forward="false" selection-start-line="2585" selection-start-column="8" selection-end-line="2585" selection-end-column="8" />
                   <folding>
                     <element signature="e#2291#2300#0" expanded="true" />
                   </folding>
@@ -80,85 +123,14 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="manual__segy.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt">
+          <file leaf-file-name="scratch_2.py" pinned="false" current-in-tab="false">
+            <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="0">
-                  <caret line="0" column="17" lean-forward="false" selection-start-line="0" selection-start-column="17" selection-end-line="0" selection-end-column="17" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="manual__models.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__models.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="-38">
-                  <caret line="41" column="36" lean-forward="false" selection-start-line="41" selection-start-column="36" selection-end-line="41" selection-end-column="36" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="manual__PF.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__PF.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="100">
-                  <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="manual__layer_nodes.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__layer_nodes.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="582">
-                  <caret line="53" column="37" lean-forward="false" selection-start-line="53" selection-start-column="37" selection-end-line="53" selection-end-column="37" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="manual__layer_attributes.txt" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__layer_attributes.txt">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="760">
-                  <caret line="38" column="27" lean-forward="false" selection-start-line="38" selection-start-column="27" selection-end-line="38" selection-end-column="27" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="setup.py" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/setup.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="580">
-                  <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/README.md">
-              <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-                <state split_layout="SPLIT">
-                  <first_editor relative-caret-position="20">
-                    <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="45" />
-                    <folding />
-                  </first_editor>
-                  <second_editor />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="README" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/README">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="420">
-                  <caret line="54" column="14" lean-forward="false" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="14" />
-                  <folding />
+                <state relative-caret-position="1240">
+                  <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#0#35#0" expanded="true" />
+                  </folding>
                 </state>
               </provider>
             </entry>
@@ -166,12 +138,12 @@
         </leaf>
       </split-first>
       <split-second>
-        <leaf>
+        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="gmg.py" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/gmg/gmg.py">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="421">
-                  <caret line="1047" column="0" lean-forward="false" selection-start-line="1047" selection-start-column="0" selection-end-line="1047" selection-end-column="0" />
+                <state relative-caret-position="509">
+                  <caret line="2217" column="46" lean-forward="false" selection-start-line="2217" selection-start-column="46" selection-end-line="2217" selection-end-column="46" />
                   <folding>
                     <element signature="e#2291#2300#0" expanded="true" />
                   </folding>
@@ -185,13 +157,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>1.0</find>
-      <find>1.0.0</find>
-      <find>1.0.0-</find>
-      <find>1.0.0-b</find>
-      <find>1.0.0-be</find>
-      <find>1.0.0-bet</find>
-      <find>1.0.0-beta</find>
       <find>1.0.-beta</find>
       <find>1.0.beta</find>
       <find>1.0beta</find>
@@ -205,7 +170,6 @@
       <find>Install</find>
       <find>Installing</find>
       <find>Installing f</find>
-      <find>Installing</find>
       <find>Installing gm</find>
       <find>install</find>
       <find>Installing gmg</find>
@@ -215,6 +179,14 @@
       <find>gmg_Manual</find>
       <find>show_co</find>
       <find>maximize</find>
+      <find>MessageDialog</find>
+      <find>read</find>
+      <find>python</find>
+      <find>faultline</find>
+      <find>polyline</find>
+      <find>self.polyline</find>
+      <find>draw_main_frame</find>
+      <find>start</find>
     </findStrings>
     <replaceStrings>
       <replace>cnorm</replace>
@@ -254,11 +226,14 @@
         <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__keyboard_shortcuts.txt" />
         <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__PF.txt" />
         <option value="$PROJECT_DIR$/gmg/docs/_sources/manual.txt" />
-        <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt" />
         <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__models.txt" />
         <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__layer_nodes.txt" />
         <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__layer_attributes.txt" />
+        <option value="$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt" />
+        <option value="$PROJECT_DIR$/gmg/docs/_sources/licence.txt" />
         <option value="$PROJECT_DIR$/setup.py" />
+        <option value="$PROJECT_DIR$/MANIFEST.in" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py" />
         <option value="$PROJECT_DIR$/gmg/gmg.py" />
       </list>
     </option>
@@ -270,12 +245,13 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="1915" />
-    <option name="width" value="1922" />
-    <option name="height" value="1081" />
+    <option name="x" value="-1" />
+    <option name="y" value="24" />
+    <option name="width" value="1918" />
+    <option name="height" value="1131" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1">
+    <navigator proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -288,43 +264,13 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gmg" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gmg" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gmg" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gmg" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="gmg" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scratches" />
-      <pane id="Scope" />
-    </panes>
+    <panes />
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PythonContentEntriesConfigurable" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.documentation.PythonDocumentationConfigurable" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
+    <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -338,7 +284,26 @@
       </list>
     </option>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.scratch_2">
+    <configuration default="false" name="scratch_2" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="gmg" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <method />
+    </configuration>
     <configuration default="true" type="BashConfigurationType" factoryName="Bash">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="INTERPRETER_PATH" value="/bin/bash" />
@@ -535,6 +500,14 @@
       <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method />
     </configuration>
+    <list size="1">
+      <item index="0" class="java.lang.String" itemvalue="Python.scratch_2" />
+    </list>
+    <recent_temporary>
+      <list size="1">
+        <item index="0" class="java.lang.String" itemvalue="Python.scratch_2" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false">
     <option name="remove_strategy" value="false" />
@@ -565,23 +538,30 @@
       <option name="project" value="LOCAL" />
       <updated>1497570743387</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="&quot;bug fixes&quot;">
+      <created>1497970660703</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1497970660703</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1915" y="0" width="1922" height="1081" extended-state="6" />
+    <frame x="-1" y="24" width="1918" height="1131" extended-state="6" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.15651709" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.11140725" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23469388" sideWeight="0.50213677" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31290323" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3510204" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16897655" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.29354838" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33870968" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13354701" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23469388" sideWeight="0.49786323" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -601,7 +581,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="&quot;updated pip requirements&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;updated pip requirements&quot;" />
+    <MESSAGE value="&quot;bug fixes&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;bug fixes&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -610,14 +591,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/gmg/gui/model_stats.py" />
-    <entry file="file://$PROJECT_DIR$/gmg.egg-info/SOURCES.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gmg.egg-info/dependency_links.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -693,7 +666,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="169">
           <caret line="363" column="32" lean-forward="false" selection-start-line="363" selection-start-column="32" selection-end-line="363" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -729,13 +701,6 @@
     <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/keys.txt" />
     <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/layer_attributes.txt" />
     <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/layers_nodes.txt" />
-    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/licence.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/installation.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -809,7 +774,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -817,39 +781,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
           <caret line="19" column="25" lean-forward="false" selection-start-line="19" selection-start-column="25" selection-end-line="19" selection-end-column="25" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__layer_nodes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="582">
-          <caret line="53" column="37" lean-forward="false" selection-start-line="53" selection-start-column="37" selection-end-line="53" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__PF.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__layer_attributes.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="760">
-          <caret line="38" column="27" lean-forward="false" selection-start-line="38" selection-start-column="27" selection-end-line="38" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="580">
-          <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -858,17 +789,8 @@
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="20">
             <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="45" />
-            <folding />
           </first_editor>
           <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="54" column="14" lean-forward="false" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="14" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -876,15 +798,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="622">
           <caret line="54" column="33" lean-forward="false" selection-start-line="54" selection-start-column="33" selection-end-line="54" selection-end-column="33" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__models.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-38">
-          <caret line="41" column="36" lean-forward="false" selection-start-line="41" selection-start-column="36" selection-end-line="41" selection-end-column="36" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -892,22 +805,86 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="380">
           <caret line="19" column="0" lean-forward="false" selection-start-line="19" selection-start-column="0" selection-end-line="19" selection-end-column="0" />
-          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1080">
+          <caret line="54" column="14" lean-forward="false" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/licence.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1120">
+          <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MANIFEST.in">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="20">
+          <caret line="1" column="6" lean-forward="true" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="440">
+          <caret line="22" column="6" lean-forward="false" selection-start-line="22" selection-start-column="6" selection-end-line="22" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__layer_attributes.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="734">
+          <caret line="38" column="27" lean-forward="false" selection-start-line="38" selection-start-column="27" selection-end-line="38" selection-end-column="27" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__layer_nodes.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="734">
+          <caret line="53" column="37" lean-forward="false" selection-start-line="53" selection-start-column="37" selection-end-line="53" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__PF.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__models.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="734">
+          <caret line="41" column="36" lean-forward="false" selection-start-line="41" selection-start-column="36" selection-end-line="41" selection-end-column="36" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="17" lean-forward="false" selection-start-line="0" selection-start-column="17" selection-end-line="0" selection-end-column="17" />
-          <folding />
+        <state relative-caret-position="320">
+          <caret line="16" column="52" lean-forward="false" selection-start-line="16" selection-start-column="52" selection-end-line="16" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1240">
+          <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#35#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gmg/gmg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="427">
-          <caret line="2622" column="37" lean-forward="false" selection-start-line="2622" selection-start-column="37" selection-end-line="2622" selection-end-column="37" />
+        <state relative-caret-position="509">
+          <caret line="2217" column="46" lean-forward="false" selection-start-line="2217" selection-start-column="46" selection-end-line="2217" selection-end-column="46" />
           <folding>
             <element signature="e#2291#2300#0" expanded="true" />
           </folding>

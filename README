@@ -51,6 +51,10 @@ anaconda python site-packages dir.
 
 pip install gmg
 
+or for local installation
+
+pip install .
+
 #~~~~~~~~~~~~~
 # STARTING GMG
 #~~~~~~~~~~~~~

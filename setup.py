@@ -11,7 +11,7 @@ setup(name='gmg',
       platforms = "Any",
       scripts = [],
       classifiers = [
-      "Intended Audience :: End Users/Desktop",
+       "Intended Audience :: End Users/Desktop",
        "Intended Audience :: Science/Research",
        "Intended Audience :: Developers",
        "Intended Audience :: Education",
