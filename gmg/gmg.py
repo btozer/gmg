@@ -31,9 +31,10 @@ www.fatiando.org/
 ***
 
 ***
-Gravity algorithm written using NumPy by Brook Tozer (2015).
+Gravity algorithm written using NumPy by Brook Tozer (2015) (Modified from the Fatiando a Terra grav code).
 
 CODE MODIFIED FROM: bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
+
 ***
 
 ***
@@ -45,7 +46,7 @@ Geological Sciences, 9, 464-480.
 ***
 
 ***
-SEGY plotting from ObsPy.
+SEGY plotting is preformed using ObsPy.
 
 ObsPy; a python toolbox for seismology Seismological Research Letters(May 2010), 81(3):530-533
 
@@ -111,7 +112,8 @@ import webbrowser
 
 class Gmg(wx.Frame):
     """
-    Master class for program. Most functions are contained in this Class.
+    Master class for program.
+    Most functions are contained in this Class.
     Sets Panels, sizer's and event bindings.
     Additional classes are used for "pop out" windows (Dialog boxes).
     Objects are passed between the master class and Dialog boxes.
@@ -2160,10 +2162,10 @@ class Gmg(wx.Frame):
         self.well_count += 1
 
         '#% DRAW WELL'
-        well_data = np.array(self.well_list[self.well_count - 1][1:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
-        y1 = well_data[1, 1].astype(float)
+        well_data = np.array(self.well_list[self.well_count - 1][0:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
+        y1 = well_data[0, 1].astype(float)
         y2 = well_data[-1, -1].astype(float)
-        well_x_location = well_data[0, 1]
+        well_x_location = well_data[1, 1]
 
         print "y1 = %s" % y1
         print "y2 = %s" % y2
@@ -2192,7 +2194,7 @@ class Gmg(wx.Frame):
         self.horizons[self.well_count - 1] = [None] * len(well_data)
         for i in range(2, len(well_data)):
             y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
-            x = [well_data[0, 1].astype(float) - 1, well_data[0, 1].astype(float) + 1]
+            x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
             print "y = %s" % y
             print "x = %s" % x
             '# %PLOT HORIZON LINE'
@@ -2202,7 +2204,7 @@ class Gmg(wx.Frame):
 
             '#% ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
             if i % 2 == 0:
-                horizon_x_pos = well_data[0, 1].astype(float) - 1.05
+                horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2215,7 +2217,7 @@ class Gmg(wx.Frame):
                                                                                            fc="0.8", ec='None'),
                                                                                  clip_on=True)
             else:
-                horizon_x_pos = well_data[0, 1].astype(float) + 1.05
+                horizon_x_pos = well_data[1, 1].astype(float) + 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2249,7 +2251,8 @@ class Gmg(wx.Frame):
                 self.well_labels_list.append([])
                 continue
             else:
-                well_data = np.array(self.well_list[w][1:])
+
+                well_data = np.array(self.well_list[w][0:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
                 y1 = well_data[0, 1].astype(float)
                 y2 = well_data[-1, -1].astype(float)
                 well_x_location = well_data[1, 1]
