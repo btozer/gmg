@@ -2916,9 +2916,11 @@ class Gmg(wx.Frame):
             for x in range(0, self.layer_count + 1):  # %LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
                 if x == self.i:
                     pass
-                node_list = self.plotx_list[x]
-                for i in range(0, len(node_list)):
-                    if node_list[i] == xt[self.index_arg]:
+                x_node_list = self.plotx_list[x]
+                y_node_list = self.ploty_list[x]
+                for i in range(0, len(x_node_list)):
+                    # %NOW CHECK X AND Y VALUES ARE EQUAL
+                    if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
                         # %IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
                         self.index_arg2_list[x] = i
                         self.pinch_switch = 1

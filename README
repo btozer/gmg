@@ -44,12 +44,22 @@ This should ensure you can install all the dependencies required  on
 any platform (Linux, Mac, Windows) using the Conda package manager.
 
 
+<<<<<<< HEAD
 Then gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
 
 The following command will install GMG and all of its dependencies 
 within your local anaconda python site-packages dir.
+=======
+Using pip all of the gmg dependencies can be installed.
 
-pip install gmg
+This will install and all of its dependencies with your local
+anaconda python site-packages dir.
+>>>>>>> e864e7fac8360f691cde142b82baa976c5b45356
+
+gmg can then be installed by running the following command in the dir where you have the source code downloaded. 
+This will install gmg into your local anaconda python site-packages dir.
+
+pip install .
 
 or for a local installation
 
@@ -66,6 +76,7 @@ alias gmg='python ~/anaconda/lib/python2.7/site-packages/gmg/gmg.py'
 
 Now on the command line simply type gmg to launch the software.
 
+<<<<<<< HEAD
 #################
 #GETTING STARTED#
 #################
@@ -86,6 +97,25 @@ below in the section SUGGESTIONS & BUG REPORTING.
 
 Once the test cases have been run (and work) the easiest way to get a feel for the 
 software is run through the tutorial as described in the documentation.
+=======
+%% FOR BTHE FUTURE
+%%#################
+%%#GETTING STARTED#
+%%#################
+%%
+%%It is recommended you run the two test cases when first launching the software
+%%to check the potential field algorithms are running correctly.
+%%Details can be found in the documentation. This can be accessed from within
+%%the software:
+%%Help -> Documentation
+%%or
+%%by opening gmg/gmg/docs/Manual.html
+%%
+%%If the test cases do not work as expected, please submit a bug report as described below.
+%%
+%%Once the test cases have been run (and work) the easiest way to get a feel for the 
+%%software is run through the tutorial as described in the documentation.
+>>>>>>> e864e7fac8360f691cde142b82baa976c5b45356
 
 
 ##############

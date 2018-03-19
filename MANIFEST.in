@@ -1,2 +1,2 @@
+recursive-include gmg/docs/_build/html *
 include gmg/icons/*
-recursive-include gmg/docs/*

@@ -4,88 +4,11 @@
     <option name="SCOPE_TYPE" value="3" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7c5d0ba6-d345-43fa-98b6-b3576e65b555" name="Default" comment="&quot;bug fixes&quot;">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_back.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_c.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_disk.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_down.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_down2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_extent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_eye.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_forward.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_g.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_load.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_m.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_save.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_up.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_up2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_well.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_zoom_in.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_1_zoom_out.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_back.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_c.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_disk.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_down.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_down2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_extent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_eye.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_forward.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_g.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_load.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_m.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_save.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_up.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_up2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_well.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_zoom_in.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_1_zoom_out.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_back.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_c.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_disk.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_down.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_down2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_extent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_eye.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_forward.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_g.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_load.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_m.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_save.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_up.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_up2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_well.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_zoom_in.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_1_zoom_out.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_back.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_c.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_disk.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down2_h.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_down_h.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_extent.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_eye.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_fault.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_forward.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_g.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_load.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_m.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_pan.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_save.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up2.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up2_h.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_up_h.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_well.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_zoom_in.png" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/gmg/icons/1_zoom_out.png" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/MANIFEST.in" afterPath="$PROJECT_DIR$/MANIFEST.in" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/licence.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/licence.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt" afterPath="$PROJECT_DIR$/gmg/docs/_sources/manual__segy.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gmg/gmg.py" afterPath="$PROJECT_DIR$/gmg/gmg.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
+    <list default="true" id="7c5d0ba6-d345-43fa-98b6-b3576e65b555" name="Default" comment="&quot;well loading fixed&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/MANIFEST.in" afterPath="$PROJECT_DIR$/MANIFEST.in" />
+      <change beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
+      <change beforePath="$PROJECT_DIR$/gmg/gmg.py" afterPath="$PROJECT_DIR$/gmg/gmg.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -95,7 +18,8 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/gmg$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1498148540878" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/gmg$scratch_2.coverage" NAME="scratch_2 Coverage Results" MODIFIED="1508587152283" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
+    <SUITE FILE_PATH="coverage/gmg$scratch_3.coverage" NAME="scratch_3 Coverage Results" MODIFIED="1509985315476" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_CONFIG_DIR$/scratches" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -106,58 +30,22 @@
     <option name="SHOW_EMPTY_GROUPS" value="false" />
     <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.18125771">
-      <split-first>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="gmg.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/gmg/gmg.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="458">
-                  <caret line="2585" column="8" lean-forward="false" selection-start-line="2585" selection-start-column="8" selection-end-line="2585" selection-end-column="8" />
-                  <folding>
-                    <element signature="e#2291#2300#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="scratch_2.py" pinned="false" current-in-tab="false">
-            <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1240">
-                  <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#0#35#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-first>
-      <split-second>
-        <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-          <file leaf-file-name="gmg.py" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/gmg/gmg.py">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="509">
-                  <caret line="2217" column="46" lean-forward="false" selection-start-line="2217" selection-start-column="46" selection-end-line="2217" selection-end-column="46" />
-                  <folding>
-                    <element signature="e#2291#2300#0" expanded="true" />
-                  </folding>
-                </state>
-              </provider>
-            </entry>
-          </file>
-        </leaf>
-      </split-second>
-    </splitter>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="MANIFEST.in" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/MANIFEST.in">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="18">
+              <caret line="1" column="6" lean-forward="false" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>1.0.-beta</find>
       <find>1.0.beta</find>
       <find>1.0beta</find>
       <find>1.beta</find>
@@ -187,6 +75,7 @@
       <find>self.polyline</find>
       <find>draw_main_frame</find>
       <find>start</find>
+      <find>FigureCanvas</find>
     </findStrings>
     <replaceStrings>
       <replace>cnorm</replace>
@@ -234,6 +123,8 @@
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/MANIFEST.in" />
         <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py" />
+        <option value="$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py" />
+        <option value="$PROJECT_DIR$/README" />
         <option value="$PROJECT_DIR$/gmg/gmg.py" />
       </list>
     </option>
@@ -245,13 +136,13 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1" />
-    <option name="y" value="24" />
-    <option name="width" value="1918" />
-    <option name="height" value="1131" />
+    <option name="x" value="194" />
+    <option name="y" value="196" />
+    <option name="width" value="1554" />
+    <option name="height" value="796" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -264,13 +155,33 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="gmg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gmg" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gmg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gmg" type="462c0819:PsiDirectoryNode" />
+              <item name="gmg" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+      <pane id="Scratches" />
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.documentation.PythonDocumentationConfigurable" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="run.code.analysis.last.selected.profile" value="aDefault" />
     <property name="com.intellij.ide.scratch.LRUPopupBuilder$2/Languages" value="Python" />
+    <property name="last_opened_file_path" value="$USER_HOME$/git/bin/airy_backstrip.py" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -284,8 +195,27 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.scratch_2">
-    <configuration default="false" name="scratch_2" type="PythonConfigurationType" factoryName="Python" temporary="true">
+  <component name="RunManager" selected="Python.scratch_3">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="gmg" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="scratch_2" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -302,7 +232,26 @@
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
-      <method />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="scratch_3" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$APPLICATION_CONFIG_DIR$/scratches" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="gmg" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
     </configuration>
     <configuration default="true" type="BashConfigurationType" factoryName="Bash">
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -377,25 +326,6 @@
       <module name="gmg" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
       <option name="ADDITIONAL_ARGS" value="" />
-      <method />
-    </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <module name="gmg" />
-      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
       <method />
     </configuration>
     <configuration default="true" type="Tox" factoryName="Tox">
@@ -498,14 +428,15 @@
       <option name="_new_additionalArguments" value="&quot;&quot;" />
       <option name="_new_target" value="&quot;.&quot;" />
       <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method />
     </configuration>
-    <list size="1">
+    <list size="2">
       <item index="0" class="java.lang.String" itemvalue="Python.scratch_2" />
+      <item index="1" class="java.lang.String" itemvalue="Python.scratch_3" />
     </list>
     <recent_temporary>
-      <list size="1">
-        <item index="0" class="java.lang.String" itemvalue="Python.scratch_2" />
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Python.scratch_3" />
+        <item index="1" class="java.lang.String" itemvalue="Python.scratch_2" />
       </list>
     </recent_temporary>
   </component>
@@ -515,6 +446,9 @@
   <component name="StructureViewFactory">
     <option name="AUTOSCROLL_MODE" value="false" />
     <option name="ACTIVE_ACTIONS" value=",SHOW_FIELDS,SHOW_INHERITED" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -545,32 +479,42 @@
       <option name="project" value="LOCAL" />
       <updated>1497970660703</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="&quot;well loading fixed&quot;">
+      <created>1505407068538</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1505407068539</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1" y="24" width="1918" height="1131" extended-state="6" />
+    <frame x="194" y="196" width="1554" height="796" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.11140725" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23469388" sideWeight="0.50213677" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5346939" sideWeight="0.428953" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Documentation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1591512" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" x="0" y="0" width="426" height="928" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3122449" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23029682" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="FLOATING" visible="false" show_stripe_button="true" weight="0.45035824" sideWeight="0.571047" order="9" side_tool="false" content_ui="tabs" x="60" y="368" width="1860" height="440" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14655173" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32995737" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31290323" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33870968" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13354701" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23469388" sideWeight="0.49786323" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="SciView" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25160256" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33777776" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection Results" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33777776" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32903227" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -582,29 +526,23 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="&quot;updated pip requirements&quot;" />
     <MESSAGE value="&quot;bug fixes&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;bug fixes&quot;" />
+    <MESSAGE value="&quot;well loading fixed&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;well loading fixed&quot;" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py</url>
+          <line>40</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/gmg.egg-info/dependency_links.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg.egg-info/not-zip-safe">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gmg.egg-info/pbr.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -630,20 +568,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg/model_stats.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="100">
-          <caret line="7" column="17" lean-forward="false" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gmg/bott.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="73" column="26" lean-forward="false" selection-start-line="73" selection-start-column="26" selection-end-line="73" selection-end-column="26" />
         </state>
       </provider>
     </entry>
@@ -808,24 +732,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1080">
-          <caret line="54" column="14" lean-forward="false" selection-start-line="54" selection-start-column="14" selection-end-line="54" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/gmg/docs/_sources/licence.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1120">
           <caret line="56" column="0" lean-forward="false" selection-start-line="56" selection-start-column="0" selection-end-line="57" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/MANIFEST.in">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="20">
-          <caret line="1" column="6" lean-forward="true" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -873,21 +783,65 @@
     </entry>
     <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_2.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1240">
-          <caret line="64" column="0" lean-forward="false" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#35#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="2" selection-end-column="18" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/gmg/gmg.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="509">
-          <caret line="2217" column="46" lean-forward="false" selection-start-line="2217" selection-start-column="46" selection-end-line="2217" selection-end-column="46" />
+        <state relative-caret-position="1458">
+          <caret line="81" column="32" lean-forward="false" selection-start-line="81" selection-start-column="32" selection-end-line="81" selection-end-column="32" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$APPLICATION_CONFIG_DIR$/scratches/scratch_3.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="127">
+          <caret line="26" column="0" lean-forward="false" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
           <folding>
-            <element signature="e#2291#2300#0" expanded="true" />
+            <element signature="e#0#31#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/bott.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="559">
+          <caret line="73" column="26" lean-forward="false" selection-start-line="73" selection-start-column="26" selection-end-line="73" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/git/bin/airy_backstrip.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9072">
+          <caret line="508" column="23" lean-forward="false" selection-start-line="508" selection-start-column="23" selection-end-line="508" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gmg/model_stats.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="7" column="17" lean-forward="false" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="128" column="23" lean-forward="false" selection-start-line="128" selection-start-column="23" selection-end-line="128" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MANIFEST.in">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="6" lean-forward="false" selection-start-line="1" selection-start-column="6" selection-end-line="1" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
