@@ -87,7 +87,7 @@ import os
 import sys
 import subprocess
 #from obspy.segy.core import readSEGY
-from obspy.io.segy.segy import _read_segy  # FUTURE
+from obspy.io.segy.core import _read_segy  # FUTURE
 import cPickle as Pickle
 from scipy import signal
 from fatiando.mesher import Polygon

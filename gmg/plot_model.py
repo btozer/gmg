@@ -97,11 +97,11 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
         num_rows = 9  # %DETERMINES AXES SIZING'S
 
     '# %DETERMINE AXES'
-    if obs_grav:
+    if obs_grav != []:
         y_start_grav = np.append(obs_grav[:, 1], calc_grav).min()- abs(np.append(obs_grav[:, 1], calc_grav).min()/20)
         y_end_grav = np.append(obs_grav[:, 1], calc_grav).max()+ (np.append(obs_grav[:, 1], calc_grav).max()/20)
 
-    if obs_mag:
+    if obs_mag != []:
         y_start_mag = np.append(obs_mag[:, 1], calc_mag).min() - abs(np.append(obs_mag[:, 1], calc_mag).min()/20)
         y_end_mag = np.append(obs_mag[:, 1], calc_mag).max() + abs(np.append(obs_mag[:, 1], calc_mag).max()/20)
 
@@ -154,7 +154,9 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
             ax2.spines['right'].set_color('none')
             ax2.spines['bottom'].set_position('center')
             ax2.spines['top'].set_position('center')
-            ax2.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
+            #ax2.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
+            ax2.xaxis.set_visible(False)
+            ax2.grid(color="grey", linestyle=":")
             ax2.tick_params(axis='y', which='both', left='on', right='off', labelright='off')
 
         if calc_grav is not None:
