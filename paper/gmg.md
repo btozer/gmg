@@ -14,6 +14,7 @@ author:
     orcid: 0000-0003-0043-0580
 affiliation:
  - name: Scripps Institution of Oceanography, La Jolla, California 92093, USA
+bibliography: gmg.bib
 ---
 
 # Summary
@@ -45,7 +46,7 @@ functionality that is beneficial to the wider community and the software should
 naturally become more useful and streamlined over time.  
 
 ``GMG`` makes extensive use of functions from
-the Scientic Computing in Python (SciPy) package [@Oliphant:2007]. In
+the Scientic Computing in Python (SciPy) package [@oliphant2007]. In
 particular, NumPy (Van Der Walt et al., 2011) data structures are used for data
 handling and computational efficiency. Matplotlib (Hunter, 2007) plotting tools
 are employed for displaying and interacting with graphics. The GUI is
