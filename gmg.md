@@ -34,7 +34,7 @@ documentation.
 ``GMG`` is an open-source Python package primarily intended as an
 interactive, user-friendly two-dimensional geophysical forward modelling GUI
 that resolves all of the draw-backs listed above. Both gravity and magnetic
-anomalies can be computed along a 2D profile consisting of subsurface bodies
+anomalies can be computed along a 2D profile consisting of subsurface bodies
 defined as any number of 2D polygons. Moreover, functions for displaying
 complementary data within the modelling environment, such as exploration well
 logs and seismic data, are provided. ``GMG`` has been designed with a minimalist
@@ -45,7 +45,7 @@ functionality that is beneficial to the wider community and the software should
 naturally become more useful and streamlined over time.  
 
 ``GMG`` makes extensive use of functions from
-the Scientic Computing in Python (SciPy) package (Oliphant, 2007). In
+the Scientic Computing in Python (SciPy) package [@Oliphant:2007]. In
 particular, NumPy (Van Der Walt et al., 2011) data structures are used for data
 handling and computational efficiency. Matplotlib (Hunter, 2007) plotting tools
 are employed for displaying and interacting with graphics. The GUI is
@@ -62,9 +62,7 @@ GMG was conceived at the University of Oxford and I acknowledge contributions
 from Brook Keats.
 
 # References
-bibliography: bibliography.bib
-
-
+bibliography: gmg.bib
 
 Figures can be included like this: ![Example figure.](figure.png)
 
