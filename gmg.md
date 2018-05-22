@@ -1,5 +1,7 @@
+
+#GMG: An open source two-dimensional geophysical modelling GUI
+
 ---
-title: 'GMG: An open source two-dimensional geophysical modelling GUI'
 tags:
   - Python
   - geophysics
@@ -7,15 +9,11 @@ tags:
   - gravity
   - magnetics
   - reflection seismic
-authors:
+author:
   - name: Brook Tozer
     orcid: 0000-0003-0043-0580
-    affiliation: "1"
-affiliations:
+affiliation:
  - name: Scripps Institution of Oceanography, La Jolla, California 92093, USA
-   index: 1
-date: 21 May 2018
-bibliography: gmg.bib
 ---
 
 # Summary
