@@ -1,5 +1,5 @@
 GMG: An open source two-dimensional geophysical modelling GUI
-===
+=============================================================
 
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
 
