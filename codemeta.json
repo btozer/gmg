@@ -1,0 +1,21 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
+  "@type": "Code",
+  "author": [
+      "@id": "https://orcid.org/0000-0003-0043-0580",
+      "@type": "orcid",
+      "email": "btozer@ucsd.edu",
+      "name:": "Brook Tozer",
+      "affiliation": "Scripps Institution of Oceanography, La Jolla, California 92093, USA",
+  ],
+  "identifier": "",
+  "codeRepository": "https://github.com/btozer/gmg",
+  "datePublished": "2018-05-22",
+  "dateModified": "2018-05-22",
+  "dateCreated": "2018-05-22",
+  "description": "gmg: An open source geophysical forward modelling GUI",
+  "keywords": "Geophysics, gravity, magnetics, modelling",
+  "license": "BSD-3-Clause Licence",
+  "title": "gmg",
+  "version": "v1.0.0"
+}
