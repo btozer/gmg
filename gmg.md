@@ -1,5 +1,5 @@
 
-#GMG: An open source two-dimensional geophysical modelling GUI
+# GMG: An open source two-dimensional geophysical modelling GUI
 
 ---
 tags:
