@@ -28,7 +28,7 @@ All of these dependencies need to be installed in order for GMG to run.
 
 **Dependencies**
 
-    python 2.7
+    python2.7
     fatiando
     matplotlib
     numpy
