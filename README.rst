@@ -25,9 +25,8 @@ Installation and Dependencies
 GMG is written in Python 2.7 and relies on the dependencies listed below. 
 All of these dependencies need to be installed in order for GMG to run.
 
-#~~~~~~~~~~~~
-#Dependencies
-#~~~~~~~~~~~~
+
+**Dependencies**
 
 python 2.7
 fatiando
@@ -37,9 +36,8 @@ obspy
 scipy
 wxpython
 
-#~~~~~~~~~~
-#Installing
-#~~~~~~~~~~
+
+**Installing**
 
 The simplest way to install gmg is to first install an Anaconda Python 
 distribution: https://www.continuum.io/downloads
@@ -65,9 +63,7 @@ or for a local installation
 
 pip install .
 
-#~~~~~~~~~~~~~
-#Launching gmg
-#~~~~~~~~~~~~~
+**Launching gmg**
 
 To start gmg the best way is to create an alias and export this e.g.:
 
@@ -115,29 +111,16 @@ Any contribution, big or small is welcome. Example include:
 
 They are all helpful.
 
-#~~~~~~~~~~~~~~~~~~~~
-#Becoming a developer
-#~~~~~~~~~~~~~~~~~~~~
+
+**Becoming a developer**
 
 The best way to become a developer is to create a folk of the github repository.
 Please see the documentation for details.
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#Suggestions & bug reporting
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**Suggestions & bug reporting**
 
 The best way to open a bug report is to raise an issue on Github.
 
-If you don't use Github, you can send a bug report to: brookt@earth.ox.ac.uk
+If you don't use Github, you can send a bug report to: btozer@ucsd.edu
 Please use the subject line - GMG bug report: "short bug description"
 and include as much detail as possible when describing the bug.
-
-#~~~~~~~~~~~~
-#Getting help
-#~~~~~~~~~~~~
-
-Please first refer to the documentation if you are having trouble.
-
-If you get stuck, you can always ask a question on GitHub. 
-If you don't use Github, you can send your question to
-btozer@ucsd.edu, but please use this as a last resort.
