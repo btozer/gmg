@@ -6,9 +6,9 @@ GMG: An open source two-dimensional geophysical modelling GUI
 Statement of need
 -----------------
 
-GMG is an Open Source Graphical User Interface designed principally for modeling 
+GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling
 2D potential field (gravity and magnetic) profiles. The software also includes 
-functions for loading XY data, seismic reflection SEGY data, and well horizons. 
+functions for loading XY data, seismic reflection SEGY data and exploration well horizons.
 The software therefore provides an integrated geological/geophysical interpretation
 package. It is anticipated that GMG will also be useful for teaching purposes.
 
@@ -92,8 +92,8 @@ or
 
 by opening PATH_TO_GMG/gmg/gmg/docs/Manual.html
 
-If the test cases do not work as expected, please submit a bug report as described
-below in the section SUGGESTIONS & BUG REPORTING.
+If the test cases don't work as expected, please submit a bug report as described
+below in the section *Contributing*.
 
 Once the test cases have been run (and work) the easiest way to get a feel for the 
 software is run through the tutorial as described in the documentation.
@@ -102,15 +102,14 @@ software is run through the tutorial as described in the documentation.
 Contributing
 ------------
 
-Any contribution, big or small is welcome. Example include:
+Any contribution, big or small is welcome. Examples include:
 
 1. Writing new code/functions.
 2. Improving the user interface.
-3. Making suggestions for improvements or new functions.
+3. Making suggestions for improvements or brand new functions.
 4. Submitting bug reports and spelling corrections.
 
 They are all helpful.
-
 
 **Becoming a developer**
 
