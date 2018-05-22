@@ -93,7 +93,7 @@ or
 by opening PATH_TO_GMG/gmg/gmg/docs/Manual.html
 
 If the test cases don't work as expected, please submit a bug report as described
-below in the section *Contributing*.
+below in the section **Contributing**.
 
 Once the test cases have been run (and work) the easiest way to get a feel for the 
 software is run through the tutorial as described in the documentation.
