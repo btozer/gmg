@@ -28,13 +28,13 @@ All of these dependencies need to be installed in order for GMG to run.
 
 **Dependencies**
 
-python 2.7
-fatiando
-matplotlib
-numpy
-obspy
-scipy
-wxpython
+    python 2.7
+    fatiando
+    matplotlib
+    numpy
+    obspy
+    scipy
+    wxpython
 
 
 **Installing**
