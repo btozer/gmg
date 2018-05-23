@@ -1,7 +1,11 @@
-
-# GMG: An open source two-dimensional geophysical modelling GUI
-
 ---
+title: "GMG: An open source two-dimensional geophysical modelling GUI"
+output: html_document
+bibliography: gmg.bib
+---
+
+# Summary
+
 tags:
   - Python
   - geophysics
@@ -14,10 +18,7 @@ author:
     orcid: 0000-0003-0043-0580
 affiliation:
  - name: Scripps Institution of Oceanography, La Jolla, California 92093, USA
-bibliography: gmg.bib
----
-
-# Summary
+ 
 For decades, forward modelling of potential field data, such as 
 gravity and magnetic anomalies, has been common practice within the 
 geophysics community as a means of constraining subsurface 
@@ -41,13 +42,13 @@ complementary data within the modelling environment, such as exploration well
 logs and seismic data, are provided. ``GMG`` has been designed with a minimalist
 user-interface and simple I/O in order to enhance usability and it is expected
 to be useful for both researchers and teaching of exploration geophysics. Most
-importantly ``GMG`` is fully open source. Hence, users can add new 
-functionality that is beneficial to the wider community and the software should
+importantly ``GMG`` is fully open source. Hence, providing an environment where
+users can add new functionality and optimise processes such that the software will
 naturally become more useful and streamlined over time.  
 
 ``GMG`` makes extensive use of functions from
 the Scientic Computing in Python (SciPy) package [@oliphant2007]. In
-particular, NumPy (Van Der Walt et al., 2011) data structures are used for data
+particular, NumPy [@VanDerWalt2011] data structures are used for data
 handling and computational efficiency. Matplotlib (Hunter, 2007) plotting tools
 are employed for displaying and interacting with graphics. The GUI is
 implemented using the wxWidgets GUI toolkit, wxPython (Rappin and Dunn, 2006).
@@ -59,14 +60,7 @@ stored on github at: https://github.com/btozer/gmg
 
 # Acknowledgements
 
-GMG was conceived at the University of Oxford and contributions
-from Brook Keats are acknowledged.
+GMG was conceived at the University of Oxford and with contributions
+from Brook Keats.
 
 # References
-bibliography: gmg.bib
-
-Figures can be included like this: ![Example figure.](figure.png)
-
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
