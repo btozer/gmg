@@ -9,7 +9,7 @@ Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
 **Components**
 
-* :func:`~gmg.gravmag.talwani_and_heirtzler.ntz`
+* :func:`~gmg.talwani_and_heirtzler.ntz`
 
 **References**
 
@@ -17,7 +17,7 @@ Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused
 arbitrary shape. In: Computers in the mineral industries, Part 1 (ed.) Parks G A, Stanford Univ. Publ., Geol. Sci.
 9 464-480.
 
-Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package 
+Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package
 for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 ----
 
@@ -29,7 +29,7 @@ import math as m
 def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanence, angle_a, angle_b):
 
     """
-    Calculates the :math:`nt_T` magnetic field strength.
+    Calculates the :math:`ntT` magnetic field strength.
 
     .. note:: The coordinate system of the input parameters is z -> **DOWN**.
 
@@ -64,14 +64,14 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
     HASUM = np.zeros_like(xp)
     TASUM = np.zeros_like(xp)
 
-    '# %SET POLYGON NUMBER'
+    '# %ITERATE OVER ALL POLYGONS'
     i = 0
     for polygon in polygons:
 
         if polygon is None or 'susceptibility' not in polygon.props:
             continue
         else:
-            C = (polygon.props['susceptibility'])  # %CONVERT FROM SI INPUT TO e.m.u (used in original code)
+            C = (polygon.props['susceptibility'])  # %CONVERT FROM SI INPUT TO e.m.u (USED IN ORIGINAL CODE)
         if C == 0.0:  # %IF C = 0 THEN SKIP THIS POLYGON; ELSE RUN THE CODE
             continue
         else:
@@ -99,7 +99,7 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
             for v in range(0, nverts):
                 xv = x[v] - xp
                 zv = z[v] - zp
-                '# %SET NEXT VERT: THE LAST VERTICE PAIRS WITH THE FIRST ONE'
+                '# %SET NEXT VERT: (NB. THE LAST VERTICE PAIRS WITH THE FIRST)'
                 if v == nverts - 1:
                     xv2 = x[0] - xp
                     zv2 = z[0] - zp

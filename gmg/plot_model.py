@@ -80,21 +80,21 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
 
     '# %NUMBER OF ROWS IN PLOT'
     if t_canvas is True and d_canvas is True and nt_canvas is True:
-        num_rows = 12  # %DETERMINES AXES SIZING'S
+        num_rows = 12  # %DETERMINES AXES SIZINGS
     if t_canvas is False and d_canvas is True and nt_canvas is True:
-        num_rows = 11  # %DETERMINES AXES SIZING'S
+        num_rows = 11  # %DETERMINES AXES SIZINGS
     if t_canvas is True and d_canvas is False and nt_canvas is True:
-        num_rows = 11  # %DETERMINES AXES SIZING'S
+        num_rows = 11  # %DETERMINES AXES SIZINGS
     if t_canvas is True and d_canvas is True and nt_canvas is False:
-        num_rows = 11  # %DETERMINES AXES SIZING'S
+        num_rows = 11  # %DETERMINES AXES SIZINGS
     if t_canvas is False and d_canvas is False and nt_canvas is True:
-        num_rows = 10  # %DETERMINES AXES SIZING'S
+        num_rows = 10  # %DETERMINES AXES SIZINGS
     if t_canvas is True and d_canvas is False and nt_canvas is False:
-        num_rows = 10  # %DETERMINES AXES SIZING'S
+        num_rows = 10  # %DETERMINES AXES SIZINGS
     if t_canvas is False and d_canvas is True and nt_canvas is False:
-        num_rows = 10  # %DETERMINES AXES SIZING'S
+        num_rows = 10  # %DETERMINES AXES SIZINGS
     if t_canvas is False and d_canvas is False and nt_canvas is False:
-        num_rows = 9  # %DETERMINES AXES SIZING'S
+        num_rows = 9  # %DETERMINES AXES SIZINGS
 
     '# %DETERMINE AXES'
     if obs_grav:
