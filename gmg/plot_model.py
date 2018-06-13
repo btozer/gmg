@@ -5,6 +5,7 @@ import numpy as np, copy
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.colors as colors
+import matplotlib.ticker as ticker
 import os
 from matplotlib import rcParams
 
@@ -147,15 +148,17 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
         ax2.set_xticklabels([])
 
         '# %PLOT GRAVITY DATA'
-        if obs_grav:
+        if obs_grav != []:
             ax2.scatter(obs_grav[:, 0], obs_grav[:, 1], marker='o', color='b', s=ms)
 
             '# %SET AXIS POSITIONS'
-            ax2.spines['right'].set_color('none')
-            ax2.spines['bottom'].set_position('center')
-            ax2.spines['top'].set_position('center')
-            #ax2.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
-            ax2.xaxis.set_visible(False)
+            tick_spacing = 50
+            ax2.yaxis.set_major_locator(ticker.MultipleLocator(tick_spacing))
+            #ax2.spines['right'].set_color('none')
+            #ax2.spines['bottom'].set_position('center')
+            #ax2.spines['top'].set_position('center')
+            ax2.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
+            #ax2.xaxis.set_visible(False)
             ax2.grid(color="grey", linestyle=":")
             ax2.tick_params(axis='y', which='both', left='on', right='off', labelright='off')
 
@@ -163,8 +166,8 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
             ax2.plot(xp*0.001, calc_grav, color='r', linewidth=lw)
 
         '#% RMS value'
-        ax2.annotate('RMS misfit: '+str(grav_rms_value), xy=(10, 60), xytext=(10, 60),
-                     fontsize=fs, horizontalalignment='left', clip_on=False)
+        #ax2.annotate('RMS misfit: '+str(grav_rms_value), xy=(10, 60), xytext=(10, 60),
+        #             fontsize=fs, horizontalalignment='left', clip_on=False)
         if grav_rms_value != 0:
             pass
 
@@ -180,7 +183,7 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
         ax3.set_xticks([])
 
         '#% PLOT MAGNETIC DATA'
-        if obs_mag:
+        if obs_mag != []:
             ax3.scatter(obs_mag[:, 0], obs_mag[:, 1], marker='o', color='b', s=ms)
 
             '# %SET AXIS POSITIONS'
