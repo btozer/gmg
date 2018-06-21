@@ -63,11 +63,15 @@ https://freeiconmaker.com/
 Documentation created using Sphinx.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+source activate py27
+
 """
 
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
+matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 import matplotlib.cm as cm
@@ -100,10 +104,10 @@ import struct
 import gc
 import webbrowser
 
+import wx.lib.agw.ribbon as RB
+
 # FUTURE
 # import wx.EnhancedStatusBar as ESB
-# import wx.lib.agw.ribbon as RB
-# import wx.lib.agw.foldpanelbar as fpb
 # from scipy import interpolate as ip
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,7 +124,9 @@ class Gmg(wx.Frame):
     """
 
     # %DIR CONTAINING PROGRAM ICONS
+
     gui_icons_dir = os.path.dirname(__file__) + '/icons/'
+    gui_icons_dir = "/Users/brook/gmg/gmg/icons/"
 
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
@@ -151,13 +157,16 @@ class Gmg(wx.Frame):
         self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 300),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
+        self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         '# %SECOND PANE; LEFT PANEL (=ATTRIBUTES)'
         self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 500),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 500),
                                                        agwStyle=fpb.FPB_VERTICAL)
-        self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Attributes", collapsed=True, foldIcons=images)
+        self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layer Attributes", collapsed=True,
+                                                                       foldIcons=images)
+        self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         '# %THIRD PANE; LEFT PANEL (=FAULTS)'
         self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 50),
@@ -165,6 +174,7 @@ class Gmg(wx.Frame):
         self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 50),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
+        self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
 
         '# %SET SPLITTERS'
         self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three, 400)
@@ -279,7 +289,7 @@ class Gmg(wx.Frame):
         self.d_canvas = True
         self.nt_canvas = True
         self.m_model_frames_submenu = wx.Menu()
-        model_view_file.AppendMenu(-1, 'Toggle Model Frames', self.m_model_frames_submenu)
+        model_view_file.Append(-1, 'Toggle Model Frames', self.m_model_frames_submenu)
         self.m_model_frames_submenu.Append(601, 'Topography')
         self.Bind(wx.EVT_MENU, self.frame_adjustment, id=601)
         self.m_model_frames_submenu.Append(602, 'Gravity')
@@ -303,7 +313,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_obs_g, m_load_obs_g)
         # %EDIT
         self.m_obs_g_submenu = wx.Menu()
-        self.gravity_data.AppendMenu(-1, 'Gravity Data...', self.m_obs_g_submenu)
+        self.gravity_data.Append(-1, 'Gravity Data...', self.m_obs_g_submenu)
         # %FILTER MENU
         grav_m_observed_filter = self.gravity_data.Append(-1, "Filter Anomaly\tCtrl-L", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.observed_filter, grav_m_observed_filter)
@@ -332,7 +342,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_obs_m, m_load_obs_m)
         # % EDIT
         self.m_obs_mag_submenu = wx.Menu()
-        self.magnetic_data.AppendMenu(-1, 'Magnetic Anomalies...', self.m_obs_mag_submenu)
+        self.magnetic_data.Append(-1, 'Magnetic Anomalies...', self.m_obs_mag_submenu)
         # % FILTER MENU
         mag_m_observed_filter = self.magnetic_data.Append(-1, "Filter Anomaly\tCtrl-L", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.observed_filter, mag_m_observed_filter)
@@ -360,7 +370,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_topo, m_load_topo)
         # % EDIT
         self.m_topo_submenu = wx.Menu()
-        self.topography_data.AppendMenu(-1, 'Topography Data', self.m_topo_submenu)
+        self.topography_data.Append(-1, 'Topography Data', self.m_topo_submenu)
         # % DRAW MENU
         self.menubar.Append(self.topography_data, "&Topography")
 
@@ -370,7 +380,7 @@ class Gmg(wx.Frame):
         m_load_xy = self.xy_data.Append(-1, "&Load XY Points...\tCtrl-L", "Load XY Points...")
         self.Bind(wx.EVT_MENU, self.load_xy, m_load_xy)
         self.m_xy_submenu = wx.Menu()
-        self.xy_data.AppendMenu(-1, 'XY Data...', self.m_xy_submenu)
+        self.xy_data.Append(-1, 'XY Data...', self.m_xy_submenu)
         # % REMOVE
         self.m_xy_submenu.Append(102, 'Remove all XY Data')
         self.Bind(wx.EVT_MENU, self.delete_all_xy, id=102)
@@ -387,13 +397,13 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.remove_all_segy, self.m_remove_all_segy)
         '# % SEGY NAME LIST'
         self.m_segy_submenu = wx.Menu()
-        self.seismic_data.AppendMenu(-1, 'SEGY Data...', self.m_segy_submenu)
+        self.seismic_data.Append(-1, 'SEGY Data...', self.m_segy_submenu)
         '# % GAIN'
         self.m_gain = wx.Menu()
-        self.seismic_data.AppendMenu(-1, 'Gain', self.m_gain)
+        self.seismic_data.Append(-1, 'Gain', self.m_gain)
         '# % COLOR PALETTE'
         self.m_color_palette = wx.Menu()
-        self.seismic_data.AppendMenu(-1, 'Color Palette', self.m_color_palette)
+        self.seismic_data.Append(-1, 'Color Palette', self.m_color_palette)
         self.m_color_palette.Append(901, 'Grey')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=901)
         self.m_color_palette.Append(902, 'Sesimic')
@@ -414,7 +424,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_well, self.m_load_well)
         # % WELL SUBMENU
         self.m_wells_submenu = wx.Menu()
-        self.well_data.AppendMenu(-1, 'Well...', self.m_wells_submenu)
+        self.well_data.Append(-1, 'Well...', self.m_wells_submenu)
         # % DRAW MENU
         self.menubar.Append(self.well_data, "&Well Data")
 
@@ -436,7 +446,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_layer, self.m_load_layer)
         # %TRANSPARENCY
         self.m_layer_transperency = wx.Menu()
-        self.layer_file.AppendMenu(-1, 'Transperency', self.m_layer_transperency)
+        self.layer_file.Append(-1, 'Transperency', self.m_layer_transperency)
         # %TRANSPARENCY INCREASE
         self.m_layer_transparency_increase = self.m_layer_transperency.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.transparency_increase, self.m_layer_transparency_increase)
@@ -481,69 +491,90 @@ class Gmg(wx.Frame):
         self.SetMenuBar(self.menubar)
 
         '# %TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)'
+
+
         self.toolbar = self.CreateToolBar()
 
-        t_save_model = self.toolbar.AddTool(wx.ID_ANY,
-                                            wx.Bitmap(self.gui_icons_dir + 'save_24.png'))
+        t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
+                                    shortHelp="Save model")
         self.Bind(wx.EVT_TOOL, self.save_model, t_save_model)
-        t_load_model = self.toolbar.AddLabelTool(wx.ID_ANY, 'Load model',
-                                                 wx.Bitmap(self.gui_icons_dir + 'load_24.png'))
-        self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
-        #t_calc_topo = self.toolbar.AddLabelTool(wx.ID_ANY, 'calculate-topo',
-        #                                       wx.Bitmap(self.gui_icons_dir + 'T_24.png'))
-        #self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)
-        t_calc_model_bott = self.toolbar.AddLabelTool(wx.ID_ANY, 'calculate-gravity',
-                                                      wx.Bitmap(self.gui_icons_dir + 'G_24.png'))
-        self.Bind(wx.EVT_TOOL, self.calc_grav_switch, t_calc_model_bott)
-        t_calc_mag = self.toolbar.AddLabelTool(wx.ID_ANY, 'calculate-magnetic',
-                                               wx.Bitmap(self.gui_icons_dir + 'M_24.png'))
-        self.Bind(wx.EVT_TOOL, self.calc_mag_switch, t_calc_mag)
-        t_capture_coordinates = self.toolbar.AddLabelTool(wx.ID_ANY, 't_capture_coordinates',
-                                                          wx.Bitmap(self.gui_icons_dir + 'C_24.png'))
-        self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
-        t_fault_pick = self.toolbar.AddLabelTool(wx.ID_ANY, 'fault_pick',
-                                                 wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'))
-        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
-        t_aspect_increase = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-up',
-                                                      wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'))
-        self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
-        t_aspect_decrease = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-down',
-                                                      wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'))
-        self.Bind(wx.EVT_TOOL, self.aspect_decrease, t_aspect_decrease)
-        t_aspect_increase2 = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-up-2',
-                                                       wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'))
-        self.Bind(wx.EVT_TOOL, self.aspect_increase2, t_aspect_increase2)
-        t_aspect_decrease2 = self.toolbar.AddLabelTool(wx.ID_ANY, 'aspect-ratio-down-2',
-                                                       wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'))
-        self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
-        t_zoom = self.toolbar.AddLabelTool(wx.ID_ANY, 'zoom',
-                                           wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'))
-        self.Bind(wx.EVT_TOOL, self.zoom, t_zoom)
-        t_zoom_out = self.toolbar.AddLabelTool(wx.ID_ANY, 'zoom out',
-                                               wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'))
-        self.Bind(wx.EVT_TOOL, self.zoom_out, t_zoom_out)
-        t_full_extent = self.toolbar.AddLabelTool(wx.ID_ANY, 'full_extent',
-                                                  wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'))
-        self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
-        t_pan = self.toolbar.AddLabelTool(wx.ID_ANY, 'pan',
-                                          wx.Bitmap(self.gui_icons_dir + 'pan_24.png'))
-        self.Bind(wx.EVT_TOOL, self.pan, t_pan)
-        t_gain_down = self.toolbar.AddLabelTool(wx.ID_ANY, 'gain_down',
-                                                wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'))
-        self.Bind(wx.EVT_TOOL, self.gain_decrease, t_gain_down)
-        t_gain_up = self.toolbar.AddLabelTool(wx.ID_ANY, 'gain_up',
-                                              wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'))
-        self.Bind(wx.EVT_TOOL, self.gain_increase, t_gain_up)
-        t_transparency_down = self.toolbar.AddLabelTool(wx.ID_ANY, 'transparency_down',
-                                                        wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'))
-        self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
-        t_transparency_up = self.toolbar.AddLabelTool(wx.ID_ANY, 'transparency_up',
-                                                      wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'))
-        self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
-        t_load_well = self.toolbar.AddLabelTool(wx.ID_ANY, 'Load-well-horizons',
-                                                wx.Bitmap(self.gui_icons_dir + 'well_24.png'))
-        self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
 
+        t_load_model = self.toolbar.AddTool(wx.ID_ANY, "Load model", wx.Bitmap(self.gui_icons_dir + 'load_24.png'),
+                                    shortHelp="Load model")
+        self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
+
+        t_calc_topo = self.toolbar.AddTool(wx.ID_ANY, "Calculate topography",
+                                    wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
+        ### self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)
+
+        t_calc_model_bott = self.toolbar.AddTool(wx.ID_ANY, "Calculate gravity",
+                                    wx.Bitmap(self.gui_icons_dir + 'G_24.png'), shortHelp="Calculate gravity")
+        self.Bind(wx.EVT_TOOL, self.calc_grav_switch, t_calc_model_bott)
+
+        t_calc_mag = self.toolbar.AddTool(wx.ID_ANY, "Calculate magnetic",
+                                    wx.Bitmap(self.gui_icons_dir + 'M_24.png'), shortHelp="Calculate magnetic")
+        self.Bind(wx.EVT_TOOL, self.calc_mag_switch, t_calc_mag)
+
+        t_capture_coordinates = self.toolbar.AddTool(wx.ID_ANY, "Capture coordinates",
+                                    wx.Bitmap(self.gui_icons_dir + 'C_24.png'), shortHelp="Capture coordinates")
+        self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
+
+        t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
+                                wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'), shortHelp="Fault pick")
+        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
+
+        t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
+                                wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'), shortHelp="Aspect increase")
+        self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
+
+        t_aspect_decrease = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease",
+                                wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'), shortHelp="Aspect decrease")
+        self.Bind(wx.EVT_TOOL, self.aspect_decrease, t_aspect_decrease)
+
+        t_aspect_increase2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase x2",
+                                wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'), shortHelp="Aspect increase x2")
+        self.Bind(wx.EVT_TOOL, self.aspect_increase2, t_aspect_increase2)
+
+        t_aspect_decrease2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease x2",
+                                wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'), shortHelp="Aspect decrease x2")
+        self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
+
+        t_zoom = self.toolbar.AddTool(wx.ID_ANY, "Zoom in",
+                                wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'), shortHelp="Zoom in")
+        self.Bind(wx.EVT_TOOL, self.zoom, t_zoom)
+
+        t_zoom_out = self.toolbar.AddTool(wx.ID_ANY, "Zoom out",
+                                wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'), shortHelp="Zoom out")
+        self.Bind(wx.EVT_TOOL, self.zoom_out, t_zoom_out)
+
+        t_full_extent = self.toolbar.AddTool(wx.ID_ANY, "Full extent",
+                                wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'), shortHelp="Full extent")
+        self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
+
+        t_pan = self.toolbar.AddTool(wx.ID_ANY, "Pan",
+                                wx.Bitmap(self.gui_icons_dir + 'pan_24.png'), shortHelp="Pan")
+        self.Bind(wx.EVT_TOOL, self.pan, t_pan)
+
+        t_gain_down = self.toolbar.AddTool(wx.ID_ANY, "Gain down",
+                                wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'), shortHelp="Gain down")
+        self.Bind(wx.EVT_TOOL, self.gain_decrease, t_gain_down)
+
+        t_gain_up = self.toolbar.AddTool(wx.ID_ANY, "Gain up",
+                                wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'), shortHelp="Gain up")
+        self.Bind(wx.EVT_TOOL, self.gain_increase, t_gain_up)
+
+        t_transparency_down = self.toolbar.AddTool(wx.ID_ANY, "Transparency down",
+                                wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'), shortHelp="Transparency down")
+        self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
+
+        t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
+                                wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'), shortHelp="Transparency up")
+        self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
+
+        t_load_well = self.toolbar.AddTool(wx.ID_ANY, "Load well horizons",
+                                wx.Bitmap(self.gui_icons_dir + 'well_24.png'), shortHelp="Load well horizons")
+        self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
+        #
         self.toolbar.Realize()
         self.toolbar.SetSize((1790, 36))
 
@@ -552,7 +583,8 @@ class Gmg(wx.Frame):
 
         self.fig = plt.figure()  # %CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # %CREATE FIGURE CANVAS
-        self.nav_toolbar = NavigationToolbar(self.canvas)  # %CREATE NAVIGATION TOOLBAR
+        self.nav_toolbar = NavigationToolbar(self.canvas)  # %CREATE DEFAULT NAVIGATION TOOLBAR
+        self.nav_toolbar.Hide()  # %HIDE DEFAULT NAVIGATION TOOLBAR
 
         '#% SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
         self.draw = self.fig.canvas.draw
@@ -772,7 +804,7 @@ class Gmg(wx.Frame):
             self.polygon_fills[0] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
-            self.current_node = self.mcanvas.scatter(-40000., 0, s=1, color='r')
+            self.current_node = self.mcanvas.scatter(-40000., 0, s=50, color='r')
         else:
             self.nextpoly = []
 
@@ -801,9 +833,10 @@ class Gmg(wx.Frame):
 
         '''#% ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
         '#% Make Attribute Label'
-        self.attr_text = wx.StaticText(self.fold_panel_two, -1, label="Layer Attributes", style=wx.ALIGN_CENTER)
+        self.attr_text = wx.StaticText(self.fold_panel_two, -1, label="", style=wx.ALIGN_CENTER)
+        self.attr_text2 = wx.StaticText(self.fold_panel_two, -1, label="", style=wx.ALIGN_CENTER)
         '#% Make NODE X Y Label'
-        self.node_text = wx.StaticText(self.fold_panel_two, -1, label="Node Position", style=wx.ALIGN_CENTER)
+        self.node_text = wx.StaticText(self.fold_panel_two, -1, label="Node Position:", style=wx.ALIGN_CENTER)
         '#% Make density spinner'
         self.density_text = wx.StaticText(self.fold_panel_two, -1, label="Density:", style=wx.ALIGN_CENTER)
         self.density_input = fs.FloatSpin(self.fold_panel_two, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
@@ -1072,11 +1105,15 @@ class Gmg(wx.Frame):
 
         '#% LAYER ATTRIBUTES'
         self.attr_box = wx.BoxSizer(wx.VERTICAL)
+
         self.attr_text_box = wx.BoxSizer(wx.HORIZONTAL)
-        self.attr_text_box.Add(self.attr_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND, 2)
-        self.attr_box.Add(self.attr_text_box, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
+        self.attr_text_box.Add(self.attr_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, 2)
+        self.attr_text_box.Add(self.attr_text2, 0, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, 2)
+        self.attr_box.Add(self.attr_text_box, 0, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND)
+
         self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+
         '#% Density'
         self.density_box = wx.BoxSizer(wx.HORIZONTAL)
         self.density_box.Add(self.density_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 2)
@@ -1164,28 +1201,33 @@ class Gmg(wx.Frame):
 
         new_model_dialogbox = NewModelDialog(self, -1, 'Create New Model')
         new_model_dialogbox.ShowModal()
-        if new_model_dialogbox.set_button is False:
+        if new_model_dialogbox.set_button is True:
+            self.newmodel = True
+            new_x1, new_x2 = float(new_model_dialogbox.x1) * 1000., float(new_model_dialogbox.x2) * 1000.
+            new_z1, new_z2 = float(new_model_dialogbox.z1) * 1000., float(new_model_dialogbox.z2) * 1000.
+            xp_inc = float(new_model_dialogbox.xp_inc) * 1000.
+
+            self.layer_lines = [[]]
+            self.polygon_fills = [[]]
+
+            '#% INITAISE THE MODEL PARAMETERS'
+            self.initalise_model()
+
+            '#% ENSURES FOLD PANELS ARE VISIBLE'
+            self.controls_panel_bar_one.Expand(self.fold_panel_one)
+            self.controls_panel_bar_two.Expand(self.fold_panel_two)
+            self.controls_panel_bar_three.Expand(self.fold_panel_three)
+
+            '#%CREATE MODEL'
+            self.model_aspect = 1.
+            area = (new_x1, new_x2, new_z1, new_z2)
+            xp = np.arange(new_x1 - self.calc_padding, new_x2 + self.calc_padding, xp_inc)
+            zp = np.zeros_like(xp)
+            self.start(area, xp, zp)
+        else:
             self.newmodel = False
             return  # % THE USER CHANGED THERE MIND
 
-        print "make model"
-        self.newmodel = True
-        new_x1, new_x2 = float(new_model_dialogbox.x1) * 1000., float(new_model_dialogbox.x2) * 1000.
-        new_z1, new_z2 = float(new_model_dialogbox.z1) * 1000., float(new_model_dialogbox.z2) * 1000.
-        xp_inc = float(new_model_dialogbox.xp_inc) * 1000.
-
-        self.layer_lines = [[]]
-        self.polygon_fills = [[]]
-
-        '#% INITAISE THE MODEL PARAMETERS'
-        self.initalise_model()
-
-        '#%CREATE MODEL'
-        self.model_aspect = 1.
-        area = (new_x1, new_x2, new_z1, new_z2)
-        xp = np.arange(new_x1 - self.calc_padding, new_x2 + self.calc_padding, xp_inc)
-        zp = np.zeros_like(xp)
-        self.start(area, xp, zp)
 
     def modify_model_dimensions(self, event):
         """#% MODIFY MODEL DIMENSIONS"""
@@ -1592,7 +1634,7 @@ class Gmg(wx.Frame):
                     continue
                 else:
                     self.well_name_submenu = wx.Menu()
-                    self.m_wells_submenu.AppendMenu(self.count + 3000, self.well_name_list[x], self.well_name_submenu)
+                    self.m_wells_submenu.Append(self.count + 3000, self.well_name_list[x], self.well_name_submenu)
                     self.well_name_submenu.Append(self.count + 2000, 'hide/show')
                     self.well_name_submenu.Append(self.count + 3000, 'delete well')
                     self.Bind(wx.EVT_MENU, self.show_hide_well, id=self.count + 2000)
@@ -1630,7 +1672,6 @@ class Gmg(wx.Frame):
         self.segy_count = len(self.segy_file_list)
 
         if self.segy_count >= 1:
-            print "doing plot segy loop"
             for s in range(0, self.segy_count):
                 if self.segy_name_list[s] != "NaN":
                     file_in = self.segy_file_list[s]
@@ -1658,7 +1699,7 @@ class Gmg(wx.Frame):
                     '''ADD SEGY_NAME TO SEGY MENU'''
                     # % 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
                     self.segy_name_submenu = wx.Menu()
-                    self.m_segy_submenu.AppendMenu(s + 1000, self.segy_name_list[s], self.segy_name_submenu)
+                    self.m_segy_submenu.Append(s + 1000, self.segy_name_list[s], self.segy_name_submenu)
                     self.segy_name_submenu.Append(s + 1000, 'delete segy')
                     self.Bind(wx.EVT_MENU, self.remove_segy, id=s + 1000)  # %id +1000 to avoid grav submenu id conflict
 
@@ -1678,7 +1719,7 @@ class Gmg(wx.Frame):
                 self.colors_index += 1
                 self.xy_name = self.xy_name_list[x]
                 self.xy_submenu = wx.Menu()
-                self.m_xy_submenu.AppendMenu(self.xy_count, self.xy_name, self.xy_submenu)
+                self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.xy_submenu)
                 self.xy_submenu.Append(self.xy_count, 'delete observed data')
                 self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count)
                 self.xy_count += 1
@@ -1699,7 +1740,7 @@ class Gmg(wx.Frame):
                 self.obs_topo_list.append([])
                 self.obs_name = self.obs_topo_name_list[x]
                 self.obs_submenu = wx.Menu()
-                self.m_topo_submenu.AppendMenu(self.obs_topo_count, self.obs_name, self.obs_submenu)
+                self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.obs_submenu)
                 self.obs_submenu.Append(self.obs_topo_count, 'delete observed data')
                 self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count)
                 self.obs_topo_count += 1
@@ -1720,7 +1761,7 @@ class Gmg(wx.Frame):
                 self.obs_grav_list.append([])
                 self.obs_name = self.obs_grav_name_list[x]
                 self.obs_submenu = wx.Menu()
-                self.m_obs_g_submenu.AppendMenu(self.obs_grav_count, self.obs_name, self.obs_submenu)
+                self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
                 self.obs_submenu.Append(self.obs_grav_count, 'delete observed data')
                 self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count)
                 self.obs_grav_count += 1
@@ -1741,7 +1782,7 @@ class Gmg(wx.Frame):
                 self.obs_mag_list.append([])
                 self.obs_mag_name = self.obs_mag_name_list[x]
                 self.obs_submenu = wx.Menu()
-                self.m_obs_mag_submenu.AppendMenu(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
+                self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
                 self.obs_submenu.Append(self.obs_mag_count, 'delete observed data')
                 self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
                 self.obs_mag_count += 1
@@ -1775,7 +1816,7 @@ class Gmg(wx.Frame):
             self.colors_index += 1
 
             self.obs_submenu = wx.Menu()
-            self.m_xy_submenu.AppendMenu(self.xy_count, self.xy_name, self.obs_submenu)
+            self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
             self.obs_submenu.Append(self.xy_count, 'delete observed data')
             self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count)
             self.xy_count += 1
@@ -1842,7 +1883,7 @@ class Gmg(wx.Frame):
         self.obs_topo_list.append([])
 
         self.submenu = wx.Menu()
-        self.m_topo_submenu.AppendMenu(self.obs_topo_count, self.obs_name, self.submenu)
+        self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.submenu)
         self.submenu.Append(self.obs_topo_count, 'delete observed data')
         self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count)
         self.obs_topo_count = self.obs_topo_count + 1
@@ -1886,7 +1927,7 @@ class Gmg(wx.Frame):
         self.obs_grav_list.append([])
         self.grav_obs_switch = True
         self.obs_submenu = wx.Menu()
-        self.m_obs_g_submenu.AppendMenu(self.obs_grav_count, self.obs_name, self.obs_submenu)
+        self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
         self.obs_submenu.Append(self.obs_grav_count, 'delete observed data')
         self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count)
         self.obs_grav_count = self.obs_grav_count + 1
@@ -1957,7 +1998,7 @@ class Gmg(wx.Frame):
         self.mag_obs_switch = True
 
         self.obs_submenu = wx.Menu()
-        self.m_obs_mag_submenu.AppendMenu(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
+        self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
         self.obs_submenu.Append(self.obs_mag_count, 'delete observed data')
         self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
         self.obs_mag_count = self.obs_mag_count + 1
@@ -2047,7 +2088,7 @@ class Gmg(wx.Frame):
             '''ADD SEGY_NAME TO SEGY MENU'''
             # % 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
             self.segy_name_submenu = wx.Menu()
-            self.m_segy_submenu.AppendMenu(self.segy_count + 1000, self.segy_name_list[self.segy_count],
+            self.m_segy_submenu.Append(self.segy_count + 1000, self.segy_name_list[self.segy_count],
                                            self.segy_name_submenu)
             self.segy_name_submenu.Append(self.segy_count + 1000, 'delete segy')
             self.Bind(wx.EVT_MENU, self.remove_segy,
@@ -2154,7 +2195,7 @@ class Gmg(wx.Frame):
 
         '#% CREATE FILE MENU DATA'
         self.well_name_submenu = wx.Menu()
-        self.m_wells_submenu.AppendMenu(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
+        self.m_wells_submenu.Append(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
         self.well_name_submenu.Append(int(self.well_count) + 2000, 'hide/show')
         self.well_name_submenu.Append(int(self.well_count) + 3000, 'delete well')
         self.Bind(wx.EVT_MENU, self.show_hide_well, id=int(self.well_count) + 2000)
@@ -2422,7 +2463,7 @@ class Gmg(wx.Frame):
 
         '#% SETUP NEW CONTACT DATA SUBMENU'
         self.contacts_submenu = wx.Menu()
-        self.m_contacts_submenu.AppendMenu(self.contact_data_count + 3000, self.contact_name, self.contacts_submenu)
+        self.m_contacts_submenu.Append(self.contact_data_count + 3000, self.contact_name, self.contacts_submenu)
         self.contacts_submenu.Append(self.contact_data_count + 3000, 'delete data')
         self.Bind(wx.EVT_MENU, self.delete_contact_data, id=self.contact_data_count + 3000)
 
@@ -2561,7 +2602,7 @@ class Gmg(wx.Frame):
                                                                            marker='o', color=filtered_color, s=5,
                                                                            gid=self.obs_grav_count)
             self.obs_submenu = wx.Menu()
-            self.m_obs_g_submenu.AppendMenu(self.obs_grav_count, filtered_name, self.obs_submenu)
+            self.m_obs_g_submenu.Append(self.obs_grav_count, filtered_name, self.obs_submenu)
             self.obs_submenu.Append(self.obs_grav_count, 'delete observed data')
             self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count)
             self.obs_grav_count += 1
@@ -2577,7 +2618,7 @@ class Gmg(wx.Frame):
                                                                          marker='o', color=filtered_color, s=5,
                                                                          gid=self.obs_mag_count)
             self.obs_submenu = wx.Menu()
-            self.m_obs_mag_submenu.AppendMenu(self.obs_mag_count, filtered_name, self.obs_submenu)
+            self.m_obs_mag_submenu.Append(self.obs_mag_count, filtered_name, self.obs_submenu)
             self.obs_submenu.Append(self.obs_mag_count, 'delete observed data')
             self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
             self.obs_mag_count += 1
@@ -2775,8 +2816,8 @@ class Gmg(wx.Frame):
             x, y = event.xdata, event.ydata  # get xy of new point
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
-            print "index node ="
-            print self.index_node
+            # print "index node ="
+            # print self.index_node
             if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
                 xt[self.index_node] = 0  # replace old x with new x
                 yt[self.index_node] = y  # replace old y with new y
@@ -3417,8 +3458,8 @@ class Gmg(wx.Frame):
 
     def model_rms(self, xp):
         """# %CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
-        print self.obs_gravity_data_for_rms
-        print self.calc_grav_switch
+        # print self.obs_gravity_data_for_rms
+        # print self.calc_grav_switch
         if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
             x = xp * 0.001
             y = self.predgz
@@ -3434,8 +3475,8 @@ class Gmg(wx.Frame):
                                                          self.obs_mag_data_for_rms[:, 1], x, y)
         else:
             pass
-        print self.grav_rms_value
-        print self.grav_residuals
+        # print self.grav_rms_value
+        # print self.grav_residuals
     # LAYER ATTRIBUTE TABLE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_attribute_table(self, event):
@@ -3863,16 +3904,14 @@ class Gmg(wx.Frame):
         dlg = wx.MessageDialog(self, "Do you really want to exit", "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         result = dlg.ShowModal()
         if result == wx.ID_OK:
-            self.Destroy()
-            wx.GetApp().Exit()
+            wx.GetApp().ExitMainLoop()
 
     def on_close_button(self, event):
         """# %SHUTDOWN APP (X BUTTON)"""
         dlg = wx.MessageDialog(self, "Do you really want to exit", "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         result = dlg.ShowModal()
         if result == wx.ID_OK:
-            self.Destroy()
-            wx.GetApp().Exit()
+            wx.GetApp().ExitMainLoop()
 
     # FUTURE MODULES (IN PROCESS)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3946,7 +3985,7 @@ class Gmg(wx.Frame):
 class NewModelDialog(wx.Dialog):
     def __init__(self, parent, id, title, m_x1=None, m_x2=None, m_z1=None, m_z2=None):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.THICK_FRAME | wx.OK | wx.CANCEL)
+                                                          | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL)
 
         floating_panel = wx.Panel(self, -1)
         self.set_button = False
@@ -3989,7 +4028,7 @@ class NewModelDialog(wx.Dialog):
         self.z2 = float(self.new_z2.GetValue())
         self.xp_inc = float(self.xp_inc.GetValue())
         self.set_button = True
-        self.Destroy()
+        self.EndModal(1)
 
 
 class LoadObservedDataFrame(wx.Frame):
@@ -4055,13 +4094,13 @@ class LoadObservedDataFrame(wx.Frame):
             self.parent.open_obs_t()
         else:
             pass
-        self.Destroy()
+        self.EndModal(1)
 
 
 class SeisDialog(wx.Dialog):
     def __init__(self, parent, id, title, area):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX
-                                                          | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
         self.area = area
         x1, x2, z1, z2 = 0.001 * np.array(self.area)
@@ -4097,13 +4136,13 @@ class SeisDialog(wx.Dialog):
         self.sz2 = float(self.z_end_Text.GetValue())
         self.dimensions = [self.sx1, self.sx2, self.sz1, self.sz2]
         self.segy_name_input = str(self.segy_name_Text.GetValue())
-        self.Destroy()
+        self.EndModal(1)
 
 
 class MagDialog(wx.Dialog):
     def __init__(self, parent, id, title, area):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                                         | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                                         | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
         '# %MODEL AZIMUTH'
         self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth:")
@@ -4137,13 +4176,13 @@ class MagDialog(wx.Dialog):
         self.model_azimuth = float(self.model_azimuth_text.GetValue())
         self.inc = float(self.inc_text.GetValue())
         self.earth_field = float(self.earth_field_text.GetValue())
-        self.Destroy()
+        self.EndModal(1)
 
 
 class PinchDialog(wx.Dialog):
     def __init__(self, parent, id, title, plotx_list, ploty_list, i):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
         self.plotx_list = plotx_list
         self.ploty_list = ploty_list
@@ -4193,7 +4232,7 @@ class PinchDialog(wx.Dialog):
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
-        self.Destroy()
+        self.EndModal(1)
 
     def down_set_button(self, event):
         p_start = float(self.p_start_Text.GetValue())
@@ -4226,13 +4265,13 @@ class PinchDialog(wx.Dialog):
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
-        self.Destroy()
+        self.EndModal(1)
 
 
 class DepinchDialog(wx.Dialog):
     def __init__(self, parent, id, title, plotx_list, ploty_list, i, layer_count):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
         self.plotx_list = plotx_list
         self.ploty_list = ploty_list
@@ -4293,14 +4332,14 @@ class DepinchDialog(wx.Dialog):
         self.depinched_x[insert_point:1] = new_xs
         self.depinched_y[insert_point:1] = new_ys_list
 
-        self.Destroy()
+        self.EndModal(1)
 
 
 class MedianFilterDialog(wx.Dialog):
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, "Apply Median Filter", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX
-                                                                          | wx.THICK_FRAME)
+                                                                          )
         input_panel = wx.Panel(self, -1)
 
         '# %GET OBSERVED DATA FROM gmg'
@@ -4364,7 +4403,7 @@ class MedianFilterDialog(wx.Dialog):
                 self.filtered_output = np.zeros(shape=(len(self.obs_input), 2))
                 self.filtered_output[:, 0] = self.obs_input[:, 0]
                 self.filtered_output[:, 1] = signal.medfilt(self.obs_input[:, 1], self.filter_length)
-                self.Destroy()
+                self.EndModal(1)
 
         for i in xrange(len(self.obs_mag_name_list)):
             '# %CHECK MAG'
@@ -4375,13 +4414,13 @@ class MedianFilterDialog(wx.Dialog):
                 self.filtered_output = np.zeros(shape=(len(self.obs_input), 2))
                 self.filtered_output[:, 0] = self.obs_input[:, 0]
                 self.filtered_output[:, 1] = signal.medfilt(self.obs_input[:, 1], self.filter_length)
-                self.Destroy()
+                self.EndModal(1)
 
 
 class SetBackgroundDensityDialog(wx.Dialog):
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
 
         '# % CHOOSE BACKGROUND DENSITY'
@@ -4408,13 +4447,13 @@ class SetBackgroundDensityDialog(wx.Dialog):
         self.background_density_upper = float(self.background_density_text_input_upper.GetValue())
         # self.background_density_lower = float(self.background_density_text_input_lower.GetValue())
         # self.background_density_lid   = float(self.background_density_text_input_lid.GetValue())
-        self.Destroy()
+        self.EndModal(1)
 
 
 class BulkShiftDialog(wx.Dialog):
     def __init__(self, parent, id, title, plotx_list, ploty_list, i):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
         self.ploty_list = ploty_list
         self.plotx_list = plotx_list
@@ -4441,13 +4480,13 @@ class BulkShiftDialog(wx.Dialog):
         '# %BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0'
         self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
         self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0. else 0.01 for y in current_y]
-        self.Destroy()
+        self.EndModal(1)
 
 
 class SetObsRmsDialog(wx.Dialog):
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
 
         self.obs_grav_name_list = obs_grav_name_list
@@ -4501,13 +4540,13 @@ class SetObsRmsDialog(wx.Dialog):
                     self.obs_mag_data_for_rms = self.obs_mag_list_save[i]
         else:
             self.obs_mag_data_for_rms = None
-        self.Destroy()
+        self.EndModal(1)
 
 
 class NewLayerDialog(wx.Dialog):
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
 
         # %CREATE FIXED LAYER BUTTON
@@ -4528,7 +4567,7 @@ class NewLayerDialog(wx.Dialog):
         floating_dialogbox = self.SetNewThickness(self, -1, "Set new layer thickness")
         answer = floating_dialogbox.ShowModal()
         self.new_thickness = floating_dialogbox.new_thickness
-        self.Destroy()
+        self.EndModal(1)
 
     def set_floating(self, event):
         """# %APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
@@ -4539,13 +4578,13 @@ class NewLayerDialog(wx.Dialog):
         self.x2, self.y2 = floating_dialogbox.x2, floating_dialogbox.y2
         self.x3, self.y3 = floating_dialogbox.x3, floating_dialogbox.y3
         self.x4, self.y4 = floating_dialogbox.x4, floating_dialogbox.y4
-        self.Destroy()
+        self.EndModal(1)
 
     class SetNewThickness(wx.Dialog):
         """# %APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
             floating_panel = wx.Panel(self, -1)
 
             self.new_Text = wx.StaticText(floating_panel, -1, "Set New layer thickness (km)")
@@ -4560,14 +4599,14 @@ class NewLayerDialog(wx.Dialog):
 
         def make_button(self, event):
             self.new_thickness = float(self.new_thickness_ctrl.GetValue())
-            self.Destroy()
+            self.EndModal(1)
 
     class SetFloatingLayer(wx.Dialog):
         """# %APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
 
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX | wx.THICK_FRAME)
+                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
             floating_panel = wx.Panel(self, -1)
 
             self.n1_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -4606,7 +4645,7 @@ class NewLayerDialog(wx.Dialog):
             self.x2, self.y2 = float(self.new_x2.GetValue()), float(self.new_y2.GetValue())
             self.x3, self.y3 = float(self.new_x3.GetValue()), float(self.new_y3.GetValue())
             self.x4, self.y4 = float(self.new_x4.GetValue()), float(self.new_y4.GetValue())
-            self.Destroy()
+            self.EndModal(1)
 
 
 class MessageDialog(wx.MessageDialog):
@@ -4863,7 +4902,6 @@ class PlotSettingsDialog(wx.Frame):
         self.Destroy()
 
     def file_path(self, event):
-        print "clicked button"
         self.save_file_dialog = wx.FileDialog(self, "Save As", "", "", "Pdf files (*.pdf)|*.pdf",
                                               wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if self.save_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -4912,9 +4950,9 @@ class AttributeEditor(wx.Frame):
         '''CREATE SET BUTTON'''
         attribute_edit.b_set_attr_button = wx.Button(attribute_edit.input_panel, -1, "Set")
         attribute_edit.Bind(wx.EVT_BUTTON, attribute_edit.set_attr_button, attribute_edit.b_set_attr_button)
+
         '''POPULATE ATTRIBUTE TABLE'''
         attribute_edit.length = len(attribute_edit.tree_items)
-        print len(attribute_edit.tree_items)
         for i in range(0, attribute_edit.length):
             attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i])
             attribute_edit.attr_grid.SetCellValue(i, 1, str(float(attribute_edit.densities[i]) / 1000.))
@@ -4945,7 +4983,6 @@ class AttributeEditor(wx.Frame):
             attribute_edit.attr_grid.SetColSize(col, width / (10 + 1))
 
     def open_colour_box(attribute_edit, event):
-        print "open Color"
         if event.GetCol() == 5:
             row = event.GetRow()
             attribute_edit.on_color_dlg(event, row)
@@ -5062,7 +5099,7 @@ class AttributeEditor(wx.Frame):
 
 '''# %START SOFTWARE'''
 if __name__ == "__main__":
-    app = wx.PySimpleApp()
+    app = wx.App(False)
     fr = wx.Frame(None, title='gmg: 2D Geophysical Modelling GUI')
     app.frame = Gmg()
     app.frame.CenterOnScreen()
