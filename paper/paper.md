@@ -20,7 +20,7 @@ bibliography: gmg.bib
 
 # Summary
  
-For decades, forward modelling of potential field data, such as 
+For decades, forward modelling of potential field data such as 
 gravity and magnetic anomalies, has been common practice within the 
 geophysics community as a means of constraining subsurface 
 structure. Many software packages (both freely available and commercially licenced) 
@@ -58,12 +58,11 @@ from which, the function fatiando.polygon is used for handling model layers and
 ObsPy [@beyreuther2010], from which, the seismic plotting function
 obspy.read is used for loading seismic data. The algorithms for calculating the
 gravity and magnetic anomalies are from [@bott1969] and [@talwani1964] respectively. 
-The source code for ``GMG`` is
-stored on github at: https://github.com/btozer/gmg
+The source code for ``GMG`` is stored on github at: https://github.com/btozer/gmg
 
 # Acknowledgements
 
-GMG was conceived at the University of Oxford and with contributions
+GMG was conceived at the University of Oxford with contributions
 from Brook Keats.
 
 # References
