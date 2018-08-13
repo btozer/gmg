@@ -23,7 +23,7 @@ geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 Installation and Dependencies
 ------------------------------
 GMG is written in Python 2.7 and relies on the dependencies listed below. 
-All of these dependencies need to be installed in order for GMG to run.
+All of these dependencies need to be installed in order for gmg to run.
 
 
 **Dependencies**
@@ -44,16 +44,16 @@ distribution: https://www.continuum.io/downloads
 This should ensure you can install all the dependencies required  on 
 any platform (Linux, Mac, Windows) using the Conda package manager.
 
-Then gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
+Then, gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
 
-pip will install and all of its dependencies with your local
-anaconda python site-packages directory.
 
-gmg can then be installed by running the following command in the dir where you have downloaded or git-cloned the source code. 
+1. Download or git clone the gmg github repository.
+
+2. Run the following command in the dir where you have downloaded or git-cloned the gmg repository. 
 
     pip install .
 
-THis will place gmg with your local anaconda python site-packages dir.
+This will place gmg with your local anaconda python site-packages dir.
 
 **Launching gmg**
 
@@ -61,11 +61,11 @@ To start gmg the best way is to create an alias and export this e.g.:
 
     export alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
-or manually add this to your .bashrc or equivalent file (e.g. .bash_profile or .cshrc) e.g.:
+or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.:
     
     alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
-Then add the executable directory to your $PATH variable by repeating the progess, e.g.:
+Then (it required) add the executable directory to your $PATH variable by repeating the progess, e.g.:
     
     export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
 
