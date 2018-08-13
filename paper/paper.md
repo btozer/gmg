@@ -27,25 +27,25 @@ structure. Many software packages (both freely available and commercially licenc
 exist for preforming such modelling. However, most, if not
 all of these packages, suffer from at least one major draw-back. Such draw-backs
 include: (1) being closed source; (2) not allowing for the calculation of both
-gravity and magnetic anomalies; (3) Not facilitating the integration of
-complimentary data within the modelling environment and (4) being programmed in 
-such a way that the software is  cumbersome for integrating within an 
-academic research project due to, for example, (5) being a single platform 
+gravity and magnetic anomalies simultaneously; (3) No means for integrating 
+complimentary data (e.g., earthquake hypocenters) within the modelling environment 
+and (4) being programmed in such a way that the software is cumbersome for integrating within 
+an academic research project due to, for example, (5) being a single platform 
 release (usually Windows only), (6) having poor I/O functionality and (7) poor 
 documentation.
 
 ``GMG`` is an open-source Python package primarily intended as an
 interactive, user-friendly two-dimensional geophysical forward modelling GUI
 that resolves all of the draw-backs listed above. Both gravity and magnetic
-anomalies can be computed along a 2D profile consisting of subsurface bodies
-defined as any number of 2D polygons. Moreover, functions for displaying
+anomalies can be computed along a two-dimensional profile consisting of subsurface bodies
+defined as any number of two-dimensional polygons. Moreover, functions for displaying
 complementary data within the modelling environment, such as exploration well
 logs and seismic data, are provided. ``GMG`` has been designed with a minimalist
 user-interface and simple I/O in order to enhance usability and it is expected
-to be useful for both researchers and teaching of exploration geophysics. Most
-importantly ``GMG`` is fully open source. Hence, providing an environment where
-users can add new functionality and optimise processes such that the software will
-naturally become more useful and streamlined over time.  
+to be useful for both researchers and for teaching. Most
+importantly, ``GMG`` is open source, providing an environment where
+users can add new functionality and optimise processes. In this way, it is hoped the 
+software will naturally become more useful and streamlined over time.  
 
 ``GMG`` makes extensive use of functions from
 the Scientic Computing in Python (SciPy) package [@oliphant2007]. In
