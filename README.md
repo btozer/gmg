@@ -59,13 +59,15 @@ THis will place gmg with your local anaconda python site-packages dir.
 
 To start gmg the best way is to create an alias and export this e.g.:
 
-export alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+    export alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
 or manually add this to your .bashrc or equivalent file (e.g. .bash_profile or .cshrc) e.g.:
-alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+    
+    alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
 Then add the executable directory to your $PATH variable by repeating the progess, e.g.:
-export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
+    
+    export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
 
 Now, in a fresh terminal, simple type "gmg" on the command line to launch the software.
 
