@@ -53,10 +53,10 @@ particular, NumPy [@vanderwalt2011] data structures are used for data
 handling and computational efficiency. Matplotlib [@hunter2007] plotting tools
 are employed for displaying and interacting with graphics. The GUI is
 implemented using the wxWidgets GUI toolkit, wxPython [@rappin2006].
-Further, software dependencies include Fatiando a Terra [@Uieda2013],
+Further software dependencies include Fatiando a Terra [@Uieda2013],
 from which, the function fatiando.polygon is used for handling model layers and
 ObsPy [@beyreuther2010], from which, the seismic plotting function
-obspy.read is used for loading seismic data. The algorithms for calculating the
+obspy.read is used for loading and displaying seismic data. The algorithms for calculating the
 gravity and magnetic anomalies are from [@bott1969] and [@talwani1964] respectively. 
 The source code for ``GMG`` is stored on github at: https://github.com/btozer/gmg
 
