@@ -46,22 +46,14 @@ any platform (Linux, Mac, Windows) using the Conda package manager.
 
 Then gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
 
-The following command will install GMG and all of its dependencies 
-within your local anaconda python site-packages dir.
-
-Using pip all of the gmg dependencies can be installed.
-
-This will install and all of its dependencies with your local
+pip will install and all of its dependencies with your local
 anaconda python site-packages directory.
 
-gmg can then be installed by running the following command in the dir where you have the source code downloaded. 
-This will install gmg into your local anaconda python site-packages dir.
+gmg can then be installed by running the following command in the dir where you have downloaded or git-cloned the source code. 
 
-pip install .
+    pip install .
 
-or for a local installation
-
-pip install .
+THis will place gmg with your local anaconda python site-packages dir.
 
 **Launching gmg**
 
