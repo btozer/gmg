@@ -62,7 +62,6 @@ The source code for ``GMG`` is stored on github at: https://github.com/btozer/gm
 
 # Acknowledgements
 
-GMG was conceived at the University of Oxford with contributions
-from Brook Keats.
+GMG was conceived at the University of Oxford and we thank Brook Keats for helpful discussion and contributions.
 
 # References
