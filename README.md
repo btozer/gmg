@@ -64,7 +64,7 @@ or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zs
     
     alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
-NB. for MAC OS users you may nned to invoke pythonw instead of python if you receive the message:
+NB. for macOS users you may need to invoke pythonw instead of python if you receive the message:
 
     This program needs access to the screen. Please run with a
     Framework build of python, and only when you are logged in
@@ -74,11 +74,13 @@ i.e.
 
     alias gmg='pythonw ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
-Then (it required) add the executable directory to your $PATH variable by repeating the progess, e.g.:
+Then you can (optionally) add the executable directory to your $PATH variable by repeating the progess. e.g.:
     
     export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
 
-Now, in a fresh terminal, simple type "gmg" on the command line to launch the software.
+Now, in a fresh terminal, simple type "gmg" on the command line to launch the software. e.g.:
+    
+    gmg
 
 
 Getting started
