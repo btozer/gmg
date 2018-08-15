@@ -12,8 +12,7 @@ functions for loading XY data, seismic reflection SEGY data and exploration well
 The software therefore provides an integrated geological/geophysical interpretation
 package. It is anticipated that GMG will also be useful for teaching purposes.
 
-Input and output of data is made as simple as possible using space delimited
-ASCII text files.
+Data I/O is made as simple as possible using space delimited ASCII text files.
 
 The project was instigated after failing to find an adequate open source option
 (in which the source code can be viewed and modified by the user) for performing 2D 
