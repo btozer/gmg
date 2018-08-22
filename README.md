@@ -43,8 +43,17 @@ distribution: https://www.continuum.io/downloads
 This should ensure you can install all the dependencies required  on 
 any platform (Linux, Mac, Windows) using the Conda package manager.
 
-Then, gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
+It may be useful to create a new python2.7 conda environment:
 
+    conda create -n py27 python=2.7 anaconda
+    
+This environment can then be activiated using:
+    
+    source activate py27
+
+Installing gmg and its dependencies within this environment will ensure gmg runs correctly.
+
+Then, gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
 
 1. Download or git clone the gmg github repository.
 
