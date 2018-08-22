@@ -64,8 +64,11 @@ Documentation created using Sphinx.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-source activate py27
+NB. run:
 
+    source activate py27
+
+Before trying to run gmg.
 """
 
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,13 +126,13 @@ class Gmg(wx.Frame):
     Objects are passed between the master class and Dialog boxes.
     """
 
-    # %DIR CONTAINING PROGRAM ICONS
-
-    gui_icons_dir = os.path.dirname(__file__) + '/icons/'
-    gui_icons_dir = "/Users/brook/gmg/gmg/icons/"
 
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
+
+        '# %DIR CONTAINING PROGRAM ICONS'
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        self.gui_icons_dir = self.script_dir + '/icons/'
 
         '# %START AUI WINDOW MANAGER'
         self.mgr = aui.AuiManager()
@@ -482,7 +485,7 @@ class Gmg(wx.Frame):
         m_help = help_file.Append(-1, "&Documentation...", "Open Documentation html...")
         self.Bind(wx.EVT_MENU, self.open_documentation, m_help)
         m_about = help_file.Append(-1, "&About...", "About gmg...")
-        self.Bind(wx.EVT_MENU, self.about_fat, m_about)
+        self.Bind(wx.EVT_MENU, self.about_gmg, m_about)
         m_legal = help_file.Append(-1, "&Legal...", "Legal...")
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
         self.menubar.Append(help_file, "&Help")
@@ -3864,13 +3867,27 @@ class Gmg(wx.Frame):
     def open_documentation(self, event):
         """# %OPENS DOCUMENTATION HTML"""
         new = 2
-        doc_url = os.path.dirname(__file__) + '/docs/_build/html/manual.html'
+        self.doc_dir = os.path.dirname(os.path.abspath(__file__))
+        doc_url = self.doc_dir + '/docs/_build/html/manual.html'
+        print doc_url
         webbrowser.open(doc_url, new=new)
 
-    def about_fat(self, event):
+    def about_gmg(self, event):
         """# %SHOW SOFTWARE INFORMATION"""
-        about = "About gmg"
-        dlg = wx.MessageDialog(self, about, "About", wx.OK | wx.ICON_INFORMATION)
+        about = [
+            "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
+            "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
+            "seismic reflection SEGY data and exploration well horizons. The software therefore provides an "
+            "integrated geological/geophysical interpretation package. It is anticipated that GMG will also be "
+            "useful for teaching purposes. \n \n"
+            "Data I/O is made as simple as possible using space delimited ASCII text files. \n \n"
+            "The project was instigated after failing to find an adequate open source option (in which the source "
+            "code can be viewed and modified by the user) for performing 2D geophysical modeling tasks.           "
+            "Inspiration came from fatiando a terra and GMT. \n \n"
+            "GMG was initially developed at the University of Oxford 2014-2017. \n \n"
+            "B. Tozer"]
+
+        dlg = wx.MessageDialog(self, about[0], "About", wx.OK | wx.ICON_INFORMATION)
         result = dlg.ShowModal()
         dlg.Destroy()
 
