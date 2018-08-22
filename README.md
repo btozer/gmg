@@ -12,8 +12,7 @@ functions for loading XY data, seismic reflection SEGY data and exploration well
 The software therefore provides an integrated geological/geophysical interpretation
 package. It is anticipated that GMG will also be useful for teaching purposes.
 
-Input and output of data is made as simple as possible using space delimited
-ASCII text files.
+Data I/O is made as simple as possible using space delimited ASCII text files.
 
 The project was instigated after failing to find an adequate open source option
 (in which the source code can be viewed and modified by the user) for performing 2D 
@@ -23,7 +22,7 @@ geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 Installation and Dependencies
 ------------------------------
 GMG is written in Python 2.7 and relies on the dependencies listed below. 
-All of these dependencies need to be installed in order for GMG to run.
+All of these dependencies need to be installed in order for gmg to run.
 
 
 **Dependencies**
@@ -44,38 +43,53 @@ distribution: https://www.continuum.io/downloads
 This should ensure you can install all the dependencies required  on 
 any platform (Linux, Mac, Windows) using the Conda package manager.
 
-Then gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
+It may be useful to create a new python2.7 conda environment:
 
-The following command will install GMG and all of its dependencies 
-within your local anaconda python site-packages dir.
+    conda create -n py27 python=2.7 anaconda
+    
+This environment can then be activiated using:
+    
+    source activate py27
 
-Using pip all of the gmg dependencies can be installed.
+Installing gmg and its dependencies within this environment will ensure gmg runs correctly.
 
-This will install and all of its dependencies with your local
-anaconda python site-packages directory.
+Then, gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
 
-gmg can then be installed by running the following command in the dir where you have the source code downloaded. 
-This will install gmg into your local anaconda python site-packages dir.
+1. Download or git clone the gmg github repository.
 
-pip install .
+2. Run the following command in the dir where you have downloaded or git-cloned the gmg repository. 
 
-or for a local installation
+    pip install .
 
-pip install .
+This will place gmg with your local anaconda python site-packages dir.
 
 **Launching gmg**
 
 To start gmg the best way is to create an alias and export this e.g.:
 
-export alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+    export alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
-or manually add this to your .bashrc or equivalent file (e.g. .bash_profile or .cshrc) e.g.:
-alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.:
+    
+    alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
 
-Then add the executable directory to your $PATH variable by repeating the progess, e.g.:
-export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
+NB. for macOS users you may need to invoke pythonw instead of python if you receive the message:
 
-Now, in a fresh terminal, simple type "gmg" on the command line to launch the software.
+    This program needs access to the screen. Please run with a
+    Framework build of python, and only when you are logged in
+    on the main display of your Mac.
+
+i.e.
+
+    alias gmg='pythonw ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+
+Then you can (optionally) add the executable directory to your $PATH variable by repeating the progess. e.g.:
+    
+    export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
+
+Now, in a fresh terminal, simple type "gmg" on the command line to launch the software. e.g.:
+    
+    gmg
 
 
 Getting started
@@ -90,7 +104,7 @@ Help -> Documentation
 
 or
 
-by opening PATH_TO_GMG/gmg/gmg/docs/Manual.html
+by opening "PATH_TO_GMG"/gmg/gmg/docs/Manual.html
 
 If the test cases don't work as expected, please submit a bug report as described
 below in the section **Contributing**.
