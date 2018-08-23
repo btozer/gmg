@@ -47,7 +47,7 @@ It may be useful to create a new python2.7 conda environment:
 
     conda create -n py27 python=2.7 anaconda
     
-This environment can then be activiated using:
+This environment can then be activated using:
     
     source activate py27
 
