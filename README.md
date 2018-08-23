@@ -104,7 +104,7 @@ Help -> Documentation
 
 or
 
-by opening "PATH_TO_GMG"/gmg/gmg/docs/Manual.html
+by opening "PATH_TO_GMG"/gmg/docs/_build/html/gmg_documentation.html
 
 If the test cases don't work as expected, please submit a bug report as described
 below in the section **Contributing**.
