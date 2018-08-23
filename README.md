@@ -26,12 +26,15 @@ Installation
 Pre-Installation
 ----------------
 
-The simplest way to install gmg is to first install an Anaconda Python distribution: https://www.continuum.io/downloads
-This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
-using the Conda package manager. Additionally, you can create a separate conda environment to use when running gmg. This
-will avoid any potential conflicts with your current system configuration.
+To install gmg you will need some familiarity with using a unix terminal. The simplest way to install gmg is to use an Anaconda Python distribution. Anaconda can be downloaded from: 
+    
+    https://www.continuum.io/downloads
 
-It may be useful to create a new python2.7 conda environment e.g.::
+Using Anaconda will ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) 
+using the Conda package manager. Additionally, you can create a separate conda environment to use when running gmg. 
+This will avoid any potential conflicts with your current system configuration.
+
+To create a new python2.7 conda environment you can use the command:
 
     conda create -n py27-gmg python=2.7 anaconda
 
