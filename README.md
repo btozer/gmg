@@ -4,7 +4,7 @@
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
 
 Statement of need
------------------
+=================
 
 GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling
 2D potential field (gravity and magnetic) profiles. The software also includes 
@@ -19,59 +19,95 @@ The project was instigated after failing to find an adequate open source option
 geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 
 
-Installation and Dependencies
-------------------------------
-GMG is written in Python 2.7 and relies on the dependencies listed below. 
-All of these dependencies need to be installed in order for gmg to run.
+Installation
+============
 
 
-**Dependencies**
+Pre-Installation
+----------------
 
-    python2.7
-    fatiando
-    matplotlib
-    numpy
-    obspy
-    scipy
-    wxpython
+The simplest way to install gmg is to first install an Anaconda Python distribution: https://www.continuum.io/downloads
+This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
+using the Conda package manager. Additionally, you can create a separate conda environment to use when running gmg. This
+will avoid any potential conflicts with your current system configuration.
 
+It may be useful to create a new python2.7 conda environment e.g.::
 
-**Installing**
+    conda create -n py27-gmg python=2.7 anaconda
 
-The simplest way to install gmg is to first install an Anaconda Python 
-distribution: https://www.continuum.io/downloads
-This should ensure you can install all the dependencies required  on 
-any platform (Linux, Mac, Windows) using the Conda package manager.
-
-It may be useful to create a new python2.7 conda environment:
-
-    conda create -n py27 python=2.7 anaconda
-    
+Where the -n flag dictates what you want to name the new environment. 
 This environment can then be activated using:
-    
-    source activate py27
 
-Installing gmg and its dependencies within this environment will ensure gmg runs correctly.
+    source activate py27-gmg
 
-Then, gmg may be installed using pip (https://packaging.python.org/tutorials/installing-packages/).
+.. note::
+    gmg is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems.
+    It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
+    Please raise any information regarding installation problems on github.
 
-1. Download or git clone the gmg github repository.
 
-2. Run the following command in the dir where you have downloaded or git-cloned the gmg repository. 
+Installing gmg
+--------------
+
+**Step 1:**
+
+Ensure your py27-gmg environment is active::
+
+    source activate py27-gmg
+
+|
+
+**Step 2: Install dependencies**
+
+GMG depends on several other packages to run. These are:
+
+* `wxpython <http://wiki.wxpython.org/>`_
+* `numpy <http://numpy.scipy.org/>`_
+* `scipy <http://scipy.org/>`_
+* `matplotlib <http://matplotlib.sourceforge.net/>`_
+* `fatiando a terra <http://www.fatiando.org/>`_
+* `ObsPy <http://docs.obspy.org/>`_
+
+These dependencies can be installed in your py27 environment using the command::
+
+    conda install wxpython numpy scipy matplotlib fatiando obspy
+
+|
+
+**Step 3: Get gmg**
+
+Download or git clone the gmg github repository. To download, navigate to::
+
+    https://github.com/btozer/gmg
+
+Use the green *clone or download* button on the right hand side of the page to download a .zip of gmg. Unzip this
+directory.
+
+or simply use git on the command line::
+
+    git clone https://github.com/btozer/gmg.git
+
+|
+
+**Step 4: Install  gmg**
+
+Run the following command in the dir where you have downloaded or git-cloned the gmg repository.
 
     pip install .
 
-This will place gmg with your local anaconda python site-packages dir.
+This will install gmg within your local anaconda python site-packages dir.
 
-**Launching gmg**
 
-To start gmg the best way is to create an alias and export this e.g.:
+Launching gmg
+-------------
 
-    export alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+To start gmg the best way is to create an alias and export this, e.g.:
 
-or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.:
-    
-    alias gmg='python ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+    export alias gmg='python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
+
+or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.
+
+    alias gmg='python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
 NB. for macOS users you may need to invoke pythonw instead of python if you receive the message:
 
@@ -79,38 +115,37 @@ NB. for macOS users you may need to invoke pythonw instead of python if you rece
     Framework build of python, and only when you are logged in
     on the main display of your Mac.
 
-i.e.
+i.e.::
 
-    alias gmg='pythonw ~/anaconda/lib/python3/site-packages/gmg/gmg.py'
+    alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
-Then you can (optionally) add the executable directory to your $PATH variable by repeating the progess. e.g.:
-    
-    export $PATH=$PATH:~/anaconda/lib/python3/site-packages/gmg/
+Then you can (optionally) add the executable directory to your $PATH variable by repeating the process, e.g.:
 
-Now, in a fresh terminal, simple type "gmg" on the command line to launch the software. e.g.:
-    
+    export $PATH=$PATH:~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/
+
+Now, in a fresh terminal, simple type "gmg" on the command line to launch the software:
+
     gmg
 
 
 Getting started
 ---------------
 
-It is recommended you run the two test cases when first launching the software
-to check the potential field algorithms are running correctly.
-Details can be found in the documentation. This can be accessed from within
+It is recommended you run the two test cases when first launching the software to check the potential field algorithms 
+are running correctly. Details can be found in the documentation. This can be accessed from within
 the software under:
 
-Help -> Documentation
+    Help -> Documentation
 
-or
-
-by opening "PATH_TO_GMG"/gmg/docs/_build/html/gmg_documentation.html
+or by opening:
+    
+    "PATH_TO_GMG"/gmg/docs/_build/html/gmg_documentation.html
 
 If the test cases don't work as expected, please submit a bug report as described
-below in the section **Contributing**.
+below in the section *Contributing*.
 
-Once the test cases have been run (and work) the easiest way to get a feel for the 
-software is run through the tutorial as described in the documentation.
+Once the test cases have been run (and work as expected) the easiest way to get a feel for the 
+software is to work through the tutorial (see *documentation*).
 
 
 Contributing

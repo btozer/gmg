@@ -15,7 +15,8 @@ It may be useful to create a new python2.7 conda environment e.g.::
 
     conda create -n py27-gmg python=2.7 anaconda
 
-where -n dictates is what you want to name the environment. This environment can then be activated using:
+Where the -n flag dictates what you want to name the new environment.
+This environment can then be activated using::
 
     source activate py27-gmg
 
@@ -27,16 +28,14 @@ where -n dictates is what you want to name the environment. This environment can
 Installation
 ------------
 
-Step 1:
--------
+**Step 1:**
 
 Ensure your py27-gmg environment is active::
 
     source activate py27-gmg
 
 
-Step 2: Install dependencies
-----------------------------
+**Step 2: Install dependencies**
 
 GMG depends on several other packages to run. These are:
 
@@ -52,8 +51,7 @@ These dependencies can be installed in your py27 environment using the command::
     conda install wxpython numpy scipy matplotlib fatiando obspy
 
 
-Step 3: Get gmg
----------------
+**Step 3: Get gmg**
 
 Download or git clone the gmg github repository. To download, navigate to::
 
@@ -66,17 +64,17 @@ or simply use git on the command line::
 
     git clone https://github.com/btozer/gmg.git
 
-Step 3: Install  gmg
---------------------
+**Step 4: Install  gmg**
 
 Run the following command in the dir where you have downloaded or git-cloned the gmg repository.
 
     pip install .
 
-This will place gmg with your local anaconda python site-packages dir.
+This will install gmg within your local anaconda python site-packages dir.
 
-**Launching gmg**
------------------
+
+Launching gmg
+-------------
 
 To start gmg the best way is to create an alias and export this e.g.::
 
@@ -96,10 +94,10 @@ i.e.::
 
     alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
-Then you can (optionally) add the executable directory to your $PATH variable by repeating the progess. e.g.::
+Then you can (optionally) add the executable directory to your $PATH variable by repeating the process, e.g.::
 
     export $PATH=$PATH:~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/
 
-Now, in a fresh terminal, simple type "gmg" on the command line to launch the software. e.g.::
+Now, in a fresh terminal, simple type "gmg" on the command line to launch the software::
 
     gmg
