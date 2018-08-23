@@ -55,7 +55,6 @@ Ensure your py27-gmg environment is active::
 
     source activate py27-gmg
 
-|
 
 **Step 2: Install dependencies**
 
@@ -72,7 +71,6 @@ These dependencies can be installed in your py27 environment using the command::
 
     conda install wxpython numpy scipy matplotlib fatiando obspy
 
-|
 
 **Step 3: Get gmg**
 
@@ -87,7 +85,6 @@ or simply use git on the command line::
 
     git clone https://github.com/btozer/gmg.git
 
-|
 
 **Step 4: Install  gmg**
 
