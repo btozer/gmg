@@ -41,10 +41,12 @@ This environment can then be activated using:
 
     source activate py27-gmg
 
-.. note::
-    gmg is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems.
-    It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
-    Please raise any information regarding installation problems on github.
+Supported OS
+------------
+
+**NB:** gmg is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
+It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
+Please raise any information regarding installation problems on github.
 
 
 Installing gmg
