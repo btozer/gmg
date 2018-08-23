@@ -18,10 +18,25 @@ The project was instigated after failing to find an adequate open source option
 (in which the source code can be viewed and modified by the user) for performing 2D 
 geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 
+Key features
+------------
+
+* Import and display observed topography, gravity and magnetic data.
+* Apply filters to observed data.
+* Import and display seismic reflection data.
+* Add and manipulate model layers (subsurface bodies) using a simple interactive interface.
+* “Pinch out/snap” layers against adjacent layers.
+* Calculate the predicted gravity anomaly produced by any combination of model layers.
+* Calculate the predicted magnetic anomaly produced by any combination of model layers.
+* Model magnetic anomalies using induced and/or remanent magnetism.
+* Display well horizon tops.
+* Display XY data (e.g., earthquake hypocenters; geological surface contacts).
+* Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.
+* Save model figures as vector graphics in Portable Document Format (PDF) file.
+
 
 Installation
 ============
-
 
 Pre-Installation
 ----------------
