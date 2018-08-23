@@ -52,7 +52,7 @@ Installing gmg
 
 **Step 1:**
 
-Ensure your py27-gmg environment is active::
+Ensure your py27-gmg environment is active:
 
     source activate py27-gmg
 
@@ -68,28 +68,28 @@ GMG depends on several other packages to run. These are:
 * [fatiando a terra](http://www.fatiando.org/)
 * [ObsPy](http://docs.obspy.org/)
 
-These dependencies can be installed in your py27 environment using the command::
+These dependencies can be installed in your py27 environment using the command:
 
     conda install wxpython numpy scipy matplotlib fatiando obspy
 
 
 **Step 3: Get gmg**
 
-Download or git clone the gmg github repository. To download, navigate to::
+Download or git clone the gmg github repository. To download, navigate to:
 
     https://github.com/btozer/gmg
 
-Use the green *clone or download* button on the right hand side of the page to download a .zip of gmg. Unzip this
+Use the green *"clone or download"* button on the right hand side of the page to download a .zip of gmg. Unzip this
 directory.
 
-or simply use git on the command line::
+or simply use git on the command line:
 
     git clone https://github.com/btozer/gmg.git
 
 
 **Step 4: Install  gmg**
 
-Run the following command in the dir where you have downloaded or git-cloned the gmg repository.
+Run the following command in the dir where you have downloaded or git-cloned the gmg repository:
 
     pip install .
 
@@ -103,7 +103,7 @@ To start gmg the best way is to create an alias and export this, e.g.:
 
     export alias gmg='python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
-or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.
+or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.:
 
     alias gmg='python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
@@ -113,7 +113,7 @@ NB. for macOS users you may need to invoke pythonw instead of python if you rece
     Framework build of python, and only when you are logged in
     on the main display of your Mac.
 
-i.e.::
+i.e.:
 
     alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
