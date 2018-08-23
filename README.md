@@ -152,8 +152,7 @@ Any contribution, big or small is welcome. Examples include:
 
 1. Writing new code/functions.
 2. Improving the user interface.
-3. Making suggestions for improvements or brand new functions.
-4. Submitting bug reports and spelling corrections.
+3. Submitting bug reports and spelling corrections.
 
 They are all helpful.
 
