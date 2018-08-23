@@ -4,12 +4,12 @@
 ====================
 
 1. Launching the software:
------------------------
+--------------------------
 
 Open a new terminal and launch gmg using the command gmg.py or the alias you may have setup.
 
 2. Creating a new model:
----------------------
+------------------------
 
 Navigate to the *file* menu and select *new model...*
 
@@ -23,7 +23,7 @@ Here you input:
     this can later be refined for detailed analysis once a first model is complete. 
 
 3. Get Modelling!
-------------------
+-----------------
 You can now add layers and edit the model. 
 
 See the Tools instructions for details on how to do this.

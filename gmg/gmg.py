@@ -3866,11 +3866,10 @@ class Gmg(wx.Frame):
 
     def open_documentation(self, event):
         """# %OPENS DOCUMENTATION HTML"""
-        new = 2
         self.doc_dir = os.path.dirname(os.path.abspath(__file__))
-        doc_url = self.doc_dir + '/docs/_build/html/manual.html'
+        doc_url = self.doc_dir + '/docs/_build/html/gmg_documentation.html'
         print doc_url
-        webbrowser.open(doc_url, new=new)
+        webbrowser.open_new(doc_url)
 
     def about_gmg(self, event):
         """# %SHOW SOFTWARE INFORMATION"""

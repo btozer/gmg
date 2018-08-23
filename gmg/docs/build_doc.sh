@@ -1,7 +1,9 @@
 #!/bin/bash
 
 #% HTML
+rm -r  _build/html
 sphinx-build -b html _sources/ _build/html/
 
 #% LATEX
-sphinx-build -b latex _sources/ _build/latex
+#rm -r  _build/latex
+#sphinx-build -b latex _sources/ _build/latex

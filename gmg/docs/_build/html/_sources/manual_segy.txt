@@ -1,0 +1,17 @@
+=================
+**5.0 SEGY data**
+=================
+
+-------------------------
+**5.1 Loading SEGY data**
+-------------------------
+
+To load observed SEGY data select the *'SEGY'* menu in the Menubar.
+Next Navigate to the file you want to load and select it.
+The file will automatically be loaded into the canvas.
+
+.. note::
+    SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values,
+    so these may need to be set using seismic processing software or obspy if they are not present in your data.
+
+    The SEGY file will be plotted as a pyplot image.

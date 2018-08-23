@@ -6,15 +6,15 @@
 .. toctree::
    :maxdepth: 1
 
-   manual__icons
-   manual__keyboard_shortcuts
-   manual__models
-   manual__layer_nodes
-   manual__layer_attributes
-   manual__PF
-   manual__segy
-   manual__wells
-   maual__XY_data
-   manual__geology
-   manual__export_figure
-   manual__python_console
+   manual_icons
+   manual_keyboard_shortcuts
+   manual_models
+   manual_layer_nodes
+   manual_layer_attributes
+   manual_PF
+   manual_segy
+   manual_wells
+   manual_XY_data
+   manual_geology
+   manual_export_figure
+   manual_python_console
