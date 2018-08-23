@@ -60,12 +60,12 @@ Ensure your py27-gmg environment is active::
 
 GMG depends on several other packages to run. These are:
 
-* `wxpython <http://wiki.wxpython.org/>`_
-* `numpy <http://numpy.scipy.org/>`_
-* `scipy <http://scipy.org/>`_
-* `matplotlib <http://matplotlib.sourceforge.net/>`_
-* `fatiando a terra <http://www.fatiando.org/>`_
-* `ObsPy <http://docs.obspy.org/>`_
+* [wxpython](http://wiki.wxpython.org/)
+* [numpy](http://numpy.scipy.org/)
+* [scipy](http://scipy.org/)
+* [matplotlib](http://matplotlib.sourceforge.net/)
+* [fatiando a terra](http://www.fatiando.org/)
+* [ObsPy](http://docs.obspy.org/)
 
 These dependencies can be installed in your py27 environment using the command::
 
