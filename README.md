@@ -1,5 +1,6 @@
-GMG: An open source two-dimensional geophysical modelling GUI
-=============================================================
+![alt text](https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/_static/gmg_logo.png)
+
+|
 
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
 
