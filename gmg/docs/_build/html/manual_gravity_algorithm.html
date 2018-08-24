@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>A1 Potential field algorithms &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>A1 Bott (1965) 2D gravity algorithm &mdash; GMG: An open source geophysical modelling GUI</title>
   
 
   
@@ -29,7 +29,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="References" href="manual_references.html" />
+    <link rel="next" title="A2 Talwani and Heirtzler (1964) magnetic algorithm" href="manual_magnetic_algorithm.html" />
     <link rel="prev" title="9.0 Python console" href="manual_python_console.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
@@ -108,11 +108,11 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>A1 Potential field algorithms</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#two-dimensional-gravity-anomalies-bott-1965-algorithm">Two-dimensional gravity anomalies: Bott (1965) algorithm</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>A1 Bott (1965) 2D gravity algorithm</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#bott-1965-algorithm-testing">Bott (1965) algorithm testing</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
 </ul>
 </li>
@@ -123,8 +123,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html#gmg-licence">gmg licence</a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html#dependencies">Dependencies</a></li>
 </ul>
 
             
@@ -172,7 +170,7 @@
         
           <li><a href="manual.html"><strong>Manual</strong></a> &raquo;</li>
         
-      <li><strong>A1 Potential field algorithms</strong></li>
+      <li><strong>A1 Bott (1965) 2D gravity algorithm</strong></li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -189,52 +187,79 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="a1-potential-field-algorithms">
-<h1><strong>A1 Potential field algorithms</strong><a class="headerlink" href="#a1-potential-field-algorithms" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="two-dimensional-gravity-anomalies-bott-1965-algorithm">
-<h2>Two-dimensional gravity anomalies: Bott (1965) algorithm<a class="headerlink" href="#two-dimensional-gravity-anomalies-bott-1965-algorithm" title="Permalink to this headline">¶</a></h2>
-<p>Two dimensional gravity anomalies are calculated using a python implementation of Bott’s (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id1">[1]</a> algorithm.
-This is similar to that derived by Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id2">[5]</a> and operates by setting the observation point as
-the origin of a Cartesian coordinate system and treating the periphery of a given body as an n-sided polygon,
-defined by of discrete set of nodal points. The total gravity anomaly is then calculated by evaluating the solution
-for a semi-infinite horizontal slab with one sloping interface for each set of nodal pairs and then summing the results.
-The analytic solution for this is given by Heiland (1940) <a class="reference internal" href="manual_references.html#heiland1940" id="id3">[3]</a> page. 153 as:</p>
+  <div class="section" id="a1-bott-1965-2d-gravity-algorithm">
+<span id="manual-gravity-algorithm"></span><h1><strong>A1 Bott (1965) 2D gravity algorithm</strong><a class="headerlink" href="#a1-bott-1965-2d-gravity-algorithm" title="Permalink to this headline">¶</a></h1>
+<p>Two dimensional gravity anomalies are calculated using a python implementation of Bott’s (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id1">[1]</a>
+algorithm. This is similar to that derived by Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id2">[7]</a> and operates by setting the
+observation point as the origin of a Cartesian coordinate system and treating the periphery of a given body as an
+n-sided polygon, defined by of discrete set of nodal points. The total gravity anomaly is then calculated by evaluating
+the solution for a semi-infinite horizontal slab with one sloping interface for each set of nodal pairs and then summing
+the results. The analytic solution for this is given by Heiland (1940) <a class="reference internal" href="manual_references.html#heiland1940" id="id3">[3]</a> page. 153 as:</p>
 <div class="math" id="equation-bott_algorithm">
 <p><span class="eqno">(1)<a class="headerlink" href="#equation-bott_algorithm" title="Permalink to this equation">¶</a></span><img src="_images/math/ce31e45839123cdb78ce7d5d858e08ca32ecf53b.png" alt="\Delta g = 2 G \Delta\rho \left[ - \left\{ x_{1} \sin \theta + z_{1} \cos \theta \right\} \times
 \left\{ \sin \theta \log_{e} \frac{r_{2}}{r_{1}} + \cos \theta (\phi_{2}-\phi_{1}) \right\} +
 z_{2}\phi_{2} - z_{1}\phi_{1} \right]"/></p>
 </div><p>Where G is the Universal Gravitational Constant; <cite>Deltarho</cite> is the density contrast between the polygon and the
 surrounding material; <img class="math" src="_images/math/cbbcd3b143286162aaf4d862782b6eefdcb23a3c.png" alt="x_{i}"/>, <img class="math" src="_images/math/5c6a6f366d550318f46ac322944a966f3e695c78.png" alt="z_{i}"/> and <img class="math" src="_images/math/99febf524dc86caf607c698099e44652bb3f65d9.png" alt="r_{i}"/> are the horizontal, vertical and absolute distance
-between each node and the observation point, <img class="math" src="_images/math/9dcbbef8e0f76051d388013b90a95bec3069e484.png" alt="P"/>, respectively; <cite>theta</cite> is the angle between the sloping edge and the
-horizontal; and <img class="math" src="_images/math/2b1fe4ce01940cc0ef4b1ad4ee48d925618897e8.png" alt="\phi_{i}"/> is the angle between the x-axis and <img class="math" src="_images/math/99febf524dc86caf607c698099e44652bb3f65d9.png" alt="r_{i}"/> respectively. The geometry of this
-parametrisation is shown in Figure <a href="#id4"><span class="problematic" id="id5">:num:`bott_method`</span></a> a.</p>
+between each node and the observation point, <img class="math" src="_images/math/9dcbbef8e0f76051d388013b90a95bec3069e484.png" alt="P"/>, respectively; <cite>theta</cite> is the angle between the sloping edge and
+the horizontal; and <img class="math" src="_images/math/2b1fe4ce01940cc0ef4b1ad4ee48d925618897e8.png" alt="\phi_{i}"/> is the angle between the x-axis and <img class="math" src="_images/math/99febf524dc86caf607c698099e44652bb3f65d9.png" alt="r_{i}"/> respectively. The geometry of
+this parametrisation is shown in <a class="reference internal" href="#bott-method"><span class="std std-numref">Figure 1</span></a>.</p>
 <p>The total gravity anomaly produced by a given polygon is then determined by moving progressively counter-clockwise
 around the polygon and summing the contribution of each side (Equation <a class="reference internal" href="#equation-bott_sum">(2)</a>).</p>
 <div class="math" id="equation-bott_sum">
 <p><span class="eqno">(2)<a class="headerlink" href="#equation-bott_sum" title="Permalink to this equation">¶</a></span><img src="_images/math/6ba5f0dab869f7b81d32100bc3dee5587533b5e9.png" alt="\Delta g = \sum_{i=1}^{N} \Delta g_{i}"/></p>
 </div><p>When <img class="math" src="_images/math/ccfa62c305d917fb80bd869aa58e9b68b42668f6.png" alt="$z_{2} &gt; z_{1}$"/> the contribution is positive and when <img class="math" src="_images/math/df00e02a6e75eaf876dc9cdf492f5c4753e3d2b4.png" alt="$z_{2} &lt; z_{1}$"/> the contribution is
 negative, such that, in the summation, the contributions outside of the polygon cancel, leaving only the gravity
-anomaly produced by the polygon itself (Fig. <code class="xref std std-numref docutils literal"><span class="pre">bott_method</span></code> b).</p>
-<p>The Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id6">[1]</a> algorithm is preferred to the Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id7">[5]</a> because a) it
+anomaly produced by the polygon itself (<a class="reference internal" href="#bott-method"><span class="std std-numref">Figure 1</span></a>).</p>
+<p>The Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id4">[1]</a> algorithm is preferred to the Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id5">[7]</a> because a) it
 runs slightly faster and b) it does not explicitly require closed polygons.</p>
-<div class="figure" id="id11">
+<div class="figure" id="bott-method">
 <img alt="_images/bott_method.png" src="_images/bott_method.png" />
-<p class="caption"><span class="caption-text">a) An example of a infinite slab with one sloping horizontal side, showing the geometric values relative to the
+<p class="caption"><span class="caption-number">Figure 1 </span><span class="caption-text">a) An example of a infinite slab with one sloping horizontal side, showing the geometric values relative to the
 observation point (0,0) using in solving Equation <a class="reference internal" href="#equation-bott_sum">(2)</a>. b) Example of calculating the gravity anomaly due
 to a two dimensional body (red dashed line) estimated using five nodes (A-E) by summing the effects of the five
-infinite slabs with sloping sides (modified after, Kearey et al., (2013) <a class="reference internal" href="manual_references.html#kearey2013" id="id8">[4]</a>).
-:label: eq:bott_method</span></p>
-</div>
+infinite slabs with sloping sides (modified after, Kearey et al., (2013) <a class="reference internal" href="manual_references.html#kearey2013" id="id6">[4]</a>).</span></p>
 </div>
 <div class="section" id="bott-1965-algorithm-testing">
 <h2>Bott (1965) algorithm testing<a class="headerlink" href="#bott-1965-algorithm-testing" title="Permalink to this headline">¶</a></h2>
-<p>To assess the accuracy of the Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id9">[1]</a> method, the gravity anomaly determined using the algorithm is
+<p>To assess the accuracy of the Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id7">[1]</a> method, the gravity anomaly determined using the algorithm is
 compared to that of an exact analytic solution for a simple body. In this case, the solution for a buried horizontal
 cylinder of constant density contrast, that extends infinitely into and out of the model plane is used. The solution
-for this case is given by, for example, Garland (1965) <a class="reference internal" href="manual_references.html#garland1965" id="id10">[2]</a> Pg. 70 as:</p>
+for this case is given by, for example, Garland (1965) <a class="reference internal" href="manual_references.html#garland1965" id="id8">[2]</a> Pg. 70 as:</p>
 <div class="math" id="equation-garland">
 <p><span class="eqno">(3)<a class="headerlink" href="#equation-garland" title="Permalink to this equation">¶</a></span><img src="_images/math/8c3579d3f71de3f0e776b23d62071370694aafca.png" alt="g_{z} = 2 \pi G r^{2} \Delta\rho \hspace{2pt} \frac{z}{x^{2}+z^{2}}"/></p>
-</div></div>
+</div><div class="figure" id="grav-cylinder">
+<img alt="_images/grav_cylinder.png" src="_images/grav_cylinder.png" />
+<p class="caption"><span class="caption-number">Figure 2 </span><span class="caption-text">Two-dimensional geometric parameters required for calculating the gravity anomaly produced by a
+buried cylinder.</span></p>
+</div>
+<p>Where <img class="math" src="_images/math/dee63237674afc3154c2e33b7b68d67f85f2ee0a.png" alt="G"/> is the Universal Gravitational Constant; <img class="math" src="_images/math/eaa6ad49a7f78fe5a13b486690163bf2dc7e3e60.png" alt="r"/> is the radius of the cylinder; <img class="math" src="_images/math/89cf51c44897404a4a8e1c0a7ef0837df241123b.png" alt="\Delta\rho"/> is
+the density contrast between the cylinder and the surrounding material; and <img class="math" src="_images/math/a59f68a4202623bb859a7093f0316bf466e6f75d.png" alt="x"/> and <img class="math" src="_images/math/683f2dd9129a91d21aaf1c04afa6f78b39d4cb0a.png" alt="z"/> are the horizontal
+and vertical distances from the observation point, <img class="math" src="_images/math/9dcbbef8e0f76051d388013b90a95bec3069e484.png" alt="P"/>, to the centre axis of the cylinder respectively. The
+geometry of this parametrisation is shown in <a class="reference internal" href="#grav-cylinder"><span class="std std-numref">Figure 2</span></a>.</p>
+<p>Using the Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id9">[1]</a> algorithm, the cylinder must be estimated using a series of discrete nodal
+points, <img class="math" src="_images/math/f4170ed8938b79490d8923857962695514a8e4cb.png" alt="N"/>. A range of values for <img class="math" src="_images/math/f4170ed8938b79490d8923857962695514a8e4cb.png" alt="N"/> were tested, starting from <img class="math" src="_images/math/e0055a921954b429798d2ea2d413163bbe47f2bc.png" alt="N = 360"/> (i.e., one node every
+1 degree) and then halving the number of nodes for each new test until <img class="math" src="_images/math/c030f3a9d1c51f3c4c21a0164ff16c2cc41b28f0.png" alt="N = 22"/> (i.e., one node every
+<img class="math" src="_images/math/5ecfb5efd13556512083272088a2baa0839e3c66.png" alt="\sim"/> 16 degrees). For the <img class="math" src="_images/math/e0055a921954b429798d2ea2d413163bbe47f2bc.png" alt="N = 360"/> case, the predicted anomaly is also calculated using the Talwani et
+al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id10">[7]</a> method for comparison. This method uses a slightly different trigonometric
+parametrisation.</p>
+<p>As can be seen in Figure <a class="reference internal" href="#gravity-anomaly-comparison"><span class="std std-numref">Figure 3</span></a>, both the Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id11">[1]</a> and
+Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id12">[7]</a> methods produce almost identical anomalies, with the slight
+( <img class="math" src="_images/math/34c65f3eb71c40e8e762ab618968702e9870c8ea.png" alt="2.9 \times 10^{-6}"/> ) mismatch resulting from the difference between the sum of precision error, due to the
+different trigonometric functions that are solved by each algorithm. When <img class="math" src="_images/math/e0055a921954b429798d2ea2d413163bbe47f2bc.png" alt="N = 360"/>, both methods reproduce the
+analytic anomaly to within an RMS misfit <img class="math" src="_images/math/01063d58a488cc5bb5a4acf5ed1b6cf0189c1b21.png" alt="9.0 \times 10^{-4}"/> mGal. For the <img class="math" src="_images/math/c030f3a9d1c51f3c4c21a0164ff16c2cc41b28f0.png" alt="N = 22"/> case the  Bott (1969)
+<a class="reference internal" href="manual_references.html#bott1969" id="id13">[1]</a> method predicts the analytic solution to within 0.25 mGal. This level of accuracy is adequate for
+modelling large scale features, for example, sedimentary basins and lithospheric gravity anomalies and demonstrates
+that bodies constructed using simplified geometries with relatively few nodes, are sufficient for modelling of such
+features. However, for some applications, such as microgravity surveys, much higher accuracy is required and detailed
+polygons with many nodes may be necessary.</p>
+<div class="figure" id="gravity-anomaly-comparison">
+<img alt="_images/gravity_anomaly_comparison.png" src="_images/gravity_anomaly_comparison.png" />
+<p class="caption"><span class="caption-number">Figure 3 </span><span class="caption-text">a) Gravity anomaly calculated for the cylinder shown in (b) using an exact analytical solution and by the
+line-integral methods of Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id14">[7]</a> and Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id15">[1]</a>. b) Model
+cylinder defined using 360 nodes, a radius of 5 <img class="math" src="_images/math/780f9edb1cde44c11eae4ddcc64f1e2d523e389f.png" alt="km"/> and a density contrast of <img class="math" src="_images/math/11364ca31382a859eea9d560aeb36409f13d21f7.png" alt="250 kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.</span></p>
+</div>
+</div>
 </div>
 
 
@@ -245,7 +270,7 @@ for this case is given by, for example, Garland (1965) <a class="reference inter
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="manual_references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="manual_magnetic_algorithm.html" class="btn btn-neutral float-right" title="A2 Talwani and Heirtzler (1964) magnetic algorithm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="manual_python_console.html" class="btn btn-neutral" title="9.0 Python console" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -258,7 +283,7 @@ for this case is given by, for example, Garland (1965) <a class="reference inter
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 23, 2018.
+      Last updated on Aug 24, 2018.
 
     </p>
   </div>

@@ -18,7 +18,8 @@
    manual_geology
    manual_export_figure
    manual_python_console
-   manual_potential_field_algorithms
+   manual_gravity_algorithm
+   manual_magnetic_algorithm
    manual_references
 
 .. bibliography:: manual.bib

@@ -4,7 +4,7 @@
 =============
 
 gmg licence
-===========
+-----------
 
 Copyright (c) 2015-2018, Brook Tozer
 
@@ -35,8 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 Dependencies
-============
-
+------------
 
 **Fatiando a Terra Licence**
 

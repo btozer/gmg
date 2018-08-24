@@ -113,7 +113,8 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_potential_field_algorithms.html"><strong>A1 Potential field algorithms</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1965) 2D gravity algorithm</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
 </ul>
 </li>
@@ -124,8 +125,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html#gmg-licence">gmg licence</a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html#dependencies">Dependencies</a></li>
 </ul>
 
             
@@ -192,9 +191,6 @@
             
   <div class="section" id="layer-attributes">
 <h1><strong>3.0 Layer attributes</strong><a class="headerlink" href="#layer-attributes" title="Permalink to this headline">¶</a></h1>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 <div class="section" id="density">
 <h2>3.1 Density<a class="headerlink" href="#density" title="Permalink to this headline">¶</a></h2>
 <p>Gravity modelling is achieved using bulk <em>density contrasts</em> relative to a <em>reference density</em>.</p>
@@ -217,9 +213,6 @@ density of 2670 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767
 <p class="last">To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure)</p>
 </div>
 <p>use the <em>gravity Field</em> -&gt; <em>Set background density</em> tool.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 </div>
 <div class="section" id="magnetic-susceptibility">
 <h2>3.2 Magnetic Susceptibility<a class="headerlink" href="#magnetic-susceptibility" title="Permalink to this headline">¶</a></h2>
@@ -233,9 +226,6 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
 <p>For example:</p>
 <p>If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.</p>
 <p class="last">If the model was orientated North-South the angle would be 68 deg.</p>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
 </div>
 </div>
 <div class="section" id="remenant-magnetism">
@@ -264,7 +254,7 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 23, 2018.
+      Last updated on Aug 24, 2018.
 
     </p>
   </div>

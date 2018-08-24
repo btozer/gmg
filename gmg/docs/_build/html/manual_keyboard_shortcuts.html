@@ -108,7 +108,8 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_potential_field_algorithms.html"><strong>A1 Potential field algorithms</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1965) 2D gravity algorithm</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
 </ul>
 </li>
@@ -119,8 +120,6 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html#gmg-licence">gmg licence</a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html#dependencies">Dependencies</a></li>
 </ul>
 
             
@@ -204,22 +203,25 @@
 <tr class="row-odd"><td><strong>d</strong></td>
 <td>Delete Node</td>
 </tr>
-<tr class="row-even"><td><strong>p</strong></td>
+<tr class="row-even"><td><strong>n</strong></td>
+<td>Create New layer</td>
+</tr>
+<tr class="row-odd"><td><strong>p</strong></td>
 <td>Pinch Node <img class="math" src="_images/math/476743baf1ee138fe2b2f9d7412e4395bdb12566.png" alt="^{*}"/></td>
 </tr>
-<tr class="row-odd"><td><strong>&gt;</strong></td>
+<tr class="row-even"><td><strong>&gt;</strong></td>
 <td>Next Layer</td>
 </tr>
-<tr class="row-even"><td><strong>&lt;</strong></td>
+<tr class="row-odd"><td><strong>&lt;</strong></td>
 <td>Previous Layer</td>
 </tr>
-<tr class="row-odd"><td><strong>z</strong></td>
+<tr class="row-even"><td><strong>z</strong></td>
 <td>Zoom</td>
 </tr>
-<tr class="row-even"><td><strong>a</strong></td>
-<td>Show All (1:1 aspect)</td>
+<tr class="row-odd"><td><strong>a</strong></td>
+<td>Reset View (1:1 aspect)</td>
 </tr>
-<tr class="row-odd"><td><strong>shift+p</strong></td>
+<tr class="row-even"><td><strong>shift+p</strong></td>
 <td>Pan</td>
 </tr>
 </tbody>
@@ -248,7 +250,7 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 23, 2018.
+      Last updated on Aug 24, 2018.
 
     </p>
   </div>

@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>A2 Talwani and Heirtzler (1964) magnetic algorithm &mdash; GMG: An open source geophysical modelling GUI</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="manual_references.html" />
+    <link rel="prev" title="A1 Bott (1965) 2D gravity algorithm" href="manual_gravity_algorithm.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="gmg_documentation.html">
+          
+
+          
+            
+            <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1965) 2D gravity algorithm</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#talwani-and-heirtzler-1964-method-testing">Talwani and Heirtzler (1964) method testing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Credits</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="gmg_documentation.html">gmg</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="gmg_documentation.html">Docs</a> &raquo;</li>
+        
+          <li><a href="manual.html"><strong>Manual</strong></a> &raquo;</li>
+        
+      <li><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="a2-talwani-and-heirtzler-1964-magnetic-algorithm">
+<h1><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong><a class="headerlink" href="#a2-talwani-and-heirtzler-1964-magnetic-algorithm" title="Permalink to this headline">¶</a></h1>
+<p>Magnetic anomalies are calculated using a python implementation of Talwani and Heirtzler’s (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id1">[6]</a>
+algorithm for two-dimensional uniformly magnetised bodies. This employs a similar procedure to that
+described in section <a class="reference internal" href="manual_gravity_algorithm.html#manual-gravity-algorithm"><span class="std std-ref">A1</span></a> for calculating two-dimensional gravity anomalies
+by treating a body as an n-sided polygon, solving the anomaly for each side and summing the result.
+However, in the case of magnetic anomalies, there is added complexity owing to the fact that a given
+bodies magnetisation vector is, for the case of induced magnetisation, dependent on the inclination,
+delineation and magnitude of the inducing magnetic field (i.e., Earth’s magnetic field). Moreover, if
+the body has retained a remanent magnetisation, then the magnetisation vector may vary from that of the
+local Earth field. Furthermore, for two-dimensional modelling, the relationship between the azimuth of
+model profile and the magnetisation vector must also be considered.</p>
+<p>These complexities are handled by considering the vertical and horizontal components of the total magnetisation
+vector separately and then summing these components at the final calculation step. Following the trigonometric
+parametrisation for a two-dimensional body shown in <a class="reference internal" href="#talwani-mag-method"><span class="std std-numref">Figure 4</span></a>, Talwani and Heirtzler’s
+(1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id2">[6]</a> showed that the horizontal and vertical components of the total magnetic field are given by:</p>
+<div class="math" id="equation-﻿talwani_mag_vertical">
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-﻿talwani_mag_vertical" title="Permalink to this equation">¶</a></span><img src="_images/math/80b02a00164b135c22134ed249b8de210eded281.png" alt="V = 2(J_{x}Q - J_{z}P)"/></p>
+</div><div class="math" id="equation-talwani_mag_horizontal">
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-talwani_mag_horizontal" title="Permalink to this equation">¶</a></span><img src="_images/math/97abf849e30075c55d15a08f6bb4d5e8d406f742.png" alt="H = 2(J_{x}Q + J_{z}P)"/></p>
+</div><p>where:</p>
+<div class="math" id="equation-﻿talwani_mag_P">
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-﻿talwani_mag_P" title="Permalink to this equation">¶</a></span><img src="_images/math/8bc2b49de2bd9075f64a581bdfccb95370a9f1b4.png" alt="P = \frac{z_{21}^2}{z_{21}^2+x_{12}^2}(\theta_{1}-\theta_{2}) +
+\frac{z_{21}x_{12}}{z_{21}^2+x_{12}^2} \log \frac{r_{2}}{r_1}"/></p>
+</div><div class="math" id="equation-﻿talwani_mag_Q">
+<p><span class="eqno">(4)<a class="headerlink" href="#equation-﻿talwani_mag_Q" title="Permalink to this equation">¶</a></span><img src="_images/math/62653103df28796d9b1fe90eda847ef1d29a65af.png" alt="Q = \frac{z_{21}x_{12}}{z_{21}^2+x_{12}^2}(\theta_{1}-\theta_{2}) -
+\frac{z_{21}^2}{z_{21}^2+x_{12}^2} \log \frac{r_{2}}{r_1}"/></p>
+</div><p>and:</p>
+<div class="math" id="equation-﻿talwani_mag_X">
+<p><span class="eqno">(5)<a class="headerlink" href="#equation-﻿talwani_mag_X" title="Permalink to this equation">¶</a></span><img src="_images/math/fc1caf0fbd22402c89c38180dcf1b700f679ac9e.png" alt="x_{12}=x_{1}-{x_2} \qquad z_{21}=z_{2}-z_{1} \qquad z_{1}=\sqrt{x_{1}^2+z_{1}^2}
+\qquad z_{2}=\sqrt{x_{2}^2+z_{2}^2}"/></p>
+</div><p>To account for the bodies magnetisation vector and its relationship with the model profile azimuth
+<img class="math" src="_images/math/55af73483b6c9a950024afbca2ffb5c71e85597b.png" alt="J_{x}"/> and <img class="math" src="_images/math/c398f6d9a68152f0398a7bd854126407f4be9c4c.png" alt="J_{z}"/> are then given by:</p>
+<div class="math" id="equation-talwani_mag_J_horizontal">
+<p><span class="eqno">(6)<a class="headerlink" href="#equation-talwani_mag_J_horizontal" title="Permalink to this equation">¶</a></span><img src="_images/math/61daf11d34319e7885823ed4802e6090db3c31f5.png" alt="J_{x} = J \cos A \cos(C-B)"/></p>
+</div><div class="math" id="equation-talwani_mag_J_vertical">
+<p><span class="eqno">(7)<a class="headerlink" href="#equation-talwani_mag_J_vertical" title="Permalink to this equation">¶</a></span><img src="_images/math/b99299b730d01e210a7203155efc00ac31b22983.png" alt="J_{z} = J \sin A"/></p>
+</div><p>where angle <strong>A</strong> is measured in the vertical plane from zero at the horizontal and positive downwards.
+Angles <strong>B</strong> and <strong>C</strong> are measured in the horizontal plane, in a positive clockwise direction from geographic north,
+as shown in <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>. For the case when magnetisation is induced only:</p>
+<div class="math" id="equation-talwani_mag_J_induced">
+<p><span class="eqno">(8)<a class="headerlink" href="#equation-talwani_mag_J_induced" title="Permalink to this equation">¶</a></span><img src="_images/math/152c2207ddcf72035dc6a3936f8d0c7fc98cb92d.png" alt="J = kH"/></p>
+</div><p>where <img class="math" src="_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> is the susceptibility contrast between the body and surrounding material and <img class="math" src="_images/math/44d4c3f22452acebfb3ac644e23508b67500be90.png" alt="H"/> is the strength
+of inducing field. Also, <strong>A</strong> will be equal to the inclination (<strong>I</strong>) and <strong>B</strong> will be equal to the declination
+(<strong>D</strong>) Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id3">[6]</a>. For the case when magnetisation is remanent or a combination
+of remanent and induced, the angles <strong>A</strong> and <strong>B</strong> will require modification by the user to account for the difference
+between the inducing field vector and remanent field vector.</p>
+<div class="figure" id="talwani-mag-method">
+<img alt="_images/talwani_magnetic.png" src="_images/talwani_magnetic.png" />
+<p class="caption"><span class="caption-number">Figure 4 </span><span class="caption-text">a) Geometric parameters used for solving for the magnetic anomaly produced by an infinite body with one
+sloping interface. b) Diagram showing an example two-dimensional body (red dashed line) estimated using
+five nodal points (A-E) (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id4">[6]</a>).</span></p>
+</div>
+<div class="figure" id="talwani-mag-angles">
+<img alt="_images/talwani_mag_angles.png" src="_images/talwani_mag_angles.png" />
+<p class="caption"><span class="caption-number">Figure 5 </span><span class="caption-text">Perspective three-dimensional view of the total magnetisation vector <img class="math" src="_images/math/d126aa8b2c7ad5fade4454bf86fbc42127174a1c.png" alt="\vec{J}"/>. Grey shade is a
+vertical plane connecting <img class="math" src="_images/math/d126aa8b2c7ad5fade4454bf86fbc42127174a1c.png" alt="\vec{J}"/> to the horizontal x-y surface. A is the dip angle of <img class="math" src="_images/math/d126aa8b2c7ad5fade4454bf86fbc42127174a1c.png" alt="\vec{J}"/>,
+measured in the vertical plane and equal to the inclination for induced magnetisation. B and C are
+the angles between geographic north and the horizontal projection of <img class="math" src="_images/math/d126aa8b2c7ad5fade4454bf86fbc42127174a1c.png" alt="\vec{J}"/> and model profile
+(positive x-axis) respectively. These are measured clockwise from geographic north and B is equal
+to declination for induced magnetisation (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id5">[6]</a>).</span></p>
+</div>
+<p>The total magnetic anomaly is then given as the sum of the horizontal and vertical components in the model plane:</p>
+<div class="math" id="equation-talwani_mag_total">
+<p><span class="eqno">(9)<a class="headerlink" href="#equation-talwani_mag_total" title="Permalink to this equation">¶</a></span><img src="_images/math/5ffa9a1d700defc92a1778b054d9ed8c96314149.png" alt="T = V \sin A + H \cos A \cos (C-B)"/></p>
+</div><div class="section" id="talwani-and-heirtzler-1964-method-testing">
+<h2>Talwani and Heirtzler (1964) method testing<a class="headerlink" href="#talwani-and-heirtzler-1964-method-testing" title="Permalink to this headline">¶</a></h2>
+<p>To assess the accuracy of the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id6">[6]</a> method, the magnetic anomaly determined
+using the algorithm is compared to that of an exact analytic solution for a simple body. In this case, the solution
+for a thin (width <img class="math" src="_images/math/172174161e5f2242e42c61d25a4e85a6d0be618b.png" alt="&lt;&lt;"/> depth) flat topped vertical sheet with a constant dip angle and magnetisation, which
+extends infinitely into and out of the model plane and infinitely in depth is solved. The solution for this case
+is given by, for example, Reford (1964) <a class="reference internal" href="manual_references.html#reford1964" id="id7">[5]</a> as:</p>
+<div class="math" id="equation-reford_dyke">
+<p><span class="eqno">(10)<a class="headerlink" href="#equation-reford_dyke" title="Permalink to this equation">¶</a></span><img src="_images/math/d590ea4d2a5c9a0fcb3c210bc37ae19c79afdd55.png" alt="\Delta T = 2kTb^{2}w  \left[ \frac{h}{R^{2}} \sin (2I'-d) - \frac{x}{R^{2}} \cos(2I'-d) \right]"/></p>
+</div><div class="math" id="equation-b">
+<p><span class="eqno">(11)<a class="headerlink" href="#equation-b" title="Permalink to this equation">¶</a></span><img src="_images/math/72fdf71ff1f23e868767cc65610ad6c771730b1b.png" alt="b^{2} = 1 - \cos{^2}i\sin{^2}D"/></p>
+</div><p>Where <img class="math" src="_images/math/0b7c1e16a3a8a849bb8ffdcdbf86f65fd1f30438.png" alt="k"/> is the magnetic susceptibility contrast between the sheet and its surroundings; <img class="math" src="_images/math/f2d283a2071f9d043c9e0b0f794a8880fa0d3ce9.png" alt="T"/> is the
+strength of the inducing field; <img class="math" src="_images/math/ecd1ee2a1cd226b40c37e079aca62398d4b774f5.png" alt="w"/> is the width of the flat top of the sheet; <img class="math" src="_images/math/293fb39e1b93282c804a86186e721b32f829f1b2.png" alt="h"/> is the depth to the
+top of the dyke; <img class="math" src="_images/math/4fea88a7a24678dcb85d60276f2a22c8da96084f.png" alt="I'"/> is the angle of inclination measured downwards from the horizontal and projected onto the
+x-z plane; <img class="math" src="_images/math/afce44aa7c55836ca9345404c22fc7b599d2ed84.png" alt="C"/> is the angle between magnetic north and the positive x axis (model profile azimuth); <img class="math" src="_images/math/b9d10b54744d07746b97f53c55eb98046fd76c8c.png" alt="d"/> is
+the dip of the dyke measured clockwise from the positive x axis (e.g. <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>).</p>
+<p>This solution is used to simulate a vertical dyke of finite depth extent by calculating the anomalies
+produced by two bodies, one where <img class="math" src="_images/math/a829c729bca4a6220fd945e4e295e70215daef58.png" alt="h=d_{1}"/> (the top of the dyke) and a second where <img class="math" src="_images/math/123f9019c1cd6ace05009355ac9ef6e7ed5a0492.png" alt="h = d_{2}"/> (the
+base of the dyke). The effect of the second dyke is subtracted from the first to leave the anomaly caused by a dyke
+of finite depth extent <img class="math" src="_images/math/52b17d6f219034694511916b5dddf9fb6308e73a.png" alt="d_{2}"/>.</p>
+<p><a class="reference internal" href="#talwani-heirtz-test"><span class="std std-numref">Figure 6</span></a> shows anomalies calculated using the analytic solution and
+the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id8">[6]</a> algorithm for a thin vertical sheet beginning at a depth of
+1 <img class="math" src="_images/math/780f9edb1cde44c11eae4ddcc64f1e2d523e389f.png" alt="km"/> and extending to 10 <img class="math" src="_images/math/780f9edb1cde44c11eae4ddcc64f1e2d523e389f.png" alt="km"/> with no dip and a magnetic susceptibility of 0.001. Inclination and
+declination are both 0 degree, and the model azimuth is due north, such that, the sheet strikes east-west.</p>
+<div class="figure" id="talwani-heirtz-test">
+<img alt="_images/magnetic_anomaly_comparison.png" src="_images/magnetic_anomaly_comparison.png" />
+<p class="caption"><span class="caption-number">Figure 6 </span><span class="caption-text">a) Predicted magnetic anomalies for the model shown in (b) using the analytic solution for a thin sheet
+(grey line) and the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id9">[6]</a> algorithm (red dashed line). b) Simple thin
+sheet model polygon used to simulate a vertical dyke. Inset table lists model parameters ( <img class="math" src="_images/math/fdcfbf01e911b6751fecef69df12dae06fd9fa52.png" alt="\Delta \chi"/> )
+susceptibility contrast; <img class="math" src="_images/math/8dfe72dae205ca011a790f9559cedb7423b41565.png" alt="w ="/> width of the flat top of the sheet; Inc. and Dec. <img class="math" src="_images/math/f83e0c11055f53d8b8d4d5968e1adb756869862c.png" alt="="/> Inclination and
+Declination of inducing field.</span></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="manual_references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="manual_gravity_algorithm.html" class="btn btn-neutral" title="A1 Bott (1965) 2D gravity algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014-2018, B. Tozer.
+      Last updated on Aug 24, 2018.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
