@@ -184,5 +184,9 @@ Please see the documentation for details.
 The best way to open a bug report is to raise an issue on Github.
 
 If you don't use Github, you can send a bug report to: btozer@ucsd.edu
-Please use the subject line - GMG bug report: "short bug description"
+
+Please use the subject line:
+    
+    GMG bug report: "short bug description"
+
 and include as much detail as possible when describing the bug.
