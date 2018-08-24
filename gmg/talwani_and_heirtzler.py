@@ -29,7 +29,7 @@ import math as m
 def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanence, angle_a, angle_b):
 
     """
-    Calculates the :math:`ntT` magnetic field strength.
+    Calculates the :math:`nt_T` magnetic field strength.
 
     .. note:: The coordinate system of the input parameters is z -> **DOWN**.
 
@@ -55,7 +55,7 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
     Returns:
 
     * nt_T : array
-        The :math:`nt_T` component calculated on the computation points
+        The :math:`nt_T` (TASUM) component calculated on the computation points
 
     """
 
