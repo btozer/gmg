@@ -3,29 +3,5 @@
 **Getting Started**
 ====================
 
-1. Launching the software:
---------------------------
-
-Open a new terminal and launch gmg using the command gmg.py or the alias you may have setup.
-
-2. Creating a new model:
-------------------------
-
-Navigate to the *file* menu and select *new model...*
-
-Here you input: 
-* 1. The new model dimensions in km
-* 2. The spacing at which potential fields are to be calculated.
-
-.. note::
-
-    Setting this spacing as a relatively coarse value to begin with will ensure the program runs smoothly, 
-    this can later be refined for detailed analysis once a first model is complete. 
-
-3. Get Modelling!
------------------
-You can now add layers and edit the model. 
-
-See the Tools instructions for details on how to do this.
-
-
+The best way to get started is to read through the :ref:`Manual <manual>` and then work your way through the
+:ref:`Tutorial <tutorial>`.

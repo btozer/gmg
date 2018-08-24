@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
@@ -29,7 +30,9 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="2.0 Model Layers" href="manual_layer_nodes.html" />
-    <link rel="prev" title="Keyboard Shortcuts" href="manual_keyboard_shortcuts.html" /> 
+    <link rel="prev" title="Keyboard Shortcuts" href="manual_keyboard_shortcuts.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -85,9 +88,13 @@
               
             
             
-              <ul class="current">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
@@ -105,13 +112,20 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html">** Python console**</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_potential_field_algorithms.html"><strong>A1 Potential field algorithms</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Credits</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html#gmg-licence">gmg licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html#dependencies">Dependencies</a></li>
 </ul>
 
             
@@ -178,66 +192,70 @@
             
   <div class="section" id="models">
 <h1><strong>1.0 Models</strong><a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 <div class="section" id="creating-a-new-model">
 <h2>1.1 Creating a New Model<a class="headerlink" href="#creating-a-new-model" title="Permalink to this headline">¶</a></h2>
-<p>Before creating a new model, it is recommended that you create a directory structure in which you will store and save
-all of the data related to the model. This can be structured in any way the user wishes but the directory structure
-as outlined below is useful:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>mkdir *model-name*_MODEL
+<p>Before creating a new model, it is recommended that you create a project directory structure in which you will store
+and save all of the data related to the model. This can be structured in any way the user wishes, however, the
+directory structure outlined in this section is a useful template. First create a new root directory for your project:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>mkdir gmg_testing
 </pre></div>
 </div>
 <p>Then:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>cd model-name_MODEL
+<div class="highlight-none"><div class="highlight"><pre><span></span>cd gmg_testing
 </pre></div>
 </div>
 <p>and create the following directory structure:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>mkdir MODELS GRAVITY_DATA MAGNETIC_DATA SEGY_DATA WELL_DATA GEOLOGICAL_DATA POINT_DATA EXPORTS FIGURES
 </pre></div>
 </div>
-<p>Now you are ready to create your model. Launch gmg and navigate to:</p>
-<p>File -&gt; New Model…</p>
-<p>You will be prompted by a window in which to enter the new model’s dimensions and the spacing
-increment at which potential field data is to be calculated (all units are km).</p>
+<p>You are now ready to start modelling. Launch gmg and navigate to:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>File -&gt; New Model...
+</pre></div>
+</div>
+<p>A pop-up window will appear in which you will enter the new model’s dimensions and the spacing increment
+at which the predicted anomalies will be calculated (NB. all units are km).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">The model dimensions and spacing at which potential field data is calculated can be modified later by using the
-Model View -&gt; Modify current Model Dimensions… option.</p>
+<p>The model dimensions and spacing at which potential field data is calculated can be modified later by navigating
+to:</p>
+<div class="last highlight-none"><div class="highlight"><pre><span></span>Model View -&gt; Modify current Model Dimensions...
+</pre></div>
+</div>
 </div>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">If a very fine spatial resolution relative to the length of the model is required for predicted anomalies, it may
-be computationally beneficial to set the  spacing at which potential field data is to be calculated as a relatively
-coarse value for initial modelling and later reduce this to the fine spacing required for the final model. This will
-ensure GMG runs smoothly during the initial forward modelling.</p>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
+<p class="last">If you require a very fine spatial resolution for the predicted anomaly increment (relative to the total length of
+the model), then it may be computationally beneficial to set the spacing as a relatively coarse value for initial
+modelling, then later reduce this to the fine spacing required for the final model. This will ensure gmg runs
+smoothly during the initial forward modelling.</p>
 </div>
 </div>
 <div class="section" id="saving-a-model">
 <h2>1.2 Saving a Model<a class="headerlink" href="#saving-a-model" title="Permalink to this headline">¶</a></h2>
-<p>To save a model navigate to Files -&gt; Save Model…
-This is prompt a save file menu from which you can navigate to the directory where you would like to save your model,
-for example gmg_MODEL/MODELS/</p>
-<p>gmg models are saved as python Pickle files and must have a “.model” suffix, for example,
-gmg_MODEL/MODELS/gmg_model_01.model</p>
+<p>To save a model navigate to:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>File -&gt; Save Model...
+</pre></div>
+</div>
+<p>This will prompt a save file menu, from which you can navigate to the directory where you would like to save your model.
+For example: gmg_testing/MODELS/</p>
+<p>gmg models are saved as <em>Pickle</em> files and must have a “.model” suffix, for example:</p>
+<blockquote>
+<div>gmg_model_01.model</div></blockquote>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">It is recommended that the user incrementally saves updated models with a new suffix such as model_1.model,
-model_02.model…etc</p>
+<p>It is recommended that the user incrementally saves updated models using a incremented suffix such as:</p>
+<p>model_1.model</p>
+<p>model_02.model</p>
+<p class="last">…etc</p>
 </div>
-<p>This will ensure you can revert back to previous models if your current model becomes a “dead end”.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
+<p>This will ensure you can revert back to previous models if you “corrupt” your current model, or it becomes a “dead end”.</p>
 </div>
 <div class="section" id="loading-a-model">
 <h2>1.2 Loading a Model<a class="headerlink" href="#loading-a-model" title="Permalink to this headline">¶</a></h2>
-<p>To load a model navigate to Files -&gt; Load Model…
-Navigate to your required .model and select Open.</p>
+<p>To load a model navigate to:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Files -&gt; Load Model -&gt; navigate to your required .model -&gt; Open
+</pre></div>
+</div>
 <p>Your model will be loaded into the current gmg window.</p>
 </div>
 </div>
@@ -263,7 +281,7 @@ Navigate to your required .model and select Open.</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 22, 2018.
+      Last updated on Aug 23, 2018.
 
     </p>
   </div>

@@ -10,6 +10,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.imgmath',
+    'sphinxcontrib.bibtex'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -166,6 +167,7 @@ html_logo = '_static/gmg_icon.png'
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 html_last_updated_fmt = '%b %d, %Y'
+
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.

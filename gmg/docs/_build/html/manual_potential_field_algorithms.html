@@ -1,0 +1,306 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>A1 Potential field algorithms &mdash; GMG: An open source geophysical modelling GUI</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="References" href="manual_references.html" />
+    <link rel="prev" title="9.0 Python console" href="manual_python_console.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="gmg_documentation.html">
+          
+
+          
+            
+            <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>A1 Potential field algorithms</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#two-dimensional-gravity-anomalies-bott-1965-algorithm">Two-dimensional gravity anomalies: Bott (1965) algorithm</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bott-1965-algorithm-testing">Bott (1965) algorithm testing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Credits</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html#gmg-licence">gmg licence</a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html#dependencies">Dependencies</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="gmg_documentation.html">gmg</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="gmg_documentation.html">Docs</a> &raquo;</li>
+        
+          <li><a href="manual.html"><strong>Manual</strong></a> &raquo;</li>
+        
+      <li><strong>A1 Potential field algorithms</strong></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="a1-potential-field-algorithms">
+<h1><strong>A1 Potential field algorithms</strong><a class="headerlink" href="#a1-potential-field-algorithms" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="two-dimensional-gravity-anomalies-bott-1965-algorithm">
+<h2>Two-dimensional gravity anomalies: Bott (1965) algorithm<a class="headerlink" href="#two-dimensional-gravity-anomalies-bott-1965-algorithm" title="Permalink to this headline">¶</a></h2>
+<p>Two dimensional gravity anomalies are calculated using a python implementation of Bott’s (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id1">[1]</a> algorithm.
+This is similar to that derived by Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id2">[5]</a> and operates by setting the observation point as
+the origin of a Cartesian coordinate system and treating the periphery of a given body as an n-sided polygon,
+defined by of discrete set of nodal points. The total gravity anomaly is then calculated by evaluating the solution
+for a semi-infinite horizontal slab with one sloping interface for each set of nodal pairs and then summing the results.
+The analytic solution for this is given by Heiland (1940) <a class="reference internal" href="manual_references.html#heiland1940" id="id3">[3]</a> page. 153 as:</p>
+<div class="math" id="equation-bott_algorithm">
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-bott_algorithm" title="Permalink to this equation">¶</a></span><img src="_images/math/ce31e45839123cdb78ce7d5d858e08ca32ecf53b.png" alt="\Delta g = 2 G \Delta\rho \left[ - \left\{ x_{1} \sin \theta + z_{1} \cos \theta \right\} \times
+\left\{ \sin \theta \log_{e} \frac{r_{2}}{r_{1}} + \cos \theta (\phi_{2}-\phi_{1}) \right\} +
+z_{2}\phi_{2} - z_{1}\phi_{1} \right]"/></p>
+</div><p>Where G is the Universal Gravitational Constant; <cite>Deltarho</cite> is the density contrast between the polygon and the
+surrounding material; <img class="math" src="_images/math/cbbcd3b143286162aaf4d862782b6eefdcb23a3c.png" alt="x_{i}"/>, <img class="math" src="_images/math/5c6a6f366d550318f46ac322944a966f3e695c78.png" alt="z_{i}"/> and <img class="math" src="_images/math/99febf524dc86caf607c698099e44652bb3f65d9.png" alt="r_{i}"/> are the horizontal, vertical and absolute distance
+between each node and the observation point, <img class="math" src="_images/math/9dcbbef8e0f76051d388013b90a95bec3069e484.png" alt="P"/>, respectively; <cite>theta</cite> is the angle between the sloping edge and the
+horizontal; and <img class="math" src="_images/math/2b1fe4ce01940cc0ef4b1ad4ee48d925618897e8.png" alt="\phi_{i}"/> is the angle between the x-axis and <img class="math" src="_images/math/99febf524dc86caf607c698099e44652bb3f65d9.png" alt="r_{i}"/> respectively. The geometry of this
+parametrisation is shown in Figure <a href="#id4"><span class="problematic" id="id5">:num:`bott_method`</span></a> a.</p>
+<p>The total gravity anomaly produced by a given polygon is then determined by moving progressively counter-clockwise
+around the polygon and summing the contribution of each side (Equation <a class="reference internal" href="#equation-bott_sum">(2)</a>).</p>
+<div class="math" id="equation-bott_sum">
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-bott_sum" title="Permalink to this equation">¶</a></span><img src="_images/math/6ba5f0dab869f7b81d32100bc3dee5587533b5e9.png" alt="\Delta g = \sum_{i=1}^{N} \Delta g_{i}"/></p>
+</div><p>When <img class="math" src="_images/math/ccfa62c305d917fb80bd869aa58e9b68b42668f6.png" alt="$z_{2} &gt; z_{1}$"/> the contribution is positive and when <img class="math" src="_images/math/df00e02a6e75eaf876dc9cdf492f5c4753e3d2b4.png" alt="$z_{2} &lt; z_{1}$"/> the contribution is
+negative, such that, in the summation, the contributions outside of the polygon cancel, leaving only the gravity
+anomaly produced by the polygon itself (Fig. <code class="xref std std-numref docutils literal"><span class="pre">bott_method</span></code> b).</p>
+<p>The Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id6">[1]</a> algorithm is preferred to the Talwani et al., (1959) <a class="reference internal" href="manual_references.html#talwani1959" id="id7">[5]</a> because a) it
+runs slightly faster and b) it does not explicitly require closed polygons.</p>
+<div class="figure" id="id11">
+<img alt="_images/bott_method.png" src="_images/bott_method.png" />
+<p class="caption"><span class="caption-text">a) An example of a infinite slab with one sloping horizontal side, showing the geometric values relative to the
+observation point (0,0) using in solving Equation <a class="reference internal" href="#equation-bott_sum">(2)</a>. b) Example of calculating the gravity anomaly due
+to a two dimensional body (red dashed line) estimated using five nodes (A-E) by summing the effects of the five
+infinite slabs with sloping sides (modified after, Kearey et al., (2013) <a class="reference internal" href="manual_references.html#kearey2013" id="id8">[4]</a>).
+:label: eq:bott_method</span></p>
+</div>
+</div>
+<div class="section" id="bott-1965-algorithm-testing">
+<h2>Bott (1965) algorithm testing<a class="headerlink" href="#bott-1965-algorithm-testing" title="Permalink to this headline">¶</a></h2>
+<p>To assess the accuracy of the Bott (1969) <a class="reference internal" href="manual_references.html#bott1969" id="id9">[1]</a> method, the gravity anomaly determined using the algorithm is
+compared to that of an exact analytic solution for a simple body. In this case, the solution for a buried horizontal
+cylinder of constant density contrast, that extends infinitely into and out of the model plane is used. The solution
+for this case is given by, for example, Garland (1965) <a class="reference internal" href="manual_references.html#garland1965" id="id10">[2]</a> Pg. 70 as:</p>
+<div class="math" id="equation-garland">
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-garland" title="Permalink to this equation">¶</a></span><img src="_images/math/8c3579d3f71de3f0e776b23d62071370694aafca.png" alt="g_{z} = 2 \pi G r^{2} \Delta\rho \hspace{2pt} \frac{z}{x^{2}+z^{2}}"/></p>
+</div></div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="manual_references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="manual_python_console.html" class="btn btn-neutral" title="9.0 Python console" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014-2018, B. Tozer.
+      Last updated on Aug 23, 2018.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

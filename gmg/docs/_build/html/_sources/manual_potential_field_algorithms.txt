@@ -1,0 +1,56 @@
+=================================
+**A1 Potential field algorithms**
+=================================
+
+Two-dimensional gravity anomalies: Bott (1965) algorithm
+--------------------------------------------------------
+
+Two dimensional gravity anomalies are calculated using a python implementation of Bott's (1969) :cite:`bott1969` algorithm.
+This is similar to that derived by Talwani et al., (1959) :cite:`talwani1959` and operates by setting the observation point as
+the origin of a Cartesian coordinate system and treating the periphery of a given body as an n-sided polygon,
+defined by of discrete set of nodal points. The total gravity anomaly is then calculated by evaluating the solution
+for a semi-infinite horizontal slab with one sloping interface for each set of nodal pairs and then summing the results.
+The analytic solution for this is given by Heiland (1940) :cite:`heiland1940` page. 153 as:
+
+.. math:: \Delta g = 2 G \Delta\rho \left[ - \left\{ x_{1} \sin \theta + z_{1} \cos \theta \right\} \times
+    \left\{ \sin \theta \log_{e} \frac{r_{2}}{r_{1}} + \cos \theta (\phi_{2}-\phi_{1}) \right\} +
+    z_{2}\phi_{2} - z_{1}\phi_{1} \right]
+    :label: bott_algorithm
+
+Where G is the Universal Gravitational Constant; `\Delta\rho` is the density contrast between the polygon and the
+surrounding material; :math:`x_{i}`, :math:`z_{i}` and :math:`r_{i}` are the horizontal, vertical and absolute distance
+between each node and the observation point, :math:`P`, respectively; `\theta` is the angle between the sloping edge and the
+horizontal; and :math:`\phi_{i}` is the angle between the x-axis and :math:`r_{i}` respectively. The geometry of this
+parametrisation is shown in Figure :num:`bott_method` a.
+
+The total gravity anomaly produced by a given polygon is then determined by moving progressively counter-clockwise
+around the polygon and summing the contribution of each side (Equation :eq:`bott_sum`).
+
+.. math:: \Delta g = \sum_{i=1}^{N} \Delta g_{i}
+    :label: bott_sum
+
+When :math:`$z_{2} > z_{1}$` the contribution is positive and when :math:`$z_{2} < z_{1}$` the contribution is
+negative, such that, in the summation, the contributions outside of the polygon cancel, leaving only the gravity
+anomaly produced by the polygon itself (Fig. :numref:`bott_method` b).
+
+The Bott (1969) :cite:`bott1969` algorithm is preferred to the Talwani et al., (1959) :cite:`talwani1959` because a) it
+runs slightly faster and b) it does not explicitly require closed polygons.
+
+.. figure:: _static/bott_method.png
+
+    a) An example of a infinite slab with one sloping horizontal side, showing the geometric values relative to the
+    observation point (0,0) using in solving Equation :eq:`bott_sum`. b) Example of calculating the gravity anomaly due
+    to a two dimensional body (red dashed line) estimated using five nodes (A-E) by summing the effects of the five
+    infinite slabs with sloping sides (modified after, Kearey et al., (2013) :cite:`kearey2013`).
+    :label: eq:bott_method
+
+Bott (1965) algorithm testing
+-----------------------------
+
+To assess the accuracy of the Bott (1969) :cite:`bott1969` method, the gravity anomaly determined using the algorithm is
+compared to that of an exact analytic solution for a simple body. In this case, the solution for a buried horizontal
+cylinder of constant density contrast, that extends infinitely into and out of the model plane is used. The solution
+for this case is given by, for example, Garland (1965) :cite:`garland1965` Pg. 70 as:
+
+.. math:: g_{z} = 2 \pi G r^{2} \Delta\rho \hspace{2pt} \frac{z}{x^{2}+z^{2}}
+    :label: garland

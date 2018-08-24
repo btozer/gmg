@@ -8,7 +8,7 @@ Key         Function
 =========== =====================
 **i**       Insert Node
 **d**       Delete Node
-**p**       Pinch Node^
+**p**       Pinch Node :math:`^{*}`
 **>**       Next Layer
 **<**       Previous Layer
 **z**       Zoom
@@ -16,4 +16,4 @@ Key         Function
 **shift+p** Pan
 =========== =====================
 
-^Left click selects node to pinch, now change layer and select the node to pinch onto.
+:math:`^{*}` Left click selects node to pinch, now change layer and select the node to pinch onto.

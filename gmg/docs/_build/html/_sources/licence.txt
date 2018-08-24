@@ -3,9 +3,10 @@
 **Licencing**
 =============
 
-gmg Licence
---------------
-Copyright (c) 2015-2017, Brook Tozer
+gmg licence
+===========
+
+Copyright (c) 2015-2018, Brook Tozer
 
 All rights reserved.
 
@@ -32,10 +33,14 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Fatiando a Terra Licence
-------------------------
 
-Copyright (c) 2010-2017, Leonardo Uieda
+Dependencies
+============
+
+
+**Fatiando a Terra Licence**
+
+Copyright (c) 2010-2018, Leonardo Uieda
 
 All rights reserved.
 
@@ -63,7 +68,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-ObsPy Licence
--------------
+**ObsPy Licence**
 
 GNU Lesser General Public License, Version 3 (https://www.gnu.org/copyleft/lesser.html)

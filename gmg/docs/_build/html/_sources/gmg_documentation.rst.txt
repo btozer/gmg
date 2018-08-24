@@ -15,19 +15,31 @@ GMG is written in python 2.7 using wx.python for GUI implementation. GMG makes
 use of several other open source python packages to preform various tasks
 (see `References <references.html>`_ for a detailed listing).
 
-Index
------
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 2
+    :hidden:
+    :caption: Getting Started
 
-   installation
-   getting_started
-   manual
-   tutorial
-   contribute
-   references
-   licence
+    installation
+    getting_started
+
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+    :caption: User Guide
+
+    manual
+    tutorial
+    contribute
+
+.. toctree::
+    :maxdepth: 2
+    :hidden:
+    :caption: Credits
+
+    references
+    licence
 
 Release Notes
 -------------

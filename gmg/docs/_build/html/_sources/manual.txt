@@ -1,7 +1,7 @@
-.. _gui_manual:
+.. _manual:
 
 **Manual**
-============
+==========
 
 .. toctree::
    :maxdepth: 1
@@ -18,3 +18,7 @@
    manual_geology
    manual_export_figure
    manual_python_console
+   manual_potential_field_algorithms
+   manual_references
+
+.. bibliography:: manual.bib
