@@ -1,7 +1,7 @@
 .. _manual_gravity_algorithm:
 
 =======================================
-**A1 Bott (1965) 2D gravity algorithm**
+**A1 Bott (1969) 2D gravity algorithm**
 =======================================
 
 Two dimensional gravity anomalies are calculated using a python implementation of Bott's (1969) :cite:`bott1969`
@@ -44,7 +44,7 @@ runs slightly faster and b) it does not explicitly require closed polygons.
     infinite slabs with sloping sides (modified after, Kearey et al., (2013) :cite:`kearey2013`).
 
 
-Bott (1965) algorithm testing
+Bott (1969) algorithm testing
 -----------------------------
 
 To assess the accuracy of the Bott (1969) :cite:`bott1969` method, the gravity anomaly determined using the algorithm is
@@ -73,7 +73,7 @@ points, :math:`N`. A range of values for :math:`N` were tested, starting from :m
 al., (1959) :cite:`talwani1959` method for comparison. This method uses a slightly different trigonometric
 parametrisation.
 
-As can be seen in Figure :numref:`gravity_anomaly_comparison`, both the Bott (1969) :cite:`bott1969` and
+As can be seen in :numref:`gravity_anomaly_comparison`, both the Bott (1969) :cite:`bott1969` and
 Talwani et al., (1959) :cite:`talwani1959` methods produce almost identical anomalies, with the slight
 ( :math:`2.9 \times 10^{-6}` ) mismatch resulting from the difference between the sum of precision error, due to the
 different trigonometric functions that are solved by each algorithm. When :math:`N = 360`, both methods reproduce the
