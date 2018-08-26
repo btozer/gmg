@@ -21,7 +21,7 @@ geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 Key features
 ------------
 
-* Import and display observed topography, gravity and magnetic data.
+* Import and display observed topography, gravity and magnetic 2D profile data.
 * Apply filters to observed data.
 * Import and display seismic reflection data.
 * Add and manipulate model layers (subsurface bodies) using a simple interactive interface.
@@ -32,7 +32,7 @@ Key features
 * Display well horizon tops.
 * Display XY data (e.g., earthquake hypocenters or geological surface contacts).
 * Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.
-* Save model figures as vector graphics in Portable Document Format (PDF) file.
+* Save model figures as vector or raster graphics in various formats (.png .ps .eps .pdf).
 
 
 Installation
