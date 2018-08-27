@@ -41,23 +41,41 @@ Installation
 Pre-Installation
 ----------------
 
-To install gmg you will need some familiarity with using a unix terminal. The simplest way to install gmg is to use an Anaconda Python distribution. Anaconda can be downloaded from [https://www.continuum.io/downloads](https://www.continuum.io/downloads)
+**Step 1: Install an Anaconda python distribution**
 
-Using Anaconda will ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) 
-using the Conda package manager. Additionally, you can create a separate conda environment to use when running gmg. 
-This will avoid any potential conflicts with your current system configuration.
+The simplest way to install gmg is to first install an Anaconda Python distribution: https://www.continuum.io/downloads
+This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
+using the Conda package manager.
 
-To create a new python2.7 conda environment you can use the command:
+**Step 2: Create a new python environment for gmg**
+
+It may be useful to create a new python2.7 conda environment to use when running gmg. This will avoid any potential
+conflicts with your current system configuration. e.g.:
 
     conda create -n py27-gmg python=2.7 anaconda
 
-Where the -n flag dictates what you want to name the new environment. 
-This environment can then be activated using:
+Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
+but the documentation will use the name py27-gmg).
+
+On macOS and Linux this environment can then be activated using:
 
     source activate py27-gmg
 
-Supported OS
-------------
+Or on Windows use:
+
+    activate py27-gmg
+
+Once the environment is activated any call to python will only "see" the packages install within the py27-gmg
+environment. To deactivate the environment either close the terminal window or on macOS and Linux run:
+
+    source deactivate
+
+Or on Windows use:
+
+    deactivate
+
+OS Support
+----------
 
 **NB:** gmg is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
 It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
