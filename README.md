@@ -108,14 +108,20 @@ These dependencies can be installed in your py27 environment using the command:
 
 **Step 3: Get gmg**
 
-Download or git clone the gmg github repository. To download, navigate to:
+Download or "git clone" the gmg github repository. 
+
+*Option 1. Download:* 
+
+In your browser, navigate to:
 
     https://github.com/btozer/gmg
 
 Use the green *"clone or download"* button on the right hand side of the page to download a .zip of GMG. Unzip this
 directory.
 
-or if you have git installed, simply use git on the command line:
+*Option 2. git clone:* 
+
+If you have git installed, simply use git on the command line:
 
     git clone https://github.com/btozer/gmg.git
 
@@ -123,7 +129,11 @@ This will create a copy of the GMG repository in the current working directory.
 
 **Step 4: Install  gmg**
 
-Run the following command in the dir where you have downloaded or git-cloned the gmg repository:
+In the gmg/ dir cd to gmg/gmg:
+
+    cd gmg
+
+Now run the following command:
 
     pip install .
 
