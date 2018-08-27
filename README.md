@@ -43,7 +43,7 @@ Pre-Installation
 
 **Step 1: Install an Anaconda python distribution**
 
-The simplest way to install gmg is to first install an Anaconda Python distribution: https://www.continuum.io/downloads
+The simplest way to install GMG is to first install an Anaconda Python distribution: https://www.continuum.io/downloads
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
 using the Conda package manager.
 
@@ -74,10 +74,8 @@ Or on Windows use:
 
     deactivate
 
-OS Support
-----------
-
-**NB:** gmg is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
+**NB. OS Support**
+GMG is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
 It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
 Please raise any information regarding installation problems on github.
 
@@ -114,13 +112,14 @@ Download or git clone the gmg github repository. To download, navigate to:
 
     https://github.com/btozer/gmg
 
-Use the green *"clone or download"* button on the right hand side of the page to download a .zip of gmg. Unzip this
+Use the green *"clone or download"* button on the right hand side of the page to download a .zip of GMG. Unzip this
 directory.
 
-or simply use git on the command line:
+or if you have git installed, simply use git on the command line:
 
     git clone https://github.com/btozer/gmg.git
 
+This will create a copy of the GMG repository in the current working directory. 
 
 **Step 4: Install  gmg**
 
