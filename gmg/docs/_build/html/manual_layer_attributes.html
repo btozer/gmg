@@ -101,7 +101,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>3.0 Layer attributes</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#density">3.1 Density</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#bulk-density">3.1 Bulk density</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#magnetic-susceptibility">3.2 Magnetic Susceptibility</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#remenant-magnetism">3.3 Remenant Magnetism</a></li>
 </ul>
@@ -113,7 +113,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1965) 2D gravity algorithm</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
 </ul>
@@ -191,8 +191,23 @@
             
   <div class="section" id="layer-attributes">
 <h1><strong>3.0 Layer attributes</strong><a class="headerlink" href="#layer-attributes" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="density">
-<h2>3.1 Density<a class="headerlink" href="#density" title="Permalink to this headline">¶</a></h2>
+<p>Attributes refer to the physical properties assigned to a given model layer(polygon) and are used to calculate
+the predicted gravity and magnetic anomalies. These include:</p>
+<ul class="simple">
+<li>Layer bulk density</li>
+<li>Model reference density</li>
+<li>Layer susceptibility contrast</li>
+<li>Magnetic field vector angle A</li>
+<li>Magnetic field vector angle B</li>
+</ul>
+<p>Layer attributes are set using the <strong>Attributes</strong> sidebar within the modelling window or from the
+<strong>Attribute Table</strong> which can be accessed from the top menubar. gmg is designed such that attributes can be
+easily varied when modelling, to allow for rapid assessment of the effect of varying each attribute. A given attribute
+need only be set if required for the given layer, if attributes are not set, the given layer will not contribute to
+the modelled anomaly, be that gravity or magnetic. Angles A and B need only be set if the given layers magnetic vector
+differs from the inducing field, as may be the case for remanent magnetism.</p>
+<div class="section" id="bulk-density">
+<h2>3.1 Bulk density<a class="headerlink" href="#bulk-density" title="Permalink to this headline">¶</a></h2>
 <p>Gravity modelling is achieved using bulk <em>density contrasts</em> relative to a <em>reference density</em>.</p>
 <p>Each layer requires:</p>
 <ul class="simple">
@@ -254,7 +269,7 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 24, 2018.
+      Last updated on Aug 28, 2018.
 
     </p>
   </div>

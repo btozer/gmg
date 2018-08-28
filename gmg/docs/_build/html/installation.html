@@ -174,17 +174,33 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="pre-installation">
 <h2>Pre-Installation<a class="headerlink" href="#pre-installation" title="Permalink to this headline">¶</a></h2>
+<p><strong>Step 1: Install an Anaconda python distribution</strong></p>
 <p>The simplest way to install gmg is to first install an Anaconda Python distribution: <a class="reference external" href="https://www.continuum.io/downloads">https://www.continuum.io/downloads</a>
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
-using the Conda package manager. Additionally, you can create a separate conda environment to use when running gmg. This
-will avoid any potential conflicts with your current system configuration.</p>
-<p>It may be useful to create a new python2.7 conda environment e.g.:</p>
+using the Conda package manager.</p>
+<p><strong>Step 2: Create a new python environment for gmg</strong></p>
+<p>It may be useful to create a new python2.7 conda environment to use when running gmg. This will avoid any potential
+conflicts with your current system configuration. e.g.:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>conda create -n py27-gmg python=2.7 anaconda
 </pre></div>
 </div>
-<p>Where the -n flag dictates what you want to name the new environment.
-This environment can then be activated using:</p>
+<p>Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
+but the documentation will use the name py27-gmg).</p>
+<p>On macOS and Linux this environment can then be activated using:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>source activate py27-gmg
+</pre></div>
+</div>
+<p>Or on Windows use:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>activate py27-gmg
+</pre></div>
+</div>
+<p>Once the environment is activated any call to python will only “see” the packages install within the py27-gmg
+environment. To deactivate the environment either close the terminal window or on macOS and Linux run:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>source deactivate
+</pre></div>
+</div>
+<p>Or on Windows use:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>deactivate
 </pre></div>
 </div>
 <div class="admonition note">
@@ -197,8 +213,12 @@ Please raise any information regarding installation problems on github.</p>
 <div class="section" id="id2">
 <h2>Installation<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
 <p><strong>Step 1:</strong></p>
-<p>Ensure your py27-gmg environment is active:</p>
+<p>Ensure your py27-gmg environment is active, on macOS and Linux use:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>source activate py27-gmg
+</pre></div>
+</div>
+<p>Or on Windows use:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>activate py27-gmg
 </pre></div>
 </div>
 <p><strong>Step 2: Install dependencies</strong></p>
@@ -284,7 +304,7 @@ on the main display of your Mac.
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 24, 2018.
+      Last updated on Aug 28, 2018.
 
     </p>
   </div>

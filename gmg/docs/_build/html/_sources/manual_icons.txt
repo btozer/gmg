@@ -3,44 +3,45 @@
 **Icon Shortcuts**
 =======================
 
-.. |fig1| image:: _images/1_save.png
-.. |fig2| image:: _images/1_load.png
-.. |fig3| image:: _images/1_g.png
-.. |fig4| image:: _images/1_m.png
-.. |fig5| image:: _images/1_c.png
-.. |fig6| image:: _images/1_fault.png
-.. |fig7| image:: _images/1_up.png
-.. |fig8| image:: _images/1_down.png
-.. |fig9| image:: _images/1_up2.png
-.. |fig10| image:: _images/1_down2.png
-.. |fig11| image:: _images/1_zoom_in.png
-.. |fig12| image:: _images/1_zoom_out.png
-.. |fig13| image:: _images/1_extent.png
-.. |fig14| image:: _images/1_pan.png
-.. |fig15| image:: _images/1_down_h.png
-.. |fig16| image:: _images/1_up_h.png
-.. |fig17| image:: _images/1_down2_h.png
-.. |fig18| image:: _images/1_up2_h.png
-.. |fig19| image:: _images/1_well.png
+.. |fig1| image:: _images/save_24.png
+.. |fig2| image:: _images/load_24.png
+.. |fig3| image:: _images/T_24.png
+.. |fig4| image:: _images/G_24.png
+.. |fig5| image:: _images/M_24.png
+.. |fig6| image:: _images/C_24.png
+.. |fig7| image:: _images/faultline_24.png
+.. |fig8| image:: _images/large_up_24.png
+.. |fig9| image:: _images/large_down_24.png
+.. |fig10| image:: _images/small_up_24.png
+.. |fig11| image:: _images/small_down_24.png
+.. |fig12| image:: _images/zoom_in_24.png
+.. |fig13| image:: _images/zoom_out_24.png
+.. |fig14| image:: _images/full_extent_24.png
+.. |fig15| image:: _images/pan_24.png
+.. |fig16| image:: _images/left_small_24.png
+.. |fig17| image:: _images/right_small_24.png
+.. |fig18| image:: _images/large_left_24.png
+.. |fig19| image:: _images/large_right_24.png
+.. |fig20| image:: _images/well_24.png
 
-+--------------------------------+---------------------------------+
-| |fig1| Save model              | |fig2| Load model               |
-+--------------------------------+---------------------------------+
-| |fig3| Compute gravity anomaly | |fig4| Compute magnetic anomaly |
-+--------------------------------+---------------------------------+
-| |fig5| Capture Coordinates     | |fig6| Start fault picking      |
-+--------------------------------+---------------------------------+
-| |fig7| Increase aspect         | |fig8| Decrease aspect          |
-+--------------------------------+---------------------------------+
-| |fig9| Increase aspect x2      | |fig10| Decrease aspect x2      |
-+--------------------------------+---------------------------------+
-| |fig11| Zoom in                | |fig12| Zoom out                |
-+--------------------------------+---------------------------------+
-| |fig13| Full extent            | |fig14| Pan                     |
-+--------------------------------+---------------------------------+
-| |fig15| Segy gain up           | |fig16| Segy gain down          |
-+--------------------------------+---------------------------------+
-| |fig17| Transparency increase  | |fig18| Transparency decrease   |
-+--------------------------------+---------------------------------+
-| |fig19| Load well data         |                                 |
-+--------------------------------+---------------------------------+
++-------------------------------------+-------------------------------------+
+| |fig1| Save model                   | |fig2| Load model                   |
++-------------------------------------+-------------------------------------+
+| |fig3| Load topography anomaly      | |fig4| Load gravity anomaly         |
++-------------------------------------+-------------------------------------+
+| |fig5| Load magnetic anomaly        | |fig6| Capture Coordinates          |
++-------------------------------------+-------------------------------------+
+| |fig7| Start fault picking          | |fig8| Increase aspect x2           |
++-------------------------------------+-------------------------------------+
+| |fig9| Decrease aspect x2           | |fig10| Increase aspect             |
++-------------------------------------+-------------------------------------+
+| |fig11| Decrease aspect             | |fig12| Zoom in                     |
++-------------------------------------+-------------------------------------+
+| |fig13| Zoom out                    | |fig14| Full extent                 |
++-------------------------------------+-------------------------------------+
+| |fig15| Pan                         | |fig16| Segy gain down              |
++-------------------------------------+-------------------------------------+
+| |fig17| Segy gain up                | |fig18| Layer transparency decrease |
++-------------------------------------+-------------------------------------+
+| |fig19| Layer transparency increase | |fig20| Load well data              |
++-------------------------------------+-------------------------------------+
