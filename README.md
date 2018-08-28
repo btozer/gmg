@@ -129,11 +129,7 @@ This will create a copy of the GMG repository in the current working directory.
 
 **Step 4: Install  gmg**
 
-In the gmg/ dir cd to gmg/gmg:
-
-    cd gmg
-
-Now run the following command:
+Run the following command in the dir where you have downloaded or git-cloned the gmg repository:
 
     pip install .
 
