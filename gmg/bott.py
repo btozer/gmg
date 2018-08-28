@@ -1,7 +1,6 @@
 """
 Calculate the gravitational attraction of a 2D body defined as a polygon of
-infinte extent orthogonal to the cross section using the method of 
-Bott (1965).
+infinte extent orthogonal to the cross section using the method of Bott (1965).
 
 Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
@@ -16,9 +15,8 @@ Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
 Bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
 
-Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package 
-for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
-
+Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a
+Python package for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 """
 
 import numpy
