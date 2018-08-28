@@ -45,3 +45,18 @@
 +-------------------------------------+-------------------------------------+
 | |fig19| Layer transparency increase | |fig20| Load well data              |
 +-------------------------------------+-------------------------------------+
+
+
+.. |fig21| image:: _images/large_up_24.png
+.. |fig22| image:: _images/python_24.png
+.. |fig23| image:: _images/T_24.png
+.. |fig24| image:: _images/G_24.png
+.. |fig25| image:: _images/M_24.png
+
++--------------------------------------------+-----------------------------------------+
+| |fig21| Expand controls frame              | |fig22| Expand python console           |
++--------------------------------------------+-----------------------------------------+
+| |fig23| Expand/Collapse topography profile | |fig24| Expand/Collapse gravity profile |
++--------------------------------------------+-----------------------------------------+
+| |fig25| Expand/Collapse magnetic profile   |                                         |
++--------------------------------------------+-----------------------------------------+

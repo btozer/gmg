@@ -214,29 +214,29 @@ class Gmg(wx.Frame):
         self.create_menu()
 
         '# %CREATE STATUS BAR'
-        self.statusbar = self.CreateStatusBar(3, style=wx.NO_BORDER)
-        self.controls_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'redock_2.png'),
-                                               pos=(0, 0), style=wx.NO_BORDER)
+        self.statusbar = self.CreateStatusBar(3)
+        self.controls_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'large_up_16.png'),
+                                               pos=(0, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_controls, self.controls_button)
 
         '# %PYTHON CONSOLE'
         self.console_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'python_16.png'),
-                                              pos=(24, 0), style=wx.NO_BORDER)
+                                              pos=(24, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_console, self.console_button)
 
         '# %TOPOGRAPHY'
         self.topography_button = GenBitmapButton(self.statusbar, 601, wx.Bitmap(self.gui_icons_dir + 'T_16.png'),
-                                                 pos=(48, 0), style=wx.NO_BORDER)
+                                                 pos=(48, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.topography_button)
 
         '# %GRAVITY'
         self.gravity_button = GenBitmapButton(self.statusbar, 602, wx.Bitmap(self.gui_icons_dir + 'G_16.png'),
-                                              pos=(72, 0), style=wx.NO_BORDER)
+                                              pos=(72, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.gravity_button)
 
         '# %MAGNETIC'
         self.magnetic_button = GenBitmapButton(self.statusbar, 603, wx.Bitmap(self.gui_icons_dir + 'M_16.png'),
-                                               pos=(96, 0), style=wx.NO_BORDER)
+                                               pos=(96, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
         self.status_text = " || Currently Editing Layer: || Layer Status: || Model Aspect Ratio = || " \
