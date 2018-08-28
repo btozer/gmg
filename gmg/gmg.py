@@ -147,41 +147,41 @@ class Gmg(wx.Frame):
         images.Add(top)
         images.Add(bottom)
 
-        '# %CREATE PANELS TO FILL WITH LAYER TREE CONTROL, PARAMETER CONTROLS AND FAULT TREE CONTROL'
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 700), style=wx.SP_NOBORDER | wx.EXPAND)
+        '# %CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1000), style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 600),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
-        '# %FIRST PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 300),
+        '# %FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 450),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 300),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 450),
                                                        agwStyle=fpb.FPB_VERTICAL)
-        self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
+        self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
+                                                                       foldIcons=images)
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
-        '# %SECOND PANE; LEFT PANEL (=ATTRIBUTES)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 500),
+        '# %SECOND PANE; LEFT PANEL (=LAYERS)'
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 450),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 500),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 450),
                                                        agwStyle=fpb.FPB_VERTICAL)
-        self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layer Attributes", collapsed=True,
-                                                                       foldIcons=images)
+        self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         '# %THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 50),
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 50),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 200),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
 
         '# %SET SPLITTERS'
-        self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three, 400)
-        self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b, 300)
+        self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three)
+        self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b)
 
         self.splitter_left_panel_sizer = wx.BoxSizer(wx.VERTICAL)
         self.splitter_left_panel_sizer.Add(self.leftPanel, 1, wx.EXPAND)
@@ -816,7 +816,7 @@ class Gmg(wx.Frame):
                                            linewidth=1.0, alpha=0.5)
 
         '#% MAKE LAYER TREE'
-        self.tree = ct.CustomTreeCtrl(self.fold_panel_one, -1, size=(200, 280),
+        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
         self.tree.SetIndent(0.0)
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.tree)
@@ -836,53 +836,53 @@ class Gmg(wx.Frame):
 
         '''#% ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
         '#% Make Attribute Label'
-        self.attr_text = wx.StaticText(self.fold_panel_two, -1, label="", style=wx.ALIGN_CENTER)
-        self.attr_text2 = wx.StaticText(self.fold_panel_two, -1, label="", style=wx.ALIGN_CENTER)
+        self.attr_text = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
+        self.attr_text2 = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
         '#% Make NODE X Y Label'
-        self.node_text = wx.StaticText(self.fold_panel_two, -1, label="Node Position:", style=wx.ALIGN_CENTER)
+        self.node_text = wx.StaticText(self.fold_panel_one, -1, label="Node Position:", style=wx.ALIGN_LEFT)
         '#% Make density spinner'
-        self.density_text = wx.StaticText(self.fold_panel_two, -1, label="Density:", style=wx.ALIGN_CENTER)
-        self.density_input = fs.FloatSpin(self.fold_panel_two, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
+        self.density_text = wx.StaticText(self.fold_panel_one, -1, label="Density:    ", style=wx.ALIGN_LEFT)
+        self.density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
         self.density_input.SetFormat("%f")
         self.density_input.SetDigits(4)
         '#% Make refernece density spinner'
-        self.ref_density_text = wx.StaticText(self.fold_panel_two, -1, label="Ref Den:", style=wx.ALIGN_CENTER)
-        self.ref_density_input = fs.FloatSpin(self.fold_panel_two, -1, min_val=-5, max_val=5, increment=0.001,
+        self.ref_density_text = wx.StaticText(self.fold_panel_one, -1, label="Reference:\nDensity", style=wx.ALIGN_LEFT)
+        self.ref_density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001,
                                               value=0.00)
         self.ref_density_input.SetFormat("%f")
         self.ref_density_input.SetDigits(4)
         '#% Make susceptibility spinner'
-        self.susceptibility_text = wx.StaticText(self.fold_panel_two, -1, label="Suscept:", style=wx.ALIGN_CENTER)
-        self.susceptibility_input = fs.FloatSpin(self.fold_panel_two, -1, min_val=-2.0, max_val=2.0, increment=0.00001,
+        self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="susceptibi:", style=wx.ALIGN_LEFT)
+        self.susceptibility_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-2.0, max_val=2.0, increment=0.00001,
                                                  value=0.00)
         self.susceptibility_input.SetFormat("%f")
         self.susceptibility_input.SetDigits(6)
         '#% REMANENT MAG SWITCH'
-        self.remanent_mag_checkbox = wx.CheckBox(self.fold_panel_two, -1, "Remanence")
+        self.remanent_mag_checkbox = wx.CheckBox(self.fold_panel_one, -1, "Remanence")
         self.remanent_mag_checkbox.SetValue(False)
         '#% MAKE ANGLE A SPINNER'
-        self.angle_a_text = wx.StaticText(self.fold_panel_two, -1, label="Angle A:", style=wx.ALIGN_CENTER)
-        self.angle_a_input = fs.FloatSpin(self.fold_panel_two, -1, min_val=0.0, max_val=90.0, increment=1.0, value=0.0)
+        self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label="Angle A:", style=wx.ALIGN_LEFT)
+        self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=90.0, increment=1.0, value=0.0)
         self.angle_a_input.SetFormat("%f")
         self.angle_a_input.SetDigits(1)
         '#% Make ANGLE B SPINNER'
-        self.angle_b_text = wx.StaticText(self.fold_panel_two, -1, label="Angle B:", style=wx.ALIGN_CENTER)
-        self.angle_b_input = fs.FloatSpin(self.fold_panel_two, -1, min_val=0.0, max_val=180.0, increment=1.0, value=0.0)
+        self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label="Angle B:", style=wx.ALIGN_LEFT)
+        self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=180.0, increment=1.0, value=0.0)
         self.angle_b_input.SetFormat("%f")
         self.angle_b_input.SetDigits(1)
         '#% Make well text size slider'
-        self.text_size_text = wx.StaticText(self.fold_panel_two, -1, label="Label Text Size:")
-        self.text_size_input = wx.Slider(self.fold_panel_two, value=1, minValue=1, maxValue=20., size=(175, -1),
+        self.text_size_text = wx.StaticText(self.fold_panel_one, -1, label="Label Text Size:")
+        self.text_size_input = wx.Slider(self.fold_panel_one, value=1, minValue=1, maxValue=20., size=(175, -1),
                                          style=wx.SL_HORIZONTAL)
         '#% Make Node XY spinners'
-        self.x_text = wx.StaticText(self.fold_panel_two, -1, label="X:")
-        self.x_input = fs.FloatSpin(self.fold_panel_two, -1, increment=0.001, value=0.00)
+        self.x_text = wx.StaticText(self.fold_panel_one, -1, label="X:")
+        self.x_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.x_input.SetDigits(4)
-        self.y_text = wx.StaticText(self.fold_panel_two, -1, label="Y:")
-        self.y_input = fs.FloatSpin(self.fold_panel_two, -1, increment=0.001, value=0.00)
+        self.y_text = wx.StaticText(self.fold_panel_one, -1, label="Y:")
+        self.y_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.y_input.SetDigits(4)
         '#% Make Set button'
-        self.node_set_button = wx.Button(self.fold_panel_two, -1, "Set")
+        self.node_set_button = wx.Button(self.fold_panel_one, -1, "Set layer attributes")
 
         '#% INITALISE CALCULATED P.F. LINES'
         self.predplot, = self.dcanvas.plot([], [], '-r', linewidth=2, alpha=0.5)
@@ -1114,55 +1114,50 @@ class Gmg(wx.Frame):
         self.attr_text_box.Add(self.attr_text2, 0, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, 2)
         self.attr_box.Add(self.attr_text_box, 0, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND)
 
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
 
         '#% Density'
         self.density_box = wx.BoxSizer(wx.HORIZONTAL)
         self.density_box.Add(self.density_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 2)
         self.density_box.Add(self.density_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.density_box, 0, wx.LEFT | wx.EXPAND, 1)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         '#% Reference Density'
         self.ref_density_box = wx.BoxSizer(wx.HORIZONTAL)
         self.ref_density_box.Add(self.ref_density_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 2)
         self.ref_density_box.Add(self.ref_density_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.ref_density_box, 0, wx.LEFT | wx.EXPAND, 1)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         '#% Susceptibility'
         self.susept_box = wx.BoxSizer(wx.HORIZONTAL)
         self.susept_box.Add(self.susceptibility_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.susept_box.Add(self.susceptibility_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.susept_box, 0, wx.LEFT | wx.EXPAND)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         '# %REMANANCE'
         self.remanence_box = wx.BoxSizer(wx.HORIZONTAL)
         self.remanence_box.Add(self.remanent_mag_checkbox, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.attr_box.Add(self.remanence_box, 0, wx.LEFT | wx.EXPAND)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
         '#% Angle A'
         self.angle_a_box = wx.BoxSizer(wx.HORIZONTAL)
         self.angle_a_box.Add(self.angle_a_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.angle_a_box.Add(self.angle_a_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.angle_a_box, 0, wx.LEFT | wx.EXPAND, 9)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
         '#% Angle B'
         self.angle_b_box = wx.BoxSizer(wx.HORIZONTAL)
         self.angle_b_box.Add(self.angle_b_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.angle_b_box.Add(self.angle_b_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.angle_b_box, 0, wx.LEFT | wx.EXPAND, 9)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         '#% Well label text size'
         self.attr_box.Add(self.text_size_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
         self.attr_box.Add(self.text_size_input, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         '#% XY Nodes'
         self.node_box = wx.BoxSizer(wx.HORIZONTAL)
         self.node_box.Add(self.node_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND, 2)
         self.attr_box.Add(self.node_box, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_two), 0, wx.ALL | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         '#% X NODE'
         self.x_box = wx.BoxSizer(wx.HORIZONTAL)
         self.x_box.Add(self.x_text, 0, wx.LEFT | wx.EXPAND, 8)
@@ -1173,16 +1168,17 @@ class Gmg(wx.Frame):
         self.y_box.Add(self.y_text, 0, wx.ALL | wx.EXPAND, 3)
         self.y_box.Add(self.y_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.y_box, 0, wx.ALL | wx.LEFT | wx.ALIGN_TOP | wx.EXPAND, 5)
+        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         ' #% SET BUTTON'
         self.attr_box.Add(self.node_set_button, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
 
         '#PLACE BOX SIZERS IN CORRECT PANELS'
-        self.fold_panel_one.SetSizerAndFit(self.tree_box)
-        self.fold_panel_two.SetSizerAndFit(self.attr_box)
+        self.fold_panel_one.SetSizerAndFit(self.attr_box)
+        self.fold_panel_two.SetSizerAndFit(self.tree_box)
         self.leftPanel.SetSizer(self.splitter_left_panel_sizer)
         self.fold_panel_one.Collapse()
         self.fold_panel_one.Expand()
-        self.fold_panel_two.Collapse()
+        self.fold_panel_one.Collapse()
         self.fold_panel_one.Expand()
         self.fold_panel_three.Collapse()
 
@@ -4000,25 +3996,51 @@ class Gmg(wx.Frame):
 
 class NewModelDialog(wx.Dialog):
     def __init__(self, parent, id, title, m_x1=None, m_x2=None, m_z1=None, m_z2=None):
-        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL)
+        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL
+                           | wx.BORDER_RAISED)
 
-        floating_panel = wx.Panel(self, -1)
+        self.floating_panel = wx.Panel(self, -1)
         self.set_button = False
+
+        self.main_box = wx.BoxSizer(wx.HORIZONTAL)
+
+        self.title_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.title_text = wx.StaticText(self.floating_panel, -1, "Enter the region boundary for the new model\n"
+                                                                 "and the x-increment for anomaly calculations:",
+                                        style=wx.ALIGN_CENTRE_HORIZONTAL)
+        self.title_sizer.Add(self.title_text)
+
+        self.line1 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
+
         self.x_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.x_Text = wx.StaticText(floating_panel, -1, "X1, X2 (km)")
-        self.new_x1 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
-        self.new_x2 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.x_Text = wx.StaticText(self.floating_panel, -1, "X1, X2 (km)      ")
+        self.new_x1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
+        self.new_x2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
         self.x_sizer.AddMany([self.x_Text, self.new_x1, self.new_x2])
         self.z_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.z_Text = wx.StaticText(floating_panel, -1, "Z1, Z2 (km)")
-        self.new_z1 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
-        self.new_z2 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.z_Text = wx.StaticText(self.floating_panel, -1, "Z1, Z2 (km)      ")
+        self.new_z1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
+        self.new_z2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
         self.z_sizer.AddMany([self.z_Text, self.new_z1, self.new_z2])
-        self.xp_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.xp_Text = wx.StaticText(floating_panel, -1, "Spacing (km)")
-        self.xp_inc = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
-        self.xp_sizer.AddMany([self.xp_Text, self.xp_inc])
+        self.xp1_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.xp1_text = wx.StaticText(self.floating_panel, -1, "Calculation\nIncrement (km)")
+        self.xp1_inc = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
+        self.xp1_sizer.AddMany([self.xp1_text, self.xp1_inc])
+
+        self.line2 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
+
+        self.create_button_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.spacing = wx.StaticText(self.floating_panel, -1, "                           ")
+        self.b_create_button = wx.Button(self.floating_panel, -1, "Create Model")
+        self.Bind(wx.EVT_BUTTON, self.create_button, self.b_create_button)
+        self.create_button_sizer.AddMany([self.spacing, self.b_create_button])
+
+        self.line3 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
+
+        self.footer_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.footer_text = wx.StaticText(self.floating_panel, -1, "NB. these values can be modified during modelling,\n"
+                                                                 "it may be beneficial to begin with a coarse spacing.")
+        self.footer_sizer.Add(self.footer_text)
 
         # % POPULATE BOX WITH EXISTING VALUES
         if m_x1:
@@ -4030,19 +4052,20 @@ class NewModelDialog(wx.Dialog):
         if m_z2:
             self.new_z2.SetValue(str(m_z2))
 
-        sizer = wx.FlexGridSizer(cols=1, hgap=6, vgap=6)
-        self.b_create_button = wx.Button(floating_panel, -1, "Create Model")
-        self.Bind(wx.EVT_BUTTON, self.create_button, self.b_create_button)
-        sizer.AddMany([self.x_sizer, self.z_sizer, self.xp_sizer, self.b_create_button])
-        floating_panel.SetSizerAndFit(sizer)
-        sizer.Fit(self)
+        self.sizer = wx.FlexGridSizer(cols=1, hgap=10, vgap=10)
+        self.sizer.AddMany([self.title_text, self.line1, self.x_sizer, self.z_sizer, self.xp1_sizer,
+                            self.line2, self.create_button_sizer, self.line3, self.footer_text])
+
+        self.main_box.Add(self.sizer, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
+        self.floating_panel.SetSizerAndFit(self.main_box)
+        self.main_box.Fit(self)
 
     def create_button(self, event):
         self.x1 = float(self.new_x1.GetValue())
         self.x2 = float(self.new_x2.GetValue())
         self.z1 = float(self.new_z1.GetValue())
         self.z2 = float(self.new_z2.GetValue())
-        self.xp_inc = float(self.xp_inc.GetValue())
+        self.xp_inc = float(self.xp1_inc.GetValue())
         self.set_button = True
         self.EndModal(1)
 
