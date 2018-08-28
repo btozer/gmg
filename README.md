@@ -38,49 +38,46 @@ Key features
 Installation
 ============
 
-To install gmg you will need some familiarity with using a unix terminal. 
-
 Pre-Installation
 ----------------
 
 **Step 1: Install an Anaconda python distribution**
 
-The simplest way to install gmg is to use an Anaconda Python distribution. 
-Anaconda can be downloaded from [https://www.continuum.io/downloads](https://www.continuum.io/downloads) Using 
-Anaconda will ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the 
-Conda package manager. 
+The simplest way to install GMG is to first install an Anaconda Python distribution: www.anaconda.com/download
 
-**Step 2:  Create a new python environment for gmg**
+This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
+using the Conda package manager.  It is recommended you download the python3 version, even though GMG is written 
+in python2.7 (you can create a python2.7 environment to run GMG).
+
+**Step 2: Create a new python environment for gmg**
 
 It may be useful to create a new python2.7 conda environment to use when running gmg. This will avoid any potential
-conflicts with your current system configuration. e.g.::
+conflicts with your current system configuration. e.g.:
 
     conda create -n py27-gmg python=2.7 anaconda
 
 Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
 but the documentation will use the name py27-gmg).
 
-On macOS and Linux this environment can then be activated using::
+On macOS and Linux this environment can then be activated using:
 
     source activate py27-gmg
 
-Or on Windows use::
+Or on Windows use:
 
     activate py27-gmg
 
 Once the environment is activated any call to python will only "see" the packages install within the py27-gmg
-environment. To deactivate the environment either close the terminal window or on macOS and Linux run::
+environment. To deactivate the environment either close the terminal window or on macOS and Linux run:
 
     source deactivate
 
-Or on Windows use::
+Or on Windows use:
 
     deactivate
 
-Supported OS
-------------
-
-**NB:** gmg is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
+**NB. OS Support**
+GMG is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
 It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
 Please raise any information regarding installation problems on github.
 
@@ -113,17 +110,24 @@ These dependencies can be installed in your py27 environment using the command:
 
 **Step 3: Get gmg**
 
-Download or git clone the gmg github repository. To download, navigate to:
+Download or "git clone" the gmg github repository. 
+
+*Option 1. Download:* 
+
+In your browser, navigate to:
 
     https://github.com/btozer/gmg
 
-Use the green *"clone or download"* button on the right hand side of the page to download a .zip of gmg. Unzip this
+Use the green *"clone or download"* button on the right hand side of the page to download a .zip of GMG. Unzip this
 directory.
 
-or simply use git on the command line:
+*Option 2. git clone:* 
+
+If you have git installed, simply use git on the command line:
 
     git clone https://github.com/btozer/gmg.git
 
+This will create a copy of the GMG repository in the current working directory. 
 
 **Step 4: Install  gmg**
 
