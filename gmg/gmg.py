@@ -827,8 +827,8 @@ class Gmg(wx.Frame):
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
         self.tree_items = ["Layer 1"]
-        tree_item = self.tree.AppendItem(self.root, "layer 1", ct_type=1)
-        self.tree.SetItemPyData(tree_item, 0)
+        # tree_item = self.tree.AppendItem(self.root, "layer 1", ct_type=1)
+        # self.tree.SetItemPyData(tree_item, 0)
         self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
 
         self.error = 0.
