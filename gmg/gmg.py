@@ -94,8 +94,7 @@ import math as m
 import os
 import sys
 import subprocess
-#from obspy.segy.core import readSEGY
-from obspy import read  # FUTURE
+from obspy import read
 import cPickle as Pickle
 from scipy import signal
 from fatiando.mesher import Polygon
@@ -107,9 +106,8 @@ import struct
 import gc
 import webbrowser
 
-import wx.lib.agw.ribbon as RB
-
 # FUTURE
+# mport wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
 # from scipy import interpolate as ip
 
@@ -392,33 +390,32 @@ class Gmg(wx.Frame):
 
         '# %SEISMIC DATA'
         self.seismic_data = wx.Menu()
-        '# %SEGY LOAD'
+        # %SEGY LOAD
         self.m_load_segy = self.seismic_data.Append(-1, "&Load Segy...\tCtrl-y", "Load Segy Data")
         self.Bind(wx.EVT_MENU, self.segy_input, self.m_load_segy)
-        '# % SEGY REMOVE_ALL'
+        # % SEGY REMOVE_ALL
         self.m_remove_all_segy = self.seismic_data.Append(-1, "&Remove All Segy...\tCtrl-y", "Remove All Segy Data")
         self.Bind(wx.EVT_MENU, self.remove_all_segy, self.m_remove_all_segy)
-        '# % SEGY NAME LIST'
+        # % SEGY NAME LIST
         self.m_segy_submenu = wx.Menu()
         self.seismic_data.Append(-1, 'SEGY Data...', self.m_segy_submenu)
-        '# % GAIN'
+        # % GAIN
         self.m_gain = wx.Menu()
         self.seismic_data.Append(-1, 'Gain', self.m_gain)
-        '# % COLOR PALETTE'
+        # % COLOR PALETTE
         self.m_color_palette = wx.Menu()
         self.seismic_data.Append(-1, 'Color Palette', self.m_color_palette)
         self.m_color_palette.Append(901, 'Grey')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=901)
         self.m_color_palette.Append(902, 'Sesimic')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=902)
-
-        '# % GAIN INCREASE'
+        # % GAIN INCREASE
         self.m_gain_increase = self.m_gain.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.gain_increase, self.m_gain_increase)
-        '# % GAIN DECREASE'
+        # % GAIN DECREASE
         self.m_gain_decrease = self.m_gain.Append(-1, "Decrease...", "Decrease...")
         self.Bind(wx.EVT_MENU, self.gain_decrease, self.m_gain_decrease)
-        '# % DRAW MENU'
+        # % DRAW MENU
         self.menubar.Append(self.seismic_data, "&Seismic Data")
 
         '# %WELL DATA'
@@ -494,8 +491,6 @@ class Gmg(wx.Frame):
         self.SetMenuBar(self.menubar)
 
         '# %TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)'
-
-
         self.toolbar = self.CreateToolBar()
 
         t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
@@ -508,7 +503,7 @@ class Gmg(wx.Frame):
 
         t_calc_topo = self.toolbar.AddTool(wx.ID_ANY, "Calculate topography",
                                     wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
-        ### self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)
+        ### self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
         t_calc_model_bott = self.toolbar.AddTool(wx.ID_ANY, "Calculate gravity",
                                     wx.Bitmap(self.gui_icons_dir + 'G_24.png'), shortHelp="Calculate gravity")
@@ -584,10 +579,10 @@ class Gmg(wx.Frame):
     def start(self, area, xp, zp):
         """# %CREATE MPL FIGURE CANVAS"""
 
-        self.fig = plt.figure()  # %CREATE MPL FIGURE
-        self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # %CREATE FIGURE CANVAS
-        self.nav_toolbar = NavigationToolbar(self.canvas)  # %CREATE DEFAULT NAVIGATION TOOLBAR
-        self.nav_toolbar.Hide()  # %HIDE DEFAULT NAVIGATION TOOLBAR
+        self.fig = plt.figure()  # CREATE MPL FIGURE
+        self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
+        self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
+        self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
         '#% SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
         self.draw = self.fig.canvas.draw
@@ -618,7 +613,7 @@ class Gmg(wx.Frame):
         self.Show()
 
     def initalise_model(self):
-        """# %INITALISE OBSERVED DATA AND LAYERS"""
+        """INITIALISE OBSERVED DATA AND LAYERS"""
 
         self.pinch = False
         self.showverts = True
@@ -643,12 +638,14 @@ class Gmg(wx.Frame):
         self.colors = "bmycbmycbmyc"  # %OBSERVED COLOR LIST
         self.colors_index = 0
         self.model_azimuth = 0.
-        '#% INITIALIZE POLYGON LISTS (USED AS MODEL LAYERS)'
+
+        '#% INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)'
         self.mag_polygons = []
         self.polygons = []
         self.polyplots = []
         self.poly_fills = [[]]
-        '#% INITIALIZE LAYER LISTS (USED FOR STORING LAYER DATA)'
+
+        '#% INITIALISE LAYER LISTS (USED FOR STORING LAYER DATA)'
         self.plotx_list = [[]]
         self.ploty_list = [[]]
         self.layer_colors = [[]]
@@ -660,20 +657,23 @@ class Gmg(wx.Frame):
         self.layer_transparency = 0.4
         self.pinch_node_list = [[], []]
         self.pinch_count = 0
-        '#% INITIALIZE XY DATA ATTRIBUTES'
+
+        '#% INITIALISE XY DATA ATTRIBUTES'
         self.xy = []
         self.xy_list = [[]]
         self.xy_list_save = [[]]
         self.xy_name_list = []
         self.xy_count = 0
-        '#% INITIALIZE TOPO ATTRIBUTES'
+
+        '#% INITIALISE TOPOGRAPHY ATTRIBUTES'
         self.obs_topo = []
         self.obs_topo_list = [[]]
         self.obs_topo_list_save = [[]]
         self.obs_topo_name_list = []
         self.obs_topo_colors = [[]]
         self.obs_topo_count = 0
-        '#% INITIALIZE GRAVITY ATTRIBUTES'
+
+        '#% INITIALISE GRAVITY ATTRIBUTES'
         self.grav_obs_switch = False
         self.obs_grav = []
         self.obs_grav_list = [[]]
@@ -687,7 +687,8 @@ class Gmg(wx.Frame):
         self.obs_gravity_data_for_rms = []  # %OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.grav_rms_value = 0.  # %TOTAL RMS MISFIT VALUE
         self.grav_residuals = []  # %CALCULATED RESIDUAL
-        '#% INITIALIZE MAGNETIC ATTRIBUTES'
+
+        '#% INITIALISE MAGNETIC ATTRIBUTES'
         self.mag_obs_switch = False
         self.obs_mag = []
         self.obs_mag_list = [[]]
@@ -703,7 +704,8 @@ class Gmg(wx.Frame):
         self.obs_mag_data_for_rms = []  # %OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.mag_rms_value = 0.  # %TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
         self.mag_residuals = []  # %CALCULATED RESIDUAL
-        '#% INITIALIZE SEISMIC ATTRIBUTES'
+
+        '#% INITIALISE SEISMIC ATTRIBUTES'
         self.gain = 4.0
         self.gain_neg = -self.gain
         self.segy_on = False
@@ -712,13 +714,15 @@ class Gmg(wx.Frame):
         self.segy_plot_list = []
         self.segy_dimension_list = []
         self.segy_count = 0
-        '#% INITIALIZE CONTACT ATTRIBUTES'
+
+        '#% INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
         self.contact_data_list = [[]]
         self.contact_text_list = [[]]
         self.contact_data = [[]]
         self.contact_name_list = []
         self.contact_data_count = 0
-        '#% INITIALIZE Well ATTRIBUTES'
+
+        '#% INITIALISE Well ATTRIBUTES'
         self.well_list = []
         self.well_list_hidden = []
         self.well_name_list = []
@@ -728,7 +732,8 @@ class Gmg(wx.Frame):
         self.well_count = 0
         self.well_list_switch = [[]]
         self.well_textsize = 2
-        '#% INITIALIZE LAYER ATTRIBUTES'
+
+        '#% INITIALISE LAYER ATTRIBUTES'
         self.densities = [0.]
         self.reference_densities = [2.67]
         self.susceptibilities = [0.]
@@ -736,18 +741,20 @@ class Gmg(wx.Frame):
         self.angle_b = [0.]
         self.remanence = [0]
         self.layers_calculation_switch = [1]
-        '#% INITIALIZE FAULTS'
+
+        '#% INITIALISE FAULTS'
         self.faults = [[]]
         self.fault_count = 0
         self.current_fault = 0
         self.fault_colors = ['k']
+
         '#% INITIALIZE COORDINATE CAPTURE'
         self.capture = False
         self.linex = []
         self.liney = []
 
     def draw_main_frame(self):
-        """# %DRAW THE PROGRAM CANVASES"""
+        """DRAW THE PROGRAM CANVASES"""
 
         '#%TOPO CANVAS'
         self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=2, colspan=12)
@@ -827,8 +834,6 @@ class Gmg(wx.Frame):
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
         self.tree_items = ["Layer 1"]
-        # tree_item = self.tree.AppendItem(self.root, "layer 1", ct_type=1)
-        # self.tree.SetItemPyData(tree_item, 0)
         self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
 
         self.error = 0.
@@ -2882,20 +2887,20 @@ class Gmg(wx.Frame):
     def key_press(self, event):
         """# %DEFINE KEY PRESS LINKS"""
 
-        's = show/hide layer nodes'
+        's = SHOW/HIDE LAYER NODES'
         if event.key == 's':
             if not self.showverts:
                 self.showverts = not self.showverts
                 self.polyline.set_visible(self.showverts)
 
-        'i = Insert new node at mouse position'
+        'i = INSERT NEW NODE AT MOUSE POSITION'
         if event.key == 'i':
             if not self.showverts:
                 return
             if event.inaxes is None:
                 return
 
-            '''#% GET CURRENT LAYER XY'''
+            # GET CURRENT LAYER XY
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
 
@@ -2910,11 +2915,7 @@ class Gmg(wx.Frame):
             self.update()
             self.draw()
 
-        'q = BEAT THE BUG'
-        if event.key == 'q':
-            self.nodes = True
-
-        'm = Display node x and y'
+        'm = DISPLAY NODE X AND Y'
         if event.key == 'm':
             xyt = self.polyline.get_xydata()
             xt, yt = xyt[:, 0], xyt[:, 1]
@@ -2933,7 +2934,7 @@ class Gmg(wx.Frame):
                 print "x = %s" % xt[self.index_arg]
                 print "y = %s" % yt[self.index_arg]
 
-        'd = Delete node at mouse position'
+        'd = DELETE NODE AT MOUSE POSITION'
         if event.key == 'd':
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
@@ -2978,16 +2979,20 @@ class Gmg(wx.Frame):
                         self.plotx_list[k], self.ploty_list[
                             k] = next_x_list, next_y_list  # %OVERWRITE THE NODE LIST WITH UPDATED LIST
 
-            # %UPDATE
+            # UPDATE GMG
             self.update_layer_data()
             self.update()
             self.draw()
 
-        'n = Create new layer at mouse point'
+        'q = BEAT THE ZOOM BUG'
+        if event.key == 'q':
+            self.nodes = True
+
+        'n = CREATE NEW LAYER AT MOUSE POINT'
         if event.key == 'n':
             self.new_layer(event)
 
-        'b = lock or unlock layer boundary locked mode'
+        'b = LOCK OR UNLOCK LAYER BOUNDARY LOCKED MODE'
         if event.key == 'b':
             if self.boundary_lock:
                 'unlock layer'
@@ -2998,7 +3003,7 @@ class Gmg(wx.Frame):
                 self.boundary_lock = True
                 self.boundary_lock_list[self.i] = 0
 
-        'l = lock or unlock layer/polygon mode'
+        'l = LOCK OR UNLOCK LAYER/POLYGON MODE'
         if event.key == 'l':
             if self.layer_lock:
                 'unlock layer'
@@ -3009,7 +3014,7 @@ class Gmg(wx.Frame):
                 self.layer_lock = True
                 self.layer_lock_list[self.i] = 0
 
-        '<" = Move to next layer'
+        '< = MOVE TO NEXT LAYER'
         if event.key == '.':
             if self.i == self.layer_count:
                 # %UPDATE LAYER DATA
@@ -3045,7 +3050,7 @@ class Gmg(wx.Frame):
                 self.update_layer_data()
                 self.update()
 
-        '<" = Move to next layer'
+        '< = MOVE TO NEXT LAYER'
         if event.key == ',':
             if self.i == 0:
                 # %UPDATE LAYER DATA
@@ -3064,9 +3069,9 @@ class Gmg(wx.Frame):
                 self.update_layer_data()
                 self.update()
             else:
-                # %Update layer data
+                # UPDATE LAYER DATA
                 self.update_layer_data()
-                # %Move to layer above input layer & assign current layer xy data
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
                 self.i = self.i - 1
                 self.nextdens = self.densities[self.i]
                 self.density_input.SetValue(0.001 * self.densities[self.i])
@@ -3082,23 +3087,23 @@ class Gmg(wx.Frame):
                 self.update()
             self.draw()
 
-        'z = zoom in mode'
+        'z = ZOOM IN MODE'
         if event.key == 'z':
             self.zoom(self)
 
-        ' "ctrl+z" == zoom out'
+        'ctrl+z = ZOOM OUT'
         if event.key == 'ctrl+z':
             self.zoom_out(event)
 
-        ' "shift" = pan mode'
+        'shift = PAN MODE'
         if event.key == 'ctrl+p':
             self.pan(self)
 
-        ' "a" = zoom all'
+        'a = FULL EXTENT VIEW'
         if event.key == 'a':
             self.full_extent()
 
-        ' "p" = Turn on pinch node mode'
+        'p = TURN ON PINCH NODE MODE'
         if event.key == 'p':
             if not self.pinch:
                 self.pinch = True
@@ -3107,27 +3112,27 @@ class Gmg(wx.Frame):
                 self.pinch_node_list = [[], []]
                 self.pinch_count = 0
 
-        ' "ctrl+i" = increase layer transparency'
+        'ctrl+i = INCREASE LAYER TRANSPARENCY'
         if event.key == 'ctrl+i':
             self.transparency_increase(event)
 
-        ' "ctrl+d" = increase layer transparency'
+        'ctrl+d = INCREASE LAYER TRANSPARENCY'
         if event.key == 'ctrl+d':
             self.transparency_decrease(event)
 
-        ' "up" = increase layer transparency'
+        'up arrow = INCREASE LAYER TRANSPARENCY'
         if event.key == 'up':
             self.aspect_increase(event)
 
-        ' "ctrl+up" = increase layer transparency'
+        'ctrl+up = INCREASE LAYER TRANSPARENCY X2'
         if event.key == 'ctrl+up':
             self.aspect_increase2(event)
 
-        ' "down" = increase layer transparency'
+        'down arrow = INCREASE LAYER TRANSPARENCY'
         if event.key == 'down':
             self.aspect_decrease(event)
 
-        ' "ctrl+down" = increase layer transparency'
+        'ctrl+down = INCREASE LAYER TRANSPARENCY'
         if event.key == 'ctrl+down':
             self.aspect_decrease2(event)
 
@@ -3136,7 +3141,7 @@ class Gmg(wx.Frame):
         answer = new_layer_dialogbox.ShowModal()
 
         if new_layer_dialogbox.fixed:
-            # %DETERMINE LAST FIXED LAYER X AND Y VALUES
+            # DETERMINE LAST FIXED LAYER X AND Y VALUES
             if self.layer_count > 0:
                 for i in range(0, self.layer_count):
                     if self.layer_lock_list[i] == 0:
@@ -3145,7 +3150,7 @@ class Gmg(wx.Frame):
                         continue
             else:
                 k = 0
-            # %Now append nodes for boundary conditions (continuous slab)
+            # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
             layer_above_x = np.array(self.plotx_list[k])
             layer_above_y = np.array(self.ploty_list[k])
 

@@ -29,7 +29,7 @@
 +-------------------------------------+-------------------------------------+
 | |fig3| Load topography anomaly      | |fig4| Load gravity anomaly         |
 +-------------------------------------+-------------------------------------+
-| |fig5| Load magnetic anomaly        | |fig6| Capture Coordinates          |
+| |fig5| Load magnetic anomaly        | |fig6| Capture coordinates          |
 +-------------------------------------+-------------------------------------+
 | |fig7| Start fault picking          | |fig8| Increase aspect x2           |
 +-------------------------------------+-------------------------------------+
