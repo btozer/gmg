@@ -44,8 +44,10 @@ Pre-Installation
 **Step 1: Install an Anaconda python distribution**
 
 The simplest way to install GMG is to first install an Anaconda Python distribution: www.anaconda.com/download
+
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
-using the Conda package manager.
+using the Conda package manager.  It is recommended you download the python3 version, even though GMG is written 
+in python2.7 (you can create a python2.7 environment to run GMG).
 
 **Step 2: Create a new python environment for gmg**
 
