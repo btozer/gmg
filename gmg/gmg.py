@@ -2938,19 +2938,23 @@ class Gmg(wx.Frame):
         if event.key == 'd':
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
+
+            # FIND NODE CLOSEST TO CURSOR LOCATION
             d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
             self.index_arg = np.argmin(d)
             ind = d[self.index_arg]
+
             if xt[self.index_arg] == 0:  # %PREVENT END NODES BEING DELETED
                 return 0
             if ind >= self.node_click_limit:
                 return 0
             else:
+                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
                 self.plotx = [tup for i, tup in enumerate(self.plotx) if i != self.index_arg]  # %DELETE X
                 self.ploty = [tup for i, tup in enumerate(self.ploty) if i != self.index_arg]  # %DELETE Y
                 self.polyline.set_data(self.plotx, self.ploty)
 
-            # %CHECK FOR PINCHED NODES
+            # NOW CHECK FOR PINCHED NODES
             index_arg2 = None
             self.pinch_switch = 0
             self.index_arg2_list = [None] * (self.layer_count + 1)  # %CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
@@ -2978,6 +2982,9 @@ class Gmg(wx.Frame):
                                        i != self.index_arg2_list[k]]  # %DELETE Y
                         self.plotx_list[k], self.ploty_list[
                             k] = next_x_list, next_y_list  # %OVERWRITE THE NODE LIST WITH UPDATED LIST
+
+            # SHIFT CURRENT NODE COLORING TO PREVIOUS NODE
+            self.current_node.set_offsets([xt[self.index_arg-1], yt[self.index_arg-1]])
 
             # UPDATE GMG
             self.update_layer_data()
