@@ -2148,7 +2148,6 @@ class Gmg(wx.Frame):
 
     def gain_increase(self, event):
         if self.segy_on is False:
-            print "no segy"
             return 0
         elif self.gain >= 0.5:
             self.gain = self.gain - 0.5
@@ -2157,14 +2156,12 @@ class Gmg(wx.Frame):
                 if self.segy_plot_list[s]:
                     self.segy_plot_list[s].set_clim(vmax=self.gain)
                     self.segy_plot_list[s].set_clim(vmin=self.gain_neg)
-            print "gain down"
             self.draw()
         else:
-            print "gain is a min value"
+            return 0
 
     def gain_decrease(self, event):
         if self.segy_on is False:
-            print "no segy"
             return 0
         elif self.gain >= 0.5:
             self.gain = self.gain + 0.5
@@ -2173,10 +2170,9 @@ class Gmg(wx.Frame):
                 if self.segy_plot_list[s]:
                     self.segy_plot_list[s].set_clim(vmax=self.gain)
                     self.segy_plot_list[s].set_clim(vmin=self.gain_neg)
-                print "gain down"
             self.draw()
         else:
-            print "gain is a min value"
+            return 0
 
     # WELL DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2384,8 +2380,7 @@ class Gmg(wx.Frame):
             self.update_layer_data()
 
     def delete_well(self, event):
-        """#% REMOVE PLOT GRAPHICS"""
-
+        """REMOVE PLOT GRAPHICS"""
         self.wells[event.Id - 3000][0].set_visible(False)
         self.well_name_text[event.Id - 3000].set_visible(False)
         horizons = self.horizons[event.Id - 3000]
@@ -2408,7 +2403,7 @@ class Gmg(wx.Frame):
     # GEOLOGY OUTCROP DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_contact_data(self, event):
-        """#% CHOSE CONTACT DATA FILE TO LOAD"""
+        """CHOSE CONTACT DATA FILE TO LOAD"""
         open_file_dialog = wx.FileDialog(self, "Open contact data", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2514,7 +2509,7 @@ class Gmg(wx.Frame):
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # %USER CHANGED THEIR MIND
 
-        # % NOW WRITE OUT THE DATA
+        # NOW WRITE OUT THE DATA
         output_stream = save_file_dialog.GetPath()
         with open(output_stream, 'wb') as f:
             # % LAYER NODES
@@ -2524,37 +2519,35 @@ class Gmg(wx.Frame):
                 # print data
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d')
 
-            # % VELOCITY NODES
+            # VELOCITY NODES
             for i in range(0, self.layer_count):
-                # % CONVERT DENSITY TO VELOCITY USING NAFE-DRAKE EQUATION
                 density = (self.background_density + self.densities[i])
+
                 # % CONVERT DENSITY TO VELOCITY USING GARNERS RULE
                 velocity = round((m.pow((density / 1670.), (1. / .25))), 2)
+
+                # % CONVERT DENSITY TO VELOCITY USING NAFE-DRAKE EQUATION
                 # velocity = (1.6612*density) - (0.4721*density)**2 + (0.0671*density)**3 -
                 # (0.0043*density)**4 + (0.000106*density)**5
+
+                # FORMAT c.in FILE
                 f.write('B  {0}\n'.format(i))
                 data = zip(self.plotx_list[i], np.linspace(velocity, velocity, len(self.ploty_list[i])),
                            np.ones(len(self.ploty_list[i])), np.linspace(velocity, velocity, len(self.ploty_list[i])),
                            np.ones(len(self.ploty_list[i])))
+
+                # OUTPUT FILE
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d %3.02f %1d')
 
     def capture_coordinates(self, event):
         if self.capture is False:
             self.capture = True
-        else:
-            # %CREATE OUTPUT FILE
-            save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
-                                             wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-            if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-                return  # %USER CHANGED THEIR MIND
 
-            # %NOW WRITE OUT THE DATA
-            output_stream = save_file_dialog.GetPath()
-            with open(output_stream, 'wb') as f:
-                out = csv.writer(f, delimiter=' ')
-                data = [self.linex, self.liney]
-                out.writerows(zip(*data))
-            self.capture = False
+            # CREATE INSTANCE OF CAPTURE COORDINATES
+            self.capture_window = CaptureCoordinates(self, -1, 'Capture Coordinates')
+            self.capture_window.Show(True)
+
+
 
     def pinch_out_layer(self, event):
         pinch_box = PinchDialog(self, -1, 'Pinch Out Layer:', self.plotx_list, self.ploty_list, self.i)
@@ -2709,17 +2702,17 @@ class Gmg(wx.Frame):
         if self.index_node is None:
             return
 
-        if self.pick_new_fault is False:
-            '# %IN LAYER MODE'
+        if self.pick_new_fault is False and self.capture is False:
+            # GMG IS IN LAYER MODE
             xyt = self.polyline.get_xydata()
             xt, yt = xyt[:, 0], xyt[:, 1]
             self.x_input.SetValue(xt[self.index_node])
             self.y_input.SetValue(yt[self.index_node])
 
-            '# %COLOR CURRENTLY SELECTED NODE RED'
+            # COLOR CURRENTLY SELECTED NODE RED
             self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
-            'If pinch == TRUE pinch the node to next node'
+            'IF PINCH == TRUE PINCH THE NODE TO NEXT NODE'
             if self.pinch:
                 print "pinch_node = true so doing pinch"
                 'Get the node number and layer number and place them in "pinch_node_list" '
@@ -2734,9 +2727,9 @@ class Gmg(wx.Frame):
                     self.pinch_node_list[self.pinch_count] = self.index_node[0]
                     self.pinch_node_list[self.pinch_count + 1] = self.i
                     self.pinch_count = + 1
-                    'Set the x and y of the first node as that of the second node'
+                    'SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE'
                 else:
-                    'set the second node x and y'
+                    'SET THE SECOND NODE X AND Y'
                     self.plotx2 = self.plotx_list[self.i]
                     self.ploty2 = self.ploty_list[self.i]
                     x2 = np.array(self.plotx2)
@@ -2744,29 +2737,35 @@ class Gmg(wx.Frame):
                     self.index_node = self.get_node_under_point(event)
                     new_x = x2[int(self.index_node[0])]
                     new_y = y2[int(self.index_node[0])]
-                    'Set the first node x and y'
+                    'SET THE FIRST NODE X AND Y'
                     self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
                     self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
                     x1 = np.array(self.plotx1)
                     y1 = np.array(self.ploty1)
-                    'Replace the original node with the new node'
+                    'REPLACE THE ORIGINAL NODE WITH THE NEW NODE'
                     x1[int(self.pinch_node_list[0])] = new_x  # replace old x with new x
                     y1[int(self.pinch_node_list[0])] = new_y  # replace old y with new y
                     self.plotx_list[int(self.pinch_node_list[1])] = x1
                     self.ploty_list[int(self.pinch_node_list[1])] = y1
                     self.pinch_count = 0
-        else:
-            '# %IN FAULT PICKING MODE'
+
+                '# %COLOR CURRENTLY SELECTED NODE RED'
+                self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
+
+        elif self.pick_new_fault is True:
+            # GMG IS IN FAULT PICKING MODE
             xyt = self.polyline.get_xydata()
             xt, yt = xyt[:, 0], xyt[:, 1]
             self.x_input.SetValue(xt[self.index_node])
             self.y_input.SetValue(yt[self.index_node])
 
-            '# %COLOR CURRENTLY SELECTED NODE RED'
-            self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
+        elif self.capture is True:
+            pass
 
     def get_node_under_point(self, event):
-        """# %GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
+        """
+        GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
+        """
 
         if self.nodes is False:
             return
@@ -2820,10 +2819,14 @@ class Gmg(wx.Frame):
             x, y = event.xdata, event.ydata  # get xy of new point
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
-            # print "index node ="
-            # print self.index_node
-            if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
-                xt[self.index_node] = 0  # replace old x with new x
+
+            # SET CURRENT NODE LOCATION
+            current_x = xt[self.index_node]
+            current_y = yt[self.index_node]
+
+            # UPDATE NODE
+            if xt[self.index_node] == self.x1 and yt[self.index_node] != 0.001:
+                xt[self.index_node] = self.x1  # replace old x with new x
                 yt[self.index_node] = y  # replace old y with new y
             elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
                 xt[self.index_node] = self.x2  # replace old x with new x
@@ -2867,7 +2870,13 @@ class Gmg(wx.Frame):
         self.ploty = yt
         self.polyline.set_data(self.plotx, self.ploty)
 
-        self.current_node.set_offsets([x, y])
+        # UPDATE RED "CURRENT NODE" DOT
+        if xt[self.index_node] == self.x1:
+            self.current_node.set_offsets([self.x1, y])
+        elif xt[self.index_node] == self.x2:
+            self.current_node.set_offsets([self.x2, y])
+        else:
+            self.current_node.set_offsets([x, y])
 
         self.update_layer_data()  # %UPDATE LAYER DATA
 
@@ -2879,8 +2888,16 @@ class Gmg(wx.Frame):
             return
         if event.button != 1:
             return
+
+        # UPDATE LAYER ATTRIBUTES TABLE WITH CURRENT COORDINATES
         self.x_input.SetValue(event.xdata)
         self.y_input.SetValue(event.ydata)
+
+        if self.capture is True:
+            # GMG IS IN COORDINATE CAPTURE MODE SO ADD THE CURRENT COORDINATES TO THE TABLE
+            self.capture_window.table.Append((event.xdata, event.ydata))
+
+
         self.update_layer_data()  # % UPDATE LAYERS
         self.update()  # % RUN MODELLING ALGORITHMS
 
@@ -4147,6 +4164,61 @@ class LoadObservedDataFrame(wx.Frame):
             pass
         self.EndModal(1)
 
+
+class CaptureCoordinates(wx.Frame):
+    def __init__(coordinate_list, parent, id, title):
+        wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
+        coordinate_list.input_panel = wx.Panel(coordinate_list)
+
+        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
+        coordinate_list.parent = parent
+
+        # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
+        coordinate_list.Bind(wx.EVT_CLOSE, coordinate_list.on_close_button)
+
+        # CREATE LIST CONTROL
+        coordinate_list.table = wx.ListCtrl(coordinate_list.input_panel, size=(350, 500), style=wx.LC_REPORT)
+        coordinate_list.table.InsertColumn(0, 'X')
+        coordinate_list.table.InsertColumn(1, 'Y')
+
+        # CREATE SAVE BUTTON
+        coordinate_list.save_btn = wx.Button(coordinate_list.input_panel, label="Save coordinates")
+        coordinate_list.save_btn.Bind(wx.EVT_BUTTON, coordinate_list.on_save)
+
+
+        # ADD FEATURES TO SIZER
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(coordinate_list.table, 0, wx.ALL|wx.EXPAND, 5)
+        sizer.Add(coordinate_list.save_btn, 0, wx.ALL|wx.CENTER, 5)
+        coordinate_list.input_panel.SetSizer(sizer)
+        sizer.Fit(coordinate_list)
+
+    def on_save(coordinate_list, event):
+        # %REATE OUTPUT FILE
+        save_file_dialog = wx.FileDialog(coordinate_list, "Save XY data", "", "", "xy files (*.xy)|*.xy",
+                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+            return  # %USER CHANGED THEIR MIND
+
+        # NOW WRITE OUT THE DATA
+
+        # GET OUTPUT FILENAME
+        output_stream = save_file_dialog.GetPath()
+
+        # GET DATA
+        x = []
+        y = []
+
+        for i in range(coordinate_list.table.GetItemCount()):
+            x.append(float(coordinate_list.table.GetItem(itemIdx=i, col=0).GetText()))
+            y.append(float(coordinate_list.table.GetItem(itemIdx=i, col=1).GetText()))
+
+        # OUTPUT DATA
+        np.savetxt(output_stream, zip(x, y), delimiter=' ', fmt='%0.6f %0.6f')
+
+    def on_close_button(coordinate_list, event):
+        coordinate_list.parent.capture = False
+        coordinate_list.Destroy()
 
 class SeisDialog(wx.Dialog):
     def __init__(self, parent, id, title, area):
