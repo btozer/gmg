@@ -157,11 +157,7 @@ NB. for macOS users you may need to invoke pythonw instead of python if you rece
 
 i.e.:
 
-    alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
-
-Then you can (optionally) add the executable directory to your $PATH variable by repeating the process, e.g.:
-
-    export $PATH=$PATH:~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/
+    export alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
 Now, in a fresh terminal, simple type "gmg" on the command line to launch the software:
 
