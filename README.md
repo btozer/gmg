@@ -14,7 +14,7 @@ package. It is anticipated that GMG will also be useful for teaching purposes.
 
 Data I/O is made as simple as possible using space delimited ASCII text files.
 
-The project was instigated after failing to find an adequate open source option
+The project was instigated after failing to find an adequate open-source option
 (in which the source code can be viewed and modified by the user) for performing 2D 
 geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 
@@ -56,7 +56,7 @@ conflicts with your current system configuration. e.g.:
 
     conda create -n py27-gmg python=2.7 anaconda
 
-Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
+Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like,
 but the documentation will use the name py27-gmg).
 
 On macOS and Linux this environment can then be activated using:
@@ -76,10 +76,12 @@ On Windows use:
 
     deactivate
 
-**NB. OS Support**
+**OS Support:**
+
 GMG is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
-It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
-Please raise any information regarding installation problems on github.
+It is possible that issues may arise when trying to install on other distributions. Please raise any information 
+regarding installation problems on github.
+
 
 
 Installing gmg
