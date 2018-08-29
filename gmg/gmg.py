@@ -93,6 +93,7 @@ import csv
 import math as m
 import os
 import sys
+from sys import platform
 import subprocess
 from obspy import read
 import cPickle as Pickle
@@ -3891,10 +3892,21 @@ class Gmg(wx.Frame):
 
     def open_documentation(self, event):
         """# %OPENS DOCUMENTATION HTML"""
+
         self.doc_dir = os.path.dirname(os.path.abspath(__file__))
         doc_url = self.doc_dir + '/docs/_build/html/gmg_documentation.html'
-        print doc_url
-        webbrowser.open_new(doc_url)
+
+        if platform == "linux" or platform == "linux2":
+            # LINUX
+            webbrowser.open_new(doc_url)
+        elif platform == "darwin":
+            # OS X
+            client = webbrowser.get("open -a /Applications/Safari.app %s")
+            client.open(doc_url)
+        elif platform == "win32":
+            # WINDOWS
+            webbrowser.open_new(doc_url)
+
 
     def about_gmg(self, event):
         """# %SHOW SOFTWARE INFORMATION"""
@@ -3958,7 +3970,7 @@ class Gmg(wx.Frame):
 
     def horizontal_derivative(self, event):
         pass
-        #     '''#% Take horizontal derivative of a 1D Array'''
+        #      """CLACULATE HORIZONTAL DERIVATIVE OF PROFILE"""
         #
         #     '# %First interpolate the data onto a even x spacing as required by the
         #     '# %finite difference derivative approximation'
@@ -3979,7 +3991,7 @@ class Gmg(wx.Frame):
 
     def pick_new_fault(self, event):
         pass
-        # """# %FAULT PICKING"""
+        # """FAULT PICKING"""
         # if self.fault_picking_switch is True:
         #     self.fault_picking_switch = False
         # else:
@@ -4020,7 +4032,7 @@ class Gmg(wx.Frame):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''#% DIALOG BOXES'''
+'''#% DIALOG BOXES GO HERE'''
 
 
 class NewModelDialog(wx.Dialog):
@@ -4164,61 +4176,6 @@ class LoadObservedDataFrame(wx.Frame):
             pass
         self.EndModal(1)
 
-
-class CaptureCoordinates(wx.Frame):
-    def __init__(coordinate_list, parent, id, title):
-        wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
-        coordinate_list.input_panel = wx.Panel(coordinate_list)
-
-        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
-        coordinate_list.parent = parent
-
-        # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
-        coordinate_list.Bind(wx.EVT_CLOSE, coordinate_list.on_close_button)
-
-        # CREATE LIST CONTROL
-        coordinate_list.table = wx.ListCtrl(coordinate_list.input_panel, size=(350, 500), style=wx.LC_REPORT)
-        coordinate_list.table.InsertColumn(0, 'X')
-        coordinate_list.table.InsertColumn(1, 'Y')
-
-        # CREATE SAVE BUTTON
-        coordinate_list.save_btn = wx.Button(coordinate_list.input_panel, label="Save coordinates")
-        coordinate_list.save_btn.Bind(wx.EVT_BUTTON, coordinate_list.on_save)
-
-
-        # ADD FEATURES TO SIZER
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(coordinate_list.table, 0, wx.ALL|wx.EXPAND, 5)
-        sizer.Add(coordinate_list.save_btn, 0, wx.ALL|wx.CENTER, 5)
-        coordinate_list.input_panel.SetSizer(sizer)
-        sizer.Fit(coordinate_list)
-
-    def on_save(coordinate_list, event):
-        # %REATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(coordinate_list, "Save XY data", "", "", "xy files (*.xy)|*.xy",
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %USER CHANGED THEIR MIND
-
-        # NOW WRITE OUT THE DATA
-
-        # GET OUTPUT FILENAME
-        output_stream = save_file_dialog.GetPath()
-
-        # GET DATA
-        x = []
-        y = []
-
-        for i in range(coordinate_list.table.GetItemCount()):
-            x.append(float(coordinate_list.table.GetItem(itemIdx=i, col=0).GetText()))
-            y.append(float(coordinate_list.table.GetItem(itemIdx=i, col=1).GetText()))
-
-        # OUTPUT DATA
-        np.savetxt(output_stream, zip(x, y), delimiter=' ', fmt='%0.6f %0.6f')
-
-    def on_close_button(coordinate_list, event):
-        coordinate_list.parent.capture = False
-        coordinate_list.Destroy()
 
 class SeisDialog(wx.Dialog):
     def __init__(self, parent, id, title, area):
@@ -4784,7 +4741,60 @@ class MessageDialog(wx.MessageDialog):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''#% FRAMES'''
+'''# FRAMES ARE STORED HERE'''
+
+class CaptureCoordinates(wx.Frame):
+    def __init__(coordinate_list, parent, id, title):
+        wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
+        coordinate_list.input_panel = wx.Panel(coordinate_list)
+
+        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
+        coordinate_list.parent = parent
+
+        # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
+        coordinate_list.Bind(wx.EVT_CLOSE, coordinate_list.on_close_button)
+
+        # CREATE LIST CONTROL
+        coordinate_list.table = wx.ListCtrl(coordinate_list.input_panel, size=(350, 500), style=wx.LC_REPORT)
+        coordinate_list.table.InsertColumn(0, 'X')
+        coordinate_list.table.InsertColumn(1, 'Y')
+
+        # CREATE SAVE BUTTON
+        coordinate_list.save_btn = wx.Button(coordinate_list.input_panel, label="Save coordinates")
+        coordinate_list.save_btn.Bind(wx.EVT_BUTTON, coordinate_list.on_save)
+
+
+        # ADD FEATURES TO SIZER
+        sizer = wx.BoxSizer(wx.VERTICAL)
+        sizer.Add(coordinate_list.table, 0, wx.ALL|wx.EXPAND, 5)
+        sizer.Add(coordinate_list.save_btn, 0, wx.ALL|wx.CENTER, 5)
+        coordinate_list.input_panel.SetSizer(sizer)
+        sizer.Fit(coordinate_list)
+
+    def on_save(coordinate_list, event):
+        # CREATE OUTPUT FILE
+        save_file_dialog = wx.FileDialog(coordinate_list, "Save XY data", "", "", "xy files (*.xy)|*.xy",
+                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+            return  # %USER CHANGED THEIR MIND
+
+        # NOW WRITE OUT THE DATA
+        # GET OUTPUT FILENAME
+        output_stream = save_file_dialog.GetPath()
+
+        # GET DATA
+        x = []
+        y = []
+        for i in range(coordinate_list.table.GetItemCount()):
+            x.append(float(coordinate_list.table.GetItem(itemIdx=i, col=0).GetText()))
+            y.append(float(coordinate_list.table.GetItem(itemIdx=i, col=1).GetText()))
+
+        # OUTPUT DATA
+        np.savetxt(output_stream, zip(x, y), delimiter=' ', fmt='%0.6f %0.6f')
+
+    def on_close_button(coordinate_list, event):
+        coordinate_list.parent.capture = False
+        coordinate_list.Destroy()
 
 
 class PlotSettingsDialog(wx.Frame):
@@ -4792,19 +4802,19 @@ class PlotSettingsDialog(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'Figure settings')
         input_panel = wx.Panel(self, -1)
 
-        '''#% CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES'''
+        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
         self.parent = parent
 
         self.model_aspect = model_aspect
         self.dcanvas_aspect = dcanvas_aspect
 
-        '#% FIGURE FILE'
+        # FIGURE FILE
         self.file_path_text = wx.TextCtrl(input_panel, -1, value="output.pdf", size=(150, -1))
         self.b_file_path = wx.Button(input_panel, -1, "File...")
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
         self.place_holder_text_01 = wx.StaticText(input_panel, -1, "")
 
-        '#% FIGURE FONT SIZE'
+        # FIGURE FONT SIZE
         self.set_fs = wx.StaticText(input_panel, -1, "Text size:")
         self.fs_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=8.,
                                     size=(75, -1))
@@ -4812,15 +4822,15 @@ class PlotSettingsDialog(wx.Frame):
         self.fs_text.SetDigits(3)
         self.place_holder_text_02 = wx.StaticText(input_panel, -1, "")
 
-        '#% MODEL ASPECT RATIO'
+        # MODEL ASPECT RATIO
         self.set_aspect_ratio = wx.StaticText(input_panel, -1, "Model Aspect ratio:")
         self.aspect_ratio_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=2000.0, increment=0.1,
                                               value=self.model_aspect, size=(75, -1))
 
-        '#% Tight Layout?'
+        # TIGHT LAYOUT?
         self.use_tight_layout_checkbox = wx.CheckBox(input_panel, -1, " Tight \n layout?")
 
-        '#% POLYGON ALPHA VALUE'
+        # POLYGON ALPHA VALUE
         self.set_poly_alpha = wx.StaticText(input_panel, -1, " Polygon \n alpha val:")
         self.poly_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=1.0, increment=0.01, value=0.5,
                                             size=(75, -1))
@@ -4828,7 +4838,7 @@ class PlotSettingsDialog(wx.Frame):
         self.poly_alpha_text.SetDigits(3)
         self.place_holder_text_03 = wx.StaticText(input_panel, -1, "")
 
-        '#% MARKER SIZE'
+        # MARKER SIZE
         self.set_ms = wx.StaticText(input_panel, -1, "Observed point size:")
         self.ms_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=0.5,
                                     size=(75, -1))
@@ -4836,7 +4846,7 @@ class PlotSettingsDialog(wx.Frame):
         self.ms_text.SetDigits(3)
         self.place_holder_text_04 = wx.StaticText(input_panel, -1, "")
 
-        '#% LINE WIDTH'
+        # LINE WIDTH
         self.set_lw = wx.StaticText(input_panel, -1, " Calculated anomaly \n line width:")
         self.lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.0,
                                     size=(75, -1))
@@ -4844,41 +4854,41 @@ class PlotSettingsDialog(wx.Frame):
         self.lw_text.SetDigits(3)
         self.place_holder_text_05 = wx.StaticText(input_panel, -1, "")
 
-        '#% FONT TYPE'
+        # FONT TYPE
         self.fonts = ['Times New Roman', 'Times', 'Courier', 'Courier New', 'Helvetica', 'Sans', 'verdana', 'Arial']
         self.set_font_type = wx.StaticText(input_panel, -1, "Font type:")
         self.font_type_text = wx.ComboBox(input_panel, -1, value='Times New Roman', choices=self.fonts, size=(75, -1),
                                           style=wx.CB_DROPDOWN)
         self.place_holder_text_06 = wx.StaticText(input_panel, -1, "")
 
-        '#% LAYER POLYGONS'
+        # LAYER POLYGONS
         self.draw_polygons_checkbox = wx.CheckBox(input_panel, -1, " Draw layer \n polygons")
         self.draw_polygons_checkbox.SetValue(True)
 
-        '#% LAYER LINES'
+        # LAYER LINES
         self.draw_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw layer \n lines")
         self.draw_layer_lines_checkbox.SetValue(True)
         self.place_holder_text_07 = wx.StaticText(input_panel, -1, "")
 
-        '#% FLOATING LAYER LINES'
+        # FLOATING LAYER LINES
         self.draw_floating_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw floating \n layer outlines")
         self.draw_floating_layer_lines_checkbox.SetValue(True)
 
-        '#% DRAW COLORBAR LINES'
+        # DRAW COLORBAR LINES
         self.draw_colorbar_checkbox = wx.CheckBox(input_panel, -1, "Draw colorbar")
         self.draw_colorbar_checkbox.SetValue(True)
         self.place_holder_text_08 = wx.StaticText(input_panel, -1, "")
 
-        '#% DRAW XY DATA'
+        # DRAW XY DATA
         self.draw_xy_checkbox = wx.CheckBox(input_panel, -1, "Draw XY data")
         self.draw_xy_checkbox.SetValue(True)
 
-        '#% DRAW WELLS'
+        # DRAW WELLS
         self.draw_wells_checkbox = wx.CheckBox(input_panel, -1, "Draw Wells")
         self.draw_wells_checkbox.SetValue(True)
         self.place_holder_text_09 = wx.StaticText(input_panel, -1, "")
 
-        '#% WELL FONT SIZE'
+        # WELL FONT SIZE
         self.set_well_font_size = wx.StaticText(input_panel, -1, "Well font size:")
         self.well_font_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
                                                 size=(75, -1))
@@ -4886,7 +4896,7 @@ class PlotSettingsDialog(wx.Frame):
         self.well_font_size_text.SetDigits(2)
         self.place_holder_text_10 = wx.StaticText(input_panel, -1, "")
 
-        '#% WELL LINE WIDTH'
+        # WELL LINE WIDTH
         self.set_well_lw = wx.StaticText(input_panel, -1, "Well line width:")
         self.well_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
                                          size=(75, -1))
@@ -4894,7 +4904,7 @@ class PlotSettingsDialog(wx.Frame):
         self.well_lw_text.SetDigits(3)
         self.place_holder_text_11 = wx.StaticText(input_panel, -1, "")
 
-        '#% XY POINT SIZE'
+        # XY POINT SIZE
         self.set_xy_size = wx.StaticText(input_panel, -1, "XY point size:")
         self.xy_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
                                          size=(75, -1))
@@ -4902,14 +4912,14 @@ class PlotSettingsDialog(wx.Frame):
         self.xy_size_text.SetDigits(2)
         self.place_holder_text_12 = wx.StaticText(input_panel, -1, "")
 
-        '#% XY COLOR'
+        # XY COLOR
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
         self.set_xy_color = wx.StaticText(input_panel, -1, "XY color:")
         self.xy_color_text = wx.ComboBox(input_panel, -1, value='black', choices=self.colors, size=(75, -1),
                                          style=wx.CB_DROPDOWN)
         self.place_holder_text_13 = wx.StaticText(input_panel, -1, "")
 
-        '#% LAYER LINE WIDTH'
+        # LAYER LINE WIDTH
         self.set_layer_lw = wx.StaticText(input_panel, -1, "Layer line width:")
         self.layer_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
                                           size=(75, -1))
@@ -4917,7 +4927,7 @@ class PlotSettingsDialog(wx.Frame):
         self.layer_lw_text.SetDigits(3)
         self.place_holder_text_14 = wx.StaticText(input_panel, -1, "")
 
-        '#% LAYER Transparency'
+        # LAYER TRANSPARENCY
         self.set_layer_alpha = wx.StaticText(input_panel, -1, "Layer transparency:")
         self.layer_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
                                              size=(75, -1))
@@ -4925,7 +4935,7 @@ class PlotSettingsDialog(wx.Frame):
         self.layer_alpha_text.SetDigits(2)
         self.place_holder_text_15 = wx.StaticText(input_panel, -1, "")
 
-        '#% Colorbar xy'
+        # COLORBAR XY
         self.colorbar_xy = wx.StaticText(input_panel, -1, "Colorbar xy position:")
         self.colorbar_x_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
                                             size=(75, -1))
@@ -4936,7 +4946,7 @@ class PlotSettingsDialog(wx.Frame):
         self.colorbar_y_text.SetFormat("%f")
         self.colorbar_y_text.SetDigits(2)
 
-        '#% Colorbar size'
+        # COLORBAR SIZE
         self.colorbar_size = wx.StaticText(input_panel, -1, "Colorbar size:")
         self.colorbar_size_x_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.15,
                                                  size=(75, -1))
@@ -4947,7 +4957,7 @@ class PlotSettingsDialog(wx.Frame):
         self.colorbar_size_y_text.SetFormat("%f")
         self.colorbar_size_y_text.SetDigits(3)
 
-        '#% Grav frame y values'
+        # GRAV FRAME Y VALUES
         self.grav_frame_text = wx.StaticText(input_panel, -1, "Gravity frame \nY-axis max/min:")
         self.grav_min_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=-100,
                                           size=(75, -1))
@@ -4958,15 +4968,15 @@ class PlotSettingsDialog(wx.Frame):
         self.grav_max_text.SetFormat("%f")
         self.grav_max_text.SetDigits(2)
 
-        '#% MAKE BUTTONS'
-        # %DRAW
+        # DRAW BUTTON
         self.b_draw_button = wx.Button(input_panel, -1, "Draw figure")
         self.Bind(wx.EVT_BUTTON, self.draw_button, self.b_draw_button)
-        # %EXIT
+
+        # EXIT BUTTON
         self.b_exit = wx.Button(input_panel, -1, "Exit")
         self.Bind(wx.EVT_BUTTON, self.exit, self.b_exit)
 
-        '#% MAKE SIZER'
+        # MAKE SIZER
         sizer = wx.FlexGridSizer(cols=3, hgap=8, vgap=8)
         sizer.AddMany([self.file_path_text, self.b_file_path, self.place_holder_text_01,
                        self.set_fs, self.fs_text, self.use_tight_layout_checkbox,
@@ -5037,13 +5047,13 @@ class PlotSettingsDialog(wx.Frame):
 class AttributeEditor(wx.Frame):
     def __init__(attribute_edit, parent, id, title, tree_items, densities, reference_densities, susceptibilities,
                  angle_a, angle_b, layer_colors):
-        wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(1000, 1000))
+        wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(800, 1000))
         attribute_edit.input_panel = wx.Panel(attribute_edit)
 
-        '''#% CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES'''
+        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
         attribute_edit.parent = parent
 
-        '''SET VARIABLES'''
+        # SET VARIABLES
         attribute_edit.tree_items = tree_items
         attribute_edit.densities = densities
         attribute_edit.reference_densities = reference_densities
@@ -5052,8 +5062,8 @@ class AttributeEditor(wx.Frame):
         attribute_edit.angle_b = angle_b
         attribute_edit.layer_colors = layer_colors
 
-        '''DEFINE ATTRIBUTE GRID'''
-        attribute_edit.attr_grid = gridlib.Grid(attribute_edit.input_panel, -1, size=(1000, 1000))
+        # DEFINE ATTRIBUTE GRID
+        attribute_edit.attr_grid = gridlib.Grid(attribute_edit.input_panel, -1, size=(780, 980))
         attribute_edit.attr_grid.CreateGrid(len(attribute_edit.tree_items), 7)
         attribute_edit.attr_grid.SetColLabelValue(0, 'Layer Name')
         attribute_edit.attr_grid.SetColLabelValue(1, 'Density')
@@ -5063,18 +5073,18 @@ class AttributeEditor(wx.Frame):
         attribute_edit.attr_grid.SetColLabelValue(5, 'Angle B')
         attribute_edit.attr_grid.SetColLabelValue(6, 'Layer color')
 
-        '#% SET COLUMN FORMATS'
+        # SET COLUMN FORMATS
         attribute_edit.attr_grid.SetColFormatFloat(1, 3, 2)
         attribute_edit.attr_grid.SetColFormatFloat(2, 3, 2)
         attribute_edit.attr_grid.SetColFormatFloat(3, 9, 7)
         attribute_edit.attr_grid.SetColFormatFloat(4, 3, 2)
         attribute_edit.attr_grid.SetColFormatFloat(5, 3, 2)
 
-        '''CREATE SET BUTTON'''
+        # CREATE SET BUTTON
         attribute_edit.b_set_attr_button = wx.Button(attribute_edit.input_panel, -1, "Set")
         attribute_edit.Bind(wx.EVT_BUTTON, attribute_edit.set_attr_button, attribute_edit.b_set_attr_button)
 
-        '''POPULATE ATTRIBUTE TABLE'''
+        # POPULATE ATTRIBUTE TABLE
         attribute_edit.length = len(attribute_edit.tree_items)
         for i in range(0, attribute_edit.length):
             attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i])
@@ -5084,7 +5094,8 @@ class AttributeEditor(wx.Frame):
             attribute_edit.attr_grid.SetCellValue(i, 4, str(attribute_edit.angle_a[i]))
             attribute_edit.attr_grid.SetCellValue(i, 5, str(attribute_edit.angle_b[i]))
             attribute_edit.attr_grid.SetCellValue(i, 6, str(attribute_edit.layer_colors[i]))
-        '''SET SIZER'''
+
+        # SET SIZER
         for col in range(6):
             attribute_edit.attr_grid.SetColSize(col, 12)
 
@@ -5095,7 +5106,7 @@ class AttributeEditor(wx.Frame):
         attribute_edit.input_panel.SetSizer(sizer)
         sizer.Fit(attribute_edit)
 
-        '#%ACTION BINDINGS'
+        # ACTION BINDINGS
         attribute_edit.Bind(wx.EVT_CHAR_HOOK, attribute_edit.on_key)
         attribute_edit.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, attribute_edit.open_colour_box)
         attribute_edit.attr_grid.Bind(wx.EVT_SIZE, attribute_edit.on_size)
@@ -5128,15 +5139,15 @@ class AttributeEditor(wx.Frame):
     def on_key(attribute_edit, event):
         if event.ControlDown() and event.GetKeyCode() == 67:
             attribute_edit.selection()
-            attribute_edit.copy()  # %CALL COPY METHOD
-        # %SKIP OTHER KEY EVENTS
+            attribute_edit.copy()  # CALL COPY METHOD
+        # SKIP OTHER KEY EVENTS
         if event.GetKeyCode():
             event.Skip()
             return
 
     def selection(attribute_edit):
-        # Show cell selection
-        # If selection is cell...
+        # SHOW CELL SELECTION
+        # IF SELECTION IS CELL...
         if attribute_edit.attr_grid.GetSelectedCells():
             print "Selected cells " + str(attribute_edit.GetSelectedCells())
         # If selection is block...
@@ -5145,11 +5156,11 @@ class AttributeEditor(wx.Frame):
         if attribute_edit.attr_grid.GetSelectionBlockbottomRight():
             print "Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight())
 
-        # If selection is col...
+        # IF SELECTION IS COL...
         if attribute_edit.attr_grid.GetSelectedCols():
             print "Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols())
 
-        # If selection is row...
+        # IF SELECTION IS ROW...
         if attribute_edit.attr_grid.GetSelectedRows():
             print "Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows())
 
@@ -5161,17 +5172,17 @@ class AttributeEditor(wx.Frame):
         print "Current cell " + str(cell)
 
     def copy(attribute_edit):
-        # Number of rows and cols
+        # NUMBER OF ROWS AND COLS
         rows = attribute_edit.attr_grid.GetSelectionBlockbottomRight()[0][0] - \
                attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][0] + 1
         cols = attribute_edit.attr_grid.GetSelectionBlockbottomRight()[0][1] - \
                attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][1] + 1
 
-        # data variable contain text that must be set in the clipboard
+        # DATA VARIABLE CONTAIN TEXT THAT MUST BE SET IN THE CLIPBOARD
         data = ''
 
-        # For each cell in selected range append the cell value in the data variable
-        # Tabs '\t' for cols and '\r' for rows
+        # FOR EACH CELL IN SELECTED RANGE APPEND THE CELL VALUE IN THE DATA VARIABLE
+        # TABS '\t' FOR COLS AND '\r' FOR ROWS
         for r in range(rows):
             for c in range(cols):
                 data = data + str(
@@ -5181,11 +5192,14 @@ class AttributeEditor(wx.Frame):
                 if c < cols - 1:
                     data = data + '\t'
             data = data + '\n'
-        # Create text data object
+
+        # CREATE TEXT DATA OBJECT
         clipboard = wx.TextDataObject()
-        # Set data object value
+
+        # SET DATA OBJECT VALUE
         clipboard.SetText(data)
-        # Put the data in the clipboard
+
+        # PUT THE DATA IN THE CLIPBOARD
         if wx.TheClipboard.Open():
             wx.TheClipboard.SetData(clipboard)
             wx.TheClipboard.Close()
@@ -5201,7 +5215,7 @@ class AttributeEditor(wx.Frame):
         attribute_edit.angle_b = []
         attribute_edit.layer_colors = []
 
-        '# %SET NEW DATA'
+        # SET NEW DATA
         for i in xrange(attribute_edit.length):
             attribute_edit.tree_items.append(str(attribute_edit.attr_grid.GetCellValue(i, 0)))
             attribute_edit.densities.append(float(attribute_edit.attr_grid.GetCellValue(i, 1)) * 1000.)
@@ -5211,7 +5225,7 @@ class AttributeEditor(wx.Frame):
             attribute_edit.angle_b.append(float(attribute_edit.attr_grid.GetCellValue(i, 5)))
             attribute_edit.layer_colors.append(str(attribute_edit.attr_grid.GetCellValue(i, 6)))
 
-        '# %UPDATE MAIN FRAME'
+        # UPDATE MAIN FRAME
         attribute_edit.parent.attribute_set(attribute_edit.tree_items, attribute_edit.densities,
                                             attribute_edit.reference_densities, attribute_edit.susceptibilities,
                                             attribute_edit.angle_a, attribute_edit.angle_b, attribute_edit.layer_colors)
@@ -5220,10 +5234,10 @@ class AttributeEditor(wx.Frame):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''# %START SOFTWARE'''
+'''# START SOFTWARE'''
 if __name__ == "__main__":
     app = wx.App(False)
-    fr = wx.Frame(None, title='gmg: 2D Geophysical Modelling GUI')
+    fr = wx.Frame(None, title='GMG: Geophysical Modelling GUI')
     app.frame = Gmg()
     app.frame.CenterOnScreen()
     app.frame.Show()
