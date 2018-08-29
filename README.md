@@ -160,7 +160,7 @@ NB. for macOS users you may need to invoke pythonw instead of python if you rece
 
 i.e.:
 
-    export alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
+    alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
 Now, in a fresh terminal, simple type "gmg" on the command line to launch the software:
 
