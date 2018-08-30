@@ -238,8 +238,7 @@ class Gmg(wx.Frame):
                                                pos=(96, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
-        self.status_text = " || Currently Editing Layer: || Layer Status: || Model Aspect Ratio = || " \
-                           "GRAV RMS = || MAG RMS =  || Pinch Mode =  || "
+        self.status_text = " "
         self.statusbar.SetStatusWidths([-1, -1, 1700])
         self.statusbar.SetStatusText(self.status_text, 2)
         self.statusbar.SetSize((1800, 24))
@@ -834,7 +833,7 @@ class Gmg(wx.Frame):
         '#% TREE ATTRIBUTES'
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
-        self.tree_items = ["Layer 1"]
+        self.tree_items = ["Layer 0"]
         self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
 
         self.error = 0.
@@ -1326,9 +1325,11 @@ class Gmg(wx.Frame):
             self.layers_calculation_switch[layer] = 1
 
     def display_info(self):
-        self.statusbar.SetStatusText("  || Currently Editing Layer: %s || Layer Status: %s "
-                                     "|| Model Aspect Ratio = %s:1  || GRAV RMS = %s "
-                                     "|| MAG RMS = %s ||" % (self.i + 1, self.layer_lock_status[self.i],
+        self.statusbar.SetStatusText("                                                                                 "
+                                     "                                                   "
+                                     " || Currently Editing Layer: %s  || Layer Status: %s "
+                                     " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
+                                     " || MAG RMS = %s  ||" % (self.i, self.layer_lock_status[self.i],
                                                              self.mcanvas.get_aspect(), self.grav_rms_value,
                                                              self.mag_rms_value), 2)
         self.statusbar.Update()
@@ -1612,11 +1613,13 @@ class Gmg(wx.Frame):
             self.root = self.tree.AddRoot("Layers:")  # %CREATE NEW TREE
             self.tree.SetItemPyData(self.root, None)
 
-            for i in xrange(len(self.loaded_tree_items)):
+            for i in xrange(1, len(self.loaded_tree_items)):
                 tree_item = self.tree.AppendItem(self.root, "%s" % self.loaded_tree_items[i], ct_type=1)
                 tree_item.Check(checked=True)
                 self.tree.SetItemPyData(tree_item, i)
+
             self.layers_calculation_switch = [1] * len(self.loaded_tree_items)
+
             self.tree_items = self.loaded_tree_items
 
             '#% MAKE LAYER LINES AND POLYGONS'
@@ -2625,65 +2628,69 @@ class Gmg(wx.Frame):
 
     def b_node_set_button(self, event):
         """
-        #% CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT THEN PASS THIS PART AND ONLY UPDATE ATTRIBUTES
+        CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT THEN PASS THIS PART AND ONLY UPDATE ATTRIBUTES
         """
 
+        new_x = float(self.x_input.GetValue())
+        new_y = float(self.y_input.GetValue())
+
         if self.i == self.node_layer_reference:
-            new_x = float(self.x_input.GetValue())
-            new_y = float(self.y_input.GetValue())
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
 
             if self.boundary_lock_list[self.i] == 0 and self.index_node is not None:
                 if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
-                    xt[self.index_node] = 0  # replace old x with new x
-                    yt[self.index_node] = new_y  # replace old y with new y
+                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
                 elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
-                    xt[self.index_node] = self.x2  # replace old x with new x
-                    yt[self.index_node] = new_y  # replace old y with new y
+                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
                 elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
-                    xt[self.index_node] = 0  # replace old x with new x
-                    yt[self.index_node] = 0.001  # replace old y with new y
+                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
                 elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
-                    xt[self.index_node] = self.x2  # replace old x with new x
-                    yt[self.index_node] = 0.001  # replace old y with new y
+                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
                 elif new_y <= 0:
-                    xt[self.index_node] = new_x  # replace old x with new x
-                    yt[self.index_node] = 0.001  # replace old y with new y
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
                 else:
-                    xt[self.index_node] = new_x  # replace old x with new x
-                    yt[self.index_node] = new_y  # replace old y with new y
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
             elif self.boundary_lock_list[self.i] == 1:
                 if new_y <= 0:
-                    xt[self.index_node] = new_x  # replace old x with new x
-                    yt[self.index_node] = 0.001  # replace old y with new y
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
                 else:
-                    xt[self.index_node] = new_x  # replace old x with new x
-                    yt[self.index_node] = new_y  # replace old y with new y
-            'Deal with pinched node'
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+            # DEAL WITH PINCHED NODE
             if self.pinch_switch != 0:
                 for k in range(0, len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
                         next_x_list = self.plotx_list[k]
-                        next_y_list = self.ploty_list[k]  # %get the node list of the next layer
+                        next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
                         next_x_list[self.index_arg2_list[k]] = new_x
-                        next_y_list[self.index_arg2_list[k]] = new_y  # % replace the pinched node with the new node
+                        next_y_list[self.index_arg2_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
                         self.plotx_list[k] = next_x_list
-                        self.ploty_list[k] = next_y_list  # % overwrite the node list with updated list
+                        self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
 
             self.plotx = xt
             self.ploty = yt
             self.polyline.set_data(self.plotx, self.ploty)
+
+            # COLOR CURRENTLY SELECTED NODE RED
+            self.current_node.set_offsets([new_x, new_y])
         else:
             pass
-        # % Update layer data
+
+        # UPDATE LAYER DATA
         self.set_density(self)
         self.set_susceptibility(self)
         self.set_remanence(self)
         self.set_angle_a(self)
         self.set_angle_b(self)
-        '#% COLOR CURRENTLY SELECTED NODE RED'
-        self.current_node.set_offsets([new_x, new_y])
+
 
         self.update_layer_data()
         self.update()
@@ -2750,7 +2757,7 @@ class Gmg(wx.Frame):
                     self.ploty_list[int(self.pinch_node_list[1])] = y1
                     self.pinch_count = 0
 
-                '# %COLOR CURRENTLY SELECTED NODE RED'
+                # COLOR CURRENTLY SELECTED NODE RED'
                 self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
         elif self.pick_new_fault is True:
@@ -3126,7 +3133,7 @@ class Gmg(wx.Frame):
 
         'a = FULL EXTENT VIEW'
         if event.key == 'a':
-            self.full_extent()
+            self.full_extent(event)
 
         'p = TURN ON PINCH NODE MODE'
         if event.key == 'p':
@@ -3179,14 +3186,14 @@ class Gmg(wx.Frame):
             layer_above_x = np.array(self.plotx_list[k])
             layer_above_y = np.array(self.ploty_list[k])
 
-            '#% Increment the layer count'
+            # INCREMENT THE LAYER COUNT
             self.i = self.layer_count
             self.i += 1
 
-            '#% Increment the total layer count'
+            # INCREMENT THE TOTAL LAYER COUNT
             self.layer_count += 1
 
-            '#% add a new blank layer to the plot lists'
+            # ADD A NEW BLANK LAYER TO THE PLOT LISTS
             self.polygon_fills.append([])
             self.layer_lines.append([])
             self.plotx_list.append([])
@@ -3203,48 +3210,48 @@ class Gmg(wx.Frame):
             self.layer_lock_status.append('locked')
             self.boundary_lock_status.append('locked')
             self.layer_colors.append('black')
-            self.tree_items.append('layer %s' % (int(self.i + 1)))
-            self.item = 'layer %s' % (int(self.i + 1))
+            self.tree_items.append('layer %s' % (int(self.i)))
+            self.item = 'layer %s' % (int(self.i))
             self.layers_calculation_switch.append(0)
             self.add_new_tree_nodes(self.root, self.item, self.i)
 
-            '# %SET NEW LAYER NODES'
+            # SET NEW LAYER NODES
             self.new_layer_thickness = new_layer_dialogbox.new_thickness
             self.plotx = layer_above_x
             self.ploty = layer_above_y + self.new_layer_thickness
             self.nextpoly = zip(self.plotx, self.ploty)
-            '# %CREATE LAYER LINE'
+
+            # CREATE LAYER LINE
             self.layer_lines[self.i] = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
                                                          color='blue', linewidth=1.0, alpha=1.0)
-            '# %CREATE LAYER POLYGON FILL'
+            # CREATE LAYER POLYGON FILL
             self.plotx_polygon = np.array(self.plotx)
             self.ploty_polygon = np.array(self.ploty)
             self.polygon_fills[self.i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                            alpha=self.layer_transparency, closed=True, linewidth=None,
                                                            ec=None)
-            '# %UPDATE LAYER DATA'
+            # UPDATE LAYER DATA
             self.nextdens = self.densities[self.i]
             self.density_input.SetValue(0.001 * self.densities[self.i])
             self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
             self.susceptibility_input.SetValue(self.susceptibilities[self.i])
             self.angle_a_input.SetValue(self.angle_a[self.i])
             self.update_layer_data()
-            # self.update()
             self.draw()
 
         elif not new_layer_dialogbox.fixed:
-            '# %GET NEW NODE VALUES'
+            # GET NEW NODE VALUES
             self.new_x1, self.new_y1 = new_layer_dialogbox.x1, new_layer_dialogbox.y1
             self.new_x2, self.new_y2 = new_layer_dialogbox.x2, new_layer_dialogbox.y2
             self.new_x3, self.new_y3 = new_layer_dialogbox.x3, new_layer_dialogbox.y3
             self.new_x4, self.new_y4 = new_layer_dialogbox.x4, new_layer_dialogbox.y4
 
-            '# %INCREMENT THE LAYER COUNT'
+            # INCREMENT THE LAYER COUNT'
             self.i = self.layer_count
             self.i = self.i + 1
-            '#% Increment the total layer count'
+            # INCREMENT THE TOTAL LAYER COUNT
             self.layer_count = self.layer_count + 1
-            '#% ADD A NEW BLANK LAYER TO THE PLOT LISTS'
+            # ADD A NEW BLANK LAYER TO THE PLOT LISTS
             self.polygon_fills.append([])
             self.layer_lines.append([])
             self.plotx_list.append([])
@@ -3269,17 +3276,17 @@ class Gmg(wx.Frame):
             self.ploty = [self.new_y1, self.new_y2, self.new_y3, self.new_y4]
             self.nextpoly = zip(self.plotx, self.ploty)
 
-            ' #% CREATE LAYER LINE'
+            # CREATE LAYER LINE
             self.layer_lines[self.i] = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
                                                          color='blue', linewidth=1.0, alpha=1.0)
-            '#% CREATE LAYER POLYGON FILL'
+            # CREATE LAYER POLYGON FILL
             self.plotx_polygon = np.array(self.plotx)
             self.ploty_polygon = np.array(self.ploty)
             self.polygon_fills[self.i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                            alpha=self.layer_transparency, closed=True, linewidth=None,
                                                            ec=None)
 
-            '#% UPDATE LAYER DATA'
+            # UPDATE LAYER DATA
             self.nextdens = self.densities[self.i]
             self.density_input.SetValue(0.001 * self.densities[self.i])
             self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
@@ -3289,7 +3296,7 @@ class Gmg(wx.Frame):
             self.update()
             self.draw()
         else:
-            '# %USER CHANGED THEIR MIND - NO NEW LAYER'
+            # USER CHANGED THEIR MIND - NO NEW LAYER'
             pass
 
     def load_layer(self, event):
@@ -3301,12 +3308,15 @@ class Gmg(wx.Frame):
         file_in = open_file_dialog.GetPath()
         new_layer = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
 
-        '# %INCREMENT THE LAYER COUNT'
+        # INCREMENT THE LAYER COUNT
         self.i = self.layer_count
         self.i += 1
-        '#% Increment the total layer count'
+
+        # INCREMENT THE TOTAL LAYER COUNT
         self.layer_count += 1
-        '#% add a new blank layer to the plot lists'
+
+        # ADD A NEW BLANK LAYER TO THE PLOT LISTS
+
         self.polygon_fills.append([])
         self.layer_lines.append([])
         self.plotx_list.append([])
@@ -3360,7 +3370,7 @@ class Gmg(wx.Frame):
         # %REMOVE POLYGON
         self.layer_lines[self.i][0].remove()
         del self.layer_lines[self.i]
-        '# %SET CURRENT AS THE NEXT LAYER'
+        # SET CURRENT AS THE NEXT LAYER'
         if self.i == self.layer_count:
             self.polyline.set_xdata(self.plotx_list[0])
             self.polyline.set_ydata(self.ploty_list[0])
@@ -3375,7 +3385,7 @@ class Gmg(wx.Frame):
             self.ploty = self.ploty_list[self.i + 1]
         self.draw()
 
-        '# %REMOVE META DATA'
+        # REMOVE META DATA'
         del self.plotx_list[self.i]
         del self.ploty_list[self.i]
         del self.densities[self.i]
@@ -3504,8 +3514,7 @@ class Gmg(wx.Frame):
                                                          self.obs_mag_data_for_rms[:, 1], x, y)
         else:
             pass
-        # print self.grav_rms_value
-        # print self.grav_residuals
+
     # LAYER ATTRIBUTE TABLE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_attribute_table(self, event):
@@ -3516,14 +3525,15 @@ class Gmg(wx.Frame):
 
     def attribute_set(self, new_tree_items, densities, reference_densities, susceptibilities, angle_a, angle_b,
                       layer_colors):
-        """# %SET NEW ATTRIBUTES"""
 
-        '''#%UPDATE MAIN FRAME TREE'''
+        """UPDATE GMG ATTRIBUTES WITH NEW ATTRIBUTES FROM THE ATTRIBUTE TABLE"""
+
+        # UPDATE MAIN FRAME TREE LIST
         current_tree_items = self.tree.GetRootItem().GetChildren()
-        for x in range(len(self.tree_items)):
-            self.tree.SetItemText(current_tree_items[x], new_tree_items[x])
+        for i in range(0, len(self.tree_items)-1):
+            self.tree.SetItemText(current_tree_items[i], new_tree_items[i+1])
 
-        '''#%UPDATE MAIN FRAME ATTRIBUTES'''
+        # UPDATE MAIN FRAME ATTRIBUTES
         self.densities = densities
         self.reference_densities = reference_densities
         self.susceptibilities = susceptibilities
@@ -3531,7 +3541,7 @@ class Gmg(wx.Frame):
         self.angle_b = angle_b
         self.layer_colors = layer_colors
 
-        '''UPDATE MAIN'''
+        # UPDATE GMG STATE
         self.update_layer_data()
         self.draw()
 
@@ -5047,7 +5057,7 @@ class PlotSettingsDialog(wx.Frame):
 class AttributeEditor(wx.Frame):
     def __init__(attribute_edit, parent, id, title, tree_items, densities, reference_densities, susceptibilities,
                  angle_a, angle_b, layer_colors):
-        wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(800, 1000))
+        wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(650, 1000))
         attribute_edit.input_panel = wx.Panel(attribute_edit)
 
         # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
@@ -5063,8 +5073,8 @@ class AttributeEditor(wx.Frame):
         attribute_edit.layer_colors = layer_colors
 
         # DEFINE ATTRIBUTE GRID
-        attribute_edit.attr_grid = gridlib.Grid(attribute_edit.input_panel, -1, size=(780, 980))
-        attribute_edit.attr_grid.CreateGrid(len(attribute_edit.tree_items), 7)
+        attribute_edit.attr_grid = gridlib.Grid(attribute_edit.input_panel, -1, size=(650, 980))
+        attribute_edit.attr_grid.CreateGrid(len(attribute_edit.tree_items)-1, 7)
         attribute_edit.attr_grid.SetColLabelValue(0, 'Layer Name')
         attribute_edit.attr_grid.SetColLabelValue(1, 'Density')
         attribute_edit.attr_grid.SetColLabelValue(2, 'Density Reference')
@@ -5086,14 +5096,15 @@ class AttributeEditor(wx.Frame):
 
         # POPULATE ATTRIBUTE TABLE
         attribute_edit.length = len(attribute_edit.tree_items)
-        for i in range(0, attribute_edit.length):
-            attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i])
-            attribute_edit.attr_grid.SetCellValue(i, 1, str(float(attribute_edit.densities[i]) / 1000.))
-            attribute_edit.attr_grid.SetCellValue(i, 2, str(float(attribute_edit.reference_densities[i]) / 1000.))
+
+        for i in range(attribute_edit.length - 1):
+            attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i+1])
+            attribute_edit.attr_grid.SetCellValue(i, 1, str(float(attribute_edit.densities[i+1]) / 1000.))
+            attribute_edit.attr_grid.SetCellValue(i, 2, str(float(attribute_edit.reference_densities[i+1]) / 1000.))
             attribute_edit.attr_grid.SetCellValue(i, 3, str(attribute_edit.susceptibilities[i]))
-            attribute_edit.attr_grid.SetCellValue(i, 4, str(attribute_edit.angle_a[i]))
-            attribute_edit.attr_grid.SetCellValue(i, 5, str(attribute_edit.angle_b[i]))
-            attribute_edit.attr_grid.SetCellValue(i, 6, str(attribute_edit.layer_colors[i]))
+            attribute_edit.attr_grid.SetCellValue(i, 4, str(attribute_edit.angle_a[i+1]))
+            attribute_edit.attr_grid.SetCellValue(i, 5, str(attribute_edit.angle_b[i+1]))
+            attribute_edit.attr_grid.SetCellValue(i, 6, str(attribute_edit.layer_colors[i+1]))
 
         # SET SIZER
         for col in range(6):
@@ -5112,7 +5123,7 @@ class AttributeEditor(wx.Frame):
         attribute_edit.attr_grid.Bind(wx.EVT_SIZE, attribute_edit.on_size)
 
     def on_size(attribute_edit, event):
-        width, height = attribute_edit.GetClientSizeTuple()
+        width, height = attribute_edit.GetClientSize()
         for col in range(6):
             attribute_edit.attr_grid.SetColSize(col, width / (10 + 1))
 
@@ -5147,20 +5158,20 @@ class AttributeEditor(wx.Frame):
 
     def selection(attribute_edit):
         # SHOW CELL SELECTION
-        # IF SELECTION IS CELL...
+
+        # IF SELECTION IS CELL
         if attribute_edit.attr_grid.GetSelectedCells():
             print "Selected cells " + str(attribute_edit.GetSelectedCells())
-        # If selection is block...
+        # IF SELECTION IS BLOCK
         if attribute_edit.attr_grid.GetSelectionBlockTopLeft():
             print "Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft())
         if attribute_edit.attr_grid.GetSelectionBlockbottomRight():
             print "Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight())
-
-        # IF SELECTION IS COL...
+        # IF SELECTION IS COL
         if attribute_edit.attr_grid.GetSelectedCols():
             print "Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols())
 
-        # IF SELECTION IS ROW...
+        # IF SELECTION IS ROW
         if attribute_edit.attr_grid.GetSelectedRows():
             print "Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows())
 
@@ -5207,16 +5218,17 @@ class AttributeEditor(wx.Frame):
             wx.MessageBox("Can't open the clipboard", "Error")
 
     def set_attr_button(attribute_edit, event):
-        attribute_edit.tree_items = []
-        attribute_edit.densities = []
-        attribute_edit.reference_densities = []
-        attribute_edit.susceptibilities = []
-        attribute_edit.angle_a = []
-        attribute_edit.angle_b = []
-        attribute_edit.layer_colors = []
+        # RECREATE ARRAYS (INCLUDE VALUES FOR "LAYER 0)"
+        attribute_edit.tree_items = ['Layer 1']
+        attribute_edit.densities = [0.0]
+        attribute_edit.reference_densities = [0.0]
+        attribute_edit.susceptibilities = [0.0]
+        attribute_edit.angle_a = [0.0]
+        attribute_edit.angle_b = [0.0]
+        attribute_edit.layer_colors = ['b']
 
-        # SET NEW DATA
-        for i in xrange(attribute_edit.length):
+        # SET NEW DATA FOR LAYERS 1 to i
+        for i in range(attribute_edit.length - 1):
             attribute_edit.tree_items.append(str(attribute_edit.attr_grid.GetCellValue(i, 0)))
             attribute_edit.densities.append(float(attribute_edit.attr_grid.GetCellValue(i, 1)) * 1000.)
             attribute_edit.reference_densities.append(float(attribute_edit.attr_grid.GetCellValue(i, 2)) * 1000.)
@@ -5225,6 +5237,9 @@ class AttributeEditor(wx.Frame):
             attribute_edit.angle_b.append(float(attribute_edit.attr_grid.GetCellValue(i, 5)))
             attribute_edit.layer_colors.append(str(attribute_edit.attr_grid.GetCellValue(i, 6)))
 
+
+        print "attribute_edit.tree_items = "
+        print attribute_edit.tree_items
         # UPDATE MAIN FRAME
         attribute_edit.parent.attribute_set(attribute_edit.tree_items, attribute_edit.densities,
                                             attribute_edit.reference_densities, attribute_edit.susceptibilities,
