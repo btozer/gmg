@@ -107,7 +107,7 @@ import gc
 import webbrowser
 
 # FUTURE
-# mport wx.lib.agw.ribbon as RB
+# import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
 # from scipy import interpolate as ip
 
@@ -742,10 +742,14 @@ class Gmg(wx.Frame):
         self.layers_calculation_switch = [1]
 
         'INITIALISE FAULTS'
+        self.fault_picking_switch = False
         self.faults = [[]]
+        self.fault_names_list = []
         self.fault_count = 0
         self.current_fault = 0
         self.fault_colors = ['k']
+        self.fault_x_list = [[]]
+        self.fault_y_list = [[]]
 
         'INITIALIZE COORDINATE CAPTURE'
         self.capture = False
@@ -817,9 +821,9 @@ class Gmg(wx.Frame):
         else:
             self.nextpoly = []
 
-        'INITALISE FAULTS'
-        self.showing_faultline, = self.mcanvas.plot([], [], marker='o', color=self.fault_colors[0],
-                                           linewidth=1.0, alpha=0.5)
+        'INITALISE FAULTLINE DRAWING'
+        self.faultline, = self.mcanvas.plot([-50000], [-50000], marker='o',
+                                           color='r', linewidth=1.0, alpha=0.5, picker=True)
 
         'MAKE LAYER TREE'
         self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
@@ -2913,16 +2917,9 @@ class Gmg(wx.Frame):
     def key_press(self, event):
         """ DEFINE KEY PRESS LINKS"""
 
-        's = SHOW/HIDE LAYER NODES'
-        if event.key == 's':
-            if not self.showverts:
-                self.showverts = not self.showverts
-                self.polyline.set_visible(self.showverts)
 
         'i = INSERT NEW NODE AT MOUSE POSITION'
         if event.key == 'i':
-            if not self.showverts:
-                return
             if event.inaxes is None:
                 return
 
@@ -2940,25 +2937,6 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             self.update()
             self.draw()
-
-        'm = DISPLAY NODE X AND Y'
-        if event.key == 'm':
-            xyt = self.polyline.get_xydata()
-            xt, yt = xyt[:, 0], xyt[:, 1]
-            d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-            self.index_arg = np.argmin(d)
-            ind = d[self.index_arg]
-            if ind >= self.node_click_limit:
-                return 0
-            elif self.capture is True:
-                print "capturing coordinates"
-                print "x = %s" % xt[self.index_arg]
-                print "y = %s" % yt[self.index_arg]
-                self.linex.append(xt[self.index_arg])
-                self.liney.append(yt[self.index_arg])
-            else:
-                print "x = %s" % xt[self.index_arg]
-                print "y = %s" % yt[self.index_arg]
 
         'd = DELETE NODE AT MOUSE POSITION'
         if event.key == 'd':
@@ -3149,23 +3127,23 @@ class Gmg(wx.Frame):
         if event.key == 'ctrl+i':
             self.transparency_increase(event)
 
-        'ctrl+d = INCREASE LAYER TRANSPARENCY'
+        'ctrl+d = INCREASE ASPECT TRANSPARENCY'
         if event.key == 'ctrl+d':
             self.transparency_decrease(event)
 
-        'up arrow = INCREASE LAYER TRANSPARENCY'
+        'up arrow = INCREASE ASPECT RATIO'
         if event.key == 'up':
             self.aspect_increase(event)
 
-        'ctrl+up = INCREASE LAYER TRANSPARENCY X2'
+        'ctrl+up = INCREASE ASPECT RATIO X2'
         if event.key == 'ctrl+up':
             self.aspect_increase2(event)
 
-        'down arrow = INCREASE LAYER TRANSPARENCY'
+        'down arrow = DECREASE ASPECT RATIO'
         if event.key == 'down':
             self.aspect_decrease(event)
 
-        'ctrl+down = INCREASE LAYER TRANSPARENCY'
+        'ctrl+down = DECREASE ASPECT RATIO'
         if event.key == 'ctrl+down':
             self.aspect_decrease2(event)
 
@@ -3251,7 +3229,7 @@ class Gmg(wx.Frame):
             self.i = self.layer_count
             self.i = self.i + 1
             # INCREMENT THE TOTAL LAYER COUNT
-            self.layer_count = self.layer_count + 1
+            self.layer_count += 1
             # ADD A NEW BLANK LAYER TO THE PLOT LISTS
             self.polygon_fills.append([])
             self.layer_lines.append([])
@@ -3626,9 +3604,9 @@ class Gmg(wx.Frame):
         self.draw()
 
     def update_layer_data(self):
-        """ UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - REDRAW EVERYTHING"""
+        """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - REDRAW EVERYTHING"""
 
-        '#UPDATE MODEL CANVAS (mcanvas) LIMITS'
+        'UPDATE MODEL CANVAS (mcanvas) LIMITS'
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
             self.dcanvas.set_xlim(xmin, xmax)
@@ -3637,15 +3615,15 @@ class Gmg(wx.Frame):
         if self.nt_canvas:
             self.ntcanvas.set_xlim(xmin, xmax)
 
-        '#SET LISTS WITH UPDATED LAYER DATA'
+        'SET LISTS WITH UPDATED LAYER DATA'
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
 
-        '#RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)'
+        'RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)'
         self.polygons = []
         self.mag_polygons = []
 
-        '#REATE UPDATED POLYGON XYs'
+        'CREATE UPDATED POLYGON XYs'
         # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
         # ISN'T PASSED TO SELF.POLYPLOTS)
         for i in range(0, self.layer_count + 1):
@@ -3707,8 +3685,8 @@ class Gmg(wx.Frame):
     def update(self):
         """ RUN MODEL ALGORITHMS"""
 
-        'REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION'
-        '(AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY'
+        # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
+        # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY
         if self.calc_grav_switch:
             if len(self.polygons) > 1:
                 for i in range(0, len(self.polygons)):
@@ -3828,10 +3806,13 @@ class Gmg(wx.Frame):
 
         '# AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED'
         self.model_saved = False
+
         '# UPDATE FRAME'
         self.draw()
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # EXTERNAL FIGURE CONSTRUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def plot_model(self, event):
         """CREATE EXTERNAL FIGURE OF MODEL USING INBUILT FIGURE CONSTRUCTION TOOL"""
@@ -3899,7 +3880,9 @@ class Gmg(wx.Frame):
         self.draw()
         return
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # DOCUMENTATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_documentation(self, event):
         """ OPENS DOCUMENTATION HTML"""
@@ -3961,7 +3944,9 @@ class Gmg(wx.Frame):
         result = dlg.ShowModal()
         dlg.Destroy()
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # EXIT FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def exit(self, event):
         """ SHUTDOWN APP (FROM FILE MENU)"""
@@ -3977,7 +3962,9 @@ class Gmg(wx.Frame):
         if result == wx.ID_OK:
             wx.GetApp().ExitMainLoop()
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # FUTURE MODULES (IN PROCESS)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def horizontal_derivative(self, event):
         pass
@@ -4001,16 +3988,66 @@ class Gmg(wx.Frame):
         #     return output
 
     def pick_new_fault(self, event):
-        pass
-        # """FAULT PICKING"""
-        # if self.fault_picking_switch is True:
-        #     self.fault_picking_switch = False
-        # else:
-        #     self.fault_picking_switch = True
-        #
-        #     current_fault = self.faults[self.fault_count]
-        #     current_fault_x = current_fault[:, 0]
-        #     current_fault_y = current_fault[:, 1]
+        """FAULT PICKING/LINE DRAWING MODE"""
+
+        # TURN ON/OFF FAULT PICKING MODE
+        if self.fault_picking_switch is True:
+            self.fault_picking_switch = False
+        else:
+            self.fault_picking_switch = True
+
+        # PROMPT NEW FAULT DIALOG BOX
+        new_fault_dialogbox = NewFaultDialog(self, -1, 'Create New Fault')
+        answer = new_fault_dialogbox.ShowModal()
+
+        # GET NEW FAULT VALUES
+        self.new_x1, self.new_y1 = new_fault_dialogbox.x1, new_fault_dialogbox.y1
+        self.new_x2, self.new_y2 = new_fault_dialogbox.x2, new_fault_dialogbox.y2
+
+        #  INCREMENT THE TOTAL FAULT COUNT
+        self.fault_count += 1
+        self.faults.append([])
+        self.fault_names_list.append([])
+        self.fault_colors.append('k')
+
+        # ADD NAME FOR NEW FAULT
+        print "self.fault_count = "
+        print self.fault_count
+        print ""
+        print "self.fault_names_list ="
+        print self.fault_names_list
+        self.fault_names_list[self.fault_count-1] = 'New fault'
+        print "self.fault_names_list ="
+        print self.fault_names_list
+
+        # CREATE NEW FAULT ATTRIBUTES
+        self.current_fault_x = [self.new_x1, self.new_x2]
+        self.current_fault_y = [self.new_y1, self.new_y2]
+
+        print "self.current_fault_x = "
+        print self.current_fault_x
+
+        print "self.current_fault_y = "
+        print self.current_fault_y
+
+        self.faults[self.fault_count-1] = self.mcanvas.plot(self.current_fault_x, self.current_fault_y,
+                                                     color='red', linewidth=1.0, alpha=1.0)
+
+        self.current_fault = self.faults[self.fault_count-1]
+
+        self.faultline.set_xdata(self.current_fault_x)
+        self.faultline.set_ydata(self.current_fault_y)
+        self.faultline.set_color(self.fault_colors[self.fault_count-1])
+
+        print "self.faults = "
+        print self.faults
+
+        # UPDATE GMG
+        self.update_layer_data()
+        self.update()
+        self.draw()
+
+
         #
         #     # LINES
         #     self.layer_lines[i][0].set_xdata(self.plotx_list[i])
@@ -4737,6 +4774,38 @@ class NewLayerDialog(wx.Dialog):
             self.x3, self.y3 = float(self.new_x3.GetValue()), float(self.new_y3.GetValue())
             self.x4, self.y4 = float(self.new_x4.GetValue()), float(self.new_y4.GetValue())
             self.EndModal(1)
+
+
+class NewFaultDialog(wx.Dialog):
+    def __init__(self, parent, id, title):
+        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+
+        floating_panel = wx.Panel(self, -1)
+
+        self.n1_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.X1_Text = wx.StaticText(floating_panel, -1, "X1:")
+        self.new_x1 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.Y1_Text = wx.StaticText(floating_panel, -1, "Y1:")
+        self.new_y1 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.n1_sizer.AddMany([self.X1_Text, self.new_x1, self.Y1_Text, self.new_y1])
+        self.n2_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.X2_Text = wx.StaticText(floating_panel, -1, "X2:")
+        self.new_x2 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.Y2_Text = wx.StaticText(floating_panel, -1, "Y2:")
+        self.new_y2 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.n2_sizer.AddMany([self.X2_Text, self.new_x2, self.Y2_Text, self.new_y2])
+        sizer = wx.FlexGridSizer(cols=1, hgap=6, vgap=6)
+        self.b_make_button = wx.Button(floating_panel, -1, "Make")
+        self.Bind(wx.EVT_BUTTON, self.make_button, self.b_make_button)
+        sizer.AddMany([self.n1_sizer, self.n2_sizer, self.b_make_button])
+        floating_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def make_button(self, event):
+        self.x1, self.y1 = float(self.new_x1.GetValue()), float(self.new_y1.GetValue())
+        self.x2, self.y2 = float(self.new_x2.GetValue()), float(self.new_y2.GetValue())
+        self.EndModal(1)
 
 
 class MessageDialog(wx.MessageDialog):
