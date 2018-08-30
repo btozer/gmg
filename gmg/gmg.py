@@ -146,33 +146,33 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         'CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1000), style=wx.SP_NOBORDER | wx.EXPAND)
-        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 600),
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1081), style=wx.SP_NOBORDER | wx.EXPAND)
+        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 662),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
         'FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 450),
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 405),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 450),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 410),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
                                                                        foldIcons=images)
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         'SECOND PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 450),
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 384),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 450),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 100),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         'THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 277),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 200),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 100),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
@@ -845,18 +845,19 @@ class Gmg(wx.Frame):
         'Make NODE X Y Label'
         self.node_text = wx.StaticText(self.fold_panel_one, -1, label="Node Position:", style=wx.ALIGN_LEFT)
         'Make density spinner'
-        self.density_text = wx.StaticText(self.fold_panel_one, -1, label="Density:    ", style=wx.ALIGN_LEFT)
+        self.density_text = wx.StaticText(self.fold_panel_one, -1, label="Density:         ", style=wx.ALIGN_LEFT)
         self.density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
         self.density_input.SetFormat("%f")
         self.density_input.SetDigits(4)
         'Make refernece density spinner'
-        self.ref_density_text = wx.StaticText(self.fold_panel_one, -1, label="Reference:\nDensity", style=wx.ALIGN_LEFT)
+        self.ref_density_text = wx.StaticText(self.fold_panel_one, -1, label="Reference:     \nDensity",
+                                              style=wx.ALIGN_LEFT)
         self.ref_density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001,
                                               value=0.00)
         self.ref_density_input.SetFormat("%f")
         self.ref_density_input.SetDigits(4)
         'Make susceptibility spinner'
-        self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="susceptibi:", style=wx.ALIGN_LEFT)
+        self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="susceptibility:", style=wx.ALIGN_LEFT)
         self.susceptibility_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-2.0, max_val=2.0, increment=0.00001,
                                                  value=0.00)
         self.susceptibility_input.SetFormat("%f")
@@ -1664,6 +1665,9 @@ class Gmg(wx.Frame):
             error_message = "INDEX ERROR IN LOADING PROCESS - MODEL NOT LOADED"
             MessageDialog(self, -1, error_message, "Load Error")
             raise
+
+        'MAXIMIZE FRAME'
+        self.Maximize(True)
 
     # PLOTTING FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
