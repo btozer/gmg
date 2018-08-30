@@ -64,11 +64,10 @@ Documentation created using Sphinx.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-NB. run:
+NB. before launching gmg, run:
 
-    source activate py27
+    source activate py27-gmg
 
-Before trying to run gmg.
 """
 
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -909,8 +908,6 @@ class Gmg(wx.Frame):
         if event.Id == 601:
             if self.t_canvas is True:
                 self.tcanvas.set_visible(False)
-                print "setting t_canvas to:"
-                print self.t_canvas
                 self.t_canvas = False
             else:
                 self.t_canvas = True
@@ -919,8 +916,6 @@ class Gmg(wx.Frame):
             if self.d_canvas is True:
                 self.dcanvas.set_visible(False)
                 self.d_canvas = False
-                print "setting d_canvas to:"
-                print self.d_canvas
             else:
                 self.d_canvas = True
                 self.dcanvas.set_visible(True)
@@ -928,8 +923,6 @@ class Gmg(wx.Frame):
             if self.nt_canvas is True:
                 self.ntcanvas.set_visible(False)
                 self.nt_canvas = False
-                print "setting nt_canvas to:"
-                print self.nt_canvas
             else:
                 self.nt_canvas = True
                 self.ntcanvas.set_visible(True)
@@ -1304,8 +1297,7 @@ class Gmg(wx.Frame):
         self.update()
 
     def on_begin_edit_label(self, event):
-        print "self.i = %s" % self.i
-        print event.GetItem()
+        pass
 
     def on_end_edit_label(self, event):
         self.i = self.tree.GetPyData(event.GetItem())
@@ -2197,7 +2189,7 @@ class Gmg(wx.Frame):
             well_data = [line.strip().split(' ') for line in f]
         self.well_list.append(well_data)
 
-        'CREATE FILE MENU DATA'
+        # CREATE FILE MENU DATA
         self.well_name_submenu = wx.Menu()
         self.m_wells_submenu.Append(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
         self.well_name_submenu.Append(int(self.well_count) + 2000, 'hide/show')
@@ -2206,23 +2198,19 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.delete_well, id=int(self.well_count) + 3000)
         self.well_count += 1
 
-        'DRAW WELL'
+        # DRAW WELL
         well_data = np.array(self.well_list[self.well_count - 1][0:])  # CREATE NP ARRAY WITHOUT HEADER INFO
         y1 = well_data[0, 1].astype(float)
         y2 = well_data[-1, -1].astype(float)
         well_x_location = well_data[1, 1]
-
-        print "y1 = %s" % y1
-        print "y2 = %s" % y2
-        print "well_x_location = %s" % well_x_location
-
         wellx = (well_x_location, well_x_location)
         welly = (y1, y2)
         self.wells.append([])
         self.wells[self.well_count - 1] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
         self.well_name_text.append([])
-        'PLOT WELL NAME'
+        
+        # PLOT WELL NAME
         self.well_name_text[self.well_count - 1] = self.mcanvas.annotate(self.well_name, xy=(well_x_location, -0.5),
                                                                          xytext=(well_x_location, -0.5),
                                                                          fontsize=self.well_textsize, weight='bold',
@@ -2231,8 +2219,8 @@ class Gmg(wx.Frame):
                                                                          clip_on=True)
         self.well_name_text.append([])
 
-        '''PLOT WELL HORIZONS'''
-        'SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS'
+        # PLOT WELL HORIZONS
+        # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
         self.well_labels.append([])
         self.horizons.append([])
         self.well_labels[self.well_count - 1] = [None] * len(well_data)
@@ -2240,14 +2228,13 @@ class Gmg(wx.Frame):
         for i in range(2, len(well_data)):
             y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
             x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
-            print "y = %s" % y
-            print "x = %s" % x
-            'PLOT HORIZON LINE'
+
+            # PLOT HORIZON LINE
             self.horizons[self.well_count - 1][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
             horizon_y_pos = well_data[i, 1].astype(float)
             horizon = well_data[i, 0].astype(str)
 
-            'ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
+            # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
             if i % 2 == 0:
                 horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
@@ -2278,13 +2265,14 @@ class Gmg(wx.Frame):
         self.well_horizons_list[self.well_count - 1] = self.horizons
         self.well_horizons_list.append([])
         self.well_labels_list.append([])
-        'UPDATE PROGRAM GRAPHICS'
+        
+        # UPDATE GMG
         self.update_layer_data()
 
     def draw_well(self):
         """DRAW WELLS ON MODEL CANVAS"""
 
-        'CREATE EMPTY ARRAYS TO FILL WITH WELL DATA'
+        # CREATE EMPTY ARRAYS TO FILL WITH WELL DATA
         self.wells = [[]] * len(self.well_list)
         self.well_name_text = [[]] * len(self.well_list)
         self.well_labels = [[]] * len(self.well_list)
@@ -2306,7 +2294,7 @@ class Gmg(wx.Frame):
 
                 self.wells[w] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
-                '''PLOT WELL NAME'''
+                # PLOT WELL NAME
                 well_name = self.well_name_list[w]
                 self.well_name_text[w] = self.mcanvas.annotate(well_name, xy=(well_x_location, -0.5),
                                                                xytext=(well_x_location, -0.5),
@@ -2315,19 +2303,20 @@ class Gmg(wx.Frame):
                                                                bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
                                                                clip_on=True)
 
-                '''PLOT WELL HORIZONS'''
+                # PLOT WELL HORIZONS 
                 # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
                 self.well_labels[w] = [None] * len(well_data)
                 self.horizons[w] = [None] * len(well_data)
                 for i in range(2, len(well_data)):
                     y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
                     x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
-                    'PLOT HORIZON LINE'
+                    
+                    # PLOT HORIZON LINE
                     self.horizons[w][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
                     horizon_y_pos = well_data[i, 1].astype(float)
                     horizon = well_data[i, 0].astype(str)
 
-                    'ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
+                    # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
                     if i % 2 == 0:
                         horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                         self.well_labels[w][i] = self.mcanvas.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
@@ -2359,7 +2348,7 @@ class Gmg(wx.Frame):
     def show_hide_well(self, event):
 
         if self.wells[event.Id - 2000][0].get_visible():
-            'HIDE WELL'
+            # HIDE WELL
             self.wells[event.Id - 2000][0].set_visible(False)
             self.well_name_text[event.Id - 2000].set_visible(False)
             horizons = self.horizons[event.Id - 2000]
@@ -2371,7 +2360,7 @@ class Gmg(wx.Frame):
 
             self.update_layer_data()
         else:
-            'SHOW WELL'
+            # SHOW WELL
             self.wells[event.Id - 2000][0].set_visible(True)
             self.well_name_text[event.Id - 2000].set_visible(True)
             horizons = self.horizons[event.Id - 2000]
@@ -2385,6 +2374,7 @@ class Gmg(wx.Frame):
 
     def delete_well(self, event):
         """REMOVE PLOT GRAPHICS"""
+        
         self.wells[event.Id - 3000][0].set_visible(False)
         self.well_name_text[event.Id - 3000].set_visible(False)
         horizons = self.horizons[event.Id - 3000]
@@ -2395,12 +2385,14 @@ class Gmg(wx.Frame):
         for i in range(2, len(labels)):
             labels[i].set_visible(False)
             labels[i] = "None"
-        'SET DATA TO NONEs'
+        
+        # SET DATA TO NONE
         self.well_list[event.Id - 3000] = "None"
         self.well_name_list[event.Id - 3000] = "None"
         self.wells[event.Id - 3000][0] = "None"
         self.well_name_text[event.Id - 3000] = "None"
-        'REMOVE SUBMENU'
+        
+        # REMOVE SUBMENU
         self.m_wells_submenu.DestroyId(event.Id)
         self.update_layer_data()
 
@@ -2408,21 +2400,22 @@ class Gmg(wx.Frame):
 
     def load_contact_data(self, event):
         """CHOSE CONTACT DATA FILE TO LOAD"""
+        
         open_file_dialog = wx.FileDialog(self, "Open contact data", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # the user changed idea
+            return  # THE USER CHANGED THERE MIND
         else:
             contact_data_in = open_file_dialog.GetPath()
             contact_name_box = wx.TextEntryDialog(None, 'Name for new data:')
             contact_name_box.ShowModal()
 
-        'LOAD DATA'
+        # LOAD DATA
         self.contact_name = contact_name_box.GetValue()
         self.contact_name_list.append(str(self.contact_name))
         self.contact_data = np.genfromtxt(contact_data_in, autostrip=True, delimiter=' ', dtype=str)
 
-        'DRAW MARKERS'
+        # DRAW MARKERS
         self.well_labels = [None] * len(self.contact_data)
         self.contacts = [None] * len(self.contact_data)
         for i in xrange(len(self.contact_data)):
@@ -2432,16 +2425,17 @@ class Gmg(wx.Frame):
             x = (x1, x1)
             y = (y1, y2)
             self.contacts[i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-        print self.contacts
+            
         self.contact_data_list[self.contact_data_count] = self.contacts
         self.contact_data_list.append([])
 
-        'DRAW TEXT'
+        # DRAW TEXT
         self.text_labels = [None] * len(self.contacts)
         text = zip(self.contact_data[:, 0].astype(float), self.contact_data[:, 1].astype(float),
                    self.contact_data[:, 3].astype(str))
         for i in xrange(len(self.contacts)):
-            'ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP'
+            
+            # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
             if i % 2 == 0:
                 self.text_labels[i] = self.mcanvas.annotate(text[i][2], xy=(text[i][0], text[i][1]),
                                                             xytext=(text[i][0], text[i][1]),
@@ -2464,16 +2458,16 @@ class Gmg(wx.Frame):
         self.contact_text_list[self.contact_data_count] = self.text_labels
         self.contact_text_list.append([])
 
-        'SETUP NEW CONTACT DATA SUBMENU'
+        # SETUP NEW CONTACT DATA SUBMENU
         self.contacts_submenu = wx.Menu()
         self.m_contacts_submenu.Append(self.contact_data_count + 3000, self.contact_name, self.contacts_submenu)
         self.contacts_submenu.Append(self.contact_data_count + 3000, 'delete data')
         self.Bind(wx.EVT_MENU, self.delete_contact_data, id=self.contact_data_count + 3000)
 
-        'INCREMENT CONTACT COUNT'
+        # INCREMENT CONTACT COUNT
         self.contact_data_count += 1
 
-        'UPDATE CANVAS'
+        # UPDATE GMG
         self.update_layer_data()
         self.draw()
 
@@ -2483,7 +2477,9 @@ class Gmg(wx.Frame):
     # LAYER & NODE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def write_layers_xy(self, event):
-        # Create output file
+        """OUTPUT LAYER DATA TO FILE"""
+        
+        # CREATE OUTPUT FILE
         save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2579,10 +2575,9 @@ class Gmg(wx.Frame):
         self.draw()
 
     def observed_filter(self, event):
+        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
 
-        """ FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
-
-        #RUN FILTER
+        # RUN FILTER
         median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.obs_grav_name_list,
                                                self.obs_grav_list_save, self.obs_mag_name_list, self.obs_mag_list_save)
         answer = median_filter_box.ShowModal()
@@ -2593,7 +2588,7 @@ class Gmg(wx.Frame):
         filtered_color = median_filter_box.output_color
         filter_type = median_filter_box.filter_type
 
-        #LOAD FILTERED DATA
+        # LOAD FILTERED DATA
         if filter_type == "gravity":
             self.obs_grav_name_list.append(filtered_name)
             self.obs_grav_list_save.append([])
@@ -2664,6 +2659,7 @@ class Gmg(wx.Frame):
                 else:
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+            
             # DEAL WITH PINCHED NODE
             if self.pinch_switch != 0:
                 for k in range(0, len(self.index_arg2_list)):
@@ -2691,7 +2687,7 @@ class Gmg(wx.Frame):
         self.set_angle_a(self)
         self.set_angle_b(self)
 
-
+        # UPDATE GMG
         self.update_layer_data()
         self.update()
 
@@ -2751,8 +2747,8 @@ class Gmg(wx.Frame):
                     x1 = np.array(self.plotx1)
                     y1 = np.array(self.ploty1)
                     'REPLACE THE ORIGINAL NODE WITH THE NEW NODE'
-                    x1[int(self.pinch_node_list[0])] = new_x  # replace old x with new x
-                    y1[int(self.pinch_node_list[0])] = new_y  # replace old y with new y
+                    x1[int(self.pinch_node_list[0])] = new_x  # REPLACE OLD X WITH NEW X
+                    y1[int(self.pinch_node_list[0])] = new_y  # REPLACE OLD Y WITH NEW Y
                     self.plotx_list[int(self.pinch_node_list[1])] = x1
                     self.ploty_list[int(self.pinch_node_list[1])] = y1
                     self.pinch_count = 0
@@ -2824,7 +2820,7 @@ class Gmg(wx.Frame):
             return
 
         if self.boundary_lock_list[self.i] == 0:
-            x, y = event.xdata, event.ydata  # get xy of new point
+            x, y = event.xdata, event.ydata  # GET XY OF NEW POINT
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
 
@@ -2834,34 +2830,34 @@ class Gmg(wx.Frame):
 
             # UPDATE NODE
             if xt[self.index_node] == self.x1 and yt[self.index_node] != 0.001:
-                xt[self.index_node] = self.x1  # replace old x with new x
-                yt[self.index_node] = y  # replace old y with new y
+                xt[self.index_node] = self.x1  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
             elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
-                xt[self.index_node] = self.x2  # replace old x with new x
-                yt[self.index_node] = y  # replace old y with new y
+                xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
             elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
-                xt[self.index_node] = 0  # replace old x with new x
-                yt[self.index_node] = 0.001  # replace old y with new y
+                xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
-                xt[self.index_node] = self.x2  # replace old x with new x
-                yt[self.index_node] = 0.001  # replace old y with new y
+                xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             elif y <= 0:
-                xt[self.index_node] = x  # replace old x with new x
-                yt[self.index_node] = 0.001  # replace old y with new y
+                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             else:
-                xt[self.index_node] = x  # replace old x with new x
-                yt[self.index_node] = y  # replace old y with new y
+                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
         elif self.boundary_lock_list[self.i] == 1:
-            x = event.xdata  # get X of new point
-            y = event.ydata  # get y of new point
+            x = event.xdata  # GET X OF NEW POINT
+            y = event.ydata  # GET Y OF NEW POINT
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
             if y <= 0:
-                xt[self.index_node] = x  # replace old x with new x
-                yt[self.index_node] = 0.001  # replace old y with new y
+                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             else:
-                xt[self.index_node] = x  # replace old x with new x
-                yt[self.index_node] = y  # replace old y with new y
+                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
 
         'Deal with pinched node'
         if self.pinch_switch != 0:
@@ -2890,6 +2886,7 @@ class Gmg(wx.Frame):
 
     def button_release(self, event):
         """WHEN MOUSE BUTTON IS RELEASED"""
+
         if event.inaxes is None:
             return
         if not self.showverts:
