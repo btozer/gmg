@@ -129,31 +129,31 @@ class Gmg(wx.Frame):
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
-        '# %DIR CONTAINING PROGRAM ICONS'
+        'DIR CONTAINING PROGRAM ICONS'
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.gui_icons_dir = self.script_dir + '/icons/'
 
-        '# %START AUI WINDOW MANAGER'
+        'START AUI WINDOW MANAGER'
         self.mgr = aui.AuiManager()
 
-        '# %TELL AUI WHICH FRAME TO USE'
+        'TELL AUI WHICH FRAME TO USE'
         self.mgr.SetManagedWindow(self)
 
-        '# %SET SPLITTER WINDOW TOGGLE IMAGES'
+        'SET SPLITTER WINDOW TOGGLE IMAGES'
         images = wx.ImageList(16, 16)
         top = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16, 16))
         bottom = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16, 16))
         images.Add(top)
         images.Add(bottom)
 
-        '# %CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
+        'CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
         self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1000), style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 600),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
-        '# %FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
+        'FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
         self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 450),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 450),
@@ -162,7 +162,7 @@ class Gmg(wx.Frame):
                                                                        foldIcons=images)
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
-        '# %SECOND PANE; LEFT PANEL (=LAYERS)'
+        'SECOND PANE; LEFT PANEL (=LAYERS)'
         self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 450),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 450),
@@ -170,7 +170,7 @@ class Gmg(wx.Frame):
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
-        '# %THIRD PANE; LEFT PANEL (=FAULTS)'
+        'THIRD PANE; LEFT PANEL (=FAULTS)'
         self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 200),
@@ -178,7 +178,7 @@ class Gmg(wx.Frame):
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
 
-        '# %SET SPLITTERS'
+        'SET SPLITTERS'
         self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three)
         self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b)
 
@@ -188,10 +188,10 @@ class Gmg(wx.Frame):
         self.splitter_left_panel_two.SetScrollbar(1, 1, 10, 10)
         self.splitter_left_panel_three.SetScrollbar(1, 1, 10, 10)
 
-        '# %CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)'
+        'CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)'
         self.rightPanel = wx.Panel(self, -1, size=(1520, 800), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
 
-        '# %CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)'
+        'CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)'
         self.ConsolePanel = wx.Panel(self, -1, size=(1800, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         intro = "###############################################################\r" \
                 "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
@@ -202,38 +202,38 @@ class Gmg(wx.Frame):
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
 
 
-        '# %ADD THE PANES TO THE AUI MANAGER'
+        'ADD THE PANES TO THE AUI MANAGER'
         self.mgr.AddPane(self.leftPanel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
         self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
         self.mgr.GetPaneByName('console').Hide()  # HIDE PYTHON CONSOLE BY DEFAULT
         self.mgr.Update()
 
-        '# %CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)'
+        'CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)'
         self.create_menu()
 
-        '# %CREATE STATUS BAR'
+        'CREATE STATUS BAR'
         self.statusbar = self.CreateStatusBar(3)
         self.controls_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'large_up_16.png'),
                                                pos=(0, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_controls, self.controls_button)
 
-        '# %PYTHON CONSOLE'
+        'PYTHON CONSOLE'
         self.console_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'python_16.png'),
                                               pos=(24, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_console, self.console_button)
 
-        '# %TOPOGRAPHY'
+        'TOPOGRAPHY'
         self.topography_button = GenBitmapButton(self.statusbar, 601, wx.Bitmap(self.gui_icons_dir + 'T_16.png'),
                                                  pos=(48, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.topography_button)
 
-        '# %GRAVITY'
+        'GRAVITY'
         self.gravity_button = GenBitmapButton(self.statusbar, 602, wx.Bitmap(self.gui_icons_dir + 'G_16.png'),
                                               pos=(72, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.gravity_button)
 
-        '# %MAGNETIC'
+        'MAGNETIC'
         self.magnetic_button = GenBitmapButton(self.statusbar, 603, wx.Bitmap(self.gui_icons_dir + 'M_16.png'),
                                                pos=(96, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
@@ -243,18 +243,18 @@ class Gmg(wx.Frame):
         self.statusbar.SetStatusText(self.status_text, 2)
         self.statusbar.SetSize((1800, 24))
 
-        '# %SET PROGRAM STATUS'
+        'SET PROGRAM STATUS'
         self.model_saved = False
         self.newmodel = False
 
-        '# %BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION'
+        'BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION'
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
 
-        '# %MAXIMIZE FRAME'
+        'MAXIMIZE FRAME'
         self.Maximize(True)
 
     def create_menu(self):
-        """# %CREATES GUI MENUBAR"""
+        """# CREATES GUI MENUBAR"""
         self.menubar = wx.MenuBar()
         menu_file = wx.Menu()
         m_new_model = menu_file.Append(-1, "New Model...\tCtrl-N", "New Model...")
@@ -275,17 +275,17 @@ class Gmg(wx.Frame):
         m_exit = menu_file.Append(-1, "Exit...\tCtrl-X", "Exit...")
         self.Bind(wx.EVT_MENU, self.exit, m_exit)
 
-        '# % DRAW MENU'
+        'DRAW MENU'
         self.menubar.Append(menu_file, "&File")
 
-        '#% MODEL VIEW MENU'
+        'MODEL VIEW MENU'
         model_view_file = wx.Menu()
         m_modify_model_dimensions = model_view_file.Append(-1, "Modify Current Model Dimensions...\tCtrl-M",
                                                            "Modify Current Model Dimensions...")
         self.Bind(wx.EVT_MENU, self.modify_model_dimensions, m_modify_model_dimensions)
         model_view_file.AppendSeparator()
 
-        '# %PROGRAM FRAME WINDOW SWITCHES'
+        'PROGRAM FRAME WINDOW SWITCHES'
         self.t_canvas = True
         self.d_canvas = True
         self.nt_canvas = True
@@ -307,128 +307,128 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.aspect_decrease, m_aspect_decrease)
         self.menubar.Append(model_view_file, "&Model View")
 
-        '# %GRAVITY DATA'
+        'GRAVITY DATA'
         self.gravity_data = wx.Menu()
-        # %LOAD OBSERVED GRAVITY DATA
+        # LOAD OBSERVED GRAVITY DATA
         m_load_obs_g = self.gravity_data.Append(-1, "&Load Gravity Anomaly...\tCtrl-L", "Load Observed Gravity Data...")
         self.Bind(wx.EVT_MENU, self.load_obs_g, m_load_obs_g)
-        # %EDIT
+        # EDIT
         self.m_obs_g_submenu = wx.Menu()
         self.gravity_data.Append(-1, 'Gravity Data...', self.m_obs_g_submenu)
-        # %FILTER MENU
+        # FILTER MENU
         grav_m_observed_filter = self.gravity_data.Append(-1, "Filter Anomaly\tCtrl-L", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.observed_filter, grav_m_observed_filter)
-        # %SET RMS OBS ARRAYS
+        # SET RMS OBS ARRAYS
         grav_m_set_rms_arrays = self.gravity_data.Append(-1, "Set RMS\tCtrl-L", "Set RMS")
         self.Bind(wx.EVT_MENU, self.set_obs_rms, grav_m_set_rms_arrays)
-        # %SET BACKGROUND DENSITY
+        # SET BACKGROUND DENSITY
         m_set_background_density = self.gravity_data.Append(-1, "&Set Background Density...\tCtrl-shift-down",
                                                             "Set Background Density...")
         self.Bind(wx.EVT_MENU, self.set_background_density, m_set_background_density)
-        # %REMOVE
+        # REMOVE
         self.m_obs_g_submenu.Append(100, 'Remove All Gravity Anomalies')
         self.Bind(wx.EVT_MENU, self.delete_all_obs_grav, id=100)
-        # %SAVE PREDICTED ANOMALY TO DISC
+        # SAVE PREDICTED ANOMALY TO DISC
         m_save_g_submenu = self.gravity_data.Append(-1, "&Save Predicted Anomaly...\tCtrl-shift-S",
                                                     "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_grav, m_save_g_submenu)
-        # % DRAW MENU
+        # DRAW MENU
         self.menubar.Append(self.gravity_data, "&Gravity")
 
-        '# %MAGNETIC DATA'
+        'MAGNETIC DATA'
         self.magnetic_data = wx.Menu()
-        # % LOAD OBSERVED MAGNETIC DATA
+        # LOAD OBSERVED MAGNETIC DATA
         m_load_obs_m = self.magnetic_data.Append(-1, "&Load Magnetic Anomaly...\tCtrl-L",
                                                  "Load Observed Magnetic Data...")
         self.Bind(wx.EVT_MENU, self.load_obs_m, m_load_obs_m)
-        # % EDIT
+        # EDIT
         self.m_obs_mag_submenu = wx.Menu()
         self.magnetic_data.Append(-1, 'Magnetic Anomalies...', self.m_obs_mag_submenu)
-        # % FILTER MENU
+        # FILTER MENU
         mag_m_observed_filter = self.magnetic_data.Append(-1, "Filter Anomaly\tCtrl-L", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.observed_filter, mag_m_observed_filter)
-        # % SET RMS OBS ARRAYS
+        # SET RMS OBS ARRAYS
         mag_m_set_rms_arrays = self.magnetic_data.Append(-1, "Set RMS\tCtrl-L", "Set RMS")
         self.Bind(wx.EVT_MENU, self.set_obs_rms, mag_m_set_rms_arrays)
-        # % SET MAG
+        # SET MAG
         m_set_mag_variables = self.magnetic_data.Append(-1, "&Set Magnetic Field...\tCtrl-shift-up",
                                                         "Set Magnetic Feild...")
         self.Bind(wx.EVT_MENU, self.set_mag_variables, m_set_mag_variables)
-        # % REMOVE
+        # REMOVE
         self.m_obs_mag_submenu.Append(101, 'Remove all Magnetic Anomalies')
         self.Bind(wx.EVT_MENU, self.delete_all_obs_mag, id=101)
-        # %SAVE PREDICTED ANOMALY TO DISC
+        # SAVE PREDICTED ANOMALY TO DISC
         m_save_mag_submenu = self.magnetic_data.Append(-1, "&Save Predicted Anomaly...\tCtrl-shift-S",
                                                        "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_mag, m_save_mag_submenu)
-        # % DRAW MENU
+        # DRAW MENU
         self.menubar.Append(self.magnetic_data, "&Magnetics")
 
-        '# %TOPOGRAPHY DATA'
+        'TOPOGRAPHY DATA'
         self.topography_data = wx.Menu()
-        # % LOAD OBSERVED TOPO DATA
+        # LOAD OBSERVED TOPO DATA
         m_load_topo = self.topography_data.Append(-1, "&Load Topography...\tCtrl-L", "Load Observed Topography...")
         self.Bind(wx.EVT_MENU, self.load_topo, m_load_topo)
-        # % EDIT
+        # EDIT
         self.m_topo_submenu = wx.Menu()
         self.topography_data.Append(-1, 'Topography Data', self.m_topo_submenu)
-        # % DRAW MENU
+        # DRAW MENU
         self.menubar.Append(self.topography_data, "&Topography")
 
-        '# %XY DATA'
+        'XY DATA'
         self.xy_data = wx.Menu()
-        # % LOAD XY DATA
+        # LOAD XY DATA
         m_load_xy = self.xy_data.Append(-1, "&Load XY Points...\tCtrl-L", "Load XY Points...")
         self.Bind(wx.EVT_MENU, self.load_xy, m_load_xy)
         self.m_xy_submenu = wx.Menu()
         self.xy_data.Append(-1, 'XY Data...', self.m_xy_submenu)
-        # % REMOVE
+        # REMOVE
         self.m_xy_submenu.Append(102, 'Remove all XY Data')
         self.Bind(wx.EVT_MENU, self.delete_all_xy, id=102)
-        # % DRAW MENU
+        # DRAW MENU
         self.menubar.Append(self.xy_data, "&XY Data")
 
-        '# %SEISMIC DATA'
+        'SEISMIC DATA'
         self.seismic_data = wx.Menu()
-        # %SEGY LOAD
+        #SEGY LOAD
         self.m_load_segy = self.seismic_data.Append(-1, "&Load Segy...\tCtrl-y", "Load Segy Data")
         self.Bind(wx.EVT_MENU, self.segy_input, self.m_load_segy)
-        # % SEGY REMOVE_ALL
+        # SEGY REMOVE_ALL
         self.m_remove_all_segy = self.seismic_data.Append(-1, "&Remove All Segy...\tCtrl-y", "Remove All Segy Data")
         self.Bind(wx.EVT_MENU, self.remove_all_segy, self.m_remove_all_segy)
-        # % SEGY NAME LIST
+        # SEGY NAME LIST
         self.m_segy_submenu = wx.Menu()
         self.seismic_data.Append(-1, 'SEGY Data...', self.m_segy_submenu)
-        # % GAIN
+        # GAIN
         self.m_gain = wx.Menu()
         self.seismic_data.Append(-1, 'Gain', self.m_gain)
-        # % COLOR PALETTE
+        # COLOR PALETTE
         self.m_color_palette = wx.Menu()
         self.seismic_data.Append(-1, 'Color Palette', self.m_color_palette)
         self.m_color_palette.Append(901, 'Grey')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=901)
         self.m_color_palette.Append(902, 'Sesimic')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=902)
-        # % GAIN INCREASE
+        # GAIN INCREASE
         self.m_gain_increase = self.m_gain.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.gain_increase, self.m_gain_increase)
-        # % GAIN DECREASE
+        # GAIN DECREASE
         self.m_gain_decrease = self.m_gain.Append(-1, "Decrease...", "Decrease...")
         self.Bind(wx.EVT_MENU, self.gain_decrease, self.m_gain_decrease)
-        # % DRAW MENU
+        # DRAW MENU
         self.menubar.Append(self.seismic_data, "&Seismic Data")
 
-        '# %WELL DATA'
+        'WELL DATA'
         self.well_data = wx.Menu()
         self.m_load_well = self.well_data.Append(-1, "&Load...\tCtrl-Shift-w", "Load Well Horizons")
         self.Bind(wx.EVT_MENU, self.load_well, self.m_load_well)
-        # % WELL SUBMENU
+        # WELL SUBMENU
         self.m_wells_submenu = wx.Menu()
         self.well_data.Append(-1, 'Well...', self.m_wells_submenu)
-        # % DRAW MENU
+        # DRAW MENU
         self.menubar.Append(self.well_data, "&Well Data")
 
-        '# %CONTACTS MENU'
+        'CONTACTS MENU'
         self.contact_file = wx.Menu()
         self.m_load_contact_data = self.contact_file.Append(-1, "&Load Outcrops...\tCtrl-Shift-w", "Load Outcrop Data")
         self.Bind(wx.EVT_MENU, self.load_contact_data, self.m_load_contact_data)
@@ -436,33 +436,33 @@ class Gmg(wx.Frame):
         self.m_contacts_submenu = wx.Menu()
         self.menubar.Append(self.contact_file, "&Outcrop data")
 
-        '# %LAYERS MENU'
+        'LAYERS MENU'
         self.layer_file = wx.Menu()
-        # %NEW LAYER
+        #NEW LAYER
         self.m_new_layer = self.layer_file.Append(-1, "New Layer...", "New Layer...")
         self.Bind(wx.EVT_MENU, self.new_layer, self.m_new_layer)
-        # %LOAD LAYER
+        #LOAD LAYER
         self.m_load_layer = self.layer_file.Append(-1, "Load Layer...", "Load Layer...")
         self.Bind(wx.EVT_MENU, self.load_layer, self.m_load_layer)
-        # %TRANSPARENCY
+        #TRANSPARENCY
         self.m_layer_transperency = wx.Menu()
         self.layer_file.Append(-1, 'Transperency', self.m_layer_transperency)
-        # %TRANSPARENCY INCREASE
+        #TRANSPARENCY INCREASE
         self.m_layer_transparency_increase = self.m_layer_transperency.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.transparency_increase, self.m_layer_transparency_increase)
-        # %TRANSPARENCY DECREASE
+        #TRANSPARENCY DECREASE
         self.m_layer_transparency_decrease = self.m_layer_transperency.Append(-1, "Decrease...", "Decrease...")
         self.Bind(wx.EVT_MENU, self.transparency_decrease, self.m_layer_transparency_decrease)
-        # %BULK SHIFT
+        #BULK SHIFT
         self.m_bulk_shift = self.layer_file.Append(-1, "Bulk Shift...", "Bulk Shift...")
         self.Bind(wx.EVT_MENU, self.bulk_shift, self.m_bulk_shift)
-        # %DELETE LAYER
+        #DELETE LAYER
         self.m_delete_layer = self.layer_file.Append(-1, "Delete Current Layer...", "Delete Current Layer...")
         self.Bind(wx.EVT_MENU, self.delete_layer, self.m_delete_layer)
-        # %APPEND MENU
+        #APPEND MENU
         self.menubar.Append(self.layer_file, "&Layers")
 
-        '# %PINCH MENU'
+        'PINCH MENU'
         layer_file = wx.Menu()
         m_pinch_layer = layer_file.Append(-1, "&Pinch Out Layer...\tCtrl-shift-up", "Pinch Out Layer...")
         self.Bind(wx.EVT_MENU, self.pinch_out_layer, m_pinch_layer)
@@ -470,14 +470,14 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.depinch_layer, m_depinch_layer)
         self.menubar.Append(layer_file, "&Pinch Layer")
 
-        '# %ATTRIBUTE MENU'
+        'ATTRIBUTE MENU'
         attribute_file = wx.Menu()
         m_attribute_table = attribute_file.Append(-1, "&Open Attribute Table...\tCtrl-shift-a",
                                                   "Open Attribute Table...")
         self.Bind(wx.EVT_MENU, self.open_attribute_table, m_attribute_table)
         self.menubar.Append(attribute_file, "&Attribute Table")
 
-        '# %HELP MENU'
+        'HELP MENU'
         help_file = wx.Menu()
         m_help = help_file.Append(-1, "&Documentation...", "Open Documentation html...")
         self.Bind(wx.EVT_MENU, self.open_documentation, m_help)
@@ -487,10 +487,10 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
         self.menubar.Append(help_file, "&Help")
 
-        '# %SET MENUBAR'
+        'SET MENUBAR'
         self.SetMenuBar(self.menubar)
 
-        '# %TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)'
+        'TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)'
         self.toolbar = self.CreateToolBar()
 
         t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
@@ -577,29 +577,29 @@ class Gmg(wx.Frame):
         self.toolbar.SetSize((1790, 36))
 
     def start(self, area, xp, zp):
-        """# %CREATE MPL FIGURE CANVAS"""
+        """#CREATE MPL FIGURE CANVAS"""
 
         self.fig = plt.figure()  # CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
         self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
-        '#% SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
+        'SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
         self.draw = self.fig.canvas.draw
 
-        '#% GET THE MODEL DIMENSIONS AND SAMPLE LOCATIONS'
+        'GET THE MODEL DIMENSIONS AND SAMPLE LOCATIONS'
         self.area = area
         self.x1, self.x2, self.z1, self.z2 = 0.001 * np.array(area)
         self.xp = np.array(xp, dtype='f')
         self.zp = np.array(zp, dtype='f')
 
-        '#% DRAW MAIN PROGRAM WINDOW'
+        'DRAW MAIN PROGRAM WINDOW'
         self.draw_main_frame()
 
-        '#%CONNECT MPL FUNCTIONS'
+        'CONNECT MPL FUNCTIONS'
         self.connect()
 
-        '#% UPDATE DISPLAY'
+        'UPDATE DISPLAY'
         self.display_info()
         self.size_handler()
 
@@ -608,7 +608,7 @@ class Gmg(wx.Frame):
         else:
             pass
 
-        '#% REFRESH SIZER POSITIONS'
+        'REFRESH SIZER POSITIONS'
         self.Hide()
         self.Show()
 
@@ -624,28 +624,28 @@ class Gmg(wx.Frame):
         self.node_click_limit = 2
         self.layer_lock = True
         self.boundary_lock = True
-        self.calc_padding = 5000.  # % PADDING FOR POTENTIAL FIELD CALCULATION POINTS
-        self.padding = 50000.  # % PADDING FOR LAYERS
-        self.i = 0  # %LAYER COUNTER
+        self.calc_padding = 5000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
+        self.padding = 50000.  # PADDING FOR LAYERS
+        self.i = 0  #LAYER COUNTER
         self.node_layer_reference = 0
-        self.index_node = None  # % THE ACTIVE NODE
-        self.predgz = None  # % THE CALCULATED GRAVITY RESPONSE
-        self.prednt = None  # % THE CALCULATED MAGNETIC RESPONSE
+        self.index_node = None  # THE ACTIVE NODE
+        self.predgz = None  # THE CALCULATED GRAVITY RESPONSE
+        self.prednt = None  # THE CALCULATED MAGNETIC RESPONSE
         self.gz = None
         self.obs_gz = None
         self.ntz = None
         self.obs_ntz = None
-        self.colors = "bmycbmycbmyc"  # %OBSERVED COLOR LIST
+        self.colors = "bmycbmycbmyc"  # OBSERVED COLOR LIST
         self.colors_index = 0
         self.model_azimuth = 0.
 
-        '#% INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)'
+        'INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)'
         self.mag_polygons = []
         self.polygons = []
         self.polyplots = []
         self.poly_fills = [[]]
 
-        '#% INITIALISE LAYER LISTS (USED FOR STORING LAYER DATA)'
+        'INITIALISE LAYER LISTS (USED FOR STORING LAYER DATA)'
         self.plotx_list = [[]]
         self.ploty_list = [[]]
         self.layer_colors = [[]]
@@ -658,14 +658,14 @@ class Gmg(wx.Frame):
         self.pinch_node_list = [[], []]
         self.pinch_count = 0
 
-        '#% INITIALISE XY DATA ATTRIBUTES'
+        'INITIALISE XY DATA ATTRIBUTES'
         self.xy = []
         self.xy_list = [[]]
         self.xy_list_save = [[]]
         self.xy_name_list = []
         self.xy_count = 0
 
-        '#% INITIALISE TOPOGRAPHY ATTRIBUTES'
+        'INITIALISE TOPOGRAPHY ATTRIBUTES'
         self.obs_topo = []
         self.obs_topo_list = [[]]
         self.obs_topo_list_save = [[]]
@@ -673,7 +673,7 @@ class Gmg(wx.Frame):
         self.obs_topo_colors = [[]]
         self.obs_topo_count = 0
 
-        '#% INITIALISE GRAVITY ATTRIBUTES'
+        'INITIALISE GRAVITY ATTRIBUTES'
         self.grav_obs_switch = False
         self.obs_grav = []
         self.obs_grav_list = [[]]
@@ -684,11 +684,11 @@ class Gmg(wx.Frame):
         self.background_density = 0
         self.absolute_densities = True
         self.calc_grav_switch = False
-        self.obs_gravity_data_for_rms = []  # %OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
-        self.grav_rms_value = 0.  # %TOTAL RMS MISFIT VALUE
-        self.grav_residuals = []  # %CALCULATED RESIDUAL
+        self.obs_gravity_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
+        self.grav_rms_value = 0.  # TOTAL RMS MISFIT VALUE
+        self.grav_residuals = []  # CALCULATED RESIDUAL
 
-        '#% INITIALISE MAGNETIC ATTRIBUTES'
+        'INITIALISE MAGNETIC ATTRIBUTES'
         self.mag_obs_switch = False
         self.obs_mag = []
         self.obs_mag_list = [[]]
@@ -701,11 +701,11 @@ class Gmg(wx.Frame):
         self.earth_field = 0.
         self.profile_azimuth = 0.
         self.calc_mag_switch = False
-        self.obs_mag_data_for_rms = []  # %OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
-        self.mag_rms_value = 0.  # %TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
-        self.mag_residuals = []  # %CALCULATED RESIDUAL
+        self.obs_mag_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
+        self.mag_rms_value = 0.  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
+        self.mag_residuals = []  # CALCULATED RESIDUAL
 
-        '#% INITIALISE SEISMIC ATTRIBUTES'
+        'INITIALISE SEISMIC ATTRIBUTES'
         self.gain = 4.0
         self.gain_neg = -self.gain
         self.segy_on = False
@@ -715,14 +715,14 @@ class Gmg(wx.Frame):
         self.segy_dimension_list = []
         self.segy_count = 0
 
-        '#% INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
+        'INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
         self.contact_data_list = [[]]
         self.contact_text_list = [[]]
         self.contact_data = [[]]
         self.contact_name_list = []
         self.contact_data_count = 0
 
-        '#% INITIALISE Well ATTRIBUTES'
+        'INITIALISE Well ATTRIBUTES'
         self.well_list = []
         self.well_list_hidden = []
         self.well_name_list = []
@@ -733,7 +733,7 @@ class Gmg(wx.Frame):
         self.well_list_switch = [[]]
         self.well_textsize = 2
 
-        '#% INITIALISE LAYER ATTRIBUTES'
+        'INITIALISE LAYER ATTRIBUTES'
         self.densities = [0.]
         self.reference_densities = [2.67]
         self.susceptibilities = [0.]
@@ -742,13 +742,13 @@ class Gmg(wx.Frame):
         self.remanence = [0]
         self.layers_calculation_switch = [1]
 
-        '#% INITIALISE FAULTS'
+        'INITIALISE FAULTS'
         self.faults = [[]]
         self.fault_count = 0
         self.current_fault = 0
         self.fault_colors = ['k']
 
-        '#% INITIALIZE COORDINATE CAPTURE'
+        'INITIALIZE COORDINATE CAPTURE'
         self.capture = False
         self.linex = []
         self.liney = []
@@ -756,29 +756,29 @@ class Gmg(wx.Frame):
     def draw_main_frame(self):
         """DRAW THE PROGRAM CANVASES"""
 
-        '#%TOPO CANVAS'
+        'TOPO CANVAS'
         self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=2, colspan=12)
         self.tcanvas.set_ylabel("Topo (m)")
         self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.tcanvas.grid()
-        '#%GRAV CANVAS'
+        'GRAV CANVAS'
         self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=3, colspan=12)
         self.dcanvas.set_ylabel("Grav (mGal)")
         self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.dcanvas.grid()
         self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        '#%MAG CANVAS'
+        'MAG CANVAS'
         self.ntcanvas = plt.subplot2grid((26, 12), (5, 1), rowspan=3, colspan=12)
         self.ntcanvas.set_ylabel("Mag (nT)")
         self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.ntcanvas.grid()
         self.ntcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        '#%MODEL CANVAS'
+        'MODEL CANVAS'
         self.mcanvas = plt.subplot2grid((26, 12), (8, 1), rowspan=17, colspan=12)
         self.mcanvas.set_ylabel("Depth (km)")
         self.mcanvas.set_xlabel("x (km)")
 
-        '# %DENSITY COLOUR BAR CANVAS'
+        'DENSITY COLOUR BAR CANVAS'
         colormap = matplotlib.cm.coolwarm
         cnorm = colors.Normalize(vmin=-0.8, vmax=0.8)
         self.colormap = cm.ScalarMappable(norm=cnorm, cmap=colormap)
@@ -788,7 +788,7 @@ class Gmg(wx.Frame):
         self.cb1.ax.tick_params(labelsize=8)
         self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=10)
 
-        '#% SET CANVAS LIMITS'
+        'SET CANVAS LIMITS'
         self.mcanvas.set_xlim(self.x1, self.x2)
         self.mcanvas.set_ylim(self.z2, self.z1)
         self.mcanvas.grid()
@@ -798,7 +798,7 @@ class Gmg(wx.Frame):
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02,
                                  hspace=1.5)
 
-        '#% ADD FIRST LAYER'
+        'ADD FIRST LAYER'
         if self.newmodel:
             self.plotx = [-(float(self.padding)), 0., self.x2, self.x2 + (float(self.padding))]
             self.ploty = [0.001, 0.001, 0.001, 0.001]
@@ -818,11 +818,11 @@ class Gmg(wx.Frame):
         else:
             self.nextpoly = []
 
-        '#% INITALISE FAULTS'
+        'INITALISE FAULTS'
         self.showing_faultline, = self.mcanvas.plot([], [], marker='o', color=self.fault_colors[0],
                                            linewidth=1.0, alpha=0.5)
 
-        '#% MAKE LAYER TREE'
+        'MAKE LAYER TREE'
         self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
         self.tree.SetIndent(0.0)
@@ -830,7 +830,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
         self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
 
-        '#% TREE ATTRIBUTES'
+        'TREE ATTRIBUTES'
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
         self.tree_items = ["Layer 0"]
@@ -839,70 +839,70 @@ class Gmg(wx.Frame):
         self.error = 0.
         self.last_layer = 0
 
-        '''#% ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
-        '#% Make Attribute Label'
+        '''ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
+        'Make Attribute Label'
         self.attr_text = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
         self.attr_text2 = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
-        '#% Make NODE X Y Label'
+        'Make NODE X Y Label'
         self.node_text = wx.StaticText(self.fold_panel_one, -1, label="Node Position:", style=wx.ALIGN_LEFT)
-        '#% Make density spinner'
+        'Make density spinner'
         self.density_text = wx.StaticText(self.fold_panel_one, -1, label="Density:    ", style=wx.ALIGN_LEFT)
         self.density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
         self.density_input.SetFormat("%f")
         self.density_input.SetDigits(4)
-        '#% Make refernece density spinner'
+        'Make refernece density spinner'
         self.ref_density_text = wx.StaticText(self.fold_panel_one, -1, label="Reference:\nDensity", style=wx.ALIGN_LEFT)
         self.ref_density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001,
                                               value=0.00)
         self.ref_density_input.SetFormat("%f")
         self.ref_density_input.SetDigits(4)
-        '#% Make susceptibility spinner'
+        'Make susceptibility spinner'
         self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="susceptibi:", style=wx.ALIGN_LEFT)
         self.susceptibility_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-2.0, max_val=2.0, increment=0.00001,
                                                  value=0.00)
         self.susceptibility_input.SetFormat("%f")
         self.susceptibility_input.SetDigits(6)
-        '#% REMANENT MAG SWITCH'
+        'REMANENT MAG SWITCH'
         self.remanent_mag_checkbox = wx.CheckBox(self.fold_panel_one, -1, "Remanence")
         self.remanent_mag_checkbox.SetValue(False)
-        '#% MAKE ANGLE A SPINNER'
+        'MAKE ANGLE A SPINNER'
         self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label="Angle A:", style=wx.ALIGN_LEFT)
         self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=90.0, increment=1.0, value=0.0)
         self.angle_a_input.SetFormat("%f")
         self.angle_a_input.SetDigits(1)
-        '#% Make ANGLE B SPINNER'
+        'Make ANGLE B SPINNER'
         self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label="Angle B:", style=wx.ALIGN_LEFT)
         self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=180.0, increment=1.0, value=0.0)
         self.angle_b_input.SetFormat("%f")
         self.angle_b_input.SetDigits(1)
-        '#% Make well text size slider'
+        'Make well text size slider'
         self.text_size_text = wx.StaticText(self.fold_panel_one, -1, label="Label Text Size:")
         self.text_size_input = wx.Slider(self.fold_panel_one, value=1, minValue=1, maxValue=20., size=(175, -1),
                                          style=wx.SL_HORIZONTAL)
-        '#% Make Node XY spinners'
+        'Make Node XY spinners'
         self.x_text = wx.StaticText(self.fold_panel_one, -1, label="X:")
         self.x_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.x_input.SetDigits(4)
         self.y_text = wx.StaticText(self.fold_panel_one, -1, label="Y:")
         self.y_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.y_input.SetDigits(4)
-        '#% Make Set button'
+        'Make Set button'
         self.node_set_button = wx.Button(self.fold_panel_one, -1, "Set layer attributes")
 
-        '#% INITALISE CALCULATED P.F. LINES'
+        'INITALISE CALCULATED P.F. LINES'
         self.predplot, = self.dcanvas.plot([], [], '-r', linewidth=2, alpha=0.5)
         self.grav_rms_plot, = self.dcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.ntcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
-        '#% UPDATE INFO BAR'
+        'UPDATE INFO BAR'
         self.display_info()
 
-        '#%DRAW MAIN'
+        'DRAW MAIN'
         self.draw()
 
     def frame_adjustment(self, event):
-        """# %FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
+        """# FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
 
         self.current_xlim = self.mcanvas.get_xlim()
         self.current_ylim = self.mcanvas.get_ylim()
@@ -934,22 +934,22 @@ class Gmg(wx.Frame):
                 self.nt_canvas = True
                 self.ntcanvas.set_visible(True)
 
-        '#% ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
+        'ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
         if self.t_canvas is True and self.d_canvas is True and self.nt_canvas is True:
             'TRUE TRUE TRUE'
-            '#%TOPO CANVAS'
+            'TOPO CANVAS'
             self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=2, colspan=12)
             self.tcanvas.set_ylabel("Topo (m)")
             self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.tcanvas.grid()
             self.tcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            '#%GRAV CANVAS'
+            'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=3, colspan=12)
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            '#%MAG CANVAS'
+            'MAG CANVAS'
             self.ntcanvas = plt.subplot2grid((26, 12), (5, 1), rowspan=3, colspan=12)
             self.ntcanvas.set_ylabel("Mag An. (nT)")
             self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
@@ -958,14 +958,14 @@ class Gmg(wx.Frame):
 
         elif self.t_canvas is False and self.d_canvas is True and self.nt_canvas is True:
             'FALSE TRUE TRUE'
-            '#%TOPO CANVAS'
-            # %HIDDEN
-            '#%GRAV CANVAS'
+            'TOPO CANVAS'
+            # HIDDEN
+            'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=4, colspan=12)
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            '#%MAG CANVAS'
+            'MAG CANVAS'
             self.ntcanvas = plt.subplot2grid((26, 12), (4, 1), rowspan=4, colspan=12)
             self.ntcanvas.set_ylabel("Mag An. (nT)")
             self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
@@ -974,14 +974,14 @@ class Gmg(wx.Frame):
 
         elif self.t_canvas is True and self.d_canvas is False and self.nt_canvas is True:
             'TRUE FALSE TRUE'
-            '#%TOPO CANVAS'
+            'TOPO CANVAS'
             self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=2, colspan=12)
             self.tcanvas.set_ylabel("Topo (m)")
             self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.tcanvas.grid()
-            '#%GRAV CANVAS'
-            # %HIDDEN
-            '#%MAG CANVAS'
+            'GRAV CANVAS'
+            # HIDDEN
+            'MAG CANVAS'
             self.ntcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=6, colspan=12)
             self.ntcanvas.set_ylabel("Mag An. (nT)")
             self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
@@ -990,26 +990,26 @@ class Gmg(wx.Frame):
 
         elif self.t_canvas is True and self.d_canvas is True and self.nt_canvas is False:
             'TRUE TRUE FALSE'
-            '#%TOPO CANVAS'
+            'TOPO CANVAS'
             self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=2, colspan=12)
             self.tcanvas.set_ylabel("Topo (m)")
             self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.tcanvas.grid()
-            '#%GRAV CANVAS'
+            'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=6, colspan=12)
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            '#%MAG CANVAS'
-            # %HIDDEN
+            'MAG CANVAS'
+            # HIDDEN
 
         elif self.t_canvas is False and self.d_canvas is False and self.nt_canvas is True:
             'FALSE FALSE TRUE'
-            '#%TOPO CANVAS'
-            # %HIDDEN
-            '#%GRAV CANVAS'
-            # %HIDDEN
-            '#%MAG CANVAS'
+            'TOPO CANVAS'
+            # HIDDEN
+            'GRAV CANVAS'
+            # HIDDEN
+            'MAG CANVAS'
             self.ntcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=8, colspan=12)
             self.ntcanvas.set_ylabel("Mag An. (nT)")
             self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1018,40 +1018,40 @@ class Gmg(wx.Frame):
 
         elif self.t_canvas is False and self.d_canvas is True and self.nt_canvas is False:
             'FALSE TRUE FALSE'
-            '#%TOPO CANVAS'
-            # %HIDDEN
-            '#%GRAV CANVAS'
+            'TOPO CANVAS'
+            # HIDDEN
+            'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=8, colspan=12)
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-            '#%MAG CANVAS'
-            # %HIDDEN
+            'MAG CANVAS'
+            # HIDDEN
 
         elif self.t_canvas is True and self.d_canvas is False and self.nt_canvas is False:
             'TRUE FALSE FALSE'
-            '#%TOPO CANVAS'
+            'TOPO CANVAS'
             self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=8, colspan=12)
             self.tcanvas.set_ylabel("Topo (m)")
             self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.tcanvas.grid()
-            '#%GRAV CANVAS'
+            'GRAV CANVAS'
             self.dcanvas.set_visible(False)
-            '#%MAG CANVAS'
+            'MAG CANVAS'
             self.ntcanvas.set_visible(False)
 
         elif self.t_canvas is False and self.d_canvas is False and self.nt_canvas is False:
             pass
             'FALSE FALSE FALSE'
-            '#%TOPO CANVAS'
-            # %HIDDEN
-            '#%GRAV CANVAS'
-            # %HIDDEN
-            '#%MAG CANVAS'
-            # %HIDDEN
+            'TOPO CANVAS'
+            # HIDDEN
+            'GRAV CANVAS'
+            # HIDDEN
+            'MAG CANVAS'
+            # HIDDEN
         self.draw()
 
-        '#% SET CANVAS LIMITS'
+        'SET CANVAS LIMITS'
         self.mcanvas.set_xlim(self.current_xlim)
         self.mcanvas.set_ylim(self.current_ylim)
         self.mcanvas.grid()
@@ -1063,7 +1063,7 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_xlim(self.mcanvas.get_xlim())
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
 
-        '#% INITALISE CALCULATED P.F. LINES'
+        'INITALISE CALCULATED P.F. LINES'
         if self.dcanvas is not None:
             self.predplot, = self.dcanvas.plot([], [], '-r', linewidth=2)
             self.grav_rms_plot, = self.dcanvas.plot([], [], color='pink', linewidth=1)
@@ -1071,7 +1071,7 @@ class Gmg(wx.Frame):
             self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2)
             self.mag_rms_plot, = self.ntcanvas.plot([], [], color='pink', linewidth=1)
 
-        '#% PLOT OBSERVED TOPO DATA'
+        'PLOT OBSERVED TOPO DATA'
         if self.tcanvas is not None:
             pass
             # for x in xrange(len(self.obs_topo_list_save)):
@@ -1079,7 +1079,7 @@ class Gmg(wx.Frame):
             #         topo = self.obs_topo_list_save[x]
             #         self.obs_topo_list[x] = self.dcanvas.scatter(topo[:, 0], topo[:, 1], marker='o',
             #                                                      color=self.obs_topo_colors[x], s=5, gid=x)
-        '#% PLOT OBSERVED GRAVITY DATA'
+        'PLOT OBSERVED GRAVITY DATA'
         if self.dcanvas is not None:
             for x in xrange(len(self.obs_grav_list_save)):
                 if len(self.obs_grav_list_save[x]) >= 1:
@@ -1088,7 +1088,7 @@ class Gmg(wx.Frame):
                     grav_y = grav[:, 1]
                     self.obs_grav_list[x] = self.dcanvas.scatter(grav_x, grav_y, marker='o',
                                                                  color=self.obs_grav_colors[x], s=5, gid=x)
-        '#% PLOT OBSERVED MAG DATA'
+        'PLOT OBSERVED MAG DATA'
         if self.ntcanvas is not None:
             for x in range(len(self.obs_mag_list_save)):
                 if len(self.obs_mag_list_save[x]) >= 1:
@@ -1098,20 +1098,20 @@ class Gmg(wx.Frame):
                     self.obs_mag_list[x] = self.dcanvas.scatter(mag_x, mag_y, marker='o',
                                                                 color=self.obs_mag_colors[x], s=5, gid=x)
 
-        '#% UPDATE FRAMES'
+        'UPDATE FRAMES'
         self.update_layer_data()
         self.update()
 
     def size_handler(self):
-        """# %CREATE CANVAS BOX"""
+        """# CREATE CANVAS BOX"""
         self.canvas_box = wx.BoxSizer(wx.HORIZONTAL)
         self.canvas_box.Add(self.canvas, 1, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, border=2)
 
-        '#% CREATE LAYER TREE BOX'
+        'CREATE LAYER TREE BOX'
         self.tree_box = wx.BoxSizer(wx.VERTICAL)
         self.tree_box.Add(self.tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
 
-        '#% LAYER ATTRIBUTES'
+        'LAYER ATTRIBUTES'
         self.attr_box = wx.BoxSizer(wx.VERTICAL)
 
         self.attr_text_box = wx.BoxSizer(wx.HORIZONTAL)
@@ -1121,60 +1121,60 @@ class Gmg(wx.Frame):
 
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
 
-        '#% Density'
+        'Density'
         self.density_box = wx.BoxSizer(wx.HORIZONTAL)
         self.density_box.Add(self.density_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 2)
         self.density_box.Add(self.density_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.density_box, 0, wx.LEFT | wx.EXPAND, 1)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        '#% Reference Density'
+        'Reference Density'
         self.ref_density_box = wx.BoxSizer(wx.HORIZONTAL)
         self.ref_density_box.Add(self.ref_density_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 2)
         self.ref_density_box.Add(self.ref_density_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.ref_density_box, 0, wx.LEFT | wx.EXPAND, 1)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        '#% Susceptibility'
+        'Susceptibility'
         self.susept_box = wx.BoxSizer(wx.HORIZONTAL)
         self.susept_box.Add(self.susceptibility_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.susept_box.Add(self.susceptibility_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.susept_box, 0, wx.LEFT | wx.EXPAND)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        '# %REMANANCE'
+        'REMANANCE'
         self.remanence_box = wx.BoxSizer(wx.HORIZONTAL)
         self.remanence_box.Add(self.remanent_mag_checkbox, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.attr_box.Add(self.remanence_box, 0, wx.LEFT | wx.EXPAND)
-        '#% Angle A'
+        'Angle A'
         self.angle_a_box = wx.BoxSizer(wx.HORIZONTAL)
         self.angle_a_box.Add(self.angle_a_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.angle_a_box.Add(self.angle_a_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.angle_a_box, 0, wx.LEFT | wx.EXPAND, 9)
-        '#% Angle B'
+        'Angle B'
         self.angle_b_box = wx.BoxSizer(wx.HORIZONTAL)
         self.angle_b_box.Add(self.angle_b_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.angle_b_box.Add(self.angle_b_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.angle_b_box, 0, wx.LEFT | wx.EXPAND, 9)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        '#% Well label text size'
+        'Well label text size'
         self.attr_box.Add(self.text_size_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
         self.attr_box.Add(self.text_size_input, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        '#% XY Nodes'
+        'XY Nodes'
         self.node_box = wx.BoxSizer(wx.HORIZONTAL)
         self.node_box.Add(self.node_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND, 2)
         self.attr_box.Add(self.node_box, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        '#% X NODE'
+        'X NODE'
         self.x_box = wx.BoxSizer(wx.HORIZONTAL)
         self.x_box.Add(self.x_text, 0, wx.LEFT | wx.EXPAND, 8)
         self.x_box.Add(self.x_input, 0, wx.LEFT | wx.EXPAND, 3)
         self.attr_box.Add(self.x_box, 0, wx.ALL | wx.LEFT | wx.ALIGN_TOP | wx.EXPAND)
-        '#% Y NODE'
+        'Y NODE'
         self.y_box = wx.BoxSizer(wx.HORIZONTAL)
         self.y_box.Add(self.y_text, 0, wx.ALL | wx.EXPAND, 3)
         self.y_box.Add(self.y_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.y_box, 0, wx.ALL | wx.LEFT | wx.ALIGN_TOP | wx.EXPAND, 5)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        ' #% SET BUTTON'
+        'SET BUTTON'
         self.attr_box.Add(self.node_set_button, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
 
         '#PLACE BOX SIZERS IN CORRECT PANELS'
@@ -1191,12 +1191,12 @@ class Gmg(wx.Frame):
         self.rightPanel.SetSize(self.GetSize())
 
     def show_controls(self, event):
-        """# %SHOW CONTROL PANE"""
+        """# SHOW CONTROL PANE"""
         self.mgr.GetPaneByName('left').Show()
         self.mgr.Update()
 
     def show_console(self, event):
-        """# %SHOW PYTHON CONSOLE"""
+        """# SHOW PYTHON CONSOLE"""
         self.mgr.GetPaneByName('console').Show()
         self.mgr.Update()
 
@@ -1214,15 +1214,15 @@ class Gmg(wx.Frame):
             self.layer_lines = [[]]
             self.polygon_fills = [[]]
 
-            '#% INITAISE THE MODEL PARAMETERS'
+            'INITAISE THE MODEL PARAMETERS'
             self.initalise_model()
 
-            '#% ENSURES FOLD PANELS ARE VISIBLE'
+            'ENSURES FOLD PANELS ARE VISIBLE'
             self.controls_panel_bar_one.Expand(self.fold_panel_one)
             self.controls_panel_bar_two.Expand(self.fold_panel_two)
             self.controls_panel_bar_three.Expand(self.fold_panel_three)
 
-            '#%CREATE MODEL'
+            'CREATE MODEL'
             self.model_aspect = 1.
             area = (new_x1, new_x2, new_z1, new_z2)
             xp = np.arange(new_x1 - self.calc_padding, new_x2 + self.calc_padding, xp_inc)
@@ -1230,11 +1230,11 @@ class Gmg(wx.Frame):
             self.start(area, xp, zp)
         else:
             self.newmodel = False
-            return  # % THE USER CHANGED THERE MIND
+            return  # THE USER CHANGED THERE MIND
 
 
     def modify_model_dimensions(self, event):
-        """#% MODIFY MODEL DIMENSIONS"""
+        """MODIFY MODEL DIMENSIONS"""
         modify_model_dialogbox = NewModelDialog(self, -1, 'Modify Current Model', self.x1, self.x2, self.z1, self.z2)
         answer = modify_model_dialogbox.ShowModal()
         new_x1, new_x2 = float(modify_model_dialogbox.x1) * 1000., float(modify_model_dialogbox.x2) * 1000.
@@ -1252,14 +1252,14 @@ class Gmg(wx.Frame):
         self.update()
 
     def connect(self):
-        """#% CONNECT MOUSE AND EVENT BINDINGS"""
+        """CONNECT MOUSE AND EVENT BINDINGS"""
         self.fig.canvas.mpl_connect('button_press_event', self.button_press)
         self.fig.canvas.mpl_connect('motion_notify_event', self.move)
         self.fig.canvas.mpl_connect('button_release_event', self.button_release)
         self.fig.canvas.mpl_connect('key_press_event', self.key_press)
         # self.fig.canvas.mpl_connect('pick_event', self.on_pick)
 
-        '#% Connect wx.widgets'
+        'Connect wx.widgets'
         self.density_input.Bind(fs.EVT_FLOATSPIN, self.set_density)
         self.ref_density_input.Bind(fs.EVT_FLOATSPIN, self.set_reference_density)
         self.susceptibility_input.Bind(fs.EVT_FLOATSPIN, self.set_susceptibility)
@@ -1316,7 +1316,7 @@ class Gmg(wx.Frame):
         self.tree.DeleteChildren(event)
 
     def item_checked(self, event):
-        """# %TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
+        """#TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
 
         layer = self.tree.GetPyData(event.GetItem())
         if self.layers_calculation_switch[layer] == 1:
@@ -1356,14 +1356,14 @@ class Gmg(wx.Frame):
         self.draw()
 
     def full_extent(self, event):
-        """# %REDRAW MODEL FRAME WITH FULL EXTENT"""
+        """#REDRAW MODEL FRAME WITH FULL EXTENT"""
         self.full_extent_adjustment()
         self.update_layer_data()
         self.update()
         self.draw()
 
     def full_extent_adjustment(self):
-        """# %FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
+        """#FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
         if not self.tcanvas.get_visible():
             self.tcanvas.set_visible(True)
         if not self.dcanvas.get_visible():
@@ -1371,7 +1371,7 @@ class Gmg(wx.Frame):
         if not self.ntcanvas.get_visible():
             self.ntcanvas.set_visible(True)
 
-        '#% SET CANVAS LIMITS'
+        'SET CANVAS LIMITS'
         self.mcanvas.set_xlim(self.x1, self.x2)
         self.mcanvas.set_ylim(self.z2, self.z1)
         self.model_aspect = 1
@@ -1383,7 +1383,7 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_xlim(self.mcanvas.get_xlim())
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
 
-        '#% ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
+        'ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
         if self.t_canvas is False:
             self.tcanvas.set_visible(False)
         if self.d_canvas is False:
@@ -1392,7 +1392,7 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_visible(False)
 
     def pan(self, event):
-        """# %PAN MODEL VIEW USING MOUSE DRAG"""
+        """#PAN MODEL VIEW USING MOUSE DRAG"""
         if self.nodes:
             self.nodes = False
             self.nav_toolbar.pan()
@@ -1404,7 +1404,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def calc_grav_switch(self, event):
-        """# %PREDICTED ANOMALY CALCULATION SWITCHES: SWITCH CALCULATED ANOMALIES ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
+        """#PREDICTED ANOMALY CALCULATION SWITCHES: SWITCH CALCULATED ANOMALIES ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_grav_switch is True:
             self.calc_grav_switch = False
             if self.grav_residuals != [] and self.obs_gravity_data_for_rms != []:
@@ -1485,13 +1485,13 @@ class Gmg(wx.Frame):
     # SAVE/LOAD MODEL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def save_model(self, event):
-        """# %SAVE MODEL TO DISC IN .Pickle FORMAT"""
+        """#SAVE MODEL TO DISC IN .Pickle FORMAT"""
         save_file_dialog = wx.FileDialog(self, "Save XYZ file", "", "", "Model files (*.model)|*.model", wx.FD_SAVE
                                          | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %USER CHANGED THEIR MIND
+            return  # USER CHANGED THEIR MIND
 
-        # % CREATE SAVE DICTIONARY
+        # CREATE SAVE DICTIONARY
         self.save_dict = {}
 
         header = ['layer_colors', 'plotx_list', 'ploty_list', 'densities', 'reference_densities',
@@ -1528,7 +1528,7 @@ class Gmg(wx.Frame):
             MessageDialog(self, -1, "Error in save process.\nModel unsaved", "Save")
 
     def load_model(self, event):
-        """# %LOAD MODEL FROM DISC IN .Pickle FORMAT"""
+        """#LOAD MODEL FROM DISC IN .Pickle FORMAT"""
         try:
             if not self.model_saved:
                 if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
@@ -1537,31 +1537,31 @@ class Gmg(wx.Frame):
                 open_file_dialog = wx.FileDialog(self, "Open XYZ file", "", "", "XYZ files (*.model)|*.model",
                                                  wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
                 if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-                    return  # %USER CHANGED THEIR MIND
+                    return  # USER CHANGED THEIR MIND
 
-            '# %INITALISE MODEL PARAMETERS'
+            'INITALISE MODEL PARAMETERS'
             self.initalise_model()
             self.model_aspect = 1.
 
-            '# %OPEN DATA STREAM'
+            'OPEN DATA STREAM'
             file_in = open_file_dialog.GetPath()
             model_data = Pickle.load(open(file_in, "r+"))
 
-            '# %CLEAR MEMORY'
+            'CLEAR MEMORY'
             gc.collect()
             del gc.garbage[:]
 
-            '# %LOAD DATA INTO MODEL'
+            'LOAD DATA INTO MODEL'
             for x in xrange(len(model_data)):
                 setattr(self, model_data.keys()[x], model_data.values()[x])
 
-            '# %SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)'
+            'SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)'
             self.loaded_tree_items = self.tree_items
 
-            '# %DRAW CANVAS'
+            'DRAW CANVAS'
             self.start(self.area, self.xp, self.zp)
 
-            '# %SET LAYERS self.boundary_lock_status'
+            'SET LAYERS self.boundary_lock_status'
             self.boundary_lock_status = [[]]
             for x in xrange(len(self.boundary_lock_list)):
                 if self.boundary_lock_list[x] == 0:
@@ -1571,7 +1571,7 @@ class Gmg(wx.Frame):
                     self.boundary_lock_status[x] = ['unlocked']
                     self.boundary_lock_status.append([])
 
-            '# %SET LAYERS self.layer_lock_status'
+            'SET LAYERS self.layer_lock_status'
             self.layer_lock_status = [[]]
             for x in xrange(len(self.layer_lock_list)):
                 if self.layer_lock_list[x] == 0:
@@ -1581,7 +1581,7 @@ class Gmg(wx.Frame):
                     self.layer_lock_status[x] = ['unlocked']
                     self.layer_lock_status.append([])
 
-            '#% PLOT OBSERVED DATA'
+            'PLOT OBSERVED DATA'
             if self.xy_list_save != [[]]:
                 self.plot_obs_xy()
             if self.obs_grav_list_save != [[]]:
@@ -1591,10 +1591,10 @@ class Gmg(wx.Frame):
             if self.obs_topo_list_save != [[]]:
                 self.plot_obs_topo()
 
-            '#% LOAD & PLOT SEGY'
+            'LOAD & PLOT SEGY'
             self.plot_segy()
 
-            '#% Set VARIABLE VALUES FROM LOADED DATA'
+            'Set VARIABLE VALUES FROM LOADED DATA'
             self.i = (len(self.densities) - 1)
             self.layer_count = (len(self.densities) - 1)
             self.density_input.SetValue(0.001 * self.densities[self.i])
@@ -1608,9 +1608,9 @@ class Gmg(wx.Frame):
             if self.layer_colors == [[]]:
                 self.layer_colors = ['black' for x in xrange(self.i + 1)]
 
-            '# %LOAD TREE ITEMS'
-            self.tree.DeleteAllItems()  # %DELETE CURRENT LAYER TREE
-            self.root = self.tree.AddRoot("Layers:")  # %CREATE NEW TREE
+            'LOAD TREE ITEMS'
+            self.tree.DeleteAllItems()  # DELETE CURRENT LAYER TREE
+            self.root = self.tree.AddRoot("Layers:")  # CREATE NEW TREE
             self.tree.SetItemPyData(self.root, None)
 
             for i in xrange(1, len(self.loaded_tree_items)):
@@ -1622,19 +1622,19 @@ class Gmg(wx.Frame):
 
             self.tree_items = self.loaded_tree_items
 
-            '#% MAKE LAYER LINES AND POLYGONS'
+            'MAKE LAYER LINES AND POLYGONS'
             self.layer_lines = [[] for x in xrange(self.i + 1)]
             self.polygon_fills = [[] for x in xrange(self.i + 1)]
 
-            '#% LOAD LAYERS'
+            'LOAD LAYERS'
             self.load_layer_data()
 
-            '#% DRAW CONTACT DATA'
+            'DRAW CONTACT DATA'
             # self.draw_contact_text()
             # self.xy_name_list = [[]]
             # self.xy_count = 0
 
-            '# %LOAD WELL MENU --- SET WELL MENU - IDs start at 2000'
+            'LOAD WELL MENU --- SET WELL MENU - IDs start at 2000'
             self.count = 0
             for x in xrange(len(self.well_name_list)):
                 if self.well_name_list[x] == "None" or self.well_name_list[x] == []:
@@ -1650,14 +1650,14 @@ class Gmg(wx.Frame):
                     self.count += 1
             self.well_count = len(self.well_name_list)
 
-            '#% SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)'
+            'SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)'
             self.current_node = self.mcanvas.scatter(-40000., 0., marker='o', color='r', zorder=10)
 
-            '#% REFRESH SIZER POSITIONS'
+            'REFRESH SIZER POSITIONS'
             self.Hide()
             self.Show()
 
-            '# %UPDATE LAYER DATA AND PLOT'
+            'UPDATE LAYER DATA AND PLOT'
             self.update_layer_data()
             self.update()
             self.draw()
@@ -1705,17 +1705,17 @@ class Gmg(wx.Frame):
 
                     self.segy_on = True
                     '''ADD SEGY_NAME TO SEGY MENU'''
-                    # % 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
+                    # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
                     self.segy_name_submenu = wx.Menu()
                     self.m_segy_submenu.Append(s + 1000, self.segy_name_list[s], self.segy_name_submenu)
                     self.segy_name_submenu.Append(s + 1000, 'delete segy')
-                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s + 1000)  # %id +1000 to avoid grav submenu id conflict
+                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s + 1000)  # ID+1000 TO AVOID GRAV SUBMENU ID CONFLICT
 
                 else:
                     continue
 
     def plot_obs_xy(self):
-        """# %PLOT OBSERVED XY"""
+        """#PLOT OBSERVED XY"""
         self.xy_list = [[]]
         for x in range(0, len(self.xy_name_list)):
             self.xy_list.append([])
@@ -1735,7 +1735,7 @@ class Gmg(wx.Frame):
                 self.xy_count += 1
 
     def plot_obs_topo(self):
-        """# %PLOT OBSERVED TOPOGRAPHY"""
+        """#PLOT OBSERVED TOPOGRAPHY"""
 
         self.obs_topo_list = [[]]
         for x in range(0, len(self.obs_topo_name_list)):
@@ -1757,7 +1757,7 @@ class Gmg(wx.Frame):
                 self.obs_topo_count += 1
 
     def plot_obs_grav(self):
-        """# %PLOT OBSERVED GRAVITY"""
+        """#PLOT OBSERVED GRAVITY"""
         self.obs_grav_list = [[]]
         for x in range(0, len(self.obs_grav_name_list)):
             self.obs_grav_list.append([])
@@ -1778,7 +1778,7 @@ class Gmg(wx.Frame):
                 self.obs_grav_count += 1
 
     def plot_obs_mag(self):
-        """# %PLOT OBSERVED MAG"""
+        """#PLOT OBSERVED MAG"""
         self.obs_mag_list = [[]]
         for x in range(0, len(self.obs_mag_name_list)):
             self.obs_mag_list.append([])
@@ -1799,12 +1799,12 @@ class Gmg(wx.Frame):
                 self.obs_mag_count += 1
 
     def load_xy(self, event):
-        """# %LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS"""
+        """#LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS"""
 
         open_file_dialog = wx.FileDialog(self, "Open XY file", "", "", "All files (*.*)|*.*", wx.FD_OPEN |
                                          wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %THE USER CHANGED THEIR MIND
+            return  # THE USER CHANGED THEIR MIND
         else:
             xy_in = open_file_dialog.GetPath()
             xy_name_box = wx.TextEntryDialog(None, 'Name for the XY data:')
@@ -1839,7 +1839,7 @@ class Gmg(wx.Frame):
     def delete_xy(self, event):
 
         """"
-        # %DELETE OBS XY DATA
+        #DELETE OBS XY DATA
         """
 
         self.m_xy_submenu.DestroyId(event.Id)
@@ -1871,7 +1871,7 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_t(self, event):
-        # % GET VALUES FROM LOAD WINDOW
+        # GET VALUES FROM LOAD WINDOW
         obs_t_input = self.load_window.file_path
         self.obs_name = self.load_window.observed_name
         self.color = self.load_window.color_picked
@@ -1913,7 +1913,7 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_g(self):
-        """# % GET VALUES FROM LOAD WINDOW"""
+        """# GET VALUES FROM LOAD WINDOW"""
         obs_g_input = self.load_window.file_path
         self.obs_name = self.load_window.observed_name
         self.color = self.load_window.color_picked
@@ -1967,12 +1967,12 @@ class Gmg(wx.Frame):
         self.draw()
 
     def save_modelled_grav(self, event):
-        """# %SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
+        """#SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
         save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %THE USER CHANGED THEIR MIND
-        # %SAVE TO DISC
+            return  # THE USER CHANGED THEIR MIND
+        # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
         np.savetxt(outputfile, zip((self.xp * 0.001), self.predgz), delimiter=' ', fmt='%.6f %.6f')
 
@@ -1983,7 +1983,7 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_m(self):
-        # % GET VALUES FROM LOAD WINDOW
+        # GET VALUES FROM LOAD WINDOW
         obs_m_input = self.load_window.file_path
         self.obs_mag_name = self.load_window.observed_name
         self.color = self.load_window.color_picked
@@ -2052,7 +2052,7 @@ class Gmg(wx.Frame):
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # THE USER CHANGED THEIR MIND
 
-        # %SAVE TO DISC
+        #SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
         np.savetxt(outputfile, zip((self.xp * 0.001), self.prednt), delimiter=' ', fmt='%.6f %.6f')
 
@@ -2094,13 +2094,13 @@ class Gmg(wx.Frame):
             self.update_layer_data()
 
             '''ADD SEGY_NAME TO SEGY MENU'''
-            # % 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
+            # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
             self.segy_name_submenu = wx.Menu()
             self.m_segy_submenu.Append(self.segy_count + 1000, self.segy_name_list[self.segy_count],
                                            self.segy_name_submenu)
             self.segy_name_submenu.Append(self.segy_count + 1000, 'delete segy')
             self.Bind(wx.EVT_MENU, self.remove_segy,
-                      id=self.segy_count + 1000)  # % id is set to +1000 to avoid conflict with grav sub menu ids
+                      id=self.segy_count + 1000)  # ID IS SET TO +1000 TO AVOID CONFLICT WITH GRAV SUB MENU IDS
 
             self.segy_count = self.segy_count + 1
         except:
@@ -2119,7 +2119,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def remove_segy(self, event):
-        # % 1000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
+        # 1000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
         if self.segy_on:
             img = self.segy_plot_list[event.Id - 1000]
             img.remove()
@@ -2184,7 +2184,7 @@ class Gmg(wx.Frame):
         open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %USER CHANGED THEIR MIND
+            return  # THE USER CHANGED THEIR MIND
         else:
             well_in = open_file_dialog.GetPath()
             well_name_box = wx.TextEntryDialog(None, 'Name for the new well:')
@@ -2197,7 +2197,7 @@ class Gmg(wx.Frame):
             well_data = [line.strip().split(' ') for line in f]
         self.well_list.append(well_data)
 
-        '#% CREATE FILE MENU DATA'
+        'CREATE FILE MENU DATA'
         self.well_name_submenu = wx.Menu()
         self.m_wells_submenu.Append(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
         self.well_name_submenu.Append(int(self.well_count) + 2000, 'hide/show')
@@ -2206,8 +2206,8 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.delete_well, id=int(self.well_count) + 3000)
         self.well_count += 1
 
-        '#% DRAW WELL'
-        well_data = np.array(self.well_list[self.well_count - 1][0:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
+        'DRAW WELL'
+        well_data = np.array(self.well_list[self.well_count - 1][0:])  # CREATE NP ARRAY WITHOUT HEADER INFO
         y1 = well_data[0, 1].astype(float)
         y2 = well_data[-1, -1].astype(float)
         well_x_location = well_data[1, 1]
@@ -2222,7 +2222,7 @@ class Gmg(wx.Frame):
         self.wells[self.well_count - 1] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
         self.well_name_text.append([])
-        '# %PLOT WELL NAME'
+        'PLOT WELL NAME'
         self.well_name_text[self.well_count - 1] = self.mcanvas.annotate(self.well_name, xy=(well_x_location, -0.5),
                                                                          xytext=(well_x_location, -0.5),
                                                                          fontsize=self.well_textsize, weight='bold',
@@ -2231,8 +2231,8 @@ class Gmg(wx.Frame):
                                                                          clip_on=True)
         self.well_name_text.append([])
 
-        '''#% PLOT WELL HORIZONS'''
-        '# % SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS'
+        '''PLOT WELL HORIZONS'''
+        'SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS'
         self.well_labels.append([])
         self.horizons.append([])
         self.well_labels[self.well_count - 1] = [None] * len(well_data)
@@ -2242,12 +2242,12 @@ class Gmg(wx.Frame):
             x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
             print "y = %s" % y
             print "x = %s" % x
-            '# %PLOT HORIZON LINE'
+            'PLOT HORIZON LINE'
             self.horizons[self.well_count - 1][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
             horizon_y_pos = well_data[i, 1].astype(float)
             horizon = well_data[i, 0].astype(str)
 
-            '#% ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
+            'ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
             if i % 2 == 0:
                 horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
@@ -2278,13 +2278,13 @@ class Gmg(wx.Frame):
         self.well_horizons_list[self.well_count - 1] = self.horizons
         self.well_horizons_list.append([])
         self.well_labels_list.append([])
-        '#% UPDATE PROGRAM GRAPHICS'
+        'UPDATE PROGRAM GRAPHICS'
         self.update_layer_data()
 
     def draw_well(self):
         """DRAW WELLS ON MODEL CANVAS"""
 
-        '#% CREATE EMPTY ARRAYS TO FILL WITH WELL DATA'
+        'CREATE EMPTY ARRAYS TO FILL WITH WELL DATA'
         self.wells = [[]] * len(self.well_list)
         self.well_name_text = [[]] * len(self.well_list)
         self.well_labels = [[]] * len(self.well_list)
@@ -2297,7 +2297,7 @@ class Gmg(wx.Frame):
                 continue
             else:
 
-                well_data = np.array(self.well_list[w][0:])  # %CREATE NP ARRAY WITHOUT HEADER INFO
+                well_data = np.array(self.well_list[w][0:])  # CREATE NP ARRAY WITHOUT HEADER INFO
                 y1 = well_data[0, 1].astype(float)
                 y2 = well_data[-1, -1].astype(float)
                 well_x_location = well_data[1, 1]
@@ -2306,7 +2306,7 @@ class Gmg(wx.Frame):
 
                 self.wells[w] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
-                '''#% PLOT WELL NAME'''
+                '''PLOT WELL NAME'''
                 well_name = self.well_name_list[w]
                 self.well_name_text[w] = self.mcanvas.annotate(well_name, xy=(well_x_location, -0.5),
                                                                xytext=(well_x_location, -0.5),
@@ -2315,19 +2315,19 @@ class Gmg(wx.Frame):
                                                                bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
                                                                clip_on=True)
 
-                '''#% PLOT WELL HORIZONS'''
-                # % SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
+                '''PLOT WELL HORIZONS'''
+                # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
                 self.well_labels[w] = [None] * len(well_data)
                 self.horizons[w] = [None] * len(well_data)
                 for i in range(2, len(well_data)):
                     y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
                     x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
-                    '# %PLOT HORIZON LINE'
+                    'PLOT HORIZON LINE'
                     self.horizons[w][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
                     horizon_y_pos = well_data[i, 1].astype(float)
                     horizon = well_data[i, 0].astype(str)
 
-                    '#% ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
+                    'ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP'
                     if i % 2 == 0:
                         horizon_x_pos = well_data[1, 1].astype(float) - 1.05
                         self.well_labels[w][i] = self.mcanvas.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
@@ -2359,7 +2359,7 @@ class Gmg(wx.Frame):
     def show_hide_well(self, event):
 
         if self.wells[event.Id - 2000][0].get_visible():
-            '# %HIDE WELL'
+            'HIDE WELL'
             self.wells[event.Id - 2000][0].set_visible(False)
             self.well_name_text[event.Id - 2000].set_visible(False)
             horizons = self.horizons[event.Id - 2000]
@@ -2371,7 +2371,7 @@ class Gmg(wx.Frame):
 
             self.update_layer_data()
         else:
-            '# %SHOW WELL'
+            'SHOW WELL'
             self.wells[event.Id - 2000][0].set_visible(True)
             self.well_name_text[event.Id - 2000].set_visible(True)
             horizons = self.horizons[event.Id - 2000]
@@ -2395,12 +2395,12 @@ class Gmg(wx.Frame):
         for i in range(2, len(labels)):
             labels[i].set_visible(False)
             labels[i] = "None"
-        '# %SET DATA TO NONEs'
+        'SET DATA TO NONEs'
         self.well_list[event.Id - 3000] = "None"
         self.well_name_list[event.Id - 3000] = "None"
         self.wells[event.Id - 3000][0] = "None"
         self.well_name_text[event.Id - 3000] = "None"
-        '# %REMOVE SUBMENU'
+        'REMOVE SUBMENU'
         self.m_wells_submenu.DestroyId(event.Id)
         self.update_layer_data()
 
@@ -2417,12 +2417,12 @@ class Gmg(wx.Frame):
             contact_name_box = wx.TextEntryDialog(None, 'Name for new data:')
             contact_name_box.ShowModal()
 
-        '#% LOAD DATA'
+        'LOAD DATA'
         self.contact_name = contact_name_box.GetValue()
         self.contact_name_list.append(str(self.contact_name))
         self.contact_data = np.genfromtxt(contact_data_in, autostrip=True, delimiter=' ', dtype=str)
 
-        '#% DRAW MARKERS'
+        'DRAW MARKERS'
         self.well_labels = [None] * len(self.contact_data)
         self.contacts = [None] * len(self.contact_data)
         for i in xrange(len(self.contact_data)):
@@ -2436,12 +2436,12 @@ class Gmg(wx.Frame):
         self.contact_data_list[self.contact_data_count] = self.contacts
         self.contact_data_list.append([])
 
-        '#% DRAW TEXT'
+        'DRAW TEXT'
         self.text_labels = [None] * len(self.contacts)
         text = zip(self.contact_data[:, 0].astype(float), self.contact_data[:, 1].astype(float),
                    self.contact_data[:, 3].astype(str))
         for i in xrange(len(self.contacts)):
-            '#% ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP'
+            'ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP'
             if i % 2 == 0:
                 self.text_labels[i] = self.mcanvas.annotate(text[i][2], xy=(text[i][0], text[i][1]),
                                                             xytext=(text[i][0], text[i][1]),
@@ -2464,16 +2464,16 @@ class Gmg(wx.Frame):
         self.contact_text_list[self.contact_data_count] = self.text_labels
         self.contact_text_list.append([])
 
-        '#% SETUP NEW CONTACT DATA SUBMENU'
+        'SETUP NEW CONTACT DATA SUBMENU'
         self.contacts_submenu = wx.Menu()
         self.m_contacts_submenu.Append(self.contact_data_count + 3000, self.contact_name, self.contacts_submenu)
         self.contacts_submenu.Append(self.contact_data_count + 3000, 'delete data')
         self.Bind(wx.EVT_MENU, self.delete_contact_data, id=self.contact_data_count + 3000)
 
-        '#% INCREMENT CONTACT COUNT'
+        'INCREMENT CONTACT COUNT'
         self.contact_data_count += 1
 
-        '#% UPDATE CANVAS'
+        'UPDATE CANVAS'
         self.update_layer_data()
         self.draw()
 
@@ -2483,18 +2483,18 @@ class Gmg(wx.Frame):
     # LAYER & NODE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def write_layers_xy(self, event):
-        # % Create output file
+        # Create output file
         save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # % THE USER CHANGED THERE MIND
+            return  # THE USER CHANGED THERE MIND
 
-        # % OUTPUT FILE
+        # OUTPUT FILE
         all_layers_output_file = save_file_dialog.GetPath()
-        # % THE OUTPUT DIRECTORY
+        # THE OUTPUT DIRECTORY
         output_dir = os.path.dirname(all_layers_output_file)
 
-        # % NOW WRITE OUT THE DATA
+        # NOW WRITE OUT THE DATA
         with open(all_layers_output_file, 'wb') as f:
             for i in range(0, self.layer_count + 1):
                 out = csv.writer(f, delimiter=' ')
@@ -2502,21 +2502,21 @@ class Gmg(wx.Frame):
                 data = [self.plotx_list[i], self.ploty_list[i]]
                 out.writerows(zip(*data))
                 layer_write = zip(self.plotx_list[i], self.ploty_list[i])
-                # % WRITE INDIVIDUAL LAYER
+                # WRITE INDIVIDUAL LAYER
                 np.savetxt(output_dir + '/' + self.loaded_tree_items[i] + '.xy', layer_write, delimiter=' ',
                            fmt='%f %f')
 
     def write_c_xy(self, event):
-        # % CREATE OUTPUT FILE
+        # CREATE OUTPUT FILE
         save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %USER CHANGED THEIR MIND
+            return  # THE USER CHANGED THEIR MIND
 
         # NOW WRITE OUT THE DATA
         output_stream = save_file_dialog.GetPath()
         with open(output_stream, 'wb') as f:
-            # % LAYER NODES
+            # LAYER NODES
             for i in range(0, self.layer_count + 1):
                 f.write('B  {0}\n'.format(i + 1))
                 data = zip(self.plotx_list[i], self.ploty_list[i], np.ones(len(self.ploty_list[i])))
@@ -2527,10 +2527,10 @@ class Gmg(wx.Frame):
             for i in range(0, self.layer_count):
                 density = (self.background_density + self.densities[i])
 
-                # % CONVERT DENSITY TO VELOCITY USING GARNERS RULE
+                # CONVERT DENSITY TO VELOCITY USING GARNERS RULE
                 velocity = round((m.pow((density / 1670.), (1. / .25))), 2)
 
-                # % CONVERT DENSITY TO VELOCITY USING NAFE-DRAKE EQUATION
+                # CONVERT DENSITY TO VELOCITY USING NAFE-DRAKE EQUATION
                 # velocity = (1.6612*density) - (0.4721*density)**2 + (0.0671*density)**3 -
                 # (0.0043*density)**4 + (0.000106*density)**5
 
@@ -2580,20 +2580,20 @@ class Gmg(wx.Frame):
 
     def observed_filter(self, event):
 
-        """# %FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+        """ FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
 
-        # %RUN FILTER
+        #RUN FILTER
         median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.obs_grav_name_list,
                                                self.obs_grav_list_save, self.obs_mag_name_list, self.obs_mag_list_save)
         answer = median_filter_box.ShowModal()
 
-        # % GET FILTERED OUTPUT
+        # GET FILTERED OUTPUT
         filtered_data = median_filter_box.filtered_output
         filtered_name = median_filter_box.output_name
         filtered_color = median_filter_box.output_color
         filter_type = median_filter_box.filter_type
 
-        # %LOAD FILTERED DATA
+        #LOAD FILTERED DATA
         if filter_type == "gravity":
             self.obs_grav_name_list.append(filtered_name)
             self.obs_grav_list_save.append([])
@@ -2696,7 +2696,7 @@ class Gmg(wx.Frame):
         self.update()
 
     def button_press(self, event):
-        """# %WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
+        """ WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
 
         if not self.showverts:
             return
@@ -2786,23 +2786,23 @@ class Gmg(wx.Frame):
         if d[self.index_arg] >= self.node_click_limit:
             return None, None
         else:
-            '''#% CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER'''
+            '''CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER'''
             self.pinch_switch = 0
-            # % CREATE LIST OF NONES SAME LENGTH AS NUMBER OF LAYERS IN MODEL
+            # CREATE LIST OF NONES SAME LENGTH AS NUMBER OF LAYERS IN MODEL
             self.index_arg2_list = [None] * (self.layer_count + 1)
 
-            for x in range(0, self.layer_count + 1):  # %LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.i:  # %SKIP CURRENT LAYER
+            for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
+                if x == self.i:  # SKIP CURRENT LAYER
                     pass
                 node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
 
                 for i in range(0, len(node_list_x)):
                     if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
-                        # %if one of the nodes from list is equal to a node from the other layer, then return the index
+                        # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER, THEN RETURN THE INDEX
                         self.index_arg2_list[x] = i
                         self.pinch_switch = 1
 
-            '#%return node index'
+            'return node index'
             return self.index_arg, self.index_arg2_list
 
     def move(self, event):
@@ -2867,13 +2867,13 @@ class Gmg(wx.Frame):
         if self.pinch_switch != 0:
             for k in range(0, len(self.index_arg2_list)):
                 if self.index_arg2_list[k] is not None:
-                    # %get the node list of the next layer
+                    # GET THE NODE LIST OF THE NEXT LAYER
                     next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
-                    # % REPLACE THE PINCHED NODE WITH THE NEW NODE
+                    # REPLACE THE PINCHED NODE WITH THE NEW NODE
                     next_x_list[self.index_arg2_list[k]] = x
                     next_y_list[self.index_arg2_list[k]] = y
                     self.plotx_list[k] = next_x_list
-                    self.ploty_list[k] = next_y_list  # %OVERWRITE THE NODE LIST WITH UPDATED LIST
+                    self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
         self.plotx = xt
         self.ploty = yt
         self.polyline.set_data(self.plotx, self.ploty)
@@ -2886,10 +2886,10 @@ class Gmg(wx.Frame):
         else:
             self.current_node.set_offsets([x, y])
 
-        self.update_layer_data()  # %UPDATE LAYER DATA
+        self.update_layer_data()  # UPDATE LAYER DATA
 
     def button_release(self, event):
-        """# %WHEN MOUSE BUTTON IS RELEASED"""
+        """WHEN MOUSE BUTTON IS RELEASED"""
         if event.inaxes is None:
             return
         if not self.showverts:
@@ -2906,11 +2906,11 @@ class Gmg(wx.Frame):
             self.capture_window.table.Append((event.xdata, event.ydata))
 
 
-        self.update_layer_data()  # % UPDATE LAYERS
-        self.update()  # % RUN MODELLING ALGORITHMS
+        self.update_layer_data()  # UPDATE LAYERS
+        self.update()  # RUN MODELLING ALGORITHMS
 
     def key_press(self, event):
-        """# %DEFINE KEY PRESS LINKS"""
+        """ DEFINE KEY PRESS LINKS"""
 
         's = SHOW/HIDE LAYER NODES'
         if event.key == 's':
@@ -2935,7 +2935,7 @@ class Gmg(wx.Frame):
             self.nextpoly.append([event.xdata, event.ydata])
             self.polyline.set_data(self.plotx, self.ploty)
 
-            # %UPDATE LAYER DATA AND PLOT
+            # UPDATE LAYER DATA AND PLOT
             self.update_layer_data()
             self.update()
             self.draw()
@@ -2969,44 +2969,44 @@ class Gmg(wx.Frame):
             self.index_arg = np.argmin(d)
             ind = d[self.index_arg]
 
-            if xt[self.index_arg] == 0:  # %PREVENT END NODES BEING DELETED
+            if xt[self.index_arg] == 0:  # PREVENT END NODES BEING DELETED
                 return 0
             if ind >= self.node_click_limit:
                 return 0
             else:
                 # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
-                self.plotx = [tup for i, tup in enumerate(self.plotx) if i != self.index_arg]  # %DELETE X
-                self.ploty = [tup for i, tup in enumerate(self.ploty) if i != self.index_arg]  # %DELETE Y
+                self.plotx = [tup for i, tup in enumerate(self.plotx) if i != self.index_arg]  # DELETE X
+                self.ploty = [tup for i, tup in enumerate(self.ploty) if i != self.index_arg]  # DELETE Y
                 self.polyline.set_data(self.plotx, self.ploty)
 
             # NOW CHECK FOR PINCHED NODES
             index_arg2 = None
             self.pinch_switch = 0
-            self.index_arg2_list = [None] * (self.layer_count + 1)  # %CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
-            for x in range(0, self.layer_count + 1):  # %LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
+            self.index_arg2_list = [None] * (self.layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
+            for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
                 if x == self.i:
                     pass
                 x_node_list = self.plotx_list[x]
                 y_node_list = self.ploty_list[x]
                 for i in range(0, len(x_node_list)):
-                    # %NOW CHECK X AND Y VALUES ARE EQUAL
+                    # NOW CHECK X AND Y VALUES ARE EQUAL
                     if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
-                        # %IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
+                        # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
                         self.index_arg2_list[x] = i
                         self.pinch_switch = 1
 
-            # %REMOVE PINCHED NODES
+            # REMOVE PINCHED NODES
             if self.pinch_switch != 0:
                 for k in xrange(len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
                         next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[
-                            k]  # %GET THE NODE LIST OF THE NEXT LAYER
+                            k]  # GET THE NODE LIST OF THE NEXT LAYER
                         next_x_list = [tup for i, tup in enumerate(next_x_list) if
-                                       i != self.index_arg2_list[k]]  # %DELETE X
+                                       i != self.index_arg2_list[k]]  # DELETE X
                         next_y_list = [tup for i, tup in enumerate(next_y_list) if
-                                       i != self.index_arg2_list[k]]  # %DELETE Y
+                                       i != self.index_arg2_list[k]]  # DELETE Y
                         self.plotx_list[k], self.ploty_list[
-                            k] = next_x_list, next_y_list  # %OVERWRITE THE NODE LIST WITH UPDATED LIST
+                            k] = next_x_list, next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
 
             # SHIFT CURRENT NODE COLORING TO PREVIOUS NODE
             self.current_node.set_offsets([xt[self.index_arg-1], yt[self.index_arg-1]])
@@ -3049,9 +3049,9 @@ class Gmg(wx.Frame):
         '< = MOVE TO NEXT LAYER'
         if event.key == '.':
             if self.i == self.layer_count:
-                # %UPDATE LAYER DATA
+                # UPDATE LAYER DATA
                 self.update_layer_data()
-                # %MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
                 self.i = 0
                 self.density_input.SetValue(0.001 * self.densities[self.i])
                 self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
@@ -3065,9 +3065,9 @@ class Gmg(wx.Frame):
                 self.update_layer_data()
                 self.update()
             else:
-                # %UPDATE LAYER DATA
+                # UPDATE LAYER DATA
                 self.update_layer_data()
-                # %MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
                 self.i = self.i + 1
                 self.nextdens = self.densities[self.i]
                 self.density_input.SetValue(0.001 * self.densities[self.i])
@@ -3085,9 +3085,9 @@ class Gmg(wx.Frame):
         '< = MOVE TO NEXT LAYER'
         if event.key == ',':
             if self.i == 0:
-                # %UPDATE LAYER DATA
+                # UPDATE LAYER DATA
                 self.update_layer_data()
-                # %MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
                 self.i = self.layer_count
                 self.density_input.SetValue(0.001 * self.densities[self.i])
                 self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
@@ -3121,7 +3121,7 @@ class Gmg(wx.Frame):
 
         'z = ZOOM IN MODE'
         if event.key == 'z':
-            self.zoom(self)
+            self.zoom(event)
 
         'ctrl+z = ZOOM OUT'
         if event.key == 'ctrl+z':
@@ -3129,7 +3129,7 @@ class Gmg(wx.Frame):
 
         'shift = PAN MODE'
         if event.key == 'ctrl+p':
-            self.pan(self)
+            self.pan(event)
 
         'a = FULL EXTENT VIEW'
         if event.key == 'a':
@@ -3303,7 +3303,7 @@ class Gmg(wx.Frame):
         open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %THE USER CHANGED THERE MIND
+            return  # THE USER CHANGED THERE MIND
 
         file_in = open_file_dialog.GetPath()
         new_layer = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
@@ -3341,16 +3341,16 @@ class Gmg(wx.Frame):
         self.ploty = new_layer[:, 1]
         self.nextpoly = zip(self.plotx, self.ploty)
 
-        ' #% CREATE LAYER LINE'
+        'CREATE LAYER LINE'
         self.layer_lines[self.i] = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
                                                      color='blue', linewidth=1.0, alpha=1.0)
-        '#% CREATE LAYER POLYGON FILL'
+        'CREATE LAYER POLYGON FILL'
         self.plotx_polygon = np.array(self.plotx)
         self.ploty_polygon = np.array(self.ploty)
         self.polygon_fills[self.i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                        alpha=self.layer_transparency, closed=True, linewidth=None,
                                                        ec=None)
-        '#% Update layer data'
+        'Update layer data'
         self.nextdens = self.densities[self.i]
         self.density_input.SetValue(0.001 * self.densities[self.i])
         self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
@@ -3362,12 +3362,12 @@ class Gmg(wx.Frame):
 
     def delete_layer(self, event):
 
-        """# %Delete LAYER DATA"""
+        """ Delete LAYER DATA"""
 
-        # %REMOVE POLYGON
+        # REMOVE POLYGON
         self.polygon_fills[self.i][0].remove()
         del self.polygon_fills[self.i]
-        # %REMOVE POLYGON
+        # REMOVE POLYGON
         self.layer_lines[self.i][0].remove()
         del self.layer_lines[self.i]
         # SET CURRENT AS THE NEXT LAYER'
@@ -3401,19 +3401,19 @@ class Gmg(wx.Frame):
         del self.layer_colors[self.i]
         del self.layers_calculation_switch[self.i]
 
-        # % REMOVE TREE ITEMS
+        #  REMOVE TREE ITEMS
         del self.tree_items[self.i]
         layers = self.tree.GetRootItem().GetChildren()
         self.tree.Delete(layers[self.i])
-        # % RESET TREE ITEM ID'S
+        # RESET TREE ITEM ID'S
         layers = self.tree.GetRootItem().GetChildren()
         for i in xrange(len(layers)):
             self.tree.SetPyData(layers[i], i)
 
-        # % UPDATE COUNTERS
+        # UPDATE COUNTERS
         self.layer_count -= 1
 
-        # %UPDATE
+        #UPDATE
         self.update_layer_data()
         self.update()
         self.draw()
@@ -3460,23 +3460,23 @@ class Gmg(wx.Frame):
         self.angle_b[self.i] = float(self.angle_b_input.GetValue())
 
     def set_text_size(self, value):
-        """# %GET NEW TEXT SIZE"""
+        """ GET NEW TEXT SIZE"""
 
         self.textsize = float(self.text_size_input.GetValue())
 
-        '#%WELL DATA'
-        '#% LOOP THROUGH ALL WELL NAMES'
+        'WELL DATA'
+        'LOOP THROUGH ALL WELL NAMES'
         for i in xrange(len(self.well_name_text)):
             if self.well_name_text[i] != "None" and self.well_name_text[i] != []:
                 self.well_name_text[i].set_size(self.textsize)
-        '#% LOOP THROUGH ALL WELL HORIZON LABELS'
+        'LOOP THROUGH ALL WELL HORIZON LABELS'
         for i in xrange(len(self.well_labels)):
             labels = self.well_labels[i]
             for l in range(2, len(labels)):
                 if labels[l] != "None" and labels[l] != []:
                     labels[l].set_size(self.textsize)
 
-        '#% CONTACT DATA'
+        'CONTACT DATA'
         for i in xrange(self.contact_data_count):
             contact_text = self.contact_text_list[i]
             for k in xrange(len(contact_text)):
@@ -3485,7 +3485,7 @@ class Gmg(wx.Frame):
                 else:
                     pass
 
-        '#% REDRAW ANNOTATIONS WITH NEW TEXT SIZE'
+        'REDRAW ANNOTATIONS WITH NEW TEXT SIZE'
         self.draw()
 
     def set_obs_rms(self, value):
@@ -3496,7 +3496,7 @@ class Gmg(wx.Frame):
         self.obs_mag_data_for_rms = set_values.obs_mag_data_for_rms
 
     def model_rms(self, xp):
-        """# %CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
+        """ CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
         # print self.obs_gravity_data_for_rms
         # print self.calc_grav_switch
         if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
@@ -3548,18 +3548,18 @@ class Gmg(wx.Frame):
     # LIVE GRAPHICS UPDATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_layer_data(self):
-        """#% UPDATE MODEL CANVAS (mcanvas) LIMITS"""
+        """UPDATE MODEL CANVAS (mcanvas) LIMITS"""
         xmin, xmax = self.mcanvas.get_xlim()
         self.dcanvas.set_xlim(xmin, xmax)
         self.ntcanvas.set_xlim(xmin, xmax)
 
-        '#% Set lists with updated layer data'
+        'Set lists with updated layer data'
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
-        # % RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)
+        # RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)
         self.polygons = []
         self.mag_polygons = []
-        # % REMOVE EXISTING DATA
+        # REMOVE EXISTING DATA
         if len(self.mcanvas.lines) >= 1:
             while len(self.mcanvas.lines) > 0:
                 self.mcanvas.lines[0].remove()
@@ -3567,35 +3567,35 @@ class Gmg(wx.Frame):
                 self.mcanvas.patches[0].remove()
             while len(self.mcanvas.texts) > 0:
                 self.mcanvas.texts[0].remove()
-        '#% Create updated data'
-        # % First create the polyline data (the bottom line of the layer polygon - Done first so the whole polygon
-        # % isn't passed to self.polyplots)
+        'Create updated data'
+        # First create the polyline data (the bottom line of the layer polygon - Done first so the whole polygon
+        # isn't passed to self.polyplots)
         for i in range(0, self.layer_count + 1):
-            '#% Create the layer polygons to pass to self.polygons and onto the Talwani algorithm'
-            # % First set up xy data; if the layer is below layer 1 then attach the above layer to complete polygon;
-            # %else use top layer check for layer mode and find last layer to make polygon
+            'Create the layer polygons to pass to self.polygons and onto the Talwani algorithm'
+            # First set up xy data; if the layer is below layer 1 then attach the above layer to complete polygon;
+            #else use top layer check for layer mode and find last layer to make polygon
             if i >= 1 and self.layer_lock_list[i] == 0:
                 for layers in range(i, 0, -1):
                     if self.layer_lock_list[layers - 1] == 0:
                         self.last_layer = layers - 1
 
-                        '#%Now append nodes for boundary conditions (continuous slab)'
+                        'Now append nodes for boundary conditions (continuous slab)'
                         plotx = np.array(self.plotx_list[i])
                         ploty = np.array(self.ploty_list[i])
-                        '# % SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB'
+                        '# SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB'
                         ploty[0] = ploty[1]
                         ploty[-1] = ploty[-2]
                         self.plotx_list[i], self.ploty_list[i] = plotx, ploty
-                        '# % ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON'
+                        '# ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON'
                         layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
                         layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
 
-                        '#%Create polygon'
+                        'Create polygon'
                         self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
                         self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
                         break
             else:
-                # % IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
+                # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
                 self.plotx_polygon = np.array(self.plotx_list[i])
                 self.ploty_polygon = np.array(self.ploty_list[i])
 
@@ -3606,18 +3606,18 @@ class Gmg(wx.Frame):
             else:
                 next_color = self.colormap.to_rgba(0)
 
-            '#% CREATE LAYER POLYGON FILLS'
+            'CREATE LAYER POLYGON FILLS'
             self.polygon_fills[i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color=next_color,
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
 
             self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
 
-        '#% CREATE LAYER LINES'
+        'CREATE LAYER LINES'
         for i in range(0, self.layer_count + 1):
             self.layer_lines[i] = self.mcanvas.plot(self.plotx_list[i], self.ploty_list[i], color=self.layer_colors[i],
                                                     linewidth=1.0, alpha=1.0)
-        '#% CURRENT LAYER LINE'
+        'CURRENT LAYER LINE'
         self.polyline, = self.mcanvas.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.i],
                                            linewidth=1.0, alpha=0.5)
         self.mcanvas.set_aspect(self.model_aspect)
@@ -3625,9 +3625,9 @@ class Gmg(wx.Frame):
         self.draw()
 
     def update_layer_data(self):
-        """# %UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - REDRAW EVERYTHING"""
+        """ UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - REDRAW EVERYTHING"""
 
-        '# %UPDATE MODEL CANVAS (mcanvas) LIMITS'
+        '#UPDATE MODEL CANVAS (mcanvas) LIMITS'
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
             self.dcanvas.set_xlim(xmin, xmax)
@@ -3636,75 +3636,75 @@ class Gmg(wx.Frame):
         if self.nt_canvas:
             self.ntcanvas.set_xlim(xmin, xmax)
 
-        '# %SET LISTS WITH UPDATED LAYER DATA'
+        '#SET LISTS WITH UPDATED LAYER DATA'
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
 
-        '# %RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)'
+        '#RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)'
         self.polygons = []
         self.mag_polygons = []
 
-        '# %CREATE UPDATED POLYGON XYs'
-        # %FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
-        # %ISN'T PASSED TO SELF.POLYPLOTS)
+        '#REATE UPDATED POLYGON XYs'
+        # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
+        # ISN'T PASSED TO SELF.POLYPLOTS)
         for i in range(0, self.layer_count + 1):
-            # %CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE BOTT ALGORITHM
-            # %FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
-            # %ELSE USE TOP LAYER CHECK FOR LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
+            # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE BOTT ALGORITHM
+            # FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
+            # ELSE USE TOP LAYER CHECK FOR LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
             if i >= 1 and self.layer_lock_list[i] == 0:
                 for layers in range(i, 0, -1):
                     if self.layer_lock_list[layers - 1] == 0:
                         self.last_layer = layers - 1
-                        # %NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
+                        # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
                         plotx, ploty = np.array(self.plotx_list[i]), np.array(self.ploty_list[i])
-                        # %SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB
+                        # SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB
                         ploty[0], ploty[-1] = ploty[1], ploty[-2]
                         self.plotx_list[i], self.ploty_list[i] = plotx, ploty
-                        # %ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON
+                        # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON
                         layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
                         layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
-                        # %CREATE POLYGON
+                        # CREATE POLYGON
                         self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
                         self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
                         break
             else:
-                # %IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
+                # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
                 self.plotx_polygon = np.array(self.plotx_list[i])
                 self.ploty_polygon = np.array(self.ploty_list[i])
             self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
 
-        '#% UPDATE LAYER POLYGONS AND LINES'
+        'UPDATE LAYER POLYGONS AND LINES'
         for i in range(0, self.layer_count + 1):
-            # %SET POLYGON FILL COLOR
+            # SET POLYGON FILL COLOR
             if self.densities[i] != 0 and self.absolute_densities is True:
                 next_color = self.colormap.to_rgba(0.001 * self.densities[i] - 0.001 * self.reference_densities[i])
             elif self.densities[i] != 0:
                 next_color = self.colormap.to_rgba(0.001 * self.densities[i])
             else:
                 next_color = self.colormap.to_rgba(0.)
-            # %UPDATE POLYGON XY AND COLOR FILL
+            # UPDATE POLYGON XY AND COLOR FILL
             self.polygon_fills[i][0].set_xy(self.polygons[i])
             self.polygon_fills[i][0].set_color(next_color)
-            # %LINES
+            # LINES
             self.layer_lines[i][0].set_xdata(self.plotx_list[i])
             self.layer_lines[i][0].set_ydata(self.ploty_list[i])
 
-        # %SET LINE FOR CURRENT LAYER BEING EDITED
+        # SET LINE FOR CURRENT LAYER BEING EDITED
         self.polyline.set_xdata(self.plotx)
         self.polyline.set_ydata(self.ploty)
         self.polyline.set_color(self.layer_colors[self.i])
 
-        # %DRAW CANVAS FEATURES
+        # DRAW CANVAS FEATURES
         self.mcanvas.set_aspect(self.model_aspect)
         self.dcanvas_aspect = ((self.dcanvas.get_xlim()[1] - self.dcanvas.get_xlim()[0]) /
                                (self.dcanvas.get_ylim()[1] - self.dcanvas.get_ylim()[0]))
         self.display_info()
         self.draw()
 
-        self.model_saved = False  # %CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
+        self.model_saved = False  # CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
 
     def update(self):
-        """# %RUN MODEL ALGORITHMS"""
+        """ RUN MODEL ALGORITHMS"""
 
         'REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION'
         '(AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY'
@@ -3716,7 +3716,7 @@ class Gmg(wx.Frame):
                 self.polygons[0] = self.polygons[0][::-1]
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''#% GRAVITY'''
+        '''GRAVITY'''
         '''ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM'''
         self.density_contrasts = np.zeros(len(self.densities))
         if not self.absolute_densities:
@@ -3745,7 +3745,7 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''#% MAGNETICS'''
+        '''MAGNETICS'''
         '''ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM'''
         if self.polygons and self.earth_field >= 1.0 and self.calc_mag_switch is True:
             'SELECT ONLY THOSE LAYERS THAT ARE CHECKED'
@@ -3755,7 +3755,7 @@ class Gmg(wx.Frame):
                     polygons_to_use.append(self.polygons[layer])
                     susceptibilities_to_use.append(self.susceptibilities[layer])
 
-            '# %PASS TO TALWANI AND HEIRTZLER ALGORITHM'
+            '# PASS TO TALWANI AND HEIRTZLER ALGORITHM'
             polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
@@ -3768,12 +3768,12 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '# %UPDATE RMS VALUES'
+        '# UPDATE RMS VALUES'
 
-        '# % RUN RMS CALC CODE'
+        '#  RUN RMS CALC CODE'
         self.model_rms(self.xp)
 
-        '#% SET GRAV RMS VALUES'
+        'SET GRAV RMS VALUES'
         if self.obs_gravity_data_for_rms != [] and self.grav_obs_switch == True and self.calc_grav_switch == True \
                 and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
@@ -3783,7 +3783,7 @@ class Gmg(wx.Frame):
         else:
             pass
 
-        '#% SET MAG RMS VALUES'
+        'SET MAG RMS VALUES'
         if self.obs_mag_data_for_rms != [] and self.mag_obs_switch == True and self.calc_mag_switch == True \
                 and self.prednt != []:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
@@ -3796,8 +3796,8 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''#% SET CANVAS LIMITS'''
-        '#% Set gravity display box limits'
+        '''SET CANVAS LIMITS'''
+        'Set gravity display box limits'
         if self.grav_obs_switch is True and self.grav_residuals != []:
             ymin = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).min()) - 2.0
             ymax = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).max()) + 2.0
@@ -3810,7 +3810,7 @@ class Gmg(wx.Frame):
         if self.dcanvas is not None:
             self.dcanvas.set_ylim(ymin, ymax)
 
-        '#% Set magnetics display box limits'
+        'Set magnetics display box limits'
         if self.mag_obs_switch is True and self.mag_residuals != []:
             ymin_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).min()) - 2.
             ymax_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).max()) + 2.
@@ -3825,9 +3825,9 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_ylim(ymin_mag, ymax_mag)
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        '# %AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED'
+        '# AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED'
         self.model_saved = False
-        '# %UPDATE FRAME'
+        '# UPDATE FRAME'
         self.draw()
 
     # EXTERNAL FIGURE CONSTRUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3835,7 +3835,7 @@ class Gmg(wx.Frame):
     def plot_model(self, event):
         """CREATE EXTERNAL FIGURE OF MODEL USING INBUILT FIGURE CONSTRUCTION TOOL"""
 
-        '# %GET PLOTTING PARAMETERS FROM DIALOG BOX'
+        '# GET PLOTTING PARAMETERS FROM DIALOG BOX'
         self.set_values = PlotSettingsDialog(self, -1, 'Set figure parameters', self.model_aspect, self.dcanvas_aspect)
         self.set_values.Show(True)
 
@@ -3867,12 +3867,12 @@ class Gmg(wx.Frame):
         self.grav_y_min = self.set_values.grav_frame_min
         self.grav_y_max = self.set_values.grav_frame_max
 
-        '#% GET FIGURE DIMENSIONS'
+        'GET FIGURE DIMENSIONS'
         xmin, xmax = self.mcanvas.get_xlim()
         ymin, ymax = self.mcanvas.get_ylim()
         area = np.array([xmin, xmax, ymin, ymax])
 
-        '#% RUN PLOT MODEL CODE'
+        'RUN PLOT MODEL CODE'
         fig_plot = plot_model.plot_fig(self.file_path, area, self.xp, self.obs_topo, self.obs_grav, self.predgz,
                                        self.obs_mag, self.prednt, self.layer_count, self.layer_lock_list,
                                        self.plotx_list, self.ploty_list, self.densities, self.absolute_densities,
@@ -3888,7 +3888,7 @@ class Gmg(wx.Frame):
                                        self.well_line_width)
         del fig_plot
 
-        '# %IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER'
+        '# IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER'
         if sys.platform == 'linux2':
             subprocess.call(["xdg-open", self.file_path])
         else:
@@ -3901,7 +3901,7 @@ class Gmg(wx.Frame):
     # DOCUMENTATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_documentation(self, event):
-        """# %OPENS DOCUMENTATION HTML"""
+        """ OPENS DOCUMENTATION HTML"""
 
         self.doc_dir = os.path.dirname(os.path.abspath(__file__))
         doc_url = self.doc_dir + '/docs/_build/html/gmg_documentation.html'
@@ -3919,7 +3919,7 @@ class Gmg(wx.Frame):
 
 
     def about_gmg(self, event):
-        """# %SHOW SOFTWARE INFORMATION"""
+        """ SHOW SOFTWARE INFORMATION"""
         about = [
             "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
             "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
@@ -3938,7 +3938,7 @@ class Gmg(wx.Frame):
         dlg.Destroy()
 
     def legal(self, event):
-        """# %SHOW LICENCE"""
+        """ SHOW LICENCE"""
         licence = ["Copyright 2015-2017 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
                    "without modification, are permitted provided that the following conditions are met: \n \n"
                    "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
@@ -3963,14 +3963,14 @@ class Gmg(wx.Frame):
     # EXIT FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def exit(self, event):
-        """# %SHUTDOWN APP (FROM FILE MENU)"""
+        """ SHUTDOWN APP (FROM FILE MENU)"""
         dlg = wx.MessageDialog(self, "Do you really want to exit", "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         result = dlg.ShowModal()
         if result == wx.ID_OK:
             wx.GetApp().ExitMainLoop()
 
     def on_close_button(self, event):
-        """# %SHUTDOWN APP (X BUTTON)"""
+        """ SHUTDOWN APP (X BUTTON)"""
         dlg = wx.MessageDialog(self, "Do you really want to exit", "Confirm Exit", wx.OK | wx.CANCEL | wx.ICON_QUESTION)
         result = dlg.ShowModal()
         if result == wx.ID_OK:
@@ -3982,8 +3982,8 @@ class Gmg(wx.Frame):
         pass
         #      """CLACULATE HORIZONTAL DERIVATIVE OF PROFILE"""
         #
-        #     '# %First interpolate the data onto a even x spacing as required by the
-        #     '# %finite difference derivative approximation'
+        #     '# First interpolate the data onto a even x spacing as required by the
+        #     '# finite difference derivative approximation'
         #     N = len(in_data)
         #     x_inc = 1.
         #     interpolat_func = ip.interp1d(in_data[:, 0], in_data[:, 1], kind='slinear')  #create interpolation func
@@ -3992,7 +3992,7 @@ class Gmg(wx.Frame):
         #     y_interp_values = np.array(interpolat_func(x_interp_values))             # yvalues for interpolated array
         #     data            = np.column_stack((x_interp_values, y_interp_values))
         #
-        #     '#% NOW CALCULATE THE DERIVATIVE USING THE INTERPOLATED (EVENLY SPACED) INPUT DATA'
+        #     'NOW CALCULATE THE DERIVATIVE USING THE INTERPOLATED (EVENLY SPACED) INPUT DATA'
         #     for i in range(1, N-1):
         #         deriv = (data[i+1] - data[i-1])/(2*x_inc)
         #
@@ -4011,23 +4011,23 @@ class Gmg(wx.Frame):
         #     current_fault_x = current_fault[:, 0]
         #     current_fault_y = current_fault[:, 1]
         #
-        #     # %LINES
+        #     # LINES
         #     self.layer_lines[i][0].set_xdata(self.plotx_list[i])
         #     self.layer_lines[i][0].set_ydata(self.ploty_list[i])
         #
-        #      # %SET LINE FOR CURRENT LAYER BEING EDITED
+        #      # SET LINE FOR CURRENT LAYER BEING EDITED
         #     self.showing_faultline.set_xdata(self.plotx)
         #     self.showing_faultline.set_ydata(self.ploty)
         #     self.showing_faultline.set_color(self.layer_colors[self.i])
         #
-        #     ' #% CREATE LAYER LINE'
+        #     'CREATE LAYER LINE'
         #     current_fault_pick = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
         #                                                  color='blue', linewidth=1.0, alpha=1.0)
         #
-        #     '#% Increment the total layer count'
+        #     'Increment the total layer count'
         #     self.fault_count += 1
         #
-        #     '#% UPDATE LAYER DATA'
+        #     'UPDATE LAYER DATA'
         #     self.update_layer_data()
         #     self.update()
         #     self.draw()
@@ -4042,7 +4042,7 @@ class Gmg(wx.Frame):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''#% DIALOG BOXES GO HERE'''
+'''DIALOG BOXES GO HERE'''
 
 
 class NewModelDialog(wx.Dialog):
@@ -4093,7 +4093,7 @@ class NewModelDialog(wx.Dialog):
                                                                  "it may be beneficial to begin with a coarse spacing.")
         self.footer_sizer.Add(self.footer_text)
 
-        # % POPULATE BOX WITH EXISTING VALUES
+        #  POPULATE BOX WITH EXISTING VALUES
         if m_x1:
             self.new_x1.SetValue(str(m_x1))
         if m_x2:
@@ -4127,30 +4127,30 @@ class LoadObservedDataFrame(wx.Frame):
 
         floating_panel = wx.Panel(self, -1)
 
-        '''#% CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES'''
+        '''CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES'''
         self.parent = parent
 
         'SET TYPE OF DATA BEING LOADED'
         self.type = type
 
-        '#% FILE PATH'
+        'FILE PATH'
         self.file_path_text = wx.TextCtrl(floating_panel, -1, value="input_file", size=(150, -1))
         self.b_file_path = wx.Button(floating_panel, -1, "File...")
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
 
-        '#% OBSERVED NAME'
+        'OBSERVED NAME'
         self.observed_name_text = wx.StaticText(floating_panel, -1, "Name for Observed data:")
         self.observed_name = wx.TextCtrl(floating_panel, -1, value="Observed_name", size=(150, -1))
-        ' #% COLOR '
+        'COLOR'
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'black', 'purple', 'pink']
         self.color_text = wx.StaticText(floating_panel, -1, "Color:")
         self.color_picked = wx.ComboBox(floating_panel, -1, value='blue', choices=self.colors, size=(75, -1),
                                         style=wx.CB_DROPDOWN)
-        '#% LOAD BUTTON'
+        'LOAD BUTTON'
         self.b_load_button = wx.Button(floating_panel, -1, "Load")
         self.Bind(wx.EVT_BUTTON, self.load_button, self.b_load_button)
 
-        '#% SIZER'
+        'SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         sizer.AddMany([self.file_path_text, self.b_file_path,
                        self.observed_name_text, self.observed_name,
@@ -4165,13 +4165,13 @@ class LoadObservedDataFrame(wx.Frame):
                                               wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if self.open_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # the user changed idea...
-        '#% SET FILE PATH IN CLASS PANEL'
+        'SET FILE PATH IN CLASS PANEL'
         self.chosen_path = self.open_file_dialog.GetPath()
         self.file_path_text.SetValue(str(self.chosen_path))
         self.open_file_dialog.Destroy()
 
     def load_button(self, event):
-        """#% WHEN THE LOAD BUTTON IS PRESSED -> SET VALUES TO PASS TO MOULDER, THEN CLOSE WINDOW"""
+        """WHEN THE LOAD BUTTON IS PRESSED -> SET VALUES TO PASS TO MOULDER, THEN CLOSE WINDOW"""
         self.file_path = str(self.file_path_text.GetValue())
         self.observed_name = str(self.observed_name.GetValue())
         self.color_picked = str(self.color_picked.GetValue())
@@ -4234,20 +4234,20 @@ class MagDialog(wx.Dialog):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                          | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
-        '# %MODEL AZIMUTH'
+        '# MODEL AZIMUTH'
         self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth:")
         self.model_azimuth_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.model_azimuth_units = wx.StaticText(input_panel, -1, "Degrees")
         self.model_azimuth_text.SetInsertionPoint(0)
-        '# %INCLINATION'
+        '# INCLINATION'
         self.set_inc = wx.StaticText(input_panel, -1, "Inclination:")
         self.inc_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.inc_units = wx.StaticText(input_panel, -1, "Degrees")
-        '# %DECLINATION'
+        '# DECLINATION'
         self.set_dec = wx.StaticText(input_panel, -1, "Declination:")
         self.dec_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.dec_units = wx.StaticText(input_panel, -1, "Degrees")
-        '# %EARTHS FIELD'
+        '# EARTHS FIELD'
         self.set_earth_field = wx.StaticText(input_panel, -1, "Earth's Field:")
         self.earth_field_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.earth_field_units = wx.StaticText(input_panel, -1, "nT")
@@ -4301,24 +4301,24 @@ class PinchDialog(wx.Dialog):
         above_x = self.plotx_list[self.i - 1]
         above_y = self.ploty_list[self.i - 1]
 
-        '# %REMOVE PINCHED NODES'
+        '# REMOVE PINCHED NODES'
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # %PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.pinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # %PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
-        '# %FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE'
+        '# FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE'
         new_xs = [tup for i, tup in enumerate(above_x) if
-                  p_start < above_x[i] < p_end]  # %PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < above_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
         new_ys = [tup for i, tup in enumerate(above_y) if
-                  p_start < above_x[i] < p_end]  # %PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < above_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
 
-        '# %DETERMINE INSERT POSITION'
+        '# DETERMINE INSERT POSITION'
         insert_point = 0
         for i in range(0, len(self.pinched_x)):
             if self.pinched_x[i] < p_start:
                 insert_point = i + 1
-        '# %INSERT NEW NODES'
+        '# INSERT NEW NODES'
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
@@ -4333,25 +4333,25 @@ class PinchDialog(wx.Dialog):
         below_x = self.plotx_list[self.i + 1]
         below_y = self.ploty_list[self.i + 1]
 
-        '# %REMOVE PINCHED NODES'
+        '# REMOVE PINCHED NODES'
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # %PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.pinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # %PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
-        # % FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE
+        #  FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE
         new_xs = [tup for i, tup in enumerate(below_x) if
-                  p_start < below_x[i] < p_end]  # %PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < below_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
         new_ys = [tup for i, tup in enumerate(below_y) if
-                  p_start < below_x[i] < p_end]  # %PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < below_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
 
-        '# %DETERMINE INSERT POSITION'
+        '# DETERMINE INSERT POSITION'
         insert_point = 0
         for i in range(0, len(self.pinched_x)):
             if self.pinched_x[i] < p_start:
                 insert_point = i + 1
 
-        '# %INSERT NEW NODES'
+        '# INSERT NEW NODES'
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
@@ -4393,32 +4393,32 @@ class DepinchDialog(wx.Dialog):
             below_x = self.plotx_list[self.i + 1]
             below_y = self.ploty_list[self.i + 1]
 
-        '# %REMOVE PINCHED NODES'
+        '# REMOVE PINCHED NODES'
         self.depinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # %PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.depinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # %PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
-        '# %FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST'
-        # %PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+        '# FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST'
+        # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
         new_xs = [tup for i, tup in enumerate(above_x) if p_start < above_x[i] < p_end]
-        # %PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+        # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
         new_ys = [tup for i, tup in enumerate(above_y) if p_start < above_x[i] < p_end]
         if not new_xs:
-            # %PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+            # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
             new_xs = [tup for i, tup in enumerate(below_x) if p_start < below_x[i] < p_end]
-            # %PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+            # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
             new_ys = [tup for i, tup in enumerate(below_y) if p_start < below_x[i] < p_end]
 
         new_ys_list = [y + 0.1 for y in new_ys]
 
-        '# %DETERMINE INSERT POSITION'
+        '# DETERMINE INSERT POSITION'
         insert_point = 0
         for i in range(0, len(self.depinched_x)):
             if self.depinched_x[i] < p_start:
                 insert_point = i + 1
 
-        '# %INSERT NEW NODES'
+        '# INSERT NEW NODES'
         self.depinched_x[insert_point:1] = new_xs
         self.depinched_y[insert_point:1] = new_ys_list
 
@@ -4432,13 +4432,13 @@ class MedianFilterDialog(wx.Dialog):
                                                                           )
         input_panel = wx.Panel(self, -1)
 
-        '# %GET OBSERVED DATA FROM gmg'
+        '# GET OBSERVED DATA FROM gmg'
         self.obs_grav_name_list = obs_grav_name_list
         self.obs_grav_list_save = obs_grav_list_save
         self.obs_mag_name_list = obs_mag_name_list
         self.obs_mag_list_save = obs_mag_list_save
 
-        '# %CHOOSE INPUT OBSERVED DATA'
+        '# CHOOSE INPUT OBSERVED DATA'
         self.obs_combo_list_text = wx.StaticText(input_panel, -1, "Input Data:")
         self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
         for i in self.obs_grav_name_list:
@@ -4451,25 +4451,25 @@ class MedianFilterDialog(wx.Dialog):
                 self.obs_combo_list.Append(i)
             except:
                 pass
-        '# %DEFINE FILTER LENGTH'
+        '# DEFINE FILTER LENGTH'
         self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
         self.filter_window_text = wx.TextCtrl(input_panel, -1, "9")
 
-        '# %DEFINE OUTPUT NAME'
+        '# DEFINE OUTPUT NAME'
         self.output_name = wx.StaticText(input_panel, -1, "OUTPUT DATA NAME:")
         self.output_name_text = wx.TextCtrl(input_panel, -1)
 
-        '# %DEFINE OUTPUT COLOR'
+        '# DEFINE OUTPUT COLOR'
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
         self.output_color = wx.StaticText(input_panel, -1, "OUTPUT DATA COLOR:")
         self.output_color_text = wx.ComboBox(input_panel, -1, value='green', choices=self.colors, size=(75, -1),
                                              style=wx.CB_DROPDOWN)
 
-        '# %DEFINE SET BUTTON'
+        '# DEFINE SET BUTTON'
         self.b_apply_filter = wx.Button(input_panel, -1, "Apply")
         self.Bind(wx.EVT_BUTTON, self.median_pass, self.b_apply_filter)
 
-        '# %DEFINE SIZER'
+        '# DEFINE SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.obs_combo_list_text, self.obs_combo_list, self.output_name, self.output_name_text,
                        self.output_color, self.output_color_text, self.filter_window, self.filter_window_text,
@@ -4485,7 +4485,7 @@ class MedianFilterDialog(wx.Dialog):
         self.output_color = str(self.output_color_text.GetValue())
 
         for i in xrange(len(self.obs_grav_name_list)):
-            '# %CHECK GRAV'
+            '# CHECK GRAV'
             if self.obs_grav_name_list[i] == self.obs_to_filter:
                 self.filter_type = str('gravity')
                 self.obs_input = self.obs_grav_list_save[i]
@@ -4496,7 +4496,7 @@ class MedianFilterDialog(wx.Dialog):
                 self.EndModal(1)
 
         for i in xrange(len(self.obs_mag_name_list)):
-            '# %CHECK MAG'
+            '# CHECK MAG'
             if self.obs_mag_name_list[i] == self.obs_to_filter:
                 self.filter_type = str('magnetics')
                 self.obs_input = self.obs_mag_list_save[i]
@@ -4513,7 +4513,7 @@ class SetBackgroundDensityDialog(wx.Dialog):
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
 
-        '# % CHOOSE BACKGROUND DENSITY'
+        '#  CHOOSE BACKGROUND DENSITY'
         self.background_den_label_upper = wx.StaticText(input_panel, -1, "Reference density (g/cm^3):")
         self.background_density_text_input_upper = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.background_density_text_input_upper.SetInsertionPoint(0)
@@ -4521,10 +4521,10 @@ class SetBackgroundDensityDialog(wx.Dialog):
         # self.background_density_text_input_lower = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         # self.background_den_label_lid = wx.StaticText(input_panel, -1, "Mantle Lid (g/cm^3):")
         # self.background_density_text_input_lid = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
-        '# %DEFINE SET BUTTON'
+        '# DEFINE SET BUTTON'
         self.b_apply_background_den = wx.Button(input_panel, -1, "Apply")
         self.Bind(wx.EVT_BUTTON, self.set_background_density, self.b_apply_background_den)
-        '# %DEFINE SIZER'
+        '# DEFINE SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.background_den_label_upper, self.background_density_text_input_upper,
                        # self.background_den_label_lower, self.background_density_text_input_lower,
@@ -4567,7 +4567,7 @@ class BulkShiftDialog(wx.Dialog):
         self.y_shift_value = float(self.bulk_panel_y_Text.GetValue())
         current_y = self.ploty_list[self.i]
         current_x = self.plotx_list[self.i]
-        '# %BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0'
+        '# BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0'
         self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
         self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0. else 0.01 for y in current_y]
         self.EndModal(1)
@@ -4584,7 +4584,7 @@ class SetObsRmsDialog(wx.Dialog):
         self.obs_mag_name_list = obs_mag_name_list
         self.obs_mag_list_save = obs_mag_list_save
 
-        '# %CHOOSE INPUT OBSERVED DATA'
+        '# CHOOSE INPUT OBSERVED DATA'
         self.obs_combo_list_grav_text = wx.StaticText(input_panel, -1, "Gravity Input:")
         self.obs_combo_list_grav = wx.ComboBox(input_panel, id=-1, value="", choices=[])
         self.obs_combo_list_mag_text = wx.StaticText(input_panel, -1, "Magnetic Input:")
@@ -4600,11 +4600,11 @@ class SetObsRmsDialog(wx.Dialog):
             except:
                 pass
 
-        '# %DEFINE SET BUTTON'
+        '# DEFINE SET BUTTON'
         self.b_set = wx.Button(input_panel, -1, "Set")
         self.Bind(wx.EVT_BUTTON, self.set_obs, self.b_set)
 
-        '# %DEFINE SIZER'
+        '# DEFINE SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.obs_combo_list_grav_text, self.obs_combo_list_grav,
                        self.obs_combo_list_mag_text, self.obs_combo_list_mag, self.b_set])
@@ -4617,14 +4617,14 @@ class SetObsRmsDialog(wx.Dialog):
 
         if obs_grav is not None:
             for i in xrange(len(self.obs_grav_name_list)):
-                '# %CHECK GRAV AND SET VALUES'
+                '# CHECK GRAV AND SET VALUES'
                 if self.obs_grav_name_list[i] == obs_grav:
                     self.obs_gravity_data_for_rms = self.obs_grav_list_save[i]
         else:
             self.obs_gravity_data_for_rms = None
 
         if obs_mag is not None:
-            '# %CHECK MAG AND SET VALUES'
+            '# CHECK MAG AND SET VALUES'
             for i in xrange(len(self.obs_mag_name_list)):
                 if self.obs_mag_name_list[i] == obs_mag:
                     self.obs_mag_data_for_rms = self.obs_mag_list_save[i]
@@ -4639,20 +4639,20 @@ class NewLayerDialog(wx.Dialog):
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
 
-        # %CREATE FIXED LAYER BUTTON
+        # CREATE FIXED LAYER BUTTON
         self.b_fixed = wx.Button(input_panel, -1, "New fixed layer")
         self.Bind(wx.EVT_BUTTON, self.set_fixed, self.b_fixed)
-        # %CREATE FLOATING LAYER BUTTON
+        # CREATE FLOATING LAYER BUTTON
         self.b_floating = wx.Button(input_panel, -1, "New floating layer")
         self.Bind(wx.EVT_BUTTON, self.set_floating, self.b_floating)
-        # % DEFINE SIZER
+        #  DEFINE SIZER
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.b_fixed, self.b_floating])
         input_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
     def set_fixed(self, event):
-        """# %APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
+        """ APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
         self.fixed = True
         floating_dialogbox = self.SetNewThickness(self, -1, "Set new layer thickness")
         answer = floating_dialogbox.ShowModal()
@@ -4660,7 +4660,7 @@ class NewLayerDialog(wx.Dialog):
         self.EndModal(1)
 
     def set_floating(self, event):
-        """# %APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
+        """ APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
         self.fixed = False
         floating_dialogbox = self.SetFloatingLayer(self, -1, "Set new layer nodes")
         answer = floating_dialogbox.ShowModal()
@@ -4671,7 +4671,7 @@ class NewLayerDialog(wx.Dialog):
         self.EndModal(1)
 
     class SetNewThickness(wx.Dialog):
-        """# %APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
+        """ APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                               | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -4692,7 +4692,7 @@ class NewLayerDialog(wx.Dialog):
             self.EndModal(1)
 
     class SetFloatingLayer(wx.Dialog):
-        """# %APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
+        """ APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
 
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
@@ -4739,7 +4739,7 @@ class NewLayerDialog(wx.Dialog):
 
 
 class MessageDialog(wx.MessageDialog):
-    """ # %GENERIC MESSAGE DIALOG"""
+    """ # GENERIC MESSAGE DIALOG"""
 
     def __init__(self, parent, id, message_text, title):
         wx.MessageDialog.__init__(self, parent, message_text, title)
@@ -4786,7 +4786,7 @@ class CaptureCoordinates(wx.Frame):
         save_file_dialog = wx.FileDialog(coordinate_list, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # %USER CHANGED THEIR MIND
+            return  # USER CHANGED THEIR MIND
 
         # NOW WRITE OUT THE DATA
         # GET OUTPUT FILENAME
