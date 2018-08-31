@@ -162,17 +162,17 @@ class Gmg(wx.Frame):
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         'SECOND PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 384),
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 100),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 400),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         'THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 277),
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 100),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 400),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
@@ -821,27 +821,6 @@ class Gmg(wx.Frame):
         else:
             self.nextpoly = []
 
-        'INITALISE FAULTLINE DRAWING'
-        self.faultline, = self.mcanvas.plot([-50000], [-50000], marker='o',
-                                           color='r', linewidth=1.0, alpha=0.5, picker=True)
-
-        'MAKE LAYER TREE'
-        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
-                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
-        self.tree.SetIndent(0.0)
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.tree)
-        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
-        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
-
-        'TREE ATTRIBUTES'
-        self.root = self.tree.AddRoot("Layers:")
-        self.tree.SetItemPyData(self.root, None)
-        self.tree_items = ["Layer 0"]
-        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
-
-        self.error = 0.
-        self.last_layer = 0
-
         '''ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
         'Make Attribute Label'
         self.attr_text = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
@@ -898,6 +877,43 @@ class Gmg(wx.Frame):
         self.grav_rms_plot, = self.dcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.ntcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+
+
+        'MAKE LAYER TREE'
+        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
+                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
+        self.tree.SetIndent(0.0)
+        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.tree)
+        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
+        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
+
+        'TREE ATTRIBUTES'
+        self.root = self.tree.AddRoot("Layers:")
+        self.tree.SetItemPyData(self.root, None)
+        self.tree_items = ["Layer 0"]
+        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
+
+        self.error = 0.
+        self.last_layer = 0
+
+        'INITALISE FAULTLINE DRAWING'
+        self.faultline, = self.mcanvas.plot([-50000], [-50000], marker='o',
+                                           color='r', linewidth=1.0, alpha=0.5, picker=True)
+
+        'MAKE FAULT TREE'
+        self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 280),
+                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
+        self.fault_tree.SetIndent(0.0)
+
+        ### self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.fault_tree)
+        ### self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.fault_tree)
+        ### self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.fault_tree)
+
+        'TREE ATTRIBUTES'
+        self.fault_tree_root = self.fault_tree.AddRoot("Faults:")
+        self.fault_tree.SetItemPyData(self.fault_tree_root, None)
+        self.fault_tree_items = []
+        ### self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
 
         'UPDATE INFO BAR'
         self.display_info()
@@ -1098,16 +1114,12 @@ class Gmg(wx.Frame):
 
         'UPDATE FRAMES'
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def size_handler(self):
         """# CREATE CANVAS BOX"""
         self.canvas_box = wx.BoxSizer(wx.HORIZONTAL)
         self.canvas_box.Add(self.canvas, 1, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, border=2)
-
-        'CREATE LAYER TREE BOX'
-        self.tree_box = wx.BoxSizer(wx.VERTICAL)
-        self.tree_box.Add(self.tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
 
         'LAYER ATTRIBUTES'
         self.attr_box = wx.BoxSizer(wx.VERTICAL)
@@ -1175,15 +1187,25 @@ class Gmg(wx.Frame):
         'SET BUTTON'
         self.attr_box.Add(self.node_set_button, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
 
+        'CREATE LAYER TREE BOX'
+        self.tree_box = wx.BoxSizer(wx.VERTICAL)
+        self.tree_box.Add(self.tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
+
+        'CREATE FAULT TREE BOX'
+        self.fault_tree_box = wx.BoxSizer(wx.VERTICAL)
+        self.fault_tree_box.Add(self.fault_tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
+
         '#PLACE BOX SIZERS IN CORRECT PANELS'
         self.fold_panel_one.SetSizerAndFit(self.attr_box)
         self.fold_panel_two.SetSizerAndFit(self.tree_box)
+        self.fold_panel_three.SetSizerAndFit(self.fault_tree_box)
         self.leftPanel.SetSizer(self.splitter_left_panel_sizer)
         self.fold_panel_one.Collapse()
         self.fold_panel_one.Expand()
-        self.fold_panel_one.Collapse()
-        self.fold_panel_one.Expand()
+        self.fold_panel_two.Collapse()
+        self.fold_panel_two.Expand()
         self.fold_panel_three.Collapse()
+        self.fold_panel_three.Expand()
 
         self.rightPanel.SetSizerAndFit(self.canvas_box)
         self.rightPanel.SetSize(self.GetSize())
@@ -1247,7 +1269,7 @@ class Gmg(wx.Frame):
         zp = np.zeros_like(xp)
         self.zp = np.array(zp, dtype='f')
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def connect(self):
         """CONNECT MOUSE AND EVENT BINDINGS"""
@@ -1299,7 +1321,7 @@ class Gmg(wx.Frame):
         self.ploty = self.ploty_list[self.i]
         self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def on_begin_edit_label(self, event):
         pass
@@ -1343,20 +1365,20 @@ class Gmg(wx.Frame):
             self.nodes = False
             self.nav_toolbar.zoom()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def zoom_out(self, event):
         self.nav_toolbar.back()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def full_extent(self, event):
         """#REDRAW MODEL FRAME WITH FULL EXTENT"""
         self.full_extent_adjustment()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def full_extent_adjustment(self):
@@ -1397,7 +1419,7 @@ class Gmg(wx.Frame):
             self.nodes = True
             self.nav_toolbar.pan()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def calc_grav_switch(self, event):
@@ -1410,7 +1432,7 @@ class Gmg(wx.Frame):
         else:
             self.calc_grav_switch = True
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def calc_mag_switch(self, event):
@@ -1422,7 +1444,7 @@ class Gmg(wx.Frame):
         else:
             self.calc_mag_switch = True
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     # MODEL WINDOW GRAPHICS OPTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1656,7 +1678,7 @@ class Gmg(wx.Frame):
 
             'UPDATE LAYER DATA AND PLOT'
             self.update_layer_data()
-            self.update()
+            self.run_algorithms()
             self.draw()
             self.draw_well()  # DRAW WELLS
             self.Restore()  # FIX'S DISPLAY ISSUE
@@ -2217,7 +2239,7 @@ class Gmg(wx.Frame):
         self.wells[self.well_count - 1] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
         self.well_name_text.append([])
-        
+
         # PLOT WELL NAME
         self.well_name_text[self.well_count - 1] = self.mcanvas.annotate(self.well_name, xy=(well_x_location, -0.5),
                                                                          xytext=(well_x_location, -0.5),
@@ -2273,7 +2295,7 @@ class Gmg(wx.Frame):
         self.well_horizons_list[self.well_count - 1] = self.horizons
         self.well_horizons_list.append([])
         self.well_labels_list.append([])
-        
+
         # UPDATE GMG
         self.update_layer_data()
 
@@ -2311,14 +2333,14 @@ class Gmg(wx.Frame):
                                                                bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
                                                                clip_on=True)
 
-                # PLOT WELL HORIZONS 
+                # PLOT WELL HORIZONS
                 # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
                 self.well_labels[w] = [None] * len(well_data)
                 self.horizons[w] = [None] * len(well_data)
                 for i in range(2, len(well_data)):
                     y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
                     x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
-                    
+
                     # PLOT HORIZON LINE
                     self.horizons[w][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
                     horizon_y_pos = well_data[i, 1].astype(float)
@@ -2382,7 +2404,7 @@ class Gmg(wx.Frame):
 
     def delete_well(self, event):
         """REMOVE PLOT GRAPHICS"""
-        
+
         self.wells[event.Id - 3000][0].set_visible(False)
         self.well_name_text[event.Id - 3000].set_visible(False)
         horizons = self.horizons[event.Id - 3000]
@@ -2393,13 +2415,13 @@ class Gmg(wx.Frame):
         for i in range(2, len(labels)):
             labels[i].set_visible(False)
             labels[i] = "None"
-        
+
         # SET DATA TO NONE
         self.well_list[event.Id - 3000] = "None"
         self.well_name_list[event.Id - 3000] = "None"
         self.wells[event.Id - 3000][0] = "None"
         self.well_name_text[event.Id - 3000] = "None"
-        
+
         # REMOVE SUBMENU
         self.m_wells_submenu.DestroyId(event.Id)
         self.update_layer_data()
@@ -2408,7 +2430,7 @@ class Gmg(wx.Frame):
 
     def load_contact_data(self, event):
         """CHOSE CONTACT DATA FILE TO LOAD"""
-        
+
         open_file_dialog = wx.FileDialog(self, "Open contact data", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2433,7 +2455,7 @@ class Gmg(wx.Frame):
             x = (x1, x1)
             y = (y1, y2)
             self.contacts[i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-            
+
         self.contact_data_list[self.contact_data_count] = self.contacts
         self.contact_data_list.append([])
 
@@ -2442,7 +2464,7 @@ class Gmg(wx.Frame):
         text = zip(self.contact_data[:, 0].astype(float), self.contact_data[:, 1].astype(float),
                    self.contact_data[:, 3].astype(str))
         for i in xrange(len(self.contacts)):
-            
+
             # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
             if i % 2 == 0:
                 self.text_labels[i] = self.mcanvas.annotate(text[i][2], xy=(text[i][0], text[i][1]),
@@ -2486,7 +2508,7 @@ class Gmg(wx.Frame):
 
     def write_layers_xy(self, event):
         """OUTPUT LAYER DATA TO FILE"""
-        
+
         # CREATE OUTPUT FILE
         save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
@@ -2667,7 +2689,7 @@ class Gmg(wx.Frame):
                 else:
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-            
+
             # DEAL WITH PINCHED NODE
             if self.pinch_switch != 0:
                 for k in range(0, len(self.index_arg2_list)):
@@ -2697,7 +2719,7 @@ class Gmg(wx.Frame):
 
         # UPDATE GMG
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def button_press(self, event):
         """ WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
@@ -2912,7 +2934,7 @@ class Gmg(wx.Frame):
 
 
         self.update_layer_data()  # UPDATE LAYERS
-        self.update()  # RUN MODELLING ALGORITHMS
+        self.run_algorithms()  # RUN MODELLING ALGORITHMS
 
     def key_press(self, event):
         """ DEFINE KEY PRESS LINKS"""
@@ -2935,7 +2957,7 @@ class Gmg(wx.Frame):
 
             # UPDATE LAYER DATA AND PLOT
             self.update_layer_data()
-            self.update()
+            self.run_algorithms()
             self.draw()
 
         'd = DELETE NODE AT MOUSE POSITION'
@@ -2992,7 +3014,7 @@ class Gmg(wx.Frame):
 
             # UPDATE GMG
             self.update_layer_data()
-            self.update()
+            self.run_algorithms()
             self.draw()
 
         'q = BEAT THE ZOOM BUG'
@@ -3042,7 +3064,7 @@ class Gmg(wx.Frame):
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
-                self.update()
+                self.run_algorithms()
             else:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
@@ -3059,7 +3081,7 @@ class Gmg(wx.Frame):
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
-                self.update()
+                self.run_algorithms()
 
         '< = MOVE TO NEXT LAYER'
         if event.key == ',':
@@ -3078,7 +3100,7 @@ class Gmg(wx.Frame):
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
-                self.update()
+                self.run_algorithms()
             else:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
@@ -3095,7 +3117,7 @@ class Gmg(wx.Frame):
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
                 self.update_layer_data()
-                self.update()
+                self.run_algorithms()
             self.draw()
 
         'z = ZOOM IN MODE'
@@ -3272,7 +3294,7 @@ class Gmg(wx.Frame):
             self.susceptibility_input.SetValue(self.susceptibilities[self.i])
             self.angle_a_input.SetValue(self.angle_a[self.i])
             self.update_layer_data()
-            self.update()
+            self.run_algorithms()
             self.draw()
         else:
             # USER CHANGED THEIR MIND - NO NEW LAYER'
@@ -3336,7 +3358,7 @@ class Gmg(wx.Frame):
         self.susceptibility_input.SetValue(self.susceptibilities[self.i])
         self.angle_a_input.SetValue(self.angle_a[self.i])
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def delete_layer(self, event):
@@ -3394,7 +3416,7 @@ class Gmg(wx.Frame):
 
         #UPDATE
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     # LAYER AND MODEL ATTRIBUTE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3527,17 +3549,21 @@ class Gmg(wx.Frame):
     # LIVE GRAPHICS UPDATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_layer_data(self):
-        """UPDATE MODEL CANVAS (mcanvas) LIMITS"""
+        """LOAD LAYER DATA INTO GMG"""
+
+        # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         self.dcanvas.set_xlim(xmin, xmax)
         self.ntcanvas.set_xlim(xmin, xmax)
 
-        'Set lists with updated layer data'
+        #SET LISTS WITH UPDATED LAYER DATA
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
+
         # RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)
         self.polygons = []
         self.mag_polygons = []
+
         # REMOVE EXISTING DATA
         if len(self.mcanvas.lines) >= 1:
             while len(self.mcanvas.lines) > 0:
@@ -3546,30 +3572,34 @@ class Gmg(wx.Frame):
                 self.mcanvas.patches[0].remove()
             while len(self.mcanvas.texts) > 0:
                 self.mcanvas.texts[0].remove()
-        'Create updated data'
-        # First create the polyline data (the bottom line of the layer polygon - Done first so the whole polygon
-        # isn't passed to self.polyplots)
+
+        # UPDATE DATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
+        # ISN'T PASSED TO SELF.POLYPLOTS)
         for i in range(0, self.layer_count + 1):
-            'Create the layer polygons to pass to self.polygons and onto the Talwani algorithm'
-            # First set up xy data; if the layer is below layer 1 then attach the above layer to complete polygon;
-            #else use top layer check for layer mode and find last layer to make polygon
+            # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE TALWANI ALGORITHM
+
+            # FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
+            # ELSE USE TOP LAYER CHECK FOR LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
             if i >= 1 and self.layer_lock_list[i] == 0:
                 for layers in range(i, 0, -1):
                     if self.layer_lock_list[layers - 1] == 0:
                         self.last_layer = layers - 1
 
-                        'Now append nodes for boundary conditions (continuous slab)'
+                        # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
                         plotx = np.array(self.plotx_list[i])
                         ploty = np.array(self.ploty_list[i])
-                        '# SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB'
+
+                        # SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB'
                         ploty[0] = ploty[1]
                         ploty[-1] = ploty[-2]
                         self.plotx_list[i], self.ploty_list[i] = plotx, ploty
-                        '# ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON'
+
+                        # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON'
                         layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
                         layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
 
-                        'Create polygon'
+                        # CREATE POLYGON
                         self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
                         self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
                         break
@@ -3585,28 +3615,40 @@ class Gmg(wx.Frame):
             else:
                 next_color = self.colormap.to_rgba(0)
 
-            'CREATE LAYER POLYGON FILLS'
+            # CREATE LAYER POLYGON FILLS
             self.polygon_fills[i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color=next_color,
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
 
             self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
 
-        'CREATE LAYER LINES'
+        # MODEL LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        #CREATE LAYER LINES
         for i in range(0, self.layer_count + 1):
             self.layer_lines[i] = self.mcanvas.plot(self.plotx_list[i], self.ploty_list[i], color=self.layer_colors[i],
                                                     linewidth=1.0, alpha=1.0)
-        'CURRENT LAYER LINE'
+        #CURRENT LAYER LINE
         self.polyline, = self.mcanvas.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.i],
                                            linewidth=1.0, alpha=0.5)
+
+        # # FAULTS LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # # CREATE FAULT LINES
+        # for i in range(0, self.fault_count + 1):
+        #     self.layer_lines[i] = self.mcanvas.plot(self.fault_plotx_list[i], self.fault_ploty_list[i],
+        #                                             color=self.fault_colors[i], linewidth=1.0, alpha=1.0)
+        # # CURRENT FAULT LINE
+        # self.fault_polyline, = self.mcanvas.plot(self.fault_plotx, self.fault_ploty, marker='o',
+        #                                          color=self.fault_colors[self.current_fault], linewidth=1.0, alpha=0.5)
+
+        # UPDATE GMG
         self.mcanvas.set_aspect(self.model_aspect)
         self.display_info()
         self.draw()
 
     def update_layer_data(self):
-        """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - REDRAW EVERYTHING"""
+        """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE (REDRAWS EVERYTHING)"""
 
-        'UPDATE MODEL CANVAS (mcanvas) LIMITS'
+        #UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
             self.dcanvas.set_xlim(xmin, xmax)
@@ -3615,11 +3657,11 @@ class Gmg(wx.Frame):
         if self.nt_canvas:
             self.ntcanvas.set_xlim(xmin, xmax)
 
-        'SET LISTS WITH UPDATED LAYER DATA'
+        #SET PLOT LISTS WITH UPDATED LAYER DATA FROM THE LAYER THAT IS CURRENTLY BEING EDITED
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
 
-        'RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)'
+        # RESET LISTS (USED AS INPUT FOR THE CALCULATE_GRAVITY FUNC)
         self.polygons = []
         self.mag_polygons = []
 
@@ -3634,14 +3676,18 @@ class Gmg(wx.Frame):
                 for layers in range(i, 0, -1):
                     if self.layer_lock_list[layers - 1] == 0:
                         self.last_layer = layers - 1
+
                         # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
                         plotx, ploty = np.array(self.plotx_list[i]), np.array(self.ploty_list[i])
+
                         # SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB
                         ploty[0], ploty[-1] = ploty[1], ploty[-2]
                         self.plotx_list[i], self.ploty_list[i] = plotx, ploty
+
                         # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON
                         layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
                         layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
+
                         # CREATE POLYGON
                         self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
                         self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
@@ -3650,6 +3696,7 @@ class Gmg(wx.Frame):
                 # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
                 self.plotx_polygon = np.array(self.plotx_list[i])
                 self.ploty_polygon = np.array(self.ploty_list[i])
+
             self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
 
         'UPDATE LAYER POLYGONS AND LINES'
@@ -3682,7 +3729,7 @@ class Gmg(wx.Frame):
 
         self.model_saved = False  # CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
 
-    def update(self):
+    def run_algorithms(self):
         """ RUN MODEL ALGORITHMS"""
 
         # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
@@ -3811,7 +3858,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # EXTERNAL FIGURE CONSTRUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # EXTERNAL FIGURE CONSTRUCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def plot_model(self, event):
@@ -3881,7 +3928,7 @@ class Gmg(wx.Frame):
         return
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # DOCUMENTATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # DOCUMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_documentation(self, event):
@@ -3904,6 +3951,7 @@ class Gmg(wx.Frame):
 
     def about_gmg(self, event):
         """ SHOW SOFTWARE INFORMATION"""
+
         about = [
             "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
             "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
@@ -3923,6 +3971,7 @@ class Gmg(wx.Frame):
 
     def legal(self, event):
         """ SHOW LICENCE"""
+
         licence = ["Copyright 2015-2017 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
                    "without modification, are permitted provided that the following conditions are met: \n \n"
                    "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
@@ -4004,11 +4053,15 @@ class Gmg(wx.Frame):
         self.new_x1, self.new_y1 = new_fault_dialogbox.x1, new_fault_dialogbox.y1
         self.new_x2, self.new_y2 = new_fault_dialogbox.x2, new_fault_dialogbox.y2
 
-        #  INCREMENT THE TOTAL FAULT COUNT
+        # INCREMENT THE TOTAL FAULT COUNT
         self.fault_count += 1
         self.faults.append([])
         self.fault_names_list.append([])
         self.fault_colors.append('k')
+        self.fault_tree_items.append('fault %s' % (int(self.fault_count)))
+        self.fault_item = 'fault %s' % (int(self.fault_count))
+        self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.fault_count)
+
 
         # ADD NAME FOR NEW FAULT
         print "self.fault_count = "
@@ -4044,37 +4097,15 @@ class Gmg(wx.Frame):
 
         # UPDATE GMG
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
-
-        #
-        #     # LINES
-        #     self.layer_lines[i][0].set_xdata(self.plotx_list[i])
-        #     self.layer_lines[i][0].set_ydata(self.ploty_list[i])
-        #
-        #      # SET LINE FOR CURRENT LAYER BEING EDITED
-        #     self.showing_faultline.set_xdata(self.plotx)
-        #     self.showing_faultline.set_ydata(self.ploty)
-        #     self.showing_faultline.set_color(self.layer_colors[self.i])
-        #
-        #     'CREATE LAYER LINE'
-        #     current_fault_pick = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
-        #                                                  color='blue', linewidth=1.0, alpha=1.0)
-        #
-        #     'Increment the total layer count'
-        #     self.fault_count += 1
-        #
-        #     'UPDATE LAYER DATA'
-        #     self.update_layer_data()
-        #     self.update()
-        #     self.draw()
 
     def set_error(self, value):
         pass
         # self.error = value
         # self.update_layer_data()
-        # self.update()
+        # self.run_algorithms()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
