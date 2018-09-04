@@ -133,7 +133,7 @@ This will create a copy of the GMG repository in the current working directory.
 
 **Step 4: Install  gmg**
 
-Run the following command in the root gmg/ dir (which contains **setup.py**):
+Run the following command in the gmg/ root directory (which contains the script **setup.py**):
 
     pip install .
 
