@@ -162,17 +162,17 @@ class Gmg(wx.Frame):
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         'SECOND PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 331),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 400),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 331),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         'THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 200),
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 331),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 400),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 331),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
@@ -516,10 +516,6 @@ class Gmg(wx.Frame):
                                     wx.Bitmap(self.gui_icons_dir + 'C_24.png'), shortHelp="Capture coordinates")
         self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
 
-        t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'), shortHelp="Fault pick")
-        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
-
         t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
                                 wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'), shortHelp="Aspect increase")
         self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
@@ -564,14 +560,27 @@ class Gmg(wx.Frame):
                                 wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'), shortHelp="Transparency down")
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
 
+        # INCREASE TRANSPERANCY ICON
         t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
                                 wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'), shortHelp="Transparency up")
         self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
 
+        # LOAD WELL ICON
         t_load_well = self.toolbar.AddTool(wx.ID_ANY, "Load well horizons",
                                 wx.Bitmap(self.gui_icons_dir + 'well_24.png'), shortHelp="Load well horizons")
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
-        #
+
+        # TOOGLE FAULT PICKING MODE
+        t_toogle_fault_mode = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
+                                wx.Bitmap(self.gui_icons_dir + 'faultlon_off_24.png'), shortHelp="Toogle fault picking")
+        self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, t_toogle_fault_mode)
+
+        # FAULT PICKER ICON
+        t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
+                                wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'), shortHelp="Fault picker")
+        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
+
+        # CREATE TOOLBAR
         self.toolbar.Realize()
         self.toolbar.SetSize((1790, 36))
 
@@ -745,8 +754,8 @@ class Gmg(wx.Frame):
         self.fault_picking_switch = False
         self.faults = [[]]
         self.fault_names_list = []
-        self.fault_index_count = 0
-        self.current_fault = 0
+        self.fault_counter = 0
+        self.current_fault_index = 0
         self.fault_colors = ['k']
         self.fault_x_coords_list = [[]]
         self.fault_y_coords_list = [[]]
@@ -818,7 +827,7 @@ class Gmg(wx.Frame):
             self.polygon_fills[0] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
-            self.current_node = self.mcanvas.scatter(-40000., 0, s=50, color='r')
+            self.current_node = self.mcanvas.scatter(-40000., 0, s=50, color='r', zorder=10)
         else:
             self.nextpoly = []
 
@@ -897,12 +906,8 @@ class Gmg(wx.Frame):
         self.error = 0.
         self.last_layer = 0
 
-        'INITALISE FAULTLINE DRAWING'
-        self.faultline, = self.mcanvas.plot([-50000, 0], [-40000, 0], marker='o',
-                                           color='b', linewidth=1.0, alpha=0.5, picker=True)
-
         'MAKE FAULT TREE'
-        self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 280),
+        self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 331),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
         self.fault_tree.SetIndent(0.0)
 
@@ -1329,14 +1334,14 @@ class Gmg(wx.Frame):
 
     def on_end_edit_label(self, event):
         self.i = self.tree.GetPyData(event.GetItem())
-        item = self.get_item_text(event.GetItem())
-        self.tree_items[self.i] = str(item)
+        new_label = self.get_item_text(event.GetItem())
+        self.tree_items[self.i] = str(new_label)
 
     def delete_all_children(self, event):
         self.tree.DeleteChildren(event)
 
     def item_checked(self, event):
-        """#TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
+        """TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
 
         layer = self.tree.GetPyData(event.GetItem())
         if self.layers_calculation_switch[layer] == 1:
@@ -1522,7 +1527,9 @@ class Gmg(wx.Frame):
                   'model_azimuth', 'susceptibilities', 'angle_a', 'angle_b', 'remanence',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms', 'xy_name_list', 'xy_list_save',
-                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect']
+                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect', 'faults', 'fault_names_list',
+                  'fault_counter', 'current_fault_index', 'fault_x_coords_list', 'fault_y_coords_list',
+                  'fault_tree_items', 'fault_counter']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
@@ -1532,7 +1539,10 @@ class Gmg(wx.Frame):
                         self.model_azimuth, self.susceptibilities, self.angle_a, self.angle_b, self.remanence,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms, self.xy_name_list, self.xy_list_save,
-                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect]
+                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect, self.faults,
+                        self.fault_names_list, self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
+                        self.fault_y_coords_list, self.fault_tree_items, self.fault_counter]
+
 
         for i in range(0, len(model_params)):
             self.save_dict[header[i]] = model_params[i]
@@ -1545,7 +1555,7 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             MessageDialog(self, -1, "Model saved successfully", "Save")
         except IOError:
-            MessageDialog(self, -1, "Error in save process.\nModel unsaved", "Save")
+            MessageDialog(self, -1, "Error in save process.\nModel not saved", "Save")
 
     def load_model(self, event):
         """LOAD MODEL FROM DISC IN .Pickle FORMAT"""
@@ -1576,8 +1586,12 @@ class Gmg(wx.Frame):
             for x in xrange(len(model_data)):
                 setattr(self, model_data.keys()[x], model_data.values()[x])
 
+            print "self.faults = "
+            print self.faults
+
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
+            self.loaded_fault_tree_items = self.fault_tree_items
 
             # DRAW CANVAS
             self.start(self.area, self.xp, self.zp)
@@ -1629,7 +1643,7 @@ class Gmg(wx.Frame):
             if self.layer_colors == [[]]:
                 self.layer_colors = ['black' for x in xrange(self.i + 1)]
 
-            # LOAD TREE ITEMS
+            # LOAD LAYER TREE ITEMS
             self.tree.DeleteAllItems()  # DELETE CURRENT LAYER TREE
             self.root = self.tree.AddRoot("Layers:")  # CREATE NEW TREE
             self.tree.SetItemPyData(self.root, None)
@@ -1643,12 +1657,33 @@ class Gmg(wx.Frame):
 
             self.tree_items = self.loaded_tree_items
 
+            # LOAD FAULT TREE ITEMS
+            for i in xrange(0, len(self.loaded_fault_tree_items)):
+                print self.loaded_fault_tree_items[i]
+                fault_tree_item = self.fault_tree.AppendItem(self.fault_tree_root, "%s" %
+                                                             self.loaded_fault_tree_items[i], ct_type=1)
+                fault_tree_item.Check(checked=True)
+                self.fault_tree.SetItemPyData(fault_tree_item, i)
+
+            self.fault_tree_items = self.loaded_fault_tree_items
+
             # MAKE LAYER LINES AND POLYGONS
             self.layer_lines = [[] for x in xrange(self.i + 1)]
             self.polygon_fills = [[] for x in xrange(self.i + 1)]
 
             # LOAD LAYERS
             self.load_layer_data()
+
+            for i in range(0, self.fault_counter):
+                # DRAW FAULTS
+                print self.fault_x_coords_list[i]
+                print self.fault_y_coords_list[i]
+                self.faults[i] = self.mcanvas.plot(self.fault_x_coords_list[i], self.fault_y_coords_list[i],
+                                                                    color='k', linewidth=0.5, zorder=1, marker='s',
+                                                                    alpha=1.0)
+            # CREATE NEW CURRENT FAULT GRAPHIC
+            self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='o', color='m', linewidth=0.75,
+                                                                                    alpha=1.0, zorder=2, picker=True)
 
             # DRAW CONTACT DATA
             # self.draw_contact_text()
@@ -1674,14 +1709,16 @@ class Gmg(wx.Frame):
             # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
             self.current_node = self.mcanvas.scatter(-40000., 0., marker='o', color='r', zorder=10)
 
-            # LOAD FAULT DATA
+            # Set Fault PICKIGN SWTICH OFF (DEFAULT TO LAYER MODE)
             self.fault_picking_swtich = False
 
             # REFRESH SIZER POSITIONS
             self.Hide()
             self.Show()
 
+            print self.faults
             # UPDATE LAYER DATA AND PLOT
+            self.draw()
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
@@ -2712,7 +2749,7 @@ class Gmg(wx.Frame):
                 return
 
             # GMG IS IN FAULT PICKING MODE
-            print "self.current_fault ="
+            print "self.current_fault_index ="
             print self.faultline
             xyt = self.faultline.get_xydata()
             self.xt, self.yt = xyt[:, 0], xyt[:, 1]
@@ -2724,6 +2761,13 @@ class Gmg(wx.Frame):
             # COORDINATE CAPTURE MODE
             print "IN CAPTURE MODE"
             pass
+
+    def toogle_fault_mode(self, event):
+        """SWITCH FAULT PICKING MODE ON AND OFF"""
+        if self.fault_picking_switch is True:
+            self.fault_picking_switch = False
+        elif self.fault_picking_switch is False:
+            self.fault_picking_switch = True
 
     def move(self, event):
         """WHEN THE MOUSE IS MOVED"""
@@ -2751,43 +2795,43 @@ class Gmg(wx.Frame):
             print "MOVING: GMG IS IN FAULT MODE"
 
             # ASSIGN NEW X AND Y POINTS
-            x = event.xdata  # GET X OF NEW POINT
-            y = event.ydata  # GET Y OF NEW POINT
+            self.new_x = event.xdata  # GET X OF NEW POINT
+            self.new_y = event.ydata  # GET Y OF NEW POINT
 
             # UPDATE NODE ARRAY
             if self.xt[self.selected_node] == self.x1 and self.yt[self.selected_node] != 0.001:
                 self.xt[self.selected_node] = self.x1  # REPLACE OLD X WITH NEW X
-                self.yt[self.selected_node] = y  # REPLACE OLD Y WITH NEW Y
+                self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
             elif self.xt[self.selected_node] == self.x2 and self.yt[self.selected_node] != 0.001:
                 self.xt[self.selected_node] = self.x2  # REPLACE OLD X WITH NEW X
-                self.yt[self.selected_node] = y  # REPLACE OLD Y WITH NEW Y
+                self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
             elif self.xt[self.selected_node] == 0 and self.yt[self.selected_node] == 0.001:
                 self.xt[self.selected_node] = 0  # REPLACE OLD X WITH NEW X
                 self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             elif self.xt[self.selected_node] == self.x2 and self.yt[self.selected_node] == 0.001:
                 self.xt[self.selected_node] = self.x2  # REPLACE OLD X WITH NEW X
                 self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            elif y <= 0:
-                self.xt[self.selected_node] = x  # REPLACE OLD X WITH NEW X
+            elif self.new_y <= 0:
+                self.xt[self.selected_node] = self.new_x  # REPLACE OLD X WITH NEW X
                 self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             else:
-                self.xt[self.selected_node] = x  # REPLACE OLD X WITH NEW X
-                self.yt[self.selected_node] = y  # REPLACE OLD Y WITH NEW Y
+                self.xt[self.selected_node] = self.new_x  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
 
             # UPDATE THE FAULT LIST RECORDS
-            self.fault_x_coords_list[self.fault_index_count - 1] = self.xt
-            self.fault_y_coords_list[self.fault_index_count - 1] = self.yt
+            self.fault_x_coords_list[self.current_fault_index] = self.xt
+            self.fault_y_coords_list[self.current_fault_index] = self.yt
 
             # UPDATE THE CURRENT VIEW OF THE FAULT
             self.faultline.set_data(self.xt, self.yt)
 
             # UPDATE "CURRENT NODE" RED DOT
             if self.xt[self.selected_node] == self.x1:
-                self.current_node.set_offsets([self.x1, y])
+                self.current_node.set_offsets([self.x1, self.new_y])
             elif self.xt[self.selected_node] == self.x2:
-                self.current_node.set_offsets([self.x2, y])
+                self.current_node.set_offsets([self.x2, self.new_y])
             else:
-                self.current_node.set_offsets([x, y])
+                self.current_node.set_offsets([self.new_x, self.new_y])
 
         'GMG IS IN LAYER MODE'
         if  self.fault_picking_switch is False:
@@ -2886,8 +2930,16 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE SO USE FAULT MODE KEY FUNCTIONS
-            # self.fault_mode_key_press(event)
+            self.fault_mode_key_press(event)
             return
+
+        'f = ACTIVATE FAULT PICKING MODE'
+        if event.key == 'f':
+            # TURN ON/OFF FAULT PICKING MODE
+            if self.fault_picking_switch is True:
+                self.fault_picking_switch = False
+            else:
+                self.fault_picking_switch = True
 
         'i = INSERT NEW NODE AT MOUSE POSITION'
         if event.key == 'i':
@@ -2898,6 +2950,7 @@ class Gmg(wx.Frame):
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
 
+            # INSERT NEW NODES INTO LAYER X AND Y LISTS
             self.plotx = np.insert(xt, [self.index_arg + 1], event.xdata)
             self.ploty = np.insert(yt, [self.index_arg + 1], event.ydata)
 
@@ -3118,8 +3171,152 @@ class Gmg(wx.Frame):
         if event.key == 'ctrl+down':
             self.aspect_decrease2(event)
 
-    def fault_mode_key_press(event):
-        pass
+    def fault_mode_key_press(self, event):
+        'i = INSERT NEW NODE AT MOUSE POSITION'
+        if event.key == 'i':
+            if event.inaxes is None:
+                return
+
+            # INSERT NEW NODE INTO XY LIST
+            self.xt = np.insert(self.xt, [self.index_arg + 1], event.xdata)
+            self.yt = np.insert(self.yt, [self.index_arg + 1], event.ydata)
+
+            # UPDATE THE FAULT LIST RECORDS
+            self.fault_x_coords_list[self.current_fault_index] = self.xt
+            self.fault_y_coords_list[self.current_fault_index] = self.yt
+
+            # UPDATE FAULT GRAPHICS
+            self.faults[self.current_fault_index][0].set_xdata(self.xt)
+            self.faults[self.current_fault_index][0].set_ydata(self.yt)
+
+            # UPDATE CURRENT FAULT OVERLAY GRAPHIC
+            self.faultline.set_data(self.xt, self.yt)
+
+            # UPDATE LAYER DATA AND PLOT (THIS WILL UPDATE THE GRAPHICS WITH THE NEW POINT)
+            self.update_layer_data()
+
+        'd = DELETE NODE AT MOUSE POSITION'
+        if event.key == 'd':
+            if event.inaxes is None:
+                return
+            # FIND NODE CLOSEST TO CURSOR LOCATION
+            d = np.sqrt((self.xt - event.xdata) ** 2 + (self.yt - event.ydata) ** 2)
+            self.index_arg = np.argmin(d)
+            self.distance = d[self.index_arg]
+
+            if self.index_arg == 0 or self.index_arg == 1:
+                # PREVENT END NODES BEING DELETED
+                return 0
+            if self.distance >= self.node_click_limit:
+                # CLICK WAS TO FAR AWAY FROM A NODE TO DELETE IT
+                return 0
+            else:
+                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
+                self.fault_x_coords_list[self.current_fault_index] = \
+                    [tup for i, tup in enumerate(self.xt) if i != self.index_arg]  # DELETE X
+
+                self.fault_y_coords_list[self.current_fault_index] = \
+                    [tup for i, tup in enumerate(self.yt) if i != self.index_arg]  # DELETE Y
+
+            # UPDATE GMG
+            self.update_layer_data()
+
+
+    def pick_new_fault(self, event):
+        """FAULT PICKING/LINE DRAWING MODE"""
+
+        # CHECK IF FAULT PICKING MODE IS ON
+        if self.fault_picking_switch is False:
+            MessageDialog(self, -1, "Faulting picking mode is not activated.\nTurn on fault picking mode first.",
+                          "Fault picker")
+        else:
+            # PROMPT NEW FAULT DIALOG BOX
+            new_fault_dialogbox = NewFaultDialog(self, -1, 'Create New Fault')
+            answer = new_fault_dialogbox.ShowModal()
+
+            # GET NEW FAULT VALUES
+            self.new_x1, self.new_y1 = new_fault_dialogbox.x1, new_fault_dialogbox.y1
+            self.new_x2, self.new_y2 = new_fault_dialogbox.x2, new_fault_dialogbox.y2
+
+            if self.fault_counter == 0:
+                # CREATE NEW CURRENT FAULT GRAPHIC
+                self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='o', color='m', linewidth=0.75,
+                                                                                    alpha=1.0, zorder=2, picker=True)
+            # INCREMENT THE TOTAL FAULT COUNT
+            self.fault_counter += 1
+
+            # SET THE CURRENT FAULT INDEX AS THE NEW FAULT
+            self.current_fault_index = self.fault_counter - 1
+            print "created new fault with index"
+            print self.current_fault_index
+            print ""
+
+            # APPEND BLANKS TO THE OBJECTS (USED FOR THE NEXT NEW FAULT)
+            self.faults.append([])
+            self.fault_names_list.append([])
+            self.fault_x_coords_list.append([])
+            self.fault_y_coords_list.append([])
+            self.fault_colors.append('k')
+
+            # APPEND THE NEW FAULT TO THE FAULT TREE SIDE PANEL
+            self.fault_tree_items.append('fault %s' % (int(self.current_fault_index)))
+            self.fault_item = 'fault %s' % (int(self.current_fault_index))
+            self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.current_fault_index)
+            self.fold_panel_three.Collapse()
+            self.fold_panel_three.Expand()
+
+
+            # ADD NAME FOR NEW FAULT
+            self.fault_names_list[self.current_fault_index] = 'Fault'
+
+            # ADD NEW FAULT XY TO XY LISTS
+            self.fault_x_coords_list[self.current_fault_index] = [self.new_x1, self.new_x2]
+            self.fault_y_coords_list[self.current_fault_index] = [self.new_y1, self.new_y2]
+
+                # SET CURRENT FAULT X AND Y ARRAYS
+            self.xt = [self.new_x1, self.new_x2]
+            self.yt = [self.new_y1, self.new_y2]
+
+            # ADD FAULT LINE TO CANVAS
+            self.faults[self.current_fault_index] = self.mcanvas.plot(
+                                                                self.fault_x_coords_list[self.current_fault_index],
+                                                                self.fault_y_coords_list[self.current_fault_index],
+                                                                color='k', linewidth=0.5, zorder=1, marker='s',
+                                                                alpha=1.0)
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
+
+            # UPDATE CURRENT NODE RED DOT GRAPHIC
+            self.current_node.set_offsets([self.new_x1, self.new_y1])
+
+            # UPDATE GMG
+            self.draw()
+
+    def fault_activated(self, event):
+        """RESPONSE WHEN A FAULT NAME IS SELECTED"""
+
+        # GET THE SELECTED FAULT INDEX NUMBER
+        self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
+
+        print "self.current_fault_index ="
+        print self.current_fault_index
+
+        # UPDATE CURRENT PLOT GRAPHICS
+        self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                self.fault_y_coords_list[self.current_fault_index])
+        
+        # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
+        self.update_layer_data()
+
+    def on_begin_edit_fault_label(self, event):
+        self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
+
+    def on_end_edit_fault_label(self, event):
+        new_label = self.fault_tree.GetItemText(event.GetItem())
+        self.fault_tree_items[self.current_fault_index] = str(new_label)
+
 
     def write_layers_xy(self, event):
         """OUTPUT LAYER DATA TO FILE"""
@@ -3722,19 +3919,19 @@ class Gmg(wx.Frame):
         # CREATE LAYER LINES
         for i in range(0, self.layer_count + 1):
             self.layer_lines[i] = self.mcanvas.plot(self.plotx_list[i], self.ploty_list[i], color=self.layer_colors[i],
-                                                    linewidth=1.0, alpha=1.0)
+                                                    linewidth=1.0, alpha=0.5)
         # CURRENT LAYER LINE
         self.polyline, = self.mcanvas.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.i],
                                            linewidth=1.0, alpha=0.5)
 
         # # FAULTS LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # # CREATE FAULT LINES
-        # for i in range(0, self.fault_index_count + 1):
-        #     self.layer_lines[i] = self.mcanvas.plot(self.fault_plotx_list[i], self.fault_ploty_list[i],
+        # for i in range(0, self.fault_counter + 1):
+        #     self.faults[i] = self.mcanvas.plot(self.fault_plotx_list[i], self.fault_ploty_list[i],
         #                                             color=self.fault_colors[i], linewidth=1.0, alpha=1.0)
         # # CURRENT FAULT LINE
         # self.fault_polyline, = self.mcanvas.plot(self.fault_plotx, self.fault_ploty, marker='o',
-        #                                          color=self.fault_colors[self.current_fault], linewidth=1.0, alpha=0.5)
+        #                                          color=self.fault_colors[self.current_fault_index], linewidth=1.0, alpha=0.5)
 
         # UPDATE GMG
         self.mcanvas.set_aspect(self.model_aspect)
@@ -3755,18 +3952,34 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
-            for i in range(0, self.fault_index_count):
-                # UPDATE FAULT LINES
-                self.faults[i][0].set_xdata(self.fault_x_coords_list[i])
-                self.faults[i][0].set_ydata(self.fault_y_coords_list[i])
+            # UPDATE FAULT LINE GRAPHICS
+            print("self.fault_counter =")
+            print(self.fault_counter)
+            for i in range(0, self.fault_counter):
+                try:
+                    self.faults[i][0].set_xdata(self.fault_x_coords_list[i])
+                    self.faults[i][0].set_ydata(self.fault_y_coords_list[i])
+                except IndexError:
+                    # USED FOR THE CASE WHEN ONLY 1 FAULT EXISTS
+                    pass
+
+            print(self.fault_x_coords_list)
+            print(self.fault_y_coords_list)
+            print "Current fault values = "
+            print(self.fault_x_coords_list[self.current_fault_index])
+            print(self.fault_y_coords_list[self.current_fault_index ])
+            
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index ],
+                                  self.fault_y_coords_list[self.current_fault_index ])
 
         else:
             # GMG IS IN LAYER MODE
-            # SET PLOT LISTS WITH UPDATED LAYER DATA FROM THE LAYER THAT IS CURRENTLY BEING EDITED
+            # UPDATE PLOT LISTS WITH LATEST EDIT
             self.plotx_list[self.i] = self.plotx
             self.ploty_list[self.i] = self.ploty
 
-            # RESET LISTS (USED AS INPUT FOR THE CALCULATE_GRAVITY FUNC)
+            # RESET LISTS (USED AS INPUT FOR THE GRAV/MAG ALGORITHMS)
             self.polygons = []
             self.mag_polygons = []
 
@@ -3809,10 +4022,13 @@ class Gmg(wx.Frame):
 
                 # SET POLYGON FILL COLOR
                 if self.densities[i] != 0 and self.absolute_densities is True:
+                    # DETERMINE DENSITY CONTRAST FROM (DENSITY - REF DENSITY)
                     next_color = self.colormap.to_rgba(0.001 * self.densities[i] - 0.001 * self.reference_densities[i])
                 elif self.densities[i] != 0:
+                    # NO REF DENSITY, SO JUST USE DENSITY VALUE
                     next_color = self.colormap.to_rgba(0.001 * self.densities[i])
                 else:
+                    # NO DEISNITY HAS BEEN SET SO LEAVE BLANK
                     next_color = self.colormap.to_rgba(0.)
 
                 # UPDATE POLYGON XY AND COLOR FILL
@@ -3828,18 +4044,21 @@ class Gmg(wx.Frame):
             self.polyline.set_ydata(self.ploty)
             self.polyline.set_color(self.layer_colors[self.i])
 
-            # DRAW CANVAS FEATURES
-            self.mcanvas.set_aspect(self.model_aspect)
-            self.dcanvas_aspect = ((self.dcanvas.get_xlim()[1] - self.dcanvas.get_xlim()[0]) /
-                                   (self.dcanvas.get_ylim()[1] - self.dcanvas.get_ylim()[0]))
+        # DRAW CANVAS FEATURES
+        self.mcanvas.set_aspect(self.model_aspect)
+        self.dcanvas_aspect = ((self.dcanvas.get_xlim()[1] - self.dcanvas.get_xlim()[0]) /
+                               (self.dcanvas.get_ylim()[1] - self.dcanvas.get_ylim()[0]))
+        # UPDATE INFO
         self.display_info()
+
+        # CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
+        self.model_saved = False
+
+        # UPDATE GMG GRAPHICS
         self.draw()
 
-        self.model_saved = False  # CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
-
-
     def run_algorithms(self):
-        """ RUN MODEL ALGORITHMS"""
+        """RUN MODEL ALGORITHMS"""
 
         # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
         # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY
@@ -3851,8 +4070,8 @@ class Gmg(wx.Frame):
                 self.polygons[0] = self.polygons[0][::-1]
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''GRAVITY'''
-        '''ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM'''
+        # GRAVITY
+        # ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM
         self.density_contrasts = np.zeros(len(self.densities))
         if not self.absolute_densities:
             self.density_contrasts = self.absolute_densities
@@ -3860,16 +4079,16 @@ class Gmg(wx.Frame):
             for i in xrange(len(self.densities)):
                 self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
 
-        '''ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT'''
+        # ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT
         if self.polygons and self.calc_grav_switch is True:
-            'SELECT ONLY THOSE LAYERS THAT ARE CHECKED'
+            # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             polygons_to_use, densities_to_use = [], []
             for layer in xrange(len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     densities_to_use.append(self.density_contrasts[layer])
 
-            'PASS TO BOTT ALGORITHM'
+            # PASS TO BOTT ALGORITHM
             polys = []
             for p, d in zip(polygons_to_use, densities_to_use):
                 polys.append(Polygon(1000 * np.array(p), {'density': d}))
@@ -3880,17 +4099,17 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''MAGNETICS'''
-        '''ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM'''
+        # MAGNETICS
+        # ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM
         if self.polygons and self.earth_field >= 1.0 and self.calc_mag_switch is True:
-            'SELECT ONLY THOSE LAYERS THAT ARE CHECKED'
+            # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             polygons_to_use, susceptibilities_to_use = [], []
             for layer in range(0, len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     susceptibilities_to_use.append(self.susceptibilities[layer])
 
-            '# PASS TO TALWANI AND HEIRTZLER ALGORITHM'
+            # PASS TO TALWANI AND HEIRTZLER ALGORITHM
             polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
@@ -3903,12 +4122,12 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '# UPDATE RMS VALUES'
+        # UPDATE RMS VALUES
 
-        '#  RUN RMS CALC CODE'
+        #  RUN RMS CALC CODE
         self.model_rms(self.xp)
 
-        'SET GRAV RMS VALUES'
+        # SET GRAV RMS VALUES
         if self.obs_gravity_data_for_rms != [] and self.grav_obs_switch == True and self.calc_grav_switch == True \
                 and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
@@ -3918,7 +4137,7 @@ class Gmg(wx.Frame):
         else:
             pass
 
-        'SET MAG RMS VALUES'
+        # SET MAG RMS VALUES
         if self.obs_mag_data_for_rms != [] and self.mag_obs_switch == True and self.calc_mag_switch == True \
                 and self.prednt != []:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
@@ -3931,8 +4150,8 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''SET CANVAS LIMITS'''
-        'Set gravity display box limits'
+        # SET CANVAS LIMITS
+        # SET GRAVITY DISPLAY BOX LIMITS
         if self.grav_obs_switch is True and self.grav_residuals != []:
             ymin = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).min()) - 2.0
             ymax = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).max()) + 2.0
@@ -3945,7 +4164,7 @@ class Gmg(wx.Frame):
         if self.dcanvas is not None:
             self.dcanvas.set_ylim(ymin, ymax)
 
-        'Set magnetics display box limits'
+        # SET MAGNETICS DISPLAY BOX LIMITS
         if self.mag_obs_switch is True and self.mag_residuals != []:
             ymin_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).min()) - 2.
             ymax_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).max()) + 2.
@@ -3960,10 +4179,10 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_ylim(ymin_mag, ymax_mag)
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        '# AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED'
+        # AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED
         self.model_saved = False
 
-        '# UPDATE FRAME'
+        # UPDATE GMG GRAPHICS
         self.draw()
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4147,86 +4366,6 @@ class Gmg(wx.Frame):
         #
         #     output = np.column_stack((x_interp_values, deriv))
         #     return output
-
-    def pick_new_fault(self, event):
-        """FAULT PICKING/LINE DRAWING MODE"""
-
-        # TURN ON/OFF FAULT PICKING MODE
-        if self.fault_picking_switch is True:
-            self.fault_picking_switch = False
-        else:
-            self.fault_picking_switch = True
-
-        # PROMPT NEW FAULT DIALOG BOX
-        new_fault_dialogbox = NewFaultDialog(self, -1, 'Create New Fault')
-        answer = new_fault_dialogbox.ShowModal()
-
-        # GET NEW FAULT VALUES
-        self.new_x1, self.new_y1 = new_fault_dialogbox.x1, new_fault_dialogbox.y1
-        self.new_x2, self.new_y2 = new_fault_dialogbox.x2, new_fault_dialogbox.y2
-
-        # INCREMENT THE TOTAL FAULT COUNT
-        self.fault_index_count += 1
-        self.faults.append([])
-        self.fault_names_list.append([])
-        self.fault_x_coords_list.append([])
-        self.fault_y_coords_list.append([])
-        self.fault_colors.append('k')
-        self.fault_tree_items.append('fault %s' % (int(self.fault_index_count)))
-        self.fault_item = 'fault %s' % (int(self.fault_index_count))
-        self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.fault_index_count)
-
-        # ADD NAME FOR NEW FAULT
-        self.fault_names_list[self.fault_index_count-1] = 'New fault'
-
-        # CREATE NEW FAULT ATTRIBUTES
-        self.fault_x_coords_list[self.fault_index_count - 1] = [self.new_x1, self.new_x2]
-        self.fault_y_coords_list[self.fault_index_count - 1] = [self.new_y1, self.new_y2]
-
-        # SET CURRENT FAULT
-        self.current_fault_x = self.fault_x_coords_list[self.fault_index_count - 1]
-        self.current_fault_y = self.fault_y_coords_list[self.fault_index_count - 1]
-
-        # UPDATE LIST OF FAULT DRAWINGS
-        self.faults[self.fault_index_count-1] = self.mcanvas.plot(self.current_fault_x, self.current_fault_y,
-                                                     color='red', linewidth=1.0, alpha=1.0)
-
-        # SET THE CURRENT FAULT AS THE NEWLY CREATED FAULT
-        self.current_fault = self.faults[self.fault_index_count-1]
-
-        # SET THE CURRENT FAULT DRAWING AS THE NEWLY CREATED FAULT
-        self.faultline, = self.mcanvas.plot(self.current_fault_x, self.current_fault_y, marker='o',
-                                           color='pink', linewidth=2.0, alpha=1.0, picker=True)
-
-        # UPDATE GMG
-        self.update_layer_data()
-        self.draw()
-
-    def fault_activated(self, event):
-        """RESPONSE WHEN A FAULT NAME IS SELECTED"""
-
-        # GET THE SELECTED FAULT INDEX NUMBER
-        self.current_fault = self.tree.GetPyData(event.GetItem())
-        print "self.current_fault ="
-        print self.current_fault
-
-        # ASSIGN CURRENT XY
-        self.current_fault_x = self.fault_x_coords_list[self.current_fault-1]
-        self.current_fault_y = self.fault_y_coords_list[self.current_fault-1]
-
-        print "self.current_fault_x = "
-        print self.current_fault_x
-
-        print "self.current_fault_y = "
-        print self.current_fault_y
-
-        print "self.fault_x_coords_list = "
-        print self.fault_x_coords_list
-
-        print "self.fault_y_coords_list = "
-        print self.fault_y_coords_list
-
-        self.update_layer_data()
 
     def set_error(self, value):
         pass
