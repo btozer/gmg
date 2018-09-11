@@ -54,9 +54,15 @@ obspy.org
 ***
 
 ***
-Icons where designed using the Free icon Maker.
+Icons where designed using the Free icon Maker:
 
-https://freeiconmaker.com/
+icons8.com
+https://icons8.com/icon/set/circle/all
+
+Pixel size: 24
+Font: Roboto Slab
+Font size: 200
+Color: 3498db
 ***
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -107,7 +113,7 @@ import gc
 import webbrowser
 
 # FUTURE
-# mport wx.lib.agw.ribbon as RB
+# import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
 # from scipy import interpolate as ip
 
@@ -162,17 +168,17 @@ class Gmg(wx.Frame):
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         'SECOND PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 384),
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 331),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 100),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 331),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         'THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 277),
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 331),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 100),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 331),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
@@ -516,10 +522,6 @@ class Gmg(wx.Frame):
                                     wx.Bitmap(self.gui_icons_dir + 'C_24.png'), shortHelp="Capture coordinates")
         self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
 
-        t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'), shortHelp="Fault pick")
-        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
-
         t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
                                 wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'), shortHelp="Aspect increase")
         self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
@@ -564,14 +566,27 @@ class Gmg(wx.Frame):
                                 wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'), shortHelp="Transparency down")
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
 
+        # INCREASE TRANSPERANCY ICON
         t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
                                 wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'), shortHelp="Transparency up")
         self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
 
+        # LOAD WELL ICON
         t_load_well = self.toolbar.AddTool(wx.ID_ANY, "Load well horizons",
                                 wx.Bitmap(self.gui_icons_dir + 'well_24.png'), shortHelp="Load well horizons")
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
-        #
+
+        # TOOGLE FAULT PICKING MODE
+        t_toogle_fault_mode = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
+                                wx.Bitmap(self.gui_icons_dir + 'F_24.png'), shortHelp="Toogle fault picking")
+        self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, t_toogle_fault_mode)
+
+        # FAULT PICKER ICON
+        t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
+                                wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'), shortHelp="Fault picker")
+        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
+
+        # CREATE TOOLBAR
         self.toolbar.Realize()
         self.toolbar.SetSize((1790, 36))
 
@@ -742,10 +757,15 @@ class Gmg(wx.Frame):
         self.layers_calculation_switch = [1]
 
         'INITIALISE FAULTS'
+        self.fault_picking_switch = False
         self.faults = [[]]
-        self.fault_count = 0
-        self.current_fault = 0
+        self.fault_names_list = []
+        self.fault_counter = 0
+        self.current_fault_index = 0
         self.fault_colors = ['k']
+        self.fault_x_coords_list = [[]]
+        self.fault_y_coords_list = [[]]
+        self.selected_node = None
 
         'INITIALIZE COORDINATE CAPTURE'
         self.capture = False
@@ -813,30 +833,9 @@ class Gmg(wx.Frame):
             self.polygon_fills[0] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
-            self.current_node = self.mcanvas.scatter(-40000., 0, s=50, color='r')
+            self.current_node = self.mcanvas.scatter(-40000., 0, s=50, color='r', zorder=10)
         else:
             self.nextpoly = []
-
-        'INITALISE FAULTS'
-        self.showing_faultline, = self.mcanvas.plot([], [], marker='o', color=self.fault_colors[0],
-                                           linewidth=1.0, alpha=0.5)
-
-        'MAKE LAYER TREE'
-        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
-                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
-        self.tree.SetIndent(0.0)
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.tree)
-        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
-        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
-
-        'TREE ATTRIBUTES'
-        self.root = self.tree.AddRoot("Layers:")
-        self.tree.SetItemPyData(self.root, None)
-        self.tree_items = ["Layer 0"]
-        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
-
-        self.error = 0.
-        self.last_layer = 0
 
         '''ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
         'Make Attribute Label'
@@ -894,6 +893,39 @@ class Gmg(wx.Frame):
         self.grav_rms_plot, = self.dcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.ntcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+
+
+        'MAKE LAYER TREE'
+        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
+                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
+        self.tree.SetIndent(0.0)
+        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.tree)
+        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
+        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
+
+        'TREE ATTRIBUTES'
+        self.root = self.tree.AddRoot("Layers:")
+        self.tree.SetItemPyData(self.root, None)
+        self.tree_items = ["Layer 0"]
+        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
+
+        self.error = 0.
+        self.last_layer = 0
+
+        'MAKE FAULT TREE'
+        self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 331),
+                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
+        self.fault_tree.SetIndent(0.0)
+
+        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.fault_activated, self.fault_tree)
+        ### self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.fault_tree)
+        ### self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.fault_tree)
+
+        'TREE ATTRIBUTES'
+        self.fault_tree_root = self.fault_tree.AddRoot("Faults:")
+        self.fault_tree.SetItemPyData(self.fault_tree_root, None)
+        self.fault_tree_items = []
+        ### self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
 
         'UPDATE INFO BAR'
         self.display_info()
@@ -1094,16 +1126,12 @@ class Gmg(wx.Frame):
 
         'UPDATE FRAMES'
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def size_handler(self):
         """# CREATE CANVAS BOX"""
         self.canvas_box = wx.BoxSizer(wx.HORIZONTAL)
         self.canvas_box.Add(self.canvas, 1, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, border=2)
-
-        'CREATE LAYER TREE BOX'
-        self.tree_box = wx.BoxSizer(wx.VERTICAL)
-        self.tree_box.Add(self.tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
 
         'LAYER ATTRIBUTES'
         self.attr_box = wx.BoxSizer(wx.VERTICAL)
@@ -1171,15 +1199,25 @@ class Gmg(wx.Frame):
         'SET BUTTON'
         self.attr_box.Add(self.node_set_button, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
 
+        'CREATE LAYER TREE BOX'
+        self.tree_box = wx.BoxSizer(wx.VERTICAL)
+        self.tree_box.Add(self.tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
+
+        'CREATE FAULT TREE BOX'
+        self.fault_tree_box = wx.BoxSizer(wx.VERTICAL)
+        self.fault_tree_box.Add(self.fault_tree, 1, wx.TOP | wx.ALIGN_CENTER | wx.EXPAND, border=20)
+
         '#PLACE BOX SIZERS IN CORRECT PANELS'
         self.fold_panel_one.SetSizerAndFit(self.attr_box)
         self.fold_panel_two.SetSizerAndFit(self.tree_box)
+        self.fold_panel_three.SetSizerAndFit(self.fault_tree_box)
         self.leftPanel.SetSizer(self.splitter_left_panel_sizer)
         self.fold_panel_one.Collapse()
         self.fold_panel_one.Expand()
-        self.fold_panel_one.Collapse()
-        self.fold_panel_one.Expand()
+        self.fold_panel_two.Collapse()
+        self.fold_panel_two.Expand()
         self.fold_panel_three.Collapse()
+        self.fold_panel_three.Expand()
 
         self.rightPanel.SetSizerAndFit(self.canvas_box)
         self.rightPanel.SetSize(self.GetSize())
@@ -1243,7 +1281,7 @@ class Gmg(wx.Frame):
         zp = np.zeros_like(xp)
         self.zp = np.array(zp, dtype='f')
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def connect(self):
         """CONNECT MOUSE AND EVENT BINDINGS"""
@@ -1295,21 +1333,21 @@ class Gmg(wx.Frame):
         self.ploty = self.ploty_list[self.i]
         self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
 
     def on_begin_edit_label(self, event):
         pass
 
     def on_end_edit_label(self, event):
         self.i = self.tree.GetPyData(event.GetItem())
-        item = self.get_item_text(event.GetItem())
-        self.tree_items[self.i] = str(item)
+        new_label = self.get_item_text(event.GetItem())
+        self.tree_items[self.i] = str(new_label)
 
     def delete_all_children(self, event):
         self.tree.DeleteChildren(event)
 
     def item_checked(self, event):
-        """#TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
+        """TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
 
         layer = self.tree.GetPyData(event.GetItem())
         if self.layers_calculation_switch[layer] == 1:
@@ -1339,20 +1377,20 @@ class Gmg(wx.Frame):
             self.nodes = False
             self.nav_toolbar.zoom()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def zoom_out(self, event):
         self.nav_toolbar.back()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def full_extent(self, event):
         """#REDRAW MODEL FRAME WITH FULL EXTENT"""
         self.full_extent_adjustment()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def full_extent_adjustment(self):
@@ -1393,7 +1431,7 @@ class Gmg(wx.Frame):
             self.nodes = True
             self.nav_toolbar.pan()
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def calc_grav_switch(self, event):
@@ -1406,7 +1444,7 @@ class Gmg(wx.Frame):
         else:
             self.calc_grav_switch = True
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def calc_mag_switch(self, event):
@@ -1418,7 +1456,7 @@ class Gmg(wx.Frame):
         else:
             self.calc_mag_switch = True
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     # MODEL WINDOW GRAPHICS OPTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1495,7 +1533,9 @@ class Gmg(wx.Frame):
                   'model_azimuth', 'susceptibilities', 'angle_a', 'angle_b', 'remanence',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms', 'xy_name_list', 'xy_list_save',
-                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect']
+                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect', 'faults', 'fault_names_list',
+                  'fault_counter', 'current_fault_index', 'fault_x_coords_list', 'fault_y_coords_list',
+                  'fault_tree_items', 'fault_counter']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
@@ -1505,7 +1545,10 @@ class Gmg(wx.Frame):
                         self.model_azimuth, self.susceptibilities, self.angle_a, self.angle_b, self.remanence,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms, self.xy_name_list, self.xy_list_save,
-                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect]
+                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect, self.faults,
+                        self.fault_names_list, self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
+                        self.fault_y_coords_list, self.fault_tree_items, self.fault_counter]
+
 
         for i in range(0, len(model_params)):
             self.save_dict[header[i]] = model_params[i]
@@ -1518,10 +1561,11 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             MessageDialog(self, -1, "Model saved successfully", "Save")
         except IOError:
-            MessageDialog(self, -1, "Error in save process.\nModel unsaved", "Save")
+            MessageDialog(self, -1, "Error in save process.\nModel not saved", "Save")
 
     def load_model(self, event):
-        """#LOAD MODEL FROM DISC IN .Pickle FORMAT"""
+        """LOAD MODEL FROM DISC IN .Pickle FORMAT"""
+
         try:
             if not self.model_saved:
                 if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
@@ -1532,29 +1576,33 @@ class Gmg(wx.Frame):
                 if open_file_dialog.ShowModal() == wx.ID_CANCEL:
                     return  # USER CHANGED THEIR MIND
 
-            'INITALISE MODEL PARAMETERS'
+            # INITALISE MODEL PARAMETERS
             self.initalise_model()
             self.model_aspect = 1.
 
-            'OPEN DATA STREAM'
+            # OPEN DATA STREAM
             file_in = open_file_dialog.GetPath()
             model_data = Pickle.load(open(file_in, "r+"))
 
-            'CLEAR MEMORY'
+            # CLEAR MEMORY
             gc.collect()
             del gc.garbage[:]
 
-            'LOAD DATA INTO MODEL'
+            # LOAD DATA INTO MODEL
             for x in xrange(len(model_data)):
                 setattr(self, model_data.keys()[x], model_data.values()[x])
 
-            'SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)'
-            self.loaded_tree_items = self.tree_items
+            print "self.faults = "
+            print self.faults
 
-            'DRAW CANVAS'
+            # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
+            self.loaded_tree_items = self.tree_items
+            self.loaded_fault_tree_items = self.fault_tree_items
+
+            # DRAW CANVAS
             self.start(self.area, self.xp, self.zp)
 
-            'SET LAYERS self.boundary_lock_status'
+            # SET LAYERS self.boundary_lock_status
             self.boundary_lock_status = [[]]
             for x in xrange(len(self.boundary_lock_list)):
                 if self.boundary_lock_list[x] == 0:
@@ -1564,7 +1612,7 @@ class Gmg(wx.Frame):
                     self.boundary_lock_status[x] = ['unlocked']
                     self.boundary_lock_status.append([])
 
-            'SET LAYERS self.layer_lock_status'
+            # SET LAYERS self.layer_lock_status
             self.layer_lock_status = [[]]
             for x in xrange(len(self.layer_lock_list)):
                 if self.layer_lock_list[x] == 0:
@@ -1574,7 +1622,7 @@ class Gmg(wx.Frame):
                     self.layer_lock_status[x] = ['unlocked']
                     self.layer_lock_status.append([])
 
-            'PLOT OBSERVED DATA'
+            # PLOT OBSERVED DATA
             if self.xy_list_save != [[]]:
                 self.plot_obs_xy()
             if self.obs_grav_list_save != [[]]:
@@ -1584,10 +1632,10 @@ class Gmg(wx.Frame):
             if self.obs_topo_list_save != [[]]:
                 self.plot_obs_topo()
 
-            'LOAD & PLOT SEGY'
+            # LOAD & PLOT SEGY
             self.plot_segy()
 
-            'Set VARIABLE VALUES FROM LOADED DATA'
+            # Set VARIABLE VALUES FROM LOADED DATA
             self.i = (len(self.densities) - 1)
             self.layer_count = (len(self.densities) - 1)
             self.density_input.SetValue(0.001 * self.densities[self.i])
@@ -1601,7 +1649,7 @@ class Gmg(wx.Frame):
             if self.layer_colors == [[]]:
                 self.layer_colors = ['black' for x in xrange(self.i + 1)]
 
-            'LOAD TREE ITEMS'
+            # LOAD LAYER TREE ITEMS
             self.tree.DeleteAllItems()  # DELETE CURRENT LAYER TREE
             self.root = self.tree.AddRoot("Layers:")  # CREATE NEW TREE
             self.tree.SetItemPyData(self.root, None)
@@ -1615,19 +1663,40 @@ class Gmg(wx.Frame):
 
             self.tree_items = self.loaded_tree_items
 
-            'MAKE LAYER LINES AND POLYGONS'
+            # LOAD FAULT TREE ITEMS
+            for i in xrange(0, len(self.loaded_fault_tree_items)):
+                print self.loaded_fault_tree_items[i]
+                fault_tree_item = self.fault_tree.AppendItem(self.fault_tree_root, "%s" %
+                                                             self.loaded_fault_tree_items[i], ct_type=1)
+                fault_tree_item.Check(checked=True)
+                self.fault_tree.SetItemPyData(fault_tree_item, i)
+
+            self.fault_tree_items = self.loaded_fault_tree_items
+
+            # MAKE LAYER LINES AND POLYGONS
             self.layer_lines = [[] for x in xrange(self.i + 1)]
             self.polygon_fills = [[] for x in xrange(self.i + 1)]
 
-            'LOAD LAYERS'
+            # LOAD LAYERS
             self.load_layer_data()
 
-            'DRAW CONTACT DATA'
+            for i in range(0, self.fault_counter):
+                # DRAW FAULTS
+                print self.fault_x_coords_list[i]
+                print self.fault_y_coords_list[i]
+                self.faults[i] = self.mcanvas.plot(self.fault_x_coords_list[i], self.fault_y_coords_list[i],
+                                                                    color='k', linewidth=0.5, zorder=1, marker='s',
+                                                                    alpha=1.0)
+            # CREATE NEW CURRENT FAULT GRAPHIC
+            self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
+                                                                                    alpha=1.0, zorder=2, picker=True)
+
+            # DRAW CONTACT DATA
             # self.draw_contact_text()
             # self.xy_name_list = [[]]
             # self.xy_count = 0
 
-            'LOAD WELL MENU --- SET WELL MENU - IDs start at 2000'
+            # LOAD WELL MENU --- SET WELL MENU - IDs start at 2000
             self.count = 0
             for x in xrange(len(self.well_name_list)):
                 if self.well_name_list[x] == "None" or self.well_name_list[x] == []:
@@ -1643,16 +1712,21 @@ class Gmg(wx.Frame):
                     self.count += 1
             self.well_count = len(self.well_name_list)
 
-            'SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)'
+            # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
             self.current_node = self.mcanvas.scatter(-40000., 0., marker='o', color='r', zorder=10)
 
-            'REFRESH SIZER POSITIONS'
+            # Set Fault PICKIGN SWTICH OFF (DEFAULT TO LAYER MODE)
+            self.fault_picking_swtich = False
+
+            # REFRESH SIZER POSITIONS
             self.Hide()
             self.Show()
 
-            'UPDATE LAYER DATA AND PLOT'
+            print self.faults
+            # UPDATE LAYER DATA AND PLOT
+            self.draw()
             self.update_layer_data()
-            self.update()
+            self.run_algorithms()
             self.draw()
             self.draw_well()  # DRAW WELLS
             self.Restore()  # FIX'S DISPLAY ISSUE
@@ -2213,7 +2287,7 @@ class Gmg(wx.Frame):
         self.wells[self.well_count - 1] = self.mcanvas.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
         self.well_name_text.append([])
-        
+
         # PLOT WELL NAME
         self.well_name_text[self.well_count - 1] = self.mcanvas.annotate(self.well_name, xy=(well_x_location, -0.5),
                                                                          xytext=(well_x_location, -0.5),
@@ -2269,7 +2343,7 @@ class Gmg(wx.Frame):
         self.well_horizons_list[self.well_count - 1] = self.horizons
         self.well_horizons_list.append([])
         self.well_labels_list.append([])
-        
+
         # UPDATE GMG
         self.update_layer_data()
 
@@ -2307,14 +2381,14 @@ class Gmg(wx.Frame):
                                                                bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
                                                                clip_on=True)
 
-                # PLOT WELL HORIZONS 
+                # PLOT WELL HORIZONS
                 # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
                 self.well_labels[w] = [None] * len(well_data)
                 self.horizons[w] = [None] * len(well_data)
                 for i in range(2, len(well_data)):
                     y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
                     x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
-                    
+
                     # PLOT HORIZON LINE
                     self.horizons[w][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
                     horizon_y_pos = well_data[i, 1].astype(float)
@@ -2378,7 +2452,7 @@ class Gmg(wx.Frame):
 
     def delete_well(self, event):
         """REMOVE PLOT GRAPHICS"""
-        
+
         self.wells[event.Id - 3000][0].set_visible(False)
         self.well_name_text[event.Id - 3000].set_visible(False)
         horizons = self.horizons[event.Id - 3000]
@@ -2389,13 +2463,13 @@ class Gmg(wx.Frame):
         for i in range(2, len(labels)):
             labels[i].set_visible(False)
             labels[i] = "None"
-        
+
         # SET DATA TO NONE
         self.well_list[event.Id - 3000] = "None"
         self.well_name_list[event.Id - 3000] = "None"
         self.wells[event.Id - 3000][0] = "None"
         self.well_name_text[event.Id - 3000] = "None"
-        
+
         # REMOVE SUBMENU
         self.m_wells_submenu.DestroyId(event.Id)
         self.update_layer_data()
@@ -2404,7 +2478,7 @@ class Gmg(wx.Frame):
 
     def load_contact_data(self, event):
         """CHOSE CONTACT DATA FILE TO LOAD"""
-        
+
         open_file_dialog = wx.FileDialog(self, "Open contact data", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2429,7 +2503,7 @@ class Gmg(wx.Frame):
             x = (x1, x1)
             y = (y1, y2)
             self.contacts[i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-            
+
         self.contact_data_list[self.contact_data_count] = self.contacts
         self.contact_data_list.append([])
 
@@ -2438,7 +2512,7 @@ class Gmg(wx.Frame):
         text = zip(self.contact_data[:, 0].astype(float), self.contact_data[:, 1].astype(float),
                    self.contact_data[:, 3].astype(str))
         for i in xrange(len(self.contacts)):
-            
+
             # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
             if i % 2 == 0:
                 self.text_labels[i] = self.mcanvas.annotate(text[i][2], xy=(text[i][0], text[i][1]),
@@ -2480,9 +2554,805 @@ class Gmg(wx.Frame):
 
     # LAYER & NODE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def b_node_set_button(self, event):
+        """
+        CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT THEN PASS THIS PART AND ONLY UPDATE ATTRIBUTES
+        """
+
+        new_x = float(self.x_input.GetValue())
+        new_y = float(self.y_input.GetValue())
+
+        if self.i == self.node_layer_reference:
+            xt = np.array(self.plotx)
+            yt = np.array(self.ploty)
+
+            if self.boundary_lock_list[self.i] == 0 and self.index_node is not None:
+                if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
+                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+                elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
+                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+                elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
+                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
+                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                elif new_y <= 0:
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                else:
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+            elif self.boundary_lock_list[self.i] == 1:
+                if new_y <= 0:
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                else:
+                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+
+            # DEAL WITH PINCHED NODE
+            if self.pinch_switch != 0:
+                for k in range(0, len(self.index_arg2_list)):
+                    if self.index_arg2_list[k] is not None:
+                        next_x_list = self.plotx_list[k]
+                        next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
+                        next_x_list[self.index_arg2_list[k]] = new_x
+                        next_y_list[self.index_arg2_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
+                        self.plotx_list[k] = next_x_list
+                        self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+
+            self.plotx = xt
+            self.ploty = yt
+            self.polyline.set_data(self.plotx, self.ploty)
+
+            # COLOR CURRENTLY SELECTED NODE RED
+            self.current_node.set_offsets([new_x, new_y])
+        else:
+            pass
+
+        # UPDATE LAYER DATA
+        self.set_density(self)
+        self.set_susceptibility(self)
+        self.set_remanence(self)
+        self.set_angle_a(self)
+        self.set_angle_b(self)
+
+        # UPDATE GMG
+        self.update_layer_data()
+        self.run_algorithms()
+
+    def get_node_under_point(self, event):
+        """
+        GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
+        """
+
+        self.node_layer_reference = self.i
+        xyt = self.polyline.get_xydata()
+        xt = xyt[:, 0]
+        yt = xyt[:, 1]
+        d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+        self.index_arg = np.argmin(d)
+        if d[self.index_arg] >= self.node_click_limit:
+            return None, None
+        else:
+            # CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER
+            self.pinch_switch = 0
+
+            # CREATE LIST OF NONES SAME LENGTH AS NUMBER OF LAYERS IN MODEL
+            self.index_arg2_list = [None] * (self.layer_count + 1)
+
+            for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
+                if x == self.i:  # SKIP CURRENT LAYER
+                    pass
+                node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
+
+                for i in range(0, len(node_list_x)):
+                    if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
+                        # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER, THEN RETURN THE INDEX
+                        self.index_arg2_list[x] = i
+                        self.pinch_switch = 1
+
+            'return node index'
+            return self.index_arg, self.index_arg2_list
+
+    def get_fault_node_under_point(self, event):
+        """
+        GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
+        """
+
+        print "GETTING FAULT NODE UNDER CLICK"
+        # GET FAULT NODE XY DATA
+        xy_data = self.faultline.get_xydata()
+        x = xy_data[:, 0]
+        y = xy_data[:, 1]
+
+        # FIND NODE CLOSEST TO EVENT CLICK POINT
+        d = np.sqrt((x - event.xdata) ** 2 + (y - event.ydata) ** 2)
+        self.index_arg = np.argmin(d)
+
+        # RETURN RESULTING NODE OR NONE
+        if d[self.index_arg] >= self.node_click_limit:
+            return None
+        else:
+            return self.index_arg
+
+    def button_press(self, event):
+        """ WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
+
+        if event.inaxes is None:
+            return  # CLICK IS OUTSIDE MODEL FRAME
+        if event.button != 1:
+            return
+
+        if self.fault_picking_switch is False and self.capture is False:
+            # GMG IS IN LAYER MODE
+
+            # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
+            self.index_node, self.index_arg2_list = self.get_node_under_point(event)
+            if self.index_node is None:
+                return
+
+            xyt = self.polyline.get_xydata()
+            xt, yt = xyt[:, 0], xyt[:, 1]
+            self.x_input.SetValue(xt[self.index_node])
+            self.y_input.SetValue(yt[self.index_node])
+
+            # IF PINCH == TRUE, THEN PINCH THE NODE TO NEXT NODE
+            if self.pinch:
+                # GET THE NODE NUMBER AND LAYER NUMBER AND PLACE THEM IN "PINCH_NODE_LIST"
+                if self.pinch_count == 0:
+                    self.plotx = self.plotx_list[self.i]
+                    self.ploty = self.ploty_list[self.i]
+                    x1 = np.array(self.plotx)
+                    y1 = np.array(self.ploty)
+                    self.index_node = self.get_node_under_point(event)
+                    self.pinch_node_list[self.pinch_count] = self.index_node[0]
+                    self.pinch_node_list[self.pinch_count + 1] = self.i
+                    self.pinch_count = + 1
+                    # SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE
+                else:
+                    # SET THE SECOND NODE X AND Y
+                    self.plotx2 = self.plotx_list[self.i]
+                    self.ploty2 = self.ploty_list[self.i]
+                    x2 = np.array(self.plotx2)
+                    y2 = np.array(self.ploty2)
+                    self.index_node = self.get_node_under_point(event)
+                    new_x = x2[int(self.index_node[0])]
+                    new_y = y2[int(self.index_node[0])]
+
+                    # SET THE FIRST NODE X AND Y
+                    self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
+                    self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
+                    x1 = np.array(self.plotx1)
+                    y1 = np.array(self.ploty1)
+
+                    # REPLACE THE ORIGINAL NODE WITH THE NEW NODE
+                    x1[int(self.pinch_node_list[0])] = new_x  # REPLACE OLD X WITH NEW X
+                    y1[int(self.pinch_node_list[0])] = new_y  # REPLACE OLD Y WITH NEW Y
+                    self.plotx_list[int(self.pinch_node_list[1])] = x1
+                    self.ploty_list[int(self.pinch_node_list[1])] = y1
+                    self.pinch_count = 0
+
+            # COLOR CURRENTLY SELECTED NODE RED
+            self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
+
+        elif self.fault_picking_switch is True:
+            # GMG IS IN FAULT MODE
+
+            # GET CURRENT NODE
+            self.selected_node = self.get_fault_node_under_point(event)
+            if self.selected_node is None:
+                return
+
+            # GET CURRENT X AND Y COORDS
+            xyt = self.faultline.get_xydata()
+            self.xt = xyt[:, 0]
+            self.yt = xyt[:, 1]
+
+            # COLOR CURRENTLY SELECTED NODE RED
+            self.current_node.set_offsets([self.xt[self.selected_node], self.yt[self.selected_node]])
+
+        elif self.capture is True:
+            # COORDINATE CAPTURE MODE
+            pass
+
+    def toogle_fault_mode(self, event):
+        """SWITCH FAULT PICKING MODE ON AND OFF"""
+        if self.fault_picking_switch is True:
+            self.fault_picking_switch = False
+        elif self.fault_picking_switch is False:
+            self.fault_picking_switch = True
+
+    def move(self, event):
+        """WHEN THE MOUSE IS MOVED"""
+
+        if self.index_node is None and self.selected_node is None:
+            # NO NODE WAS FOUND NEAR THE CLICK
+            return
+        if event.inaxes is None:
+            # CLICK WAS OUTSIDE THE MODEL FRAME
+            return
+        if event.button != 1:
+            return
+        if self.pinch is True:
+            # PINCH MODE IS ON
+            return
+        if self.pan_on is True:
+            # PAN MODE IS ON
+            return
+        if self.zoom_on is True:
+            # ZOOM MODE IS ON
+            return
+
+        if self.fault_picking_switch is True:
+            # GMG IS IN FAULT MODE
+            print "MOVING: GMG IS IN FAULT MODE"
+
+            # ASSIGN NEW X AND Y POINTS
+            self.new_x = event.xdata  # GET X OF NEW POINT
+            self.new_y = event.ydata  # GET Y OF NEW POINT
+
+            # UPDATE NODE ARRAY
+            if self.xt[self.selected_node] == self.x1 and self.yt[self.selected_node] != 0.001:
+                self.xt[self.selected_node] = self.x1  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
+            elif self.xt[self.selected_node] == self.x2 and self.yt[self.selected_node] != 0.001:
+                self.xt[self.selected_node] = self.x2  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
+            elif self.xt[self.selected_node] == 0 and self.yt[self.selected_node] == 0.001:
+                self.xt[self.selected_node] = 0  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            elif self.xt[self.selected_node] == self.x2 and self.yt[self.selected_node] == 0.001:
+                self.xt[self.selected_node] = self.x2  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            elif self.new_y <= 0:
+                self.xt[self.selected_node] = self.new_x  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            else:
+                self.xt[self.selected_node] = self.new_x  # REPLACE OLD X WITH NEW X
+                self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
+
+            # UPDATE THE FAULT LIST RECORDS
+            self.fault_x_coords_list[self.current_fault_index] = self.xt
+            self.fault_y_coords_list[self.current_fault_index] = self.yt
+
+            # UPDATE THE CURRENT VIEW OF THE FAULT
+            self.faultline.set_data(self.xt, self.yt)
+
+            # UPDATE "CURRENT NODE" RED DOT
+            if self.xt[self.selected_node] == self.x1:
+                self.current_node.set_offsets([self.x1, self.new_y])
+            elif self.xt[self.selected_node] == self.x2:
+                self.current_node.set_offsets([self.x2, self.new_y])
+            else:
+                self.current_node.set_offsets([self.new_x, self.new_y])
+
+        'GMG IS IN LAYER MODE'
+        if  self.fault_picking_switch is False:
+            print "MOVING: GMG IS IN FAULT MODE"
+            if self.boundary_lock_list[self.i] == 0:
+                x = event.xdata  # GET X OF NEW POINT
+                y = event.ydata  # GET Y OF NEW POINT
+
+                # GET CURRENT X AND Y ARRAYS
+                xt = np.array(self.plotx)
+                yt = np.array(self.ploty)
+
+                # UPDATE NODE
+                if xt[self.index_node] == self.x1 and yt[self.index_node] != 0.001:
+                    xt[self.index_node] = self.x1  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
+                elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
+                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
+                elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
+                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
+                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                elif y <= 0:
+                    xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                else:
+                    xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
+            elif self.boundary_lock_list[self.i] == 1:
+                x = event.xdata  # GET X OF NEW POINT
+                y = event.ydata  # GET Y OF NEW POINT
+                xt = np.array(self.plotx)
+                yt = np.array(self.ploty)
+                if y <= 0:
+                    xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+                else:
+                    xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                    yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
+
+            # DEAL WITH PINCHED MODE
+            if self.pinch_switch != 0:
+                for k in range(0, len(self.index_arg2_list)):
+                    if self.index_arg2_list[k] is not None:
+
+                        # GET THE NODE LIST OF THE NEXT LAYER
+                        next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
+
+                        # REPLACE THE PINCHED NODE WITH THE NEW NODE
+                        next_x_list[self.index_arg2_list[k]] = x
+                        next_y_list[self.index_arg2_list[k]] = y
+                        self.plotx_list[k] = next_x_list
+                        self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+
+            self.plotx = xt
+            self.ploty = yt
+            self.polyline.set_data(self.plotx, self.ploty)
+
+            # UPDATE "CURRENT NODE" RED DOT
+            if xt[self.index_node] == self.x1:
+                self.current_node.set_offsets([self.x1, y])
+            elif xt[self.index_node] == self.x2:
+                self.current_node.set_offsets([self.x2, y])
+            else:
+                self.current_node.set_offsets([x, y])
+
+        self.update_layer_data()  # UPDATE LAYER DATA
+
+    def button_release(self, event):
+        """WHEN MOUSE BUTTON IS RELEASED"""
+
+        if event.inaxes is None:
+            # CLICK WAS OUTSIDE THE MODEL FRAME
+            return
+        if event.button != 1:
+            return
+
+        # UPDATE LAYER ATTRIBUTES TABLE WITH CURRENT COORDINATES
+        self.x_input.SetValue(event.xdata)
+        self.y_input.SetValue(event.ydata)
+
+        if self.capture is True:
+            # GMG IS IN COORDINATE CAPTURE MODE SO ADD THE CURRENT COORDINATES TO THE TABLE
+            self.capture_window.table.Append((event.xdata, event.ydata))
+
+        # UPDATE LAYERS
+        self.update_layer_data()
+        # RUN MODELLING ALGORITHMS
+        self.run_algorithms()
+
+    def key_press(self, event):
+        """DEFINE KEY PRESS LINKS"""
+
+        if self.fault_picking_switch is True:
+            # GMG IS IN FAULT MODE SO USE FAULT MODE KEY FUNCTIONS
+            self.fault_mode_key_press(event)
+            return
+
+        'f = ACTIVATE FAULT PICKING MODE'
+        if event.key == 'f':
+            # TURN ON/OFF FAULT PICKING MODE
+            if self.fault_picking_switch is True:
+                self.fault_picking_switch = False
+            else:
+                self.fault_picking_switch = True
+
+        'i = INSERT NEW NODE AT MOUSE POSITION'
+        if event.key == 'i':
+            if event.inaxes is None:
+                return
+
+            # GET CURRENT LAYER XY
+            xt = np.array(self.plotx)
+            yt = np.array(self.ploty)
+
+            # INSERT NEW NODES INTO LAYER X AND Y LISTS
+            self.plotx = np.insert(xt, [self.index_arg + 1], event.xdata)
+            self.ploty = np.insert(yt, [self.index_arg + 1], event.ydata)
+
+            self.nextpoly.append([event.xdata, event.ydata])
+            self.polyline.set_data(self.plotx, self.ploty)
+
+            # UPDATE LAYER DATA AND PLOT
+            self.update_layer_data()
+            self.run_algorithms()
+            self.draw()
+
+        'd = DELETE NODE AT MOUSE POSITION'
+        if event.key == 'd':
+            xt = np.array(self.plotx)
+            yt = np.array(self.ploty)
+
+            # FIND NODE CLOSEST TO CURSOR LOCATION
+            d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+            self.index_arg = np.argmin(d)
+            ind = d[self.index_arg]
+
+            if xt[self.index_arg] == 0:  # PREVENT END NODES BEING DELETED
+                return 0
+            if ind >= self.node_click_limit:
+                return 0
+            else:
+                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
+                self.plotx = [tup for i, tup in enumerate(self.plotx) if i != self.index_arg]  # DELETE X
+                self.ploty = [tup for i, tup in enumerate(self.ploty) if i != self.index_arg]  # DELETE Y
+                self.polyline.set_data(self.plotx, self.ploty)
+
+            # NOW CHECK FOR PINCHED NODES
+            index_arg2 = None
+            self.pinch_switch = 0
+            self.index_arg2_list = [None] * (self.layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
+            for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
+                if x == self.i:
+                    pass
+                x_node_list = self.plotx_list[x]
+                y_node_list = self.ploty_list[x]
+                for i in range(0, len(x_node_list)):
+                    # NOW CHECK X AND Y VALUES ARE EQUAL
+                    if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
+                        # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
+                        self.index_arg2_list[x] = i
+                        self.pinch_switch = 1
+
+            # REMOVE PINCHED NODES
+            if self.pinch_switch != 0:
+                for k in xrange(len(self.index_arg2_list)):
+                    if self.index_arg2_list[k] is not None:
+                        next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[
+                            k]  # GET THE NODE LIST OF THE NEXT LAYER
+                        next_x_list = [tup for i, tup in enumerate(next_x_list) if
+                                       i != self.index_arg2_list[k]]  # DELETE X
+                        next_y_list = [tup for i, tup in enumerate(next_y_list) if
+                                       i != self.index_arg2_list[k]]  # DELETE Y
+                        self.plotx_list[k], self.ploty_list[
+                            k] = next_x_list, next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+
+            # SHIFT CURRENT NODE COLORING TO PREVIOUS NODE
+            self.current_node.set_offsets([xt[self.index_arg-1], yt[self.index_arg-1]])
+
+            # UPDATE GMG
+            self.update_layer_data()
+            self.run_algorithms()
+            self.draw()
+
+        'q = BEAT THE ZOOM BUG'
+        if event.key == 'q':
+            self.nodes = True
+
+        'n = CREATE NEW LAYER AT MOUSE POINT'
+        if event.key == 'n':
+            self.new_layer(event)
+
+        'b = LOCK OR UNLOCK LAYER BOUNDARY LOCKED MODE'
+        if event.key == 'b':
+            if self.boundary_lock:
+                'unlock layer'
+                self.boundary_lock = False
+                self.boundary_lock_list[self.i] = 1
+            elif not self.boundary_lock:
+                'lock layer'
+                self.boundary_lock = True
+                self.boundary_lock_list[self.i] = 0
+
+        'l = LOCK OR UNLOCK LAYER/POLYGON MODE'
+        if event.key == 'l':
+            if self.layer_lock:
+                'unlock layer'
+                self.layer_lock = False
+                self.layer_lock_list[self.i] = 1
+            elif not self.layer_lock:
+                'lock layer'
+                self.layer_lock = True
+                self.layer_lock_list[self.i] = 0
+
+        '< = MOVE TO NEXT LAYER'
+        if event.key == '.':
+            if self.i == self.layer_count:
+                # UPDATE LAYER DATA
+                self.update_layer_data()
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                self.i = 0
+                self.density_input.SetValue(0.001 * self.densities[self.i])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
+                self.angle_a_input.SetValue(self.angle_a[self.i])
+                self.plotx = self.plotx_list[self.i]
+                self.ploty = self.ploty_list[self.i]
+                self.x_input.SetValue(self.plotx[0])
+                self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
+                self.update_layer_data()
+                self.run_algorithms()
+            else:
+                # UPDATE LAYER DATA
+                self.update_layer_data()
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                self.i = self.i + 1
+                self.nextdens = self.densities[self.i]
+                self.density_input.SetValue(0.001 * self.densities[self.i])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
+                self.angle_a_input.SetValue(self.angle_a[self.i])
+                self.plotx = self.plotx_list[self.i]
+                self.ploty = self.ploty_list[self.i]
+                self.x_input.SetValue(self.plotx[0])
+                self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
+                self.update_layer_data()
+                self.run_algorithms()
+
+        '< = MOVE TO NEXT LAYER'
+        if event.key == ',':
+            if self.i == 0:
+                # UPDATE LAYER DATA
+                self.update_layer_data()
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                self.i = self.layer_count
+                self.density_input.SetValue(0.001 * self.densities[self.i])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
+                self.angle_a_input.SetValue(self.angle_a[self.i])
+                self.plotx = self.plotx_list[self.i]
+                self.ploty = self.ploty_list[self.i]
+                self.x_input.SetValue(self.plotx[0])
+                self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
+                self.update_layer_data()
+                self.run_algorithms()
+            else:
+                # UPDATE LAYER DATA
+                self.update_layer_data()
+                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
+                self.i = self.i - 1
+                self.nextdens = self.densities[self.i]
+                self.density_input.SetValue(0.001 * self.densities[self.i])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
+                self.angle_a_input.SetValue(self.angle_a[self.i])
+                self.plotx = self.plotx_list[self.i]
+                self.ploty = self.ploty_list[self.i]
+                self.x_input.SetValue(self.plotx[0])
+                self.y_input.SetValue(self.ploty[0])
+                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
+                self.update_layer_data()
+                self.run_algorithms()
+            self.draw()
+
+        'z = ZOOM IN MODE'
+        if event.key == 'z':
+            self.zoom(event)
+
+        'ctrl+z = ZOOM OUT'
+        if event.key == 'ctrl+z':
+            self.zoom_out(event)
+
+        'shift = PAN MODE'
+        if event.key == 'ctrl+p':
+            self.pan(event)
+
+        'a = FULL EXTENT VIEW'
+        if event.key == 'a':
+            self.full_extent(event)
+
+        'p = TURN ON PINCH NODE MODE'
+        if event.key == 'p':
+            if not self.pinch:
+                self.pinch = True
+            else:
+                self.pinch = False
+                self.pinch_node_list = [[], []]
+                self.pinch_count = 0
+
+        'ctrl+i = INCREASE LAYER TRANSPARENCY'
+        if event.key == 'ctrl+i':
+            self.transparency_increase(event)
+
+        'ctrl+d = INCREASE ASPECT TRANSPARENCY'
+        if event.key == 'ctrl+d':
+            self.transparency_decrease(event)
+
+        'up arrow = INCREASE ASPECT RATIO'
+        if event.key == 'up':
+            self.aspect_increase(event)
+
+        'ctrl+up = INCREASE ASPECT RATIO X2'
+        if event.key == 'ctrl+up':
+            self.aspect_increase2(event)
+
+        'down arrow = DECREASE ASPECT RATIO'
+        if event.key == 'down':
+            self.aspect_decrease(event)
+
+        'ctrl+down = DECREASE ASPECT RATIO'
+        if event.key == 'ctrl+down':
+            self.aspect_decrease2(event)
+
+    def fault_mode_key_press(self, event):
+        """KEY PRESS CALLBACKS WHEN FAULT MODE IS ACTIVATED"""
+
+        'i = INSERT NEW NODE AT MOUSE POSITION'
+        if event.key == 'i':
+            if event.inaxes is None:
+                return
+
+            # INSERT NEW NODE INTO XY LIST
+            self.xt = np.insert(self.xt, [self.index_arg + 1], event.xdata)
+            self.yt = np.insert(self.yt, [self.index_arg + 1], event.ydata)
+
+            # UPDATE THE FAULT LIST RECORDS
+            self.fault_x_coords_list[self.current_fault_index] = self.xt
+            self.fault_y_coords_list[self.current_fault_index] = self.yt
+
+            # UPDATE FAULT GRAPHICS
+            self.faults[self.current_fault_index][0].set_xdata(self.xt)
+            self.faults[self.current_fault_index][0].set_ydata(self.yt)
+
+            # UPDATE CURRENT FAULT OVERLAY GRAPHIC
+            self.faultline.set_data(self.xt, self.yt)
+
+        'd = DELETE NODE AT MOUSE POSITION'
+        if event.key == 'd':
+            if event.inaxes is None:
+                return
+            # FIND NODE CLOSEST TO CURSOR LOCATION
+            d = np.sqrt((self.xt - event.xdata) ** 2 + (self.yt - event.ydata) ** 2)
+            self.index_arg = np.argmin(d)
+            self.distance = d[self.index_arg]
+
+            if self.index_arg == 0 or self.index_arg == 1:
+                # PREVENT END NODES BEING DELETED
+                return 0
+            if self.distance >= self.node_click_limit:
+                # CLICK WAS TO FAR AWAY FROM A NODE TO DELETE IT
+                return 0
+            else:
+                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
+                self.fault_x_coords_list[self.current_fault_index] = \
+                    [tup for i, tup in enumerate(self.xt) if i != self.index_arg]  # DELETE X
+
+                self.fault_y_coords_list[self.current_fault_index] = \
+                    [tup for i, tup in enumerate(self.yt) if i != self.index_arg]  # DELETE Y
+
+        '< = INCREMENT WHICH FAULT IS BEING EDITED'
+        if event.key == ',':
+            print "< was pressed"
+            if self.current_fault_index <= self.fault_counter-1 and self.current_fault_index > 0:
+                # INCREMENT TO NEXT FAULT
+                self.current_fault_index -= 1
+            else:
+                # GO TO NEWEST FAULT
+                self.current_fault_index = self.fault_counter-1
+
+            print "self.current_fault_index = "
+            print self.current_fault_index
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
+
+            self.xt = self.fault_x_coords_list[self.current_fault_index]
+            self.yt = self.fault_y_coords_list[self.current_fault_index]
+
+        '> = INCREMENT WHICH FAULT IS BEING EDITED'
+        if event.key == '.':
+            print "> was pressed"
+            if self.current_fault_index < self.fault_counter-1:
+                # INCREMENT TO NEXT FAULT
+                self.current_fault_index += 1
+            elif self.current_fault_index == self.fault_counter-1:
+                # GO BACK TO FIRST FAULT
+                self.current_fault_index = 0
+
+            print "self.current_fault_index = "
+            print self.current_fault_index
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
+
+            self.xt = self.fault_x_coords_list[self.current_fault_index]
+            self.yt = self.fault_y_coords_list[self.current_fault_index]
+
+        # UPDATE GMG
+        self.update_layer_data()
+
+
+    def pick_new_fault(self, event):
+        """FAULT PICKING/LINE DRAWING MODE"""
+
+        # CHECK IF FAULT PICKING MODE IS ON
+        if self.fault_picking_switch is False:
+            MessageDialog(self, -1, "Faulting picking mode is not activated.\nTurn on fault picking mode first.",
+                          "Fault picker")
+        else:
+            # PROMPT NEW FAULT DIALOG BOX
+            new_fault_dialogbox = NewFaultDialog(self, -1, 'Create New Fault')
+            answer = new_fault_dialogbox.ShowModal()
+
+            # GET NEW FAULT VALUES
+            self.new_x1, self.new_y1 = new_fault_dialogbox.x1, new_fault_dialogbox.y1
+            self.new_x2, self.new_y2 = new_fault_dialogbox.x2, new_fault_dialogbox.y2
+
+            if self.fault_counter == 0:
+                # CREATE NEW CURRENT FAULT GRAPHIC
+                self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
+                                                                                    alpha=1.0, zorder=2, picker=True)
+            # INCREMENT THE TOTAL FAULT COUNT
+            self.fault_counter += 1
+
+            # SET THE CURRENT FAULT INDEX AS THE NEW FAULT
+            self.current_fault_index = self.fault_counter - 1
+            print "created new fault with index"
+            print self.current_fault_index
+            print ""
+
+            # APPEND BLANKS TO THE OBJECTS (USED FOR THE NEXT NEW FAULT)
+            self.faults.append([])
+            self.fault_names_list.append([])
+            self.fault_x_coords_list.append([])
+            self.fault_y_coords_list.append([])
+            self.fault_colors.append('k')
+
+            # APPEND THE NEW FAULT TO THE FAULT TREE SIDE PANEL
+            self.fault_tree_items.append('fault %s' % (int(self.current_fault_index)))
+            self.fault_item = 'fault %s' % (int(self.current_fault_index))
+            self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.current_fault_index)
+            self.fold_panel_three.Collapse()
+            self.fold_panel_three.Expand()
+
+
+            # ADD NAME FOR NEW FAULT
+            self.fault_names_list[self.current_fault_index] = 'Fault'
+
+            # ADD NEW FAULT XY TO XY LISTS
+            self.fault_x_coords_list[self.current_fault_index] = [self.new_x1, self.new_x2]
+            self.fault_y_coords_list[self.current_fault_index] = [self.new_y1, self.new_y2]
+
+                # SET CURRENT FAULT X AND Y ARRAYS
+            self.xt = [self.new_x1, self.new_x2]
+            self.yt = [self.new_y1, self.new_y2]
+
+            # ADD FAULT LINE TO CANVAS
+            self.faults[self.current_fault_index] = self.mcanvas.plot(
+                                                                self.fault_x_coords_list[self.current_fault_index],
+                                                                self.fault_y_coords_list[self.current_fault_index],
+                                                                color='k', linewidth=0.5, zorder=1, alpha=1.0)
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
+
+            # UPDATE CURRENT NODE RED DOT GRAPHIC
+            self.current_node.set_offsets([self.new_x1, self.new_y1])
+
+            # UPDATE GMG
+            self.draw()
+
+    def fault_activated(self, event):
+        """RESPONSE WHEN A FAULT NAME IS SELECTED"""
+
+        # GET THE SELECTED FAULT INDEX NUMBER
+        self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
+
+        # UPDATE CURRENT PLOT GRAPHICS
+        self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                self.fault_y_coords_list[self.current_fault_index])
+        
+        # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
+        self.update_layer_data()
+
+    def on_begin_edit_fault_label(self, event):
+        self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
+
+    def on_end_edit_fault_label(self, event):
+        new_label = self.fault_tree.GetItemText(event.GetItem())
+        self.fault_tree_items[self.current_fault_index] = str(new_label)
+
+
     def write_layers_xy(self, event):
         """OUTPUT LAYER DATA TO FILE"""
-        
+
         # CREATE OUTPUT FILE
         save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
@@ -2550,8 +3420,6 @@ class Gmg(wx.Frame):
             # CREATE INSTANCE OF CAPTURE COORDINATES
             self.capture_window = CaptureCoordinates(self, -1, 'Capture Coordinates')
             self.capture_window.Show(True)
-
-
 
     def pinch_out_layer(self, event):
         pinch_box = PinchDialog(self, -1, 'Pinch Out Layer:', self.plotx_list, self.ploty_list, self.i)
@@ -2624,550 +3492,6 @@ class Gmg(wx.Frame):
             self.obs_mag_count += 1
             self.update_layer_data()
             self.draw()
-
-    def b_node_set_button(self, event):
-        """
-        CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT THEN PASS THIS PART AND ONLY UPDATE ATTRIBUTES
-        """
-
-        new_x = float(self.x_input.GetValue())
-        new_y = float(self.y_input.GetValue())
-
-        if self.i == self.node_layer_reference:
-            xt = np.array(self.plotx)
-            yt = np.array(self.ploty)
-
-            if self.boundary_lock_list[self.i] == 0 and self.index_node is not None:
-                if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
-                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-                elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
-                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-                elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
-                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
-                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                elif new_y <= 0:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                else:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-            elif self.boundary_lock_list[self.i] == 1:
-                if new_y <= 0:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                else:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-            
-            # DEAL WITH PINCHED NODE
-            if self.pinch_switch != 0:
-                for k in range(0, len(self.index_arg2_list)):
-                    if self.index_arg2_list[k] is not None:
-                        next_x_list = self.plotx_list[k]
-                        next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
-                        next_x_list[self.index_arg2_list[k]] = new_x
-                        next_y_list[self.index_arg2_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
-                        self.plotx_list[k] = next_x_list
-                        self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
-
-            self.plotx = xt
-            self.ploty = yt
-            self.polyline.set_data(self.plotx, self.ploty)
-
-            # COLOR CURRENTLY SELECTED NODE RED
-            self.current_node.set_offsets([new_x, new_y])
-        else:
-            pass
-
-        # UPDATE LAYER DATA
-        self.set_density(self)
-        self.set_susceptibility(self)
-        self.set_remanence(self)
-        self.set_angle_a(self)
-        self.set_angle_b(self)
-
-        # UPDATE GMG
-        self.update_layer_data()
-        self.update()
-
-    def button_press(self, event):
-        """ WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
-
-        if not self.showverts:
-            return
-        if event.inaxes is None:
-            return
-        if event.button != 1:
-            return
-        if self.nodes is False:
-            return
-        self.index_node, self.index_arg2_list = self.get_node_under_point(event)
-        if self.index_node is None:
-            return
-
-        if self.pick_new_fault is False and self.capture is False:
-            # GMG IS IN LAYER MODE
-            xyt = self.polyline.get_xydata()
-            xt, yt = xyt[:, 0], xyt[:, 1]
-            self.x_input.SetValue(xt[self.index_node])
-            self.y_input.SetValue(yt[self.index_node])
-
-            # COLOR CURRENTLY SELECTED NODE RED
-            self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
-
-            'IF PINCH == TRUE PINCH THE NODE TO NEXT NODE'
-            if self.pinch:
-                print "pinch_node = true so doing pinch"
-                'Get the node number and layer number and place them in "pinch_node_list" '
-                if self.pinch_count == 0:
-                    print "pinch_count = 0"
-
-                    self.plotx = self.plotx_list[self.i]
-                    self.ploty = self.ploty_list[self.i]
-                    x1 = np.array(self.plotx)
-                    y1 = np.array(self.ploty)
-                    self.index_node = self.get_node_under_point(event)
-                    self.pinch_node_list[self.pinch_count] = self.index_node[0]
-                    self.pinch_node_list[self.pinch_count + 1] = self.i
-                    self.pinch_count = + 1
-                    'SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE'
-                else:
-                    'SET THE SECOND NODE X AND Y'
-                    self.plotx2 = self.plotx_list[self.i]
-                    self.ploty2 = self.ploty_list[self.i]
-                    x2 = np.array(self.plotx2)
-                    y2 = np.array(self.ploty2)
-                    self.index_node = self.get_node_under_point(event)
-                    new_x = x2[int(self.index_node[0])]
-                    new_y = y2[int(self.index_node[0])]
-                    'SET THE FIRST NODE X AND Y'
-                    self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
-                    self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
-                    x1 = np.array(self.plotx1)
-                    y1 = np.array(self.ploty1)
-                    'REPLACE THE ORIGINAL NODE WITH THE NEW NODE'
-                    x1[int(self.pinch_node_list[0])] = new_x  # REPLACE OLD X WITH NEW X
-                    y1[int(self.pinch_node_list[0])] = new_y  # REPLACE OLD Y WITH NEW Y
-                    self.plotx_list[int(self.pinch_node_list[1])] = x1
-                    self.ploty_list[int(self.pinch_node_list[1])] = y1
-                    self.pinch_count = 0
-
-                # COLOR CURRENTLY SELECTED NODE RED'
-                self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
-
-        elif self.pick_new_fault is True:
-            # GMG IS IN FAULT PICKING MODE
-            xyt = self.polyline.get_xydata()
-            xt, yt = xyt[:, 0], xyt[:, 1]
-            self.x_input.SetValue(xt[self.index_node])
-            self.y_input.SetValue(yt[self.index_node])
-
-        elif self.capture is True:
-            pass
-
-    def get_node_under_point(self, event):
-        """
-        GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
-        """
-
-        if self.nodes is False:
-            return
-
-        self.node_layer_reference = self.i
-        xyt = self.polyline.get_xydata()
-        xt, yt = xyt[:, 0], xyt[:, 1]
-        d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-        self.index_arg = np.argmin(d)
-        if d[self.index_arg] >= self.node_click_limit:
-            return None, None
-        else:
-            '''CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER'''
-            self.pinch_switch = 0
-            # CREATE LIST OF NONES SAME LENGTH AS NUMBER OF LAYERS IN MODEL
-            self.index_arg2_list = [None] * (self.layer_count + 1)
-
-            for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.i:  # SKIP CURRENT LAYER
-                    pass
-                node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
-
-                for i in range(0, len(node_list_x)):
-                    if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
-                        # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER, THEN RETURN THE INDEX
-                        self.index_arg2_list[x] = i
-                        self.pinch_switch = 1
-
-            'return node index'
-            return self.index_arg, self.index_arg2_list
-
-    def move(self, event):
-        if self.nodes is False:
-            return
-        if not self.showverts:
-            return
-        if self.index_node is None:
-            return
-        if event.inaxes is None:
-            return
-        if event.button != 1:
-            return
-        if self.pinch is True:
-            return
-        if self.pan_on is True:
-            return
-        if self.zoom_on is True:
-            return
-
-        if self.boundary_lock_list[self.i] == 0:
-            x, y = event.xdata, event.ydata  # GET XY OF NEW POINT
-            xt = np.array(self.plotx)
-            yt = np.array(self.ploty)
-
-            # SET CURRENT NODE LOCATION
-            current_x = xt[self.index_node]
-            current_y = yt[self.index_node]
-
-            # UPDATE NODE
-            if xt[self.index_node] == self.x1 and yt[self.index_node] != 0.001:
-                xt[self.index_node] = self.x1  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
-            elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
-                xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
-            elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
-                xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
-                xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            elif y <= 0:
-                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            else:
-                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
-        elif self.boundary_lock_list[self.i] == 1:
-            x = event.xdata  # GET X OF NEW POINT
-            y = event.ydata  # GET Y OF NEW POINT
-            xt = np.array(self.plotx)
-            yt = np.array(self.ploty)
-            if y <= 0:
-                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            else:
-                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
-
-        'Deal with pinched node'
-        if self.pinch_switch != 0:
-            for k in range(0, len(self.index_arg2_list)):
-                if self.index_arg2_list[k] is not None:
-                    # GET THE NODE LIST OF THE NEXT LAYER
-                    next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
-                    # REPLACE THE PINCHED NODE WITH THE NEW NODE
-                    next_x_list[self.index_arg2_list[k]] = x
-                    next_y_list[self.index_arg2_list[k]] = y
-                    self.plotx_list[k] = next_x_list
-                    self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
-        self.plotx = xt
-        self.ploty = yt
-        self.polyline.set_data(self.plotx, self.ploty)
-
-        # UPDATE RED "CURRENT NODE" DOT
-        if xt[self.index_node] == self.x1:
-            self.current_node.set_offsets([self.x1, y])
-        elif xt[self.index_node] == self.x2:
-            self.current_node.set_offsets([self.x2, y])
-        else:
-            self.current_node.set_offsets([x, y])
-
-        self.update_layer_data()  # UPDATE LAYER DATA
-
-    def button_release(self, event):
-        """WHEN MOUSE BUTTON IS RELEASED"""
-
-        if event.inaxes is None:
-            return
-        if not self.showverts:
-            return
-        if event.button != 1:
-            return
-
-        # UPDATE LAYER ATTRIBUTES TABLE WITH CURRENT COORDINATES
-        self.x_input.SetValue(event.xdata)
-        self.y_input.SetValue(event.ydata)
-
-        if self.capture is True:
-            # GMG IS IN COORDINATE CAPTURE MODE SO ADD THE CURRENT COORDINATES TO THE TABLE
-            self.capture_window.table.Append((event.xdata, event.ydata))
-
-
-        self.update_layer_data()  # UPDATE LAYERS
-        self.update()  # RUN MODELLING ALGORITHMS
-
-    def key_press(self, event):
-        """ DEFINE KEY PRESS LINKS"""
-
-        's = SHOW/HIDE LAYER NODES'
-        if event.key == 's':
-            if not self.showverts:
-                self.showverts = not self.showverts
-                self.polyline.set_visible(self.showverts)
-
-        'i = INSERT NEW NODE AT MOUSE POSITION'
-        if event.key == 'i':
-            if not self.showverts:
-                return
-            if event.inaxes is None:
-                return
-
-            # GET CURRENT LAYER XY
-            xt = np.array(self.plotx)
-            yt = np.array(self.ploty)
-
-            self.plotx = np.insert(xt, [self.index_arg + 1], event.xdata)
-            self.ploty = np.insert(yt, [self.index_arg + 1], event.ydata)
-
-            self.nextpoly.append([event.xdata, event.ydata])
-            self.polyline.set_data(self.plotx, self.ploty)
-
-            # UPDATE LAYER DATA AND PLOT
-            self.update_layer_data()
-            self.update()
-            self.draw()
-
-        'm = DISPLAY NODE X AND Y'
-        if event.key == 'm':
-            xyt = self.polyline.get_xydata()
-            xt, yt = xyt[:, 0], xyt[:, 1]
-            d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-            self.index_arg = np.argmin(d)
-            ind = d[self.index_arg]
-            if ind >= self.node_click_limit:
-                return 0
-            elif self.capture is True:
-                print "capturing coordinates"
-                print "x = %s" % xt[self.index_arg]
-                print "y = %s" % yt[self.index_arg]
-                self.linex.append(xt[self.index_arg])
-                self.liney.append(yt[self.index_arg])
-            else:
-                print "x = %s" % xt[self.index_arg]
-                print "y = %s" % yt[self.index_arg]
-
-        'd = DELETE NODE AT MOUSE POSITION'
-        if event.key == 'd':
-            xt = np.array(self.plotx)
-            yt = np.array(self.ploty)
-
-            # FIND NODE CLOSEST TO CURSOR LOCATION
-            d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-            self.index_arg = np.argmin(d)
-            ind = d[self.index_arg]
-
-            if xt[self.index_arg] == 0:  # PREVENT END NODES BEING DELETED
-                return 0
-            if ind >= self.node_click_limit:
-                return 0
-            else:
-                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
-                self.plotx = [tup for i, tup in enumerate(self.plotx) if i != self.index_arg]  # DELETE X
-                self.ploty = [tup for i, tup in enumerate(self.ploty) if i != self.index_arg]  # DELETE Y
-                self.polyline.set_data(self.plotx, self.ploty)
-
-            # NOW CHECK FOR PINCHED NODES
-            index_arg2 = None
-            self.pinch_switch = 0
-            self.index_arg2_list = [None] * (self.layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
-            for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.i:
-                    pass
-                x_node_list = self.plotx_list[x]
-                y_node_list = self.ploty_list[x]
-                for i in range(0, len(x_node_list)):
-                    # NOW CHECK X AND Y VALUES ARE EQUAL
-                    if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
-                        # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
-                        self.index_arg2_list[x] = i
-                        self.pinch_switch = 1
-
-            # REMOVE PINCHED NODES
-            if self.pinch_switch != 0:
-                for k in xrange(len(self.index_arg2_list)):
-                    if self.index_arg2_list[k] is not None:
-                        next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[
-                            k]  # GET THE NODE LIST OF THE NEXT LAYER
-                        next_x_list = [tup for i, tup in enumerate(next_x_list) if
-                                       i != self.index_arg2_list[k]]  # DELETE X
-                        next_y_list = [tup for i, tup in enumerate(next_y_list) if
-                                       i != self.index_arg2_list[k]]  # DELETE Y
-                        self.plotx_list[k], self.ploty_list[
-                            k] = next_x_list, next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
-
-            # SHIFT CURRENT NODE COLORING TO PREVIOUS NODE
-            self.current_node.set_offsets([xt[self.index_arg-1], yt[self.index_arg-1]])
-
-            # UPDATE GMG
-            self.update_layer_data()
-            self.update()
-            self.draw()
-
-        'q = BEAT THE ZOOM BUG'
-        if event.key == 'q':
-            self.nodes = True
-
-        'n = CREATE NEW LAYER AT MOUSE POINT'
-        if event.key == 'n':
-            self.new_layer(event)
-
-        'b = LOCK OR UNLOCK LAYER BOUNDARY LOCKED MODE'
-        if event.key == 'b':
-            if self.boundary_lock:
-                'unlock layer'
-                self.boundary_lock = False
-                self.boundary_lock_list[self.i] = 1
-            elif not self.boundary_lock:
-                'lock layer'
-                self.boundary_lock = True
-                self.boundary_lock_list[self.i] = 0
-
-        'l = LOCK OR UNLOCK LAYER/POLYGON MODE'
-        if event.key == 'l':
-            if self.layer_lock:
-                'unlock layer'
-                self.layer_lock = False
-                self.layer_lock_list[self.i] = 1
-            elif not self.layer_lock:
-                'lock layer'
-                self.layer_lock = True
-                self.layer_lock_list[self.i] = 0
-
-        '< = MOVE TO NEXT LAYER'
-        if event.key == '.':
-            if self.i == self.layer_count:
-                # UPDATE LAYER DATA
-                self.update_layer_data()
-                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = 0
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
-                self.x_input.SetValue(self.plotx[0])
-                self.y_input.SetValue(self.ploty[0])
-                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
-                self.update_layer_data()
-                self.update()
-            else:
-                # UPDATE LAYER DATA
-                self.update_layer_data()
-                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = self.i + 1
-                self.nextdens = self.densities[self.i]
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
-                self.x_input.SetValue(self.plotx[0])
-                self.y_input.SetValue(self.ploty[0])
-                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
-                self.update_layer_data()
-                self.update()
-
-        '< = MOVE TO NEXT LAYER'
-        if event.key == ',':
-            if self.i == 0:
-                # UPDATE LAYER DATA
-                self.update_layer_data()
-                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = self.layer_count
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
-                self.x_input.SetValue(self.plotx[0])
-                self.y_input.SetValue(self.ploty[0])
-                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
-                self.update_layer_data()
-                self.update()
-            else:
-                # UPDATE LAYER DATA
-                self.update_layer_data()
-                # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = self.i - 1
-                self.nextdens = self.densities[self.i]
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
-                self.x_input.SetValue(self.plotx[0])
-                self.y_input.SetValue(self.ploty[0])
-                self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
-                self.update_layer_data()
-                self.update()
-            self.draw()
-
-        'z = ZOOM IN MODE'
-        if event.key == 'z':
-            self.zoom(event)
-
-        'ctrl+z = ZOOM OUT'
-        if event.key == 'ctrl+z':
-            self.zoom_out(event)
-
-        'shift = PAN MODE'
-        if event.key == 'ctrl+p':
-            self.pan(event)
-
-        'a = FULL EXTENT VIEW'
-        if event.key == 'a':
-            self.full_extent(event)
-
-        'p = TURN ON PINCH NODE MODE'
-        if event.key == 'p':
-            if not self.pinch:
-                self.pinch = True
-            else:
-                self.pinch = False
-                self.pinch_node_list = [[], []]
-                self.pinch_count = 0
-
-        'ctrl+i = INCREASE LAYER TRANSPARENCY'
-        if event.key == 'ctrl+i':
-            self.transparency_increase(event)
-
-        'ctrl+d = INCREASE LAYER TRANSPARENCY'
-        if event.key == 'ctrl+d':
-            self.transparency_decrease(event)
-
-        'up arrow = INCREASE LAYER TRANSPARENCY'
-        if event.key == 'up':
-            self.aspect_increase(event)
-
-        'ctrl+up = INCREASE LAYER TRANSPARENCY X2'
-        if event.key == 'ctrl+up':
-            self.aspect_increase2(event)
-
-        'down arrow = INCREASE LAYER TRANSPARENCY'
-        if event.key == 'down':
-            self.aspect_decrease(event)
-
-        'ctrl+down = INCREASE LAYER TRANSPARENCY'
-        if event.key == 'ctrl+down':
-            self.aspect_decrease2(event)
 
     def new_layer(self, event):
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer')
@@ -3250,8 +3574,10 @@ class Gmg(wx.Frame):
             # INCREMENT THE LAYER COUNT'
             self.i = self.layer_count
             self.i = self.i + 1
+
             # INCREMENT THE TOTAL LAYER COUNT
-            self.layer_count = self.layer_count + 1
+            self.layer_count += 1
+
             # ADD A NEW BLANK LAYER TO THE PLOT LISTS
             self.polygon_fills.append([])
             self.layer_lines.append([])
@@ -3294,10 +3620,10 @@ class Gmg(wx.Frame):
             self.susceptibility_input.SetValue(self.susceptibilities[self.i])
             self.angle_a_input.SetValue(self.angle_a[self.i])
             self.update_layer_data()
-            self.update()
+            self.run_algorithms()
             self.draw()
         else:
-            # USER CHANGED THEIR MIND - NO NEW LAYER'
+            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED'
             pass
 
     def load_layer(self, event):
@@ -3358,12 +3684,11 @@ class Gmg(wx.Frame):
         self.susceptibility_input.SetValue(self.susceptibilities[self.i])
         self.angle_a_input.SetValue(self.angle_a[self.i])
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     def delete_layer(self, event):
-
-        """ Delete LAYER DATA"""
+        """Delete LAYER DATA"""
 
         # REMOVE POLYGON
         self.polygon_fills[self.i][0].remove()
@@ -3416,7 +3741,7 @@ class Gmg(wx.Frame):
 
         #UPDATE
         self.update_layer_data()
-        self.update()
+        self.run_algorithms()
         self.draw()
 
     # LAYER AND MODEL ATTRIBUTE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -3549,17 +3874,21 @@ class Gmg(wx.Frame):
     # LIVE GRAPHICS UPDATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_layer_data(self):
-        """UPDATE MODEL CANVAS (mcanvas) LIMITS"""
+        """LOAD LAYER DATA INTO GMG"""
+
+        # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         self.dcanvas.set_xlim(xmin, xmax)
         self.ntcanvas.set_xlim(xmin, xmax)
 
-        'Set lists with updated layer data'
+        #SET LISTS WITH UPDATED LAYER DATA
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
+
         # RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)
         self.polygons = []
         self.mag_polygons = []
+
         # REMOVE EXISTING DATA
         if len(self.mcanvas.lines) >= 1:
             while len(self.mcanvas.lines) > 0:
@@ -3568,30 +3897,34 @@ class Gmg(wx.Frame):
                 self.mcanvas.patches[0].remove()
             while len(self.mcanvas.texts) > 0:
                 self.mcanvas.texts[0].remove()
-        'Create updated data'
-        # First create the polyline data (the bottom line of the layer polygon - Done first so the whole polygon
-        # isn't passed to self.polyplots)
+
+        # UPDATE DATA ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
+        # ISN'T PASSED TO SELF.POLYPLOTS)
         for i in range(0, self.layer_count + 1):
-            'Create the layer polygons to pass to self.polygons and onto the Talwani algorithm'
-            # First set up xy data; if the layer is below layer 1 then attach the above layer to complete polygon;
-            #else use top layer check for layer mode and find last layer to make polygon
+            # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE TALWANI ALGORITHM
+
+            # FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
+            # ELSE USE TOP LAYER CHECK FOR LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
             if i >= 1 and self.layer_lock_list[i] == 0:
                 for layers in range(i, 0, -1):
                     if self.layer_lock_list[layers - 1] == 0:
                         self.last_layer = layers - 1
 
-                        'Now append nodes for boundary conditions (continuous slab)'
+                        # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
                         plotx = np.array(self.plotx_list[i])
                         ploty = np.array(self.ploty_list[i])
-                        '# SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB'
+
+                        # SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB'
                         ploty[0] = ploty[1]
                         ploty[-1] = ploty[-2]
                         self.plotx_list[i], self.ploty_list[i] = plotx, ploty
-                        '# ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON'
+
+                        # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON'
                         layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
                         layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
 
-                        'Create polygon'
+                        # CREATE POLYGON
                         self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
                         self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
                         break
@@ -3607,28 +3940,40 @@ class Gmg(wx.Frame):
             else:
                 next_color = self.colormap.to_rgba(0)
 
-            'CREATE LAYER POLYGON FILLS'
+            # CREATE LAYER POLYGON FILLS
             self.polygon_fills[i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color=next_color,
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
 
             self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
 
-        'CREATE LAYER LINES'
+        # MODEL LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # CREATE LAYER LINES
         for i in range(0, self.layer_count + 1):
             self.layer_lines[i] = self.mcanvas.plot(self.plotx_list[i], self.ploty_list[i], color=self.layer_colors[i],
-                                                    linewidth=1.0, alpha=1.0)
-        'CURRENT LAYER LINE'
+                                                    linewidth=1.0, alpha=0.5)
+        # CURRENT LAYER LINE
         self.polyline, = self.mcanvas.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.i],
                                            linewidth=1.0, alpha=0.5)
+
+        # # FAULTS LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # # CREATE FAULT LINES
+        # for i in range(0, self.fault_counter + 1):
+        #     self.faults[i] = self.mcanvas.plot(self.fault_plotx_list[i], self.fault_ploty_list[i],
+        #                                             color=self.fault_colors[i], linewidth=1.0, alpha=1.0)
+        # # CURRENT FAULT LINE
+        # self.fault_polyline, = self.mcanvas.plot(self.fault_plotx, self.fault_ploty, marker='o',
+        #                                          color=self.fault_colors[self.current_fault_index], linewidth=1.0, alpha=0.5)
+
+        # UPDATE GMG
         self.mcanvas.set_aspect(self.model_aspect)
         self.display_info()
         self.draw()
 
     def update_layer_data(self):
-        """ UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - REDRAW EVERYTHING"""
+        """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE (REDRAWS EVERYTHING)"""
 
-        '#UPDATE MODEL CANVAS (mcanvas) LIMITS'
+        # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
             self.dcanvas.set_xlim(xmin, xmax)
@@ -3637,78 +3982,118 @@ class Gmg(wx.Frame):
         if self.nt_canvas:
             self.ntcanvas.set_xlim(xmin, xmax)
 
-        '#SET LISTS WITH UPDATED LAYER DATA'
-        self.plotx_list[self.i] = self.plotx
-        self.ploty_list[self.i] = self.ploty
+        if self.fault_picking_switch is True:
+            # GMG IS IN FAULT MODE
+            # UPDATE FAULT LINE GRAPHICS
+            print("self.fault_counter =")
+            print(self.fault_counter)
+            for i in range(0, self.fault_counter):
+                try:
+                    self.faults[i][0].set_xdata(self.fault_x_coords_list[i])
+                    self.faults[i][0].set_ydata(self.fault_y_coords_list[i])
+                except IndexError:
+                    # USED FOR THE CASE WHEN ONLY 1 FAULT EXISTS
+                    pass
 
-        '#RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)'
-        self.polygons = []
-        self.mag_polygons = []
+            print(self.fault_x_coords_list)
+            print(self.fault_y_coords_list)
+            print "Current fault values = "
+            print(self.fault_x_coords_list[self.current_fault_index])
+            print(self.fault_y_coords_list[self.current_fault_index ])
+            
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index ],
+                                  self.fault_y_coords_list[self.current_fault_index ])
 
-        '#REATE UPDATED POLYGON XYs'
-        # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
-        # ISN'T PASSED TO SELF.POLYPLOTS)
-        for i in range(0, self.layer_count + 1):
-            # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE BOTT ALGORITHM
-            # FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
-            # ELSE USE TOP LAYER CHECK FOR LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
-            if i >= 1 and self.layer_lock_list[i] == 0:
-                for layers in range(i, 0, -1):
-                    if self.layer_lock_list[layers - 1] == 0:
-                        self.last_layer = layers - 1
-                        # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
-                        plotx, ploty = np.array(self.plotx_list[i]), np.array(self.ploty_list[i])
-                        # SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB
-                        ploty[0], ploty[-1] = ploty[1], ploty[-2]
-                        self.plotx_list[i], self.ploty_list[i] = plotx, ploty
-                        # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON
-                        layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
-                        layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
-                        # CREATE POLYGON
-                        self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
-                        self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
-                        break
-            else:
-                # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
-                self.plotx_polygon = np.array(self.plotx_list[i])
-                self.ploty_polygon = np.array(self.ploty_list[i])
-            self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
+        else:
+            # GMG IS IN LAYER MODE
+            # UPDATE PLOT LISTS WITH LATEST EDIT
+            self.plotx_list[self.i] = self.plotx
+            self.ploty_list[self.i] = self.ploty
 
-        'UPDATE LAYER POLYGONS AND LINES'
-        for i in range(0, self.layer_count + 1):
-            # SET POLYGON FILL COLOR
-            if self.densities[i] != 0 and self.absolute_densities is True:
-                next_color = self.colormap.to_rgba(0.001 * self.densities[i] - 0.001 * self.reference_densities[i])
-            elif self.densities[i] != 0:
-                next_color = self.colormap.to_rgba(0.001 * self.densities[i])
-            else:
-                next_color = self.colormap.to_rgba(0.)
-            # UPDATE POLYGON XY AND COLOR FILL
-            self.polygon_fills[i][0].set_xy(self.polygons[i])
-            self.polygon_fills[i][0].set_color(next_color)
-            # LINES
-            self.layer_lines[i][0].set_xdata(self.plotx_list[i])
-            self.layer_lines[i][0].set_ydata(self.ploty_list[i])
+            # RESET LISTS (USED AS INPUT FOR THE GRAV/MAG ALGORITHMS)
+            self.polygons = []
+            self.mag_polygons = []
 
-        # SET LINE FOR CURRENT LAYER BEING EDITED
-        self.polyline.set_xdata(self.plotx)
-        self.polyline.set_ydata(self.ploty)
-        self.polyline.set_color(self.layer_colors[self.i])
+            # CREATE UPDATED POLYGON XYs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
+            # ISN'T PASSED TO SELF.POLYPLOTS)
+            for i in range(0, self.layer_count + 1):
+                # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE BOTT ALGORITHM
+                # FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
+                # ELSE USE TOP LAYER CHECK FOR LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
+                if i >= 1 and self.layer_lock_list[i] == 0:
+                    for layers in range(i, 0, -1):
+                        if self.layer_lock_list[layers - 1] == 0:
+                            self.last_layer = layers - 1
+
+                            # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
+                            plotx, ploty = np.array(self.plotx_list[i]), np.array(self.ploty_list[i])
+
+                            # SET PADDING NODES TO DEPTH EQUAL TO MODEL LIMIT NODES TO CREATE SLAB
+                            ploty[0], ploty[-1] = ploty[1], ploty[-2]
+                            self.plotx_list[i], self.ploty_list[i] = plotx, ploty
+
+                            # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON
+                            layer_above_x = np.array(self.plotx_list[self.last_layer])[::-1]
+                            layer_above_y = np.array(self.ploty_list[self.last_layer])[::-1]
+
+                            # CREATE POLYGON
+                            self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
+                            self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
+                            break
+                else:
+                    # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
+                    self.plotx_polygon = np.array(self.plotx_list[i])
+                    self.ploty_polygon = np.array(self.ploty_list[i])
+
+                self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
+
+            # UPDATE LAYER POLYGONS AND LINES
+            for i in range(0, self.layer_count + 1):
+
+                # SET POLYGON FILL COLOR
+                if self.densities[i] != 0 and self.absolute_densities is True:
+                    # DETERMINE DENSITY CONTRAST FROM (DENSITY - REF DENSITY)
+                    next_color = self.colormap.to_rgba(0.001 * self.densities[i] - 0.001 * self.reference_densities[i])
+                elif self.densities[i] != 0:
+                    # NO REF DENSITY, SO JUST USE DENSITY VALUE
+                    next_color = self.colormap.to_rgba(0.001 * self.densities[i])
+                else:
+                    # NO DEISNITY HAS BEEN SET SO LEAVE BLANK
+                    next_color = self.colormap.to_rgba(0.)
+
+                # UPDATE POLYGON XY AND COLOR FILL
+                self.polygon_fills[i][0].set_xy(self.polygons[i])
+                self.polygon_fills[i][0].set_color(next_color)
+
+                # LINES
+                self.layer_lines[i][0].set_xdata(self.plotx_list[i])
+                self.layer_lines[i][0].set_ydata(self.ploty_list[i])
+
+            # SET LINE FOR CURRENT LAYER BEING EDITED
+            self.polyline.set_xdata(self.plotx)
+            self.polyline.set_ydata(self.ploty)
+            self.polyline.set_color(self.layer_colors[self.i])
 
         # DRAW CANVAS FEATURES
         self.mcanvas.set_aspect(self.model_aspect)
         self.dcanvas_aspect = ((self.dcanvas.get_xlim()[1] - self.dcanvas.get_xlim()[0]) /
                                (self.dcanvas.get_ylim()[1] - self.dcanvas.get_ylim()[0]))
+        # UPDATE INFO
         self.display_info()
+
+        # CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
+        self.model_saved = False
+
+        # UPDATE GMG GRAPHICS
         self.draw()
 
-        self.model_saved = False  # CONTENT HAS NOT BEEN SAVED SINCE LAST MODIFICATION
+    def run_algorithms(self):
+        """RUN MODEL ALGORITHMS"""
 
-    def update(self):
-        """ RUN MODEL ALGORITHMS"""
-
-        'REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION'
-        '(AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY'
+        # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
+        # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY
         if self.calc_grav_switch:
             if len(self.polygons) > 1:
                 for i in range(0, len(self.polygons)):
@@ -3717,8 +4102,8 @@ class Gmg(wx.Frame):
                 self.polygons[0] = self.polygons[0][::-1]
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''GRAVITY'''
-        '''ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM'''
+        # GRAVITY
+        # ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM
         self.density_contrasts = np.zeros(len(self.densities))
         if not self.absolute_densities:
             self.density_contrasts = self.absolute_densities
@@ -3726,16 +4111,16 @@ class Gmg(wx.Frame):
             for i in xrange(len(self.densities)):
                 self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
 
-        '''ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT'''
+        # ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT
         if self.polygons and self.calc_grav_switch is True:
-            'SELECT ONLY THOSE LAYERS THAT ARE CHECKED'
+            # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             polygons_to_use, densities_to_use = [], []
             for layer in xrange(len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     densities_to_use.append(self.density_contrasts[layer])
 
-            'PASS TO BOTT ALGORITHM'
+            # PASS TO BOTT ALGORITHM
             polys = []
             for p, d in zip(polygons_to_use, densities_to_use):
                 polys.append(Polygon(1000 * np.array(p), {'density': d}))
@@ -3746,17 +4131,17 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''MAGNETICS'''
-        '''ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM'''
+        # MAGNETICS
+        # ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM
         if self.polygons and self.earth_field >= 1.0 and self.calc_mag_switch is True:
-            'SELECT ONLY THOSE LAYERS THAT ARE CHECKED'
+            # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             polygons_to_use, susceptibilities_to_use = [], []
             for layer in range(0, len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     susceptibilities_to_use.append(self.susceptibilities[layer])
 
-            '# PASS TO TALWANI AND HEIRTZLER ALGORITHM'
+            # PASS TO TALWANI AND HEIRTZLER ALGORITHM
             polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
@@ -3769,12 +4154,12 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '# UPDATE RMS VALUES'
+        # UPDATE RMS VALUES
 
-        '#  RUN RMS CALC CODE'
+        #  RUN RMS CALC CODE
         self.model_rms(self.xp)
 
-        'SET GRAV RMS VALUES'
+        # SET GRAV RMS VALUES
         if self.obs_gravity_data_for_rms != [] and self.grav_obs_switch == True and self.calc_grav_switch == True \
                 and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
@@ -3784,7 +4169,7 @@ class Gmg(wx.Frame):
         else:
             pass
 
-        'SET MAG RMS VALUES'
+        # SET MAG RMS VALUES
         if self.obs_mag_data_for_rms != [] and self.mag_obs_switch == True and self.calc_mag_switch == True \
                 and self.prednt != []:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
@@ -3797,8 +4182,8 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        '''SET CANVAS LIMITS'''
-        'Set gravity display box limits'
+        # SET CANVAS LIMITS
+        # SET GRAVITY DISPLAY BOX LIMITS
         if self.grav_obs_switch is True and self.grav_residuals != []:
             ymin = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).min()) - 2.0
             ymax = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).max()) + 2.0
@@ -3811,7 +4196,7 @@ class Gmg(wx.Frame):
         if self.dcanvas is not None:
             self.dcanvas.set_ylim(ymin, ymax)
 
-        'Set magnetics display box limits'
+        # SET MAGNETICS DISPLAY BOX LIMITS
         if self.mag_obs_switch is True and self.mag_residuals != []:
             ymin_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).min()) - 2.
             ymax_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).max()) + 2.
@@ -3826,17 +4211,20 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_ylim(ymin_mag, ymax_mag)
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        '# AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED'
+        # AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED
         self.model_saved = False
-        '# UPDATE FRAME'
+
+        # UPDATE GMG GRAPHICS
         self.draw()
 
-    # EXTERNAL FIGURE CONSTRUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # EXTERNAL FIGURE CONSTRUCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def plot_model(self, event):
         """CREATE EXTERNAL FIGURE OF MODEL USING INBUILT FIGURE CONSTRUCTION TOOL"""
 
-        '# GET PLOTTING PARAMETERS FROM DIALOG BOX'
+        # GET PLOTTING PARAMETERS FROM DIALOG BOX
         self.set_values = PlotSettingsDialog(self, -1, 'Set figure parameters', self.model_aspect, self.dcanvas_aspect)
         self.set_values.Show(True)
 
@@ -3868,12 +4256,12 @@ class Gmg(wx.Frame):
         self.grav_y_min = self.set_values.grav_frame_min
         self.grav_y_max = self.set_values.grav_frame_max
 
-        'GET FIGURE DIMENSIONS'
+        # GET FIGURE DIMENSIONS
         xmin, xmax = self.mcanvas.get_xlim()
         ymin, ymax = self.mcanvas.get_ylim()
         area = np.array([xmin, xmax, ymin, ymax])
 
-        'RUN PLOT MODEL CODE'
+        # RUN PLOT MODEL CODE
         fig_plot = plot_model.plot_fig(self.file_path, area, self.xp, self.obs_topo, self.obs_grav, self.predgz,
                                        self.obs_mag, self.prednt, self.layer_count, self.layer_lock_list,
                                        self.plotx_list, self.ploty_list, self.densities, self.absolute_densities,
@@ -3889,17 +4277,22 @@ class Gmg(wx.Frame):
                                        self.well_line_width)
         del fig_plot
 
-        '# IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER'
+        # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
         if sys.platform == 'linux2':
             subprocess.call(["xdg-open", self.file_path])
-        else:
+        # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+        elif sys.platform == 'darwin':
             os.startfile(self.file_path)
 
+        # UPDATE GMG
         self.update_layer_data()
         self.draw()
+
         return
 
-    # DOCUMENTATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # DOCUMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_documentation(self, event):
         """ OPENS DOCUMENTATION HTML"""
@@ -3921,6 +4314,7 @@ class Gmg(wx.Frame):
 
     def about_gmg(self, event):
         """ SHOW SOFTWARE INFORMATION"""
+
         about = [
             "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
             "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
@@ -3940,6 +4334,7 @@ class Gmg(wx.Frame):
 
     def legal(self, event):
         """ SHOW LICENCE"""
+
         licence = ["Copyright 2015-2017 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
                    "without modification, are permitted provided that the following conditions are met: \n \n"
                    "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
@@ -3961,7 +4356,9 @@ class Gmg(wx.Frame):
         result = dlg.ShowModal()
         dlg.Destroy()
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # EXIT FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def exit(self, event):
         """ SHUTDOWN APP (FROM FILE MENU)"""
@@ -3977,7 +4374,9 @@ class Gmg(wx.Frame):
         if result == wx.ID_OK:
             wx.GetApp().ExitMainLoop()
 
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # FUTURE MODULES (IN PROCESS)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def horizontal_derivative(self, event):
         pass
@@ -4000,44 +4399,11 @@ class Gmg(wx.Frame):
         #     output = np.column_stack((x_interp_values, deriv))
         #     return output
 
-    def pick_new_fault(self, event):
-        pass
-        # """FAULT PICKING"""
-        # if self.fault_picking_switch is True:
-        #     self.fault_picking_switch = False
-        # else:
-        #     self.fault_picking_switch = True
-        #
-        #     current_fault = self.faults[self.fault_count]
-        #     current_fault_x = current_fault[:, 0]
-        #     current_fault_y = current_fault[:, 1]
-        #
-        #     # LINES
-        #     self.layer_lines[i][0].set_xdata(self.plotx_list[i])
-        #     self.layer_lines[i][0].set_ydata(self.ploty_list[i])
-        #
-        #      # SET LINE FOR CURRENT LAYER BEING EDITED
-        #     self.showing_faultline.set_xdata(self.plotx)
-        #     self.showing_faultline.set_ydata(self.ploty)
-        #     self.showing_faultline.set_color(self.layer_colors[self.i])
-        #
-        #     'CREATE LAYER LINE'
-        #     current_fault_pick = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
-        #                                                  color='blue', linewidth=1.0, alpha=1.0)
-        #
-        #     'Increment the total layer count'
-        #     self.fault_count += 1
-        #
-        #     'UPDATE LAYER DATA'
-        #     self.update_layer_data()
-        #     self.update()
-        #     self.draw()
-
     def set_error(self, value):
         pass
         # self.error = value
         # self.update_layer_data()
-        # self.update()
+        # self.run_algorithms()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4737,6 +5103,38 @@ class NewLayerDialog(wx.Dialog):
             self.x3, self.y3 = float(self.new_x3.GetValue()), float(self.new_y3.GetValue())
             self.x4, self.y4 = float(self.new_x4.GetValue()), float(self.new_y4.GetValue())
             self.EndModal(1)
+
+
+class NewFaultDialog(wx.Dialog):
+    def __init__(self, parent, id, title):
+        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+
+        floating_panel = wx.Panel(self, -1)
+
+        self.n1_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.X1_Text = wx.StaticText(floating_panel, -1, "X1:")
+        self.new_x1 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.Y1_Text = wx.StaticText(floating_panel, -1, "Y1:")
+        self.new_y1 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.n1_sizer.AddMany([self.X1_Text, self.new_x1, self.Y1_Text, self.new_y1])
+        self.n2_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.X2_Text = wx.StaticText(floating_panel, -1, "X2:")
+        self.new_x2 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.Y2_Text = wx.StaticText(floating_panel, -1, "Y2:")
+        self.new_y2 = wx.TextCtrl(floating_panel, -1, "0", size=(100, -1))
+        self.n2_sizer.AddMany([self.X2_Text, self.new_x2, self.Y2_Text, self.new_y2])
+        sizer = wx.FlexGridSizer(cols=1, hgap=6, vgap=6)
+        self.b_make_button = wx.Button(floating_panel, -1, "Make")
+        self.Bind(wx.EVT_BUTTON, self.make_button, self.b_make_button)
+        sizer.AddMany([self.n1_sizer, self.n2_sizer, self.b_make_button])
+        floating_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def make_button(self, event):
+        self.x1, self.y1 = float(self.new_x1.GetValue()), float(self.new_y1.GetValue())
+        self.x2, self.y2 = float(self.new_x2.GetValue()), float(self.new_y2.GetValue())
+        self.EndModal(1)
 
 
 class MessageDialog(wx.MessageDialog):
