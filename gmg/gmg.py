@@ -54,9 +54,15 @@ obspy.org
 ***
 
 ***
-Icons where designed using the Free icon Maker.
+Icons where designed using the Free icon Maker:
 
-https://freeiconmaker.com/
+icons8.com
+https://icons8.com/icon/set/circle/all
+
+Pixel size: 24
+Font: Roboto Slab
+Font size: 200
+Color: 3498db
 ***
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -572,7 +578,7 @@ class Gmg(wx.Frame):
 
         # TOOGLE FAULT PICKING MODE
         t_toogle_fault_mode = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                wx.Bitmap(self.gui_icons_dir + 'faultlon_off_24.png'), shortHelp="Toogle fault picking")
+                                wx.Bitmap(self.gui_icons_dir + 'F_24.png'), shortHelp="Toogle fault picking")
         self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, t_toogle_fault_mode)
 
         # FAULT PICKER ICON
@@ -1682,7 +1688,7 @@ class Gmg(wx.Frame):
                                                                     color='k', linewidth=0.5, zorder=1, marker='s',
                                                                     alpha=1.0)
             # CREATE NEW CURRENT FAULT GRAPHIC
-            self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='o', color='m', linewidth=0.75,
+            self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
                                                                                     alpha=1.0, zorder=2, picker=True)
 
             # DRAW CONTACT DATA
@@ -2666,19 +2672,15 @@ class Gmg(wx.Frame):
         # FIND NODE CLOSEST TO EVENT CLICK POINT
         d = np.sqrt((x - event.xdata) ** 2 + (y - event.ydata) ** 2)
         self.index_arg = np.argmin(d)
-        print "d = "
-        print d
+
         # RETURN RESULTING NODE OR NONE
         if d[self.index_arg] >= self.node_click_limit:
-            print "DIDN'T GET NODE"
             return None
         else:
-            print "GOT NODE"
             return self.index_arg
 
     def button_press(self, event):
         """ WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
-        print "BUTTON PRESSED"
 
         if event.inaxes is None:
             return  # CLICK IS OUTSIDE MODEL FRAME
@@ -2687,7 +2689,6 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is False and self.capture is False:
             # GMG IS IN LAYER MODE
-            print "IN LAYER MODE"
 
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
             self.index_node, self.index_arg2_list = self.get_node_under_point(event)
@@ -2740,26 +2741,22 @@ class Gmg(wx.Frame):
 
         elif self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
-            print "IN FAULT MODE"
 
             # GET CURRENT NODE
             self.selected_node = self.get_fault_node_under_point(event)
             if self.selected_node is None:
-                print "DIDN'T GET A NODE"
                 return
 
-            # GMG IS IN FAULT PICKING MODE
-            print "self.current_fault_index ="
-            print self.faultline
+            # GET CURRENT X AND Y COORDS
             xyt = self.faultline.get_xydata()
-            self.xt, self.yt = xyt[:, 0], xyt[:, 1]
+            self.xt = xyt[:, 0]
+            self.yt = xyt[:, 1]
 
             # COLOR CURRENTLY SELECTED NODE RED
             self.current_node.set_offsets([self.xt[self.selected_node], self.yt[self.selected_node]])
 
         elif self.capture is True:
             # COORDINATE CAPTURE MODE
-            print "IN CAPTURE MODE"
             pass
 
     def toogle_fault_mode(self, event):
@@ -3172,6 +3169,8 @@ class Gmg(wx.Frame):
             self.aspect_decrease2(event)
 
     def fault_mode_key_press(self, event):
+        """KEY PRESS CALLBACKS WHEN FAULT MODE IS ACTIVATED"""
+
         'i = INSERT NEW NODE AT MOUSE POSITION'
         if event.key == 'i':
             if event.inaxes is None:
@@ -3191,9 +3190,6 @@ class Gmg(wx.Frame):
 
             # UPDATE CURRENT FAULT OVERLAY GRAPHIC
             self.faultline.set_data(self.xt, self.yt)
-
-            # UPDATE LAYER DATA AND PLOT (THIS WILL UPDATE THE GRAPHICS WITH THE NEW POINT)
-            self.update_layer_data()
 
         'd = DELETE NODE AT MOUSE POSITION'
         if event.key == 'd':
@@ -3218,8 +3214,48 @@ class Gmg(wx.Frame):
                 self.fault_y_coords_list[self.current_fault_index] = \
                     [tup for i, tup in enumerate(self.yt) if i != self.index_arg]  # DELETE Y
 
-            # UPDATE GMG
-            self.update_layer_data()
+        '< = INCREMENT WHICH FAULT IS BEING EDITED'
+        if event.key == ',':
+            print "< was pressed"
+            if self.current_fault_index <= self.fault_counter-1 and self.current_fault_index > 0:
+                # INCREMENT TO NEXT FAULT
+                self.current_fault_index -= 1
+            else:
+                # GO TO NEWEST FAULT
+                self.current_fault_index = self.fault_counter-1
+
+            print "self.current_fault_index = "
+            print self.current_fault_index
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
+
+            self.xt = self.fault_x_coords_list[self.current_fault_index]
+            self.yt = self.fault_y_coords_list[self.current_fault_index]
+
+        '> = INCREMENT WHICH FAULT IS BEING EDITED'
+        if event.key == '.':
+            print "> was pressed"
+            if self.current_fault_index < self.fault_counter-1:
+                # INCREMENT TO NEXT FAULT
+                self.current_fault_index += 1
+            elif self.current_fault_index == self.fault_counter-1:
+                # GO BACK TO FIRST FAULT
+                self.current_fault_index = 0
+
+            print "self.current_fault_index = "
+            print self.current_fault_index
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
+
+            self.xt = self.fault_x_coords_list[self.current_fault_index]
+            self.yt = self.fault_y_coords_list[self.current_fault_index]
+
+        # UPDATE GMG
+        self.update_layer_data()
 
 
     def pick_new_fault(self, event):
@@ -3240,7 +3276,7 @@ class Gmg(wx.Frame):
 
             if self.fault_counter == 0:
                 # CREATE NEW CURRENT FAULT GRAPHIC
-                self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='o', color='m', linewidth=0.75,
+                self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
                                                                                     alpha=1.0, zorder=2, picker=True)
             # INCREMENT THE TOTAL FAULT COUNT
             self.fault_counter += 1
@@ -3281,8 +3317,7 @@ class Gmg(wx.Frame):
             self.faults[self.current_fault_index] = self.mcanvas.plot(
                                                                 self.fault_x_coords_list[self.current_fault_index],
                                                                 self.fault_y_coords_list[self.current_fault_index],
-                                                                color='k', linewidth=0.5, zorder=1, marker='s',
-                                                                alpha=1.0)
+                                                                color='k', linewidth=0.5, zorder=1, alpha=1.0)
 
             # UPDATE CURRENT PLOT GRAPHICS
             self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
@@ -3299,9 +3334,6 @@ class Gmg(wx.Frame):
 
         # GET THE SELECTED FAULT INDEX NUMBER
         self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
-
-        print "self.current_fault_index ="
-        print self.current_fault_index
 
         # UPDATE CURRENT PLOT GRAPHICS
         self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
