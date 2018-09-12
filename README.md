@@ -116,7 +116,7 @@ These dependencies can be installed in your py27 environment using the command:
 
 Download or "git clone" the gmg github repository. 
 
-*Option 1. Download:* 
+**Option 1. Download:** 
 
 In your browser, navigate to:
 
@@ -125,7 +125,7 @@ In your browser, navigate to:
 Use the green *"clone or download"* button on the right hand side of the page to download a .zip of GMG. Unzip this
 directory.
 
-*Option 2. git clone:* 
+**Option 2. git clone:**
 
 If you have git installed, simply use git on the command line:
 
