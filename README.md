@@ -172,21 +172,14 @@ Now, in a fresh terminal, simple type "gmg" on the command line to launch the so
 Getting started
 ---------------
 
-It is recommended you run the two test cases when first launching the software to check everything is running correctly. 
-Details can be found in the documentation. This can be accessed from within the software under:
+The best way to get started is to read through the Manual and then work your way through the Tutorial. 
+These can be found by launching gmg and then navigating to:
 
     Help -> Documentation
 
 or by opening:
     
     "PATH_TO_GMG"/gmg/docs/_build/html/gmg_documentation.html
-
-If the test cases don't work as expected, please submit a bug report as described
-below in the section *Contributing*.
-
-Once the test cases have been run (and work as expected) the easiest way to get a feel for the  software is to work 
-through the tutorial (see *documentation*).
-
 
 Contributing
 ------------
