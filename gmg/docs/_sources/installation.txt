@@ -8,9 +8,11 @@ Pre-Installation
 
 **Step 1: Install an Anaconda python distribution**
 
-The simplest way to install gmg is to first install an Anaconda Python distribution: https://www.continuum.io/downloads
-This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
-using the Conda package manager.
+The simplest way to install gmg is to first install an Anaconda Python distribution: www.anaconda.com/download
+
+This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
+package manager. It is recommended you download the python3 version, even though GMG is written in python2.7 (you can
+create a python2.7 environment to run GMG).
 
 **Step 2: Create a new python environment for gmg**
 
@@ -39,24 +41,24 @@ Or on Windows use::
 
     deactivate
 
+**OS Support:**
 .. note::
     gmg is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems.
     It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
     Please raise any information regarding installation problems on github.
 
-Installation
-------------
+Installing gmg
+--------------
 
 **Step 1:**
 
-Ensure your py27-gmg environment is active, on macOS and Linux use::
+Ensure your py27-gmg environment is active, on macOS or Linux use::
 
     source activate py27-gmg
 
 Or on Windows use::
 
     activate py27-gmg
-
 
 **Step 2: Install dependencies**
 
@@ -76,20 +78,28 @@ These dependencies can be installed in your py27 environment using the command::
 
 **Step 3: Get gmg**
 
-Download or git clone the gmg github repository. To download, navigate to::
+Download or "git clone" the gmg github repository.
+
+*Option 1. Download:*
+
+In your browser, navigate to::
 
     https://github.com/btozer/gmg
 
-Use the green *clone or download* button on the right hand side of the page to download a .zip of gmg. Unzip this
+Use the green **clone or download** button on the right hand side of the page to download a .zip of gmg. Unzip this
 directory.
 
-or simply use git on the command line::
+*Option 2. git clone:*
+
+If you have git installed, simply use git on the command line::
 
     git clone https://github.com/btozer/gmg.git
 
+This will create a copy of the GMG repository in the current working directory.
+
 **Step 4: Install  gmg**
 
-Run the following command in the dir where you have downloaded or git-cloned the gmg repository.
+Run the following command in the gmg/ root directory (which contains the script **setup.py**)::
 
     pip install .
 
@@ -99,11 +109,12 @@ This will install gmg within your local anaconda python site-packages dir.
 Launching gmg
 -------------
 
-To start gmg the best way is to create an alias and export this e.g.::
+To start gmg, the best way is to create an alias within your .bashrc or equivalent file
+(e.g. .bash_profile, .bashrc, .zshrc or .cshrc) e.g.::
 
-    export alias gmg='python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
+    vi .bashrc
 
-or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.::
+and then add the line::
 
     alias gmg='python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
@@ -117,10 +128,7 @@ i.e.::
 
     alias gmg='pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py'
 
-Then you can (optionally) add the executable directory to your $PATH variable by repeating the process, e.g.::
-
-    export $PATH=$PATH:~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/
-
 Now, in a fresh terminal, simple type "gmg" on the command line to launch the software::
 
     gmg
+

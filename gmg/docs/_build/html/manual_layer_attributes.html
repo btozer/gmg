@@ -30,7 +30,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="4.0 Potential field data" href="manual_PF.html" />
-    <link rel="prev" title="2.0 Model Layers" href="manual_layer_nodes.html" />
+    <link rel="prev" title="2.0 Model Layers" href="manual_model_layers.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 
@@ -98,8 +98,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>3.0 Layer attributes</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#bulk-density">3.1 Bulk density</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#magnetic-susceptibility">3.2 Magnetic Susceptibility</a></li>
@@ -112,7 +112,8 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
@@ -178,6 +179,10 @@
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <a href="https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/manual_layer_attributes.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -208,26 +213,38 @@ the modelled anomaly, be that gravity or magnetic. Angles A and B need only be s
 differs from the inducing field, as may be the case for remanent magnetism.</p>
 <div class="section" id="bulk-density">
 <h2>3.1 Bulk density<a class="headerlink" href="#bulk-density" title="Permalink to this headline">¶</a></h2>
-<p>Gravity modelling is achieved using bulk <em>density contrasts</em> relative to a <em>reference density</em>.</p>
+<p>Gravity modelling is achieved using bulk <strong>density contrasts</strong> relative to a <strong>reference density</strong>.</p>
 <p>Each layer requires:</p>
-<ul class="simple">
-<li>An absolute bulk density</li>
+<ol class="arabic simple">
+<li>A bulk density</li>
 <li>A reference density</li>
-</ul>
-<p>All densities must be input using units <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/>.</p>
-<p>These are input using the attribute side bar or within the <em>Attribute table</em>.</p>
-<p>This enables gravity anomalies relative to say an upper crust of 2670 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/>, lower crust 2900 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/>
-and upper mantle of 3330 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/>.</p>
-<p>For each layer both the bulk absolute density and the reference density must be set. For example:</p>
-<p>To model a sedimentary unit it may have a density set as 2300 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/> and reference crustal
-density of 2670 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/>.</p>
-<p>To model crustal thickened from a reference crustal thickness of 32 km to 36 km, a lower crustal density of
-2800 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/> maybe be modelled against a upper most mantle reference density of 3330 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/>.</p>
+</ol>
+<p>gmg defaults to a reference density of 0 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>. Hence, densities should be input as bulk <strong>density contrasts</strong>.
+If you would rather input densities as absolute values, then you can set the reference density to your chosen value.
+For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> depending on
+the particular geology in the region of interest. Set the paper by Hinze (2003) for more details.</p>
+<p>YOu can als use a different reference density for different layers. This is useful if you which to model
+crustal structure and relative to, for example, an upper crust of 2670 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>, lower crust
+2900 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> and upper mantle of 3330 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All densities must be input using SI units <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.
+To assign density values use the <em>Attribute Sidebar</em> or the <em>Attribute table</em>.</p>
+</div>
+<p>For each layer both the bulk absolute density and the reference density must be set.</p>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>To model a sedimentary basin typical absolute density values may be 2400 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> for the basin and
+2670 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/> as the reference density for the upper continental crust.</p>
+<p class="last">To model crustal thickened from a reference crustal thickness of 32 km, thickened to 36 km, a lower crustal
+density of 2800 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> maybe be modelled against a upper most mantle reference density
+of 3330 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.</p>
+</div>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure)</p>
+<p class="last">To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure)
+navigate to <em>‘Gavity Field’</em> -&gt; <em>‘Set background density’</em>.</p>
 </div>
-<p>use the <em>gravity Field</em> -&gt; <em>Set background density</em> tool.</p>
 </div>
 <div class="section" id="magnetic-susceptibility">
 <h2>3.2 Magnetic Susceptibility<a class="headerlink" href="#magnetic-susceptibility" title="Permalink to this headline">¶</a></h2>
@@ -235,10 +252,12 @@ density of 2670 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767
 <p>A ‘<em>strike</em>’ must also be assigned for each unit.</p>
 <div class="admonition important">
 <p class="first admonition-title">Important</p>
-<p><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
+<p class="last"><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
 (the angle is positive when measured counterclockwise) See Won and Bevis (1987) for a diagram and further details.
 The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).</p>
-<p>For example:</p>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
 <p>If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.</p>
 <p class="last">If the model was orientated North-South the angle would be 68 deg.</p>
 </div>
@@ -259,7 +278,7 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
         <a href="manual_PF.html" class="btn btn-neutral float-right" title="4.0 Potential field data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="manual_layer_nodes.html" class="btn btn-neutral" title="2.0 Model Layers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="manual_model_layers.html" class="btn btn-neutral" title="2.0 Model Layers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -269,7 +288,7 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 28, 2018.
+      Last updated on Sep 12, 2018.
 
     </p>
   </div>

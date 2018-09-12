@@ -1,20 +1,29 @@
 .. image:: _static/gmg_logo.png
 
-|
+.. raw:: html
+
+    <div class="banner">
+        <a href="http://www.github.com/btozer/gmg">Visit the gmg github repository</a>
+    </div>
 
 Overview
 --------
 
-GMG is designed primarily as a Graphical User Interface (GUI) for 2D forward
-modelling of gravity and magnetic data.
+GMG is an open-source Graphical User Interface (GUI) designed principally for modelling
+2D potential field (gravity and magnetic) profiles. GMG is written in python 2.7 using
+wx.python for GUI implementation. GMG makes use of several other open-source python
+packages to preform various tasks (see `References <references.html>`_ for a detailed
+listing).
 
-GMG is written in python 2.7 using wx.python for GUI implementation. GMG makes
-use of several other open-source python packages to preform various tasks
-(see `References <references.html>`_ for a detailed listing).
+The project was instigated after failing to find an adequate open-source option (in which
+the source code can be viewed and modified by the user) for performing 2D geophysical
+modeling tasks. Inspiration came from fatiando a terra and GMT.
+
+It is anticipated that GMG will also be useful for teaching purposes.
 
 Key features
 ------------
-
+* Data I/O is made as simple as possible using space delimited ASCII text files.
 * Import and display observed topography, gravity and magnetic data.
 * Apply filters to observed data.
 * Import and display seismic reflection data.
@@ -59,12 +68,6 @@ Release Notes
 Version: |version|
 
 Last updated: |today|
-
-Github
-------
-::
-
-    https://github.com/btozer/gmg
 
 Notices:
 --------

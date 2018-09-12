@@ -92,7 +92,7 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#pre-installation">Pre-Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id2">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-gmg">Installing gmg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#launching-gmg">Launching gmg</a></li>
 </ul>
 </li>
@@ -159,6 +159,10 @@
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <a href="https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/installation.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -175,9 +179,10 @@
 <div class="section" id="pre-installation">
 <h2>Pre-Installation<a class="headerlink" href="#pre-installation" title="Permalink to this headline">¶</a></h2>
 <p><strong>Step 1: Install an Anaconda python distribution</strong></p>
-<p>The simplest way to install gmg is to first install an Anaconda Python distribution: <a class="reference external" href="https://www.continuum.io/downloads">https://www.continuum.io/downloads</a>
-This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
-using the Conda package manager.</p>
+<p>The simplest way to install gmg is to first install an Anaconda Python distribution: www.anaconda.com/download</p>
+<p>This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
+package manager. It is recommended you download the python3 version, even though GMG is written in python2.7 (you can
+create a python2.7 environment to run GMG).</p>
 <p><strong>Step 2: Create a new python environment for gmg</strong></p>
 <p>It may be useful to create a new python2.7 conda environment to use when running gmg. This will avoid any potential
 conflicts with your current system configuration. e.g.:</p>
@@ -203,17 +208,18 @@ environment. To deactivate the environment either close the terminal window or o
 <div class="highlight-none"><div class="highlight"><pre><span></span>deactivate
 </pre></div>
 </div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">gmg is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems.
+<p><strong>OS Support:</strong>
+.. note:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>gmg is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems.
 It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
-Please raise any information regarding installation problems on github.</p>
+Please raise any information regarding installation problems on github.
+</pre></div>
 </div>
 </div>
-<div class="section" id="id2">
-<h2>Installation<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="installing-gmg">
+<h2>Installing gmg<a class="headerlink" href="#installing-gmg" title="Permalink to this headline">¶</a></h2>
 <p><strong>Step 1:</strong></p>
-<p>Ensure your py27-gmg environment is active, on macOS and Linux use:</p>
+<p>Ensure your py27-gmg environment is active, on macOS or Linux use:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>source activate py27-gmg
 </pre></div>
 </div>
@@ -236,29 +242,35 @@ Please raise any information regarding installation problems on github.</p>
 </pre></div>
 </div>
 <p><strong>Step 3: Get gmg</strong></p>
-<p>Download or git clone the gmg github repository. To download, navigate to:</p>
+<p>Download or “git clone” the gmg github repository.</p>
+<p><em>Option 1. Download:</em></p>
+<p>In your browser, navigate to:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>https://github.com/btozer/gmg
 </pre></div>
 </div>
-<p>Use the green <em>clone or download</em> button on the right hand side of the page to download a .zip of gmg. Unzip this
+<p>Use the green <strong>clone or download</strong> button on the right hand side of the page to download a .zip of gmg. Unzip this
 directory.</p>
-<p>or simply use git on the command line:</p>
+<p><em>Option 2. git clone:</em></p>
+<p>If you have git installed, simply use git on the command line:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>git clone https://github.com/btozer/gmg.git
 </pre></div>
 </div>
+<p>This will create a copy of the GMG repository in the current working directory.</p>
 <p><strong>Step 4: Install  gmg</strong></p>
-<p>Run the following command in the dir where you have downloaded or git-cloned the gmg repository.</p>
-<blockquote>
-<div>pip install .</div></blockquote>
+<p>Run the following command in the gmg/ root directory (which contains the script <strong>setup.py</strong>):</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>pip install .
+</pre></div>
+</div>
 <p>This will install gmg within your local anaconda python site-packages dir.</p>
 </div>
 <div class="section" id="launching-gmg">
 <h2>Launching gmg<a class="headerlink" href="#launching-gmg" title="Permalink to this headline">¶</a></h2>
-<p>To start gmg the best way is to create an alias and export this e.g.:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>export alias gmg=&#39;python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py&#39;
+<p>To start gmg, the best way is to create an alias within your .bashrc or equivalent file
+(e.g. .bash_profile, .bashrc, .zshrc or .cshrc) e.g.:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>vi .bashrc
 </pre></div>
 </div>
-<p>or manually add this to your .bashrc or equivalent file (e.g. .bash_profile, .zshrc or .cshrc) e.g.:</p>
+<p>and then add the line:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>alias gmg=&#39;python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py&#39;
 </pre></div>
 </div>
@@ -270,10 +282,6 @@ on the main display of your Mac.
 </div>
 <p>i.e.:</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>alias gmg=&#39;pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py&#39;
-</pre></div>
-</div>
-<p>Then you can (optionally) add the executable directory to your $PATH variable by repeating the process, e.g.:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>export $PATH=$PATH:~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/
 </pre></div>
 </div>
 <p>Now, in a fresh terminal, simple type “gmg” on the command line to launch the software:</p>
@@ -304,7 +312,7 @@ on the main display of your Mac.
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 28, 2018.
+      Last updated on Sep 12, 2018.
 
     </p>
   </div>

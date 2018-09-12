@@ -22,30 +22,38 @@ differs from the inducing field, as may be the case for remanent magnetism.
 3.1 Bulk density
 ----------------
 
-Gravity modelling is achieved using bulk *density contrasts* relative to a *reference density*.
+Gravity modelling is achieved using bulk **density contrasts** relative to a **reference density**.
 
 Each layer requires:
 
-* An absolute bulk density
-* A reference density
+1. A bulk density
+2. A reference density
 
-All densities must be input using units :math:`kg/m^3`.
+gmg defaults to a reference density of 0 :math:`kg` :math:`m^{-3}`. Hence, densities should be input as bulk **density contrasts**.
+If you would rather input densities as absolute values, then you can set the reference density to your chosen value.
+For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 :math:`kg` :math:`m^{-3}` depending on
+the particular geology in the region of interest. Set the paper by Hinze (2003) for more details.
 
-These are input using the attribute side bar or within the *Attribute table*.
+YOu can als use a different reference density for different layers. This is useful if you which to model
+crustal structure and relative to, for example, an upper crust of 2670 :math:`kg` :math:`m^{-3}`, lower crust
+2900 :math:`kg` :math:`m^{-3}` and upper mantle of 3330 :math:`kg` :math:`m^{-3}`.
 
-This enables gravity anomalies relative to say an upper crust of 2670 :math:`kg/m^3`, lower crust 2900 :math:`kg/m^3`
-and upper mantle of 3330 :math:`kg/m^3`.
+.. note:: All densities must be input using SI units :math:`kg` :math:`m^{-3}`.
+          To assign density values use the *Attribute Sidebar* or the *Attribute table*.
 
-For each layer both the bulk absolute density and the reference density must be set. For example:
+For each layer both the bulk absolute density and the reference density must be set.
 
-To model a sedimentary unit it may have a density set as 2300 :math:`kg/m^3` and reference crustal
-density of 2670 :math:`kg/m^3`.
+.. admonition:: Example
 
-To model crustal thickened from a reference crustal thickness of 32 km to 36 km, a lower crustal density of
-2800 :math:`kg/m^3` maybe be modelled against a upper most mantle reference density of 3330 :math:`kg/m^3`.
+          To model a sedimentary basin typical absolute density values may be 2400 :math:`kg` :math:`m^{-3}` for the basin and
+          2670 :math:`kg/m^3` as the reference density for the upper continental crust.
+
+          To model crustal thickened from a reference crustal thickness of 32 km, thickened to 36 km, a lower crustal
+          density of 2800 :math:`kg` :math:`m^{-3}` maybe be modelled against a upper most mantle reference density
+          of 3330 :math:`kg` :math:`m^{-3}`.
 
 .. tip:: To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure)
-use the *gravity Field* -> *Set background density* tool.
+         navigate to *'Gavity Field'* -> *'Set background density'*.
 
 ---------------------------
 3.2 Magnetic Susceptibility
@@ -61,8 +69,7 @@ A '*strike*' must also be assigned for each unit.
     (the angle is positive when measured counterclockwise) See Won and Bevis (1987) for a diagram and further details.
     The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).
 
-
-    For example:
+.. admonition:: Example
 
     If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.
 

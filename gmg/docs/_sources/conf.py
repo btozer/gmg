@@ -101,10 +101,10 @@ html_last_updated_fmt = '%b %d, %Y'
 # html_title = 'gmg'
 # html_short_title = 'gmg'
 html_logo = 'gmg_icon.png'
-#html_favicon = u'favicon.ico'
+# html_favicon = u'favicon.ico'
 html_static_path = ['_static']
 #html_extra_path = ['.nojekyll', 'CNAME']
-html_use_smartypants = True
+# #html_use_smartypants = True
 pygments_style = 'default'
 add_function_parentheses = False
 # Custom sidebar templates, maps document names to template names.
@@ -132,6 +132,14 @@ html_show_copyright = True
 #html_file_suffix = None
 # Output file base name for HTML help builder.
 #htmlhelp_basename = ''
+
+html_context = {
+    "display_github": True,  # Integrate GitHub
+    "github_user": "btozer",  # Username
+    "github_repo": "gmg",  # Repo name
+    "github_version": "master",  # Version
+    "conf_py_path": "/gmg/docs/_sources/",  # Path in the checkout to the docs root
+}
 
 #Theme config
 html_theme = 'sphinx_rtd_theme'

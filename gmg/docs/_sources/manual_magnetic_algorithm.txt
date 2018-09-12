@@ -4,14 +4,14 @@
 
 Magnetic anomalies are calculated using a python implementation of Talwani and Heirtzler's (1964) :cite:`talwani1964`
 algorithm for two-dimensional uniformly magnetised bodies. This employs a similar procedure to that
-described in section :ref:`A1 <manual_gravity_algorithm>` for calculating two-dimensional gravity anomalies
+described in Section :ref:`A1 <manual_gravity_algorithm>` for calculating two-dimensional gravity anomalies
 by treating a body as an n-sided polygon, solving the anomaly for each side and summing the result.
 However, in the case of magnetic anomalies, there is added complexity owing to the fact that a given
 bodies magnetisation vector is, for the case of induced magnetisation, dependent on the inclination,
 delineation and magnitude of the inducing magnetic field (i.e., Earth's magnetic field). Moreover, if
 the body has retained a remanent magnetisation, then the magnetisation vector may vary from that of the
-local Earth field. Furthermore, for two-dimensional modelling, the relationship between the azimuth of
-model profile and the magnetisation vector must also be considered.
+local Earth field. Furthermore, for two-dimensional modelling, the relationship between the model profile azimuth
+and the magnetisation vector must also be considered.
 
 These complexities are handled by considering the vertical and horizontal components of the total magnetisation
 vector separately and then summing these components at the final calculation step. Following the trigonometric

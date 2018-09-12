@@ -98,8 +98,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
@@ -107,7 +107,8 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#talwani-and-heirtzler-1964-method-testing">Talwani and Heirtzler (1964) method testing</a></li>
@@ -176,6 +177,10 @@
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <a href="https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/manual_magnetic_algorithm.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -191,14 +196,14 @@
 <h1><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong><a class="headerlink" href="#a2-talwani-and-heirtzler-1964-magnetic-algorithm" title="Permalink to this headline">¶</a></h1>
 <p>Magnetic anomalies are calculated using a python implementation of Talwani and Heirtzler’s (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id1">[6]</a>
 algorithm for two-dimensional uniformly magnetised bodies. This employs a similar procedure to that
-described in section <a class="reference internal" href="manual_gravity_algorithm.html#manual-gravity-algorithm"><span class="std std-ref">A1</span></a> for calculating two-dimensional gravity anomalies
+described in Section <a class="reference internal" href="manual_gravity_algorithm.html#manual-gravity-algorithm"><span class="std std-ref">A1</span></a> for calculating two-dimensional gravity anomalies
 by treating a body as an n-sided polygon, solving the anomaly for each side and summing the result.
 However, in the case of magnetic anomalies, there is added complexity owing to the fact that a given
 bodies magnetisation vector is, for the case of induced magnetisation, dependent on the inclination,
 delineation and magnitude of the inducing magnetic field (i.e., Earth’s magnetic field). Moreover, if
 the body has retained a remanent magnetisation, then the magnetisation vector may vary from that of the
-local Earth field. Furthermore, for two-dimensional modelling, the relationship between the azimuth of
-model profile and the magnetisation vector must also be considered.</p>
+local Earth field. Furthermore, for two-dimensional modelling, the relationship between the model profile azimuth
+and the magnetisation vector must also be considered.</p>
 <p>These complexities are handled by considering the vertical and horizontal components of the total magnetisation
 vector separately and then summing these components at the final calculation step. Following the trigonometric
 parametrisation for a two-dimensional body shown in <a class="reference internal" href="#talwani-mag-method"><span class="std std-numref">Figure 4</span></a>, Talwani and Heirtzler’s
@@ -308,7 +313,7 @@ Declination of inducing field.</span></p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 28, 2018.
+      Last updated on Sep 12, 2018.
 
     </p>
   </div>

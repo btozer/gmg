@@ -96,10 +96,14 @@
 <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>Icon Shortcuts</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>Icon Shortcuts</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#menubar-shortcuts">Menubar shortcuts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#controlbar-shortcuts">Controlbar shortcuts</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
@@ -107,7 +111,8 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
@@ -173,6 +178,10 @@
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <a href="https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/manual_icons.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -186,6 +195,8 @@
             
   <div class="section" id="icon-shortcuts">
 <span id="icons"></span><h1><strong>Icon Shortcuts</strong><a class="headerlink" href="#icon-shortcuts" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="menubar-shortcuts">
+<h2>Menubar shortcuts<a class="headerlink" href="#menubar-shortcuts" title="Permalink to this headline">¶</a></h2>
 <table border="1" class="docutils">
 <colgroup>
 <col width="50%" />
@@ -195,35 +206,59 @@
 <tr class="row-odd"><td><img alt="fig1" src="_images/save_24.png" /> Save model</td>
 <td><img alt="fig2" src="_images/load_24.png" /> Load model</td>
 </tr>
-<tr class="row-even"><td><img alt="fig3" src="_images/T_24.png" /> Load topography anomaly</td>
-<td><img alt="fig4" src="_images/G_24.png" /> Load gravity anomaly</td>
+<tr class="row-even"><td><img alt="fig3" src="_images/T_24.png" /> Toggle Topography calculation</td>
+<td><img alt="fig4" src="_images/G_24.png" /> Toggle gravity calculation</td>
 </tr>
-<tr class="row-odd"><td><img alt="fig5" src="_images/M_24.png" /> Load magnetic anomaly</td>
-<td><img alt="fig6" src="_images/C_24.png" /> Capture Coordinates</td>
+<tr class="row-odd"><td><img alt="fig5" src="_images/M_24.png" /> Toggle magnetic calculation</td>
+<td><img alt="fig6" src="_images/C_24.png" /> Toggle coordinate capture</td>
 </tr>
-<tr class="row-even"><td><img alt="fig7" src="_images/faultline_24.png" /> Start fault picking</td>
-<td><img alt="fig8" src="_images/large_up_24.png" /> Increase aspect x2</td>
+<tr class="row-even"><td><img alt="fig7" src="_images/large_up_24.png" /> Increase aspect x2</td>
+<td><img alt="fig8" src="_images/large_down_24.png" /> Decrease aspect x2</td>
 </tr>
-<tr class="row-odd"><td><img alt="fig9" src="_images/large_down_24.png" /> Decrease aspect x2</td>
-<td><img alt="fig10" src="_images/small_up_24.png" /> Increase aspect</td>
+<tr class="row-odd"><td><img alt="fig9" src="_images/small_up_24.png" /> Increase aspect</td>
+<td><img alt="fig10" src="_images/small_down_24.png" /> Decrease aspect</td>
 </tr>
-<tr class="row-even"><td><img alt="fig11" src="_images/small_down_24.png" /> Decrease aspect</td>
-<td><img alt="fig12" src="_images/zoom_in_24.png" /> Zoom in</td>
+<tr class="row-even"><td><img alt="fig11" src="_images/zoom_in_24.png" /> Zoom in</td>
+<td><img alt="fig12" src="_images/zoom_out_24.png" /> Zoom out</td>
 </tr>
-<tr class="row-odd"><td><img alt="fig13" src="_images/zoom_out_24.png" /> Zoom out</td>
-<td><img alt="fig14" src="_images/full_extent_24.png" /> Full extent</td>
+<tr class="row-odd"><td><img alt="fig13" src="_images/full_extent_24.png" /> Full extent</td>
+<td><img alt="fig14" src="_images/pan_24.png" /> Pan</td>
 </tr>
-<tr class="row-even"><td><img alt="fig15" src="_images/pan_24.png" /> Pan</td>
-<td><img alt="fig16" src="_images/left_small_24.png" /> Segy gain down</td>
+<tr class="row-even"><td><img alt="fig15" src="_images/left_small_24.png" /> Segy gain increase</td>
+<td><img alt="fig16" src="_images/right_small_24.png" /> Segy gain decrease</td>
 </tr>
-<tr class="row-odd"><td><img alt="fig17" src="_images/right_small_24.png" /> Segy gain up</td>
-<td><img alt="fig18" src="_images/large_left_24.png" /> Layer transparency decrease</td>
+<tr class="row-odd"><td><img alt="fig17" src="_images/large_left_24.png" /> Layer transparency decrease</td>
+<td><img alt="fig18" src="_images/large_right_24.png" /> Layer transparency increase</td>
 </tr>
-<tr class="row-even"><td><img alt="fig19" src="_images/large_right_24.png" /> Layer transparency increase</td>
-<td><img alt="fig20" src="_images/well_24.png" /> Load well data</td>
+<tr class="row-even"><td><img alt="fig19" src="_images/well_24.png" /> Load well data</td>
+<td><img alt="fig20" src="_images/F_24.png" /> Toggle Fault mode</td>
+</tr>
+<tr class="row-odd"><td><img alt="fig21" src="_images/faultline_24.png" /> Start fault picking</td>
+<td>&#160;</td>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section" id="controlbar-shortcuts">
+<h2>Controlbar shortcuts<a class="headerlink" href="#controlbar-shortcuts" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="51%" />
+<col width="49%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><img alt="fig22" src="_images/large_up_24.png" /> Toggle controls frame</td>
+<td><img alt="fig23" src="_images/python_24.png" /> Toggle python console</td>
+</tr>
+<tr class="row-even"><td><img alt="fig24" src="_images/T_24.png" /> Toggle topography profile</td>
+<td><img alt="fig25" src="_images/G_24.png" /> Toggle  gravity profile</td>
+</tr>
+<tr class="row-odd"><td><img alt="fig26" src="_images/M_24.png" /> Toggle magnetic profile</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 
 
@@ -247,7 +282,7 @@
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 28, 2018.
+      Last updated on Sep 12, 2018.
 
     </p>
   </div>

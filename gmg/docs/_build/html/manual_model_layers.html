@@ -30,7 +30,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="3.0 Layer attributes" href="manual_layer_attributes.html" />
-    <link rel="prev" title="1.0 Models" href="manual_models.html" />
+    <link rel="prev" title="1.0 Modelling" href="manual_modelling.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 
@@ -98,12 +98,13 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>2.0 Model Layers</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#adding-a-layer">2.1 Adding a layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#adding-a-new-node-to-a-layer">2.2 Adding a New Node to a Layer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#deleting-a-node-from-a-layer">2.3 Deleting a Node From a Layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-new-node-to-a-layer">2.2 Adding a new node to a layer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-a-node-from-a-layer">2.3 Deleting a node from a layer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#pinching-nodes">2.4 Pinching nodes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-a-layer">2.5 Deleting a layer</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
@@ -113,7 +114,8 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
@@ -179,6 +181,10 @@
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <a href="https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/manual_model_layers.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -192,55 +198,55 @@
             
   <div class="section" id="model-layers">
 <h1><strong>2.0 Model Layers</strong><a class="headerlink" href="#model-layers" title="Permalink to this headline">¶</a></h1>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
 <div class="section" id="adding-a-layer">
 <h2>2.1 Adding a layer<a class="headerlink" href="#adding-a-layer" title="Permalink to this headline">¶</a></h2>
-<p>To add a new layer to the model navigate to the <em>‘Layers’</em> menu and select <em>‘New Layer’</em>.</p>
-<div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">the <em>n</em> key is the keyboard shortcut for adding a new layer.</p>
+<p>To add a new layer to the model navigate to the <em>‘Layers’</em> menu and select <em>‘New Layer’</em>:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Layers -&gt; New Layer
+</pre></div>
 </div>
+<p>Alternatively, use the keyboard shortcut, <strong>n</strong> key.</p>
 <p>You will be prompted with the option of adding a <em>‘New fixed layer’</em> or a <em>‘New floating layer’</em>.</p>
 <p><strong>Floating layers:</strong></p>
-<p>Floating layers are polygons that are fully contained within the model space.</p>
+<p>Floating layers are polygons that are fully contained within the model space. For example, a narrow salt dome.</p>
 <p><strong>Fixed layers:</strong></p>
-<p>Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basins.
-Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
-These layers are padded horizontally from the boundary nodes an additional 400 km in order to avoid edge effects.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
+<p>Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basin
+formations. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.</p>
+<dl class="docutils">
+<dt>..note:</dt>
+<dd>Fixed layers are automatically <em>‘padded’</em> horizontally from the boundary nodes by an additional 400 km in order to
+avoid edge effects.</dd>
+</dl>
 </div>
 <div class="section" id="adding-a-new-node-to-a-layer">
-<h2>2.2 Adding a New Node to a Layer<a class="headerlink" href="#adding-a-new-node-to-a-layer" title="Permalink to this headline">¶</a></h2>
+<h2>2.2 Adding a new node to a layer<a class="headerlink" href="#adding-a-new-node-to-a-layer" title="Permalink to this headline">¶</a></h2>
 <p>To add a node to a layer place the mouse cursor at the position where you would like to add the new node and
 press the <em>‘i’</em> key to insert the new node.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Nodes are inserted to the right of the currently selected node.</p>
-</div>
-<div class="line-block">
-<div class="line"><br /></div>
+<p class="last">Nodes are inserted to the right of the currently selected node (which is highlighted red).</p>
 </div>
 </div>
 <div class="section" id="deleting-a-node-from-a-layer">
-<h2>2.3 Deleting a Node From a Layer<a class="headerlink" href="#deleting-a-node-from-a-layer" title="Permalink to this headline">¶</a></h2>
+<h2>2.3 Deleting a node from a layer<a class="headerlink" href="#deleting-a-node-from-a-layer" title="Permalink to this headline">¶</a></h2>
 <p>To delete a node from a layer place the mouse cursor over the node you would like to delete and
-press the <em>‘d’</em> key to delete the new node.</p>
-<div class="line-block">
-<div class="line"><br /></div>
-</div>
+press the <em>‘d’</em> key to delete the node.</p>
 </div>
 <div class="section" id="pinching-nodes">
 <h2>2.4 Pinching nodes<a class="headerlink" href="#pinching-nodes" title="Permalink to this headline">¶</a></h2>
-<p>To “pinch” a node onto a node of another layer: Press the <em>p</em> key to activate pinch mode.
-Now select the node you wish to pinch, then switch to the layer which you would like to pinch
-to, finally click on the node to pinch to.</p>
-<p>Alternatively, multiple nodes can be pinched or depinched simultaneously to the layer above or below
-(as defined in the layer order list) by selecting <em>‘pinch layer’</em> in the Menubar.
-A distance range over which to pinch/depinch nodes is then required.</p>
+<p>“Pinching” refers to “snapping” a node onto a node of another layer so that they are “stuck” together.</p>
+<p>There are two ways to pinch nodes together:</p>
+<p>1. To pinch a single node, press the <em>p</em> key to activate pinch mode. Now select the node you wish to pinch,
+then switch to the layer which you would like to pinch to, finally click on the node to pinch to.</p>
+<p>2. Alternatively, multiple nodes can be pinched or depinched simultaneously to the layer above or below
+(as defined in the layer order list) by selecting <em>‘Pinch Layer’</em> in the Menubar. A distance range over which to
+pinch/depinch nodes can then be entered.</p>
+</div>
+<div class="section" id="deleting-a-layer">
+<h2>2.5 Deleting a layer<a class="headerlink" href="#deleting-a-layer" title="Permalink to this headline">¶</a></h2>
+<p>To delete a model layer, in the Menubar navigate to:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Layers -&gt; Delete Current Layer...
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -255,7 +261,7 @@ A distance range over which to pinch/depinch nodes is then required.</p>
         <a href="manual_layer_attributes.html" class="btn btn-neutral float-right" title="3.0 Layer attributes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="manual_models.html" class="btn btn-neutral" title="1.0 Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="manual_modelling.html" class="btn btn-neutral" title="1.0 Modelling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -265,7 +271,7 @@ A distance range over which to pinch/depinch nodes is then required.</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 28, 2018.
+      Last updated on Sep 12, 2018.
 
     </p>
   </div>

@@ -2,8 +2,6 @@
 **4.0 Potential field data**
 ============================
 
-|
-
 ------------------------------------
 **4.1 Potential field calculations**
 ------------------------------------
@@ -13,8 +11,6 @@ can help speed up the GUI response time if the model becomes complex (many layer
 
 .. note:: You must set the magnetic inclination and Earth Field value under the *Magnetic Field* menu before
 the predicted anomaly can be calculated.
-
-|
 
 ---------------------------------------------
 **4.2 Loading observed potential field data**

@@ -98,19 +98,22 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_models.html"><strong>1.0 Models</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_layer_nodes.html"><strong>2.0 Model Layers</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>5.0 SEGY data</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#loading-segy-data"><strong>5.1 Loading SEGY data</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-segy-data">5.1 Loading SEGY data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#segy-options">5.2 SEGY options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-segy-data">5.3 Deleting SEGY data</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>9.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
@@ -176,6 +179,10 @@
       <li class="wy-breadcrumbs-aside">
         
             
+            
+              <a href="https://github.com/btozer/gmg/blob/master/gmg/docs/_sources/manual_segy.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
         
       </li>
     
@@ -190,15 +197,54 @@
   <div class="section" id="segy-data">
 <h1><strong>5.0 SEGY data</strong><a class="headerlink" href="#segy-data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="loading-segy-data">
-<h2><strong>5.1 Loading SEGY data</strong><a class="headerlink" href="#loading-segy-data" title="Permalink to this headline">¶</a></h2>
-<p>To load observed SEGY data select the <em>‘SEGY’</em> menu in the Menubar.
-Next Navigate to the file you want to load and select it.
-The file will automatically be loaded into the canvas.</p>
+<h2>5.1 Loading SEGY data<a class="headerlink" href="#loading-segy-data" title="Permalink to this headline">¶</a></h2>
+<p>To load observed SEGY data select the <em>‘Seismic Data’</em> menu in the Menubar and select <em>‘Load Segy…’</em>.
+Next Navigate to the file you want to load and select it. You will them be prompted to enter the dimensions of
+the SEGY data. The data will then be loaded into the model canvas using these dimensions (plotted as a pyplot image).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values,
-so these may need to be set using seismic processing software or obspy if they are not present in your data.</p>
-<p class="last">The SEGY file will be plotted as a pyplot image.</p>
+<ol class="last arabic simple">
+<li>The SEGY data must be in the depth domain.</li>
+<li>Multiple SEGY files may be loaded into a single model. For example if two sections of the model span two distinct
+seismic survey lines.</li>
+</ol>
+</div>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p class="last">SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values.
+Hence, you may need fill these headers using seismic processing software or ObsPy if they are not already present in
+your data.</p>
+</div>
+</div>
+<div class="section" id="segy-options">
+<h2>5.2 SEGY options<a class="headerlink" href="#segy-options" title="Permalink to this headline">¶</a></h2>
+<p><strong>Gain</strong></p>
+<p>The amplitude gain can be increased and decreased by either:</p>
+<ol class="arabic simple">
+<li>selecting the <em>‘Seismic Data’</em> menu in the Menubar and then selecting <em>‘Gain’</em> <em>‘Increase…’</em> or <em>‘Decrease’</em></li>
+<li>Using the Gain control icons (see <a class="reference internal" href="manual_icons.html#icons"><span class="std std-ref">Icon Shortcuts</span></a>)</li>
+</ol>
+<p><strong>Color palette</strong></p>
+<p>There are currently two color palettes to chose from:</p>
+<ol class="arabic simple">
+<li>Seismic (red-white-blue)</li>
+<li>Seismic (grey scale)</li>
+</ol>
+<p>To change the color palette select the <em>‘Seismic Data’</em> menu in the Menubar and then <em>‘Color Palette’</em> and chose
+from the options listed.</p>
+<p>More matplotlib color scales (as shown below) will be added in later versions.</p>
+<img alt="_images/mpl_color_scales.png" src="_images/mpl_color_scales.png" />
+</div>
+<div class="section" id="deleting-segy-data">
+<h2>5.3 Deleting SEGY data<a class="headerlink" href="#deleting-segy-data" title="Permalink to this headline">¶</a></h2>
+<p>If you wish remove segy data from your gmg model, simply navigate to the <em>‘Seismic Data’</em> menu in the
+Menubar and then select <em>‘Segy Data’</em> and then <em>‘Delete’</em> on the segy file of choice:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Seismic Data -&gt; Segy Data -&gt; Segy FIle -&gt; Delete
+</pre></div>
+</div>
+<p>Alternatively, if you have more that one Segy file loaded and you want to delete them all, you can use:</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>Seismic Data -&gt; Remove All Segy...
+</pre></div>
 </div>
 </div>
 </div>
@@ -224,7 +270,7 @@ so these may need to be set using seismic processing software or obspy if they a
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Aug 28, 2018.
+      Last updated on Sep 12, 2018.
 
     </p>
   </div>

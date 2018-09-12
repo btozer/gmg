@@ -8,8 +8,8 @@
 
    manual_icons
    manual_keyboard_shortcuts
-   manual_models
-   manual_layer_nodes
+   manual_modelling
+   manual_model_layers
    manual_layer_attributes
    manual_PF
    manual_segy
@@ -17,6 +17,7 @@
    manual_XY_data
    manual_geology
    manual_export_figure
+   manual_attribute_table
    manual_python_console
    manual_gravity_algorithm
    manual_magnetic_algorithm

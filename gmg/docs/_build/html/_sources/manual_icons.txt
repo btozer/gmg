@@ -1,7 +1,7 @@
 .. _icons:
 
 **Icon Shortcuts**
-=======================
+==================
 
 .. |fig1| image:: _images/save_24.png
 .. |fig2| image:: _images/load_24.png
@@ -9,39 +9,62 @@
 .. |fig4| image:: _images/G_24.png
 .. |fig5| image:: _images/M_24.png
 .. |fig6| image:: _images/C_24.png
-.. |fig7| image:: _images/faultline_24.png
-.. |fig8| image:: _images/large_up_24.png
-.. |fig9| image:: _images/large_down_24.png
-.. |fig10| image:: _images/small_up_24.png
-.. |fig11| image:: _images/small_down_24.png
-.. |fig12| image:: _images/zoom_in_24.png
-.. |fig13| image:: _images/zoom_out_24.png
-.. |fig14| image:: _images/full_extent_24.png
-.. |fig15| image:: _images/pan_24.png
-.. |fig16| image:: _images/left_small_24.png
-.. |fig17| image:: _images/right_small_24.png
-.. |fig18| image:: _images/large_left_24.png
-.. |fig19| image:: _images/large_right_24.png
-.. |fig20| image:: _images/well_24.png
+.. |fig7| image:: _images/large_up_24.png
+.. |fig8| image:: _images/large_down_24.png
+.. |fig9| image:: _images/small_up_24.png
+.. |fig10| image:: _images/small_down_24.png
+.. |fig11| image:: _images/zoom_in_24.png
+.. |fig12| image:: _images/zoom_out_24.png
+.. |fig13| image:: _images/full_extent_24.png
+.. |fig14| image:: _images/pan_24.png
+.. |fig15| image:: _images/left_small_24.png
+.. |fig16| image:: _images/right_small_24.png
+.. |fig17| image:: _images/large_left_24.png
+.. |fig18| image:: _images/large_right_24.png
+.. |fig19| image:: _images/well_24.png
+.. |fig20| image:: _images/F_24.png
+.. |fig21| image:: _images/faultline_24.png
+
+Menubar shortcuts
+-----------------
 
 +-------------------------------------+-------------------------------------+
 | |fig1| Save model                   | |fig2| Load model                   |
 +-------------------------------------+-------------------------------------+
-| |fig3| Load topography anomaly      | |fig4| Load gravity anomaly         |
+| |fig3| Toggle Topography calculation| |fig4| Toggle gravity calculation   |
 +-------------------------------------+-------------------------------------+
-| |fig5| Load magnetic anomaly        | |fig6| Capture Coordinates          |
+| |fig5| Toggle magnetic calculation  | |fig6| Toggle coordinate capture    |
 +-------------------------------------+-------------------------------------+
-| |fig7| Start fault picking          | |fig8| Increase aspect x2           |
+| |fig7| Increase aspect x2           | |fig8| Decrease aspect x2           |
 +-------------------------------------+-------------------------------------+
-| |fig9| Decrease aspect x2           | |fig10| Increase aspect             |
+| |fig9| Increase aspect              | |fig10| Decrease aspect             |
 +-------------------------------------+-------------------------------------+
-| |fig11| Decrease aspect             | |fig12| Zoom in                     |
+| |fig11| Zoom in                     | |fig12| Zoom out                    |
 +-------------------------------------+-------------------------------------+
-| |fig13| Zoom out                    | |fig14| Full extent                 |
+| |fig13| Full extent                 | |fig14| Pan                         |
 +-------------------------------------+-------------------------------------+
-| |fig15| Pan                         | |fig16| Segy gain down              |
+| |fig15| Segy gain increase          | |fig16| Segy gain decrease          |
 +-------------------------------------+-------------------------------------+
-| |fig17| Segy gain up                | |fig18| Layer transparency decrease |
+| |fig17| Layer transparency decrease | |fig18| Layer transparency increase |
 +-------------------------------------+-------------------------------------+
-| |fig19| Layer transparency increase | |fig20| Load well data              |
+| |fig19| Load well data              | |fig20| Toggle Fault mode           |
 +-------------------------------------+-------------------------------------+
+| |fig21| Start fault picking         |                                     |
++-------------------------------------+-------------------------------------+
+
+.. |fig22| image:: _images/large_up_24.png
+.. |fig23| image:: _images/python_24.png
+.. |fig24| image:: _images/T_24.png
+.. |fig25| image:: _images/G_24.png
+.. |fig26| image:: _images/M_24.png
+
+Controlbar shortcuts
+--------------------
+
++-----------------------------------+---------------------------------+
+| |fig22| Toggle controls frame     | |fig23| Toggle python console   |
++-----------------------------------+---------------------------------+
+| |fig24| Toggle topography profile | |fig25| Toggle  gravity profile |
++-----------------------------------+---------------------------------+
+| |fig26| Toggle magnetic profile   |                                 |
++-----------------------------------+---------------------------------+
