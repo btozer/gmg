@@ -89,10 +89,13 @@ Installing gmg
 
 **Step 1:**
 
-Ensure your py27-gmg environment is active:
+Ensure your py27-gmg environment is active, on macOS or Linux use:
 
     source activate py27-gmg
 
+Or on Windows use:
+
+    activate py27-gmg
 
 **Step 2: Install dependencies**
 
@@ -108,7 +111,6 @@ GMG depends on several other packages to run. These are:
 These dependencies can be installed in your py27 environment using the command:
 
     conda install wxpython numpy scipy matplotlib fatiando obspy
-
 
 **Step 3: Get gmg**
 
