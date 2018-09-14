@@ -1,0 +1,45 @@
+language: python
+
+sudo: false
+
+branches:
+    only:
+        - master
+        
+matrix:
+    include:
+        - os: linux
+          env:
+              - PYTHON=3.5
+              - BUILD_DOCS=true
+        - os: linux
+          env:
+              - PYTHON=3.6
+              - COVERAGE=true
+              - CHECK=true
+              - BUILD_DOCS=true
+              - DEPLOY_DOCS=true
+              - DEPLOY_PYPI=true
+        - os: osx
+          env:
+              - PYTHON=3.5
+              - BUILD_DOCS=true
+        - os: osx
+          env:
+              - PYTHON=3.6
+              - COVERAGE=true
+              - BUILD_DOCS=true
+
+before_install:
+
+install:
+  - python setup.py
+  - pip install .
+
+script:
+
+after_success:
+
+deploy:
+
+notifications:

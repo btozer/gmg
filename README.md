@@ -108,7 +108,7 @@ GMG depends on several other packages to run. These are:
 * [fatiando a terra](http://www.fatiando.org/)
 * [ObsPy](http://docs.obspy.org/)
 
-These dependencies can be installed in your py27 environment using the command:
+These dependencies can be installed in your py27-gmg environment using the command:
 
     conda install wxpython numpy scipy matplotlib fatiando obspy
 
