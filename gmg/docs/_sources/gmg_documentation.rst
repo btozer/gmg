@@ -3,7 +3,7 @@
 .. raw:: html
 
     <div class="banner">
-        <a href="http://www.github.com/btozer/gmg">Visit the gmg github repository</a>
+        <a href="http://www.github.com/btozer/gmg">Visit the GMG github repository</a>
     </div>
 
 Overview

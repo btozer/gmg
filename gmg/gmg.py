@@ -152,25 +152,25 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         'CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1081), style=wx.SP_NOBORDER | wx.EXPAND)
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 975), style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 662),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
         'FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 405),
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 360),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 410),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 370),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
                                                                        foldIcons=images)
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         'SECOND PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 331),
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 380),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 331),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 380),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
@@ -710,8 +710,6 @@ class Gmg(wx.Frame):
         self.obs_mag_name_list = []
         self.obs_mag_colors = [[]]
         self.obs_mag_count = 0
-        self.declination = 0.
-        self.inclination = 0.
         self.earth_field = 0.
         self.profile_azimuth = 0.
         self.calc_mag_switch = False
@@ -753,7 +751,6 @@ class Gmg(wx.Frame):
         self.susceptibilities = [0.]
         self.angle_a = [0.]
         self.angle_b = [0.]
-        self.remanence = [0]
         self.layers_calculation_switch = [1]
 
         'INITIALISE FAULTS'
@@ -856,21 +853,18 @@ class Gmg(wx.Frame):
         self.ref_density_input.SetFormat("%f")
         self.ref_density_input.SetDigits(4)
         'Make susceptibility spinner'
-        self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="susceptibility:", style=wx.ALIGN_LEFT)
+        self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="Susceptibility:", style=wx.ALIGN_LEFT)
         self.susceptibility_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-2.0, max_val=2.0, increment=0.00001,
                                                  value=0.00)
         self.susceptibility_input.SetFormat("%f")
         self.susceptibility_input.SetDigits(6)
-        'REMANENT MAG SWITCH'
-        self.remanent_mag_checkbox = wx.CheckBox(self.fold_panel_one, -1, "Remanence")
-        self.remanent_mag_checkbox.SetValue(False)
         'MAKE ANGLE A SPINNER'
-        self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label="Angle A:", style=wx.ALIGN_LEFT)
+        self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label="Angle A (Inc): ", style=wx.ALIGN_LEFT)
         self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=90.0, increment=1.0, value=0.0)
         self.angle_a_input.SetFormat("%f")
         self.angle_a_input.SetDigits(1)
         'Make ANGLE B SPINNER'
-        self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label="Angle B:", style=wx.ALIGN_LEFT)
+        self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label="Angle B (Dec):", style=wx.ALIGN_LEFT)
         self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=180.0, increment=1.0, value=0.0)
         self.angle_b_input.SetFormat("%f")
         self.angle_b_input.SetDigits(1)
@@ -1160,21 +1154,16 @@ class Gmg(wx.Frame):
         self.susept_box.Add(self.susceptibility_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
         self.susept_box.Add(self.susceptibility_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
         self.attr_box.Add(self.susept_box, 0, wx.LEFT | wx.EXPAND)
-        self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
-        'REMANANCE'
-        self.remanence_box = wx.BoxSizer(wx.HORIZONTAL)
-        self.remanence_box.Add(self.remanent_mag_checkbox, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
-        self.attr_box.Add(self.remanence_box, 0, wx.LEFT | wx.EXPAND)
         'Angle A'
         self.angle_a_box = wx.BoxSizer(wx.HORIZONTAL)
-        self.angle_a_box.Add(self.angle_a_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
+        self.angle_a_box.Add(self.angle_a_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 0)
         self.angle_a_box.Add(self.angle_a_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
-        self.attr_box.Add(self.angle_a_box, 0, wx.LEFT | wx.EXPAND, 9)
+        self.attr_box.Add(self.angle_a_box, 0, wx.LEFT | wx.EXPAND, 5)
         'Angle B'
         self.angle_b_box = wx.BoxSizer(wx.HORIZONTAL)
-        self.angle_b_box.Add(self.angle_b_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 3)
+        self.angle_b_box.Add(self.angle_b_text, 0, wx.ALL | wx.LEFT | wx.EXPAND, 0)
         self.angle_b_box.Add(self.angle_b_input, 0, wx.ALL | wx.RIGHT | wx.EXPAND)
-        self.attr_box.Add(self.angle_b_box, 0, wx.LEFT | wx.EXPAND, 9)
+        self.attr_box.Add(self.angle_b_box, 0, wx.LEFT | wx.EXPAND, 5)
         self.attr_box.Add(wx.StaticLine(self.fold_panel_one), 0, wx.ALL | wx.EXPAND, 5)
         'Well label text size'
         self.attr_box.Add(self.text_size_text, 0, wx.ALL | wx.ALIGN_CENTER | wx.ALIGN_TOP | wx.EXPAND)
@@ -1328,7 +1317,7 @@ class Gmg(wx.Frame):
         self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
         self.susceptibility_input.SetValue(self.susceptibilities[self.i])
         self.angle_a_input.SetValue(self.angle_a[self.i])
-        self.remanent_mag_checkbox.SetValue(self.remanence[self.i])
+        self.angle_b_input.SetValue(self.angle_b[self.i])
         self.plotx = self.plotx_list[self.i]
         self.ploty = self.ploty_list[self.i]
         self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
@@ -1529,8 +1518,8 @@ class Gmg(wx.Frame):
                   'boundary_lock_list', 'layer_lock_list', 'well_list', 'well_name_list',
                   'well_list_hidden', 'well_list_switch', 'segy_name_list', 'segy_dimension_list',
                   'obs_grav_list_save', 'obs_grav_name_list', 'obs_mag_list_save',
-                  'obs_mag_name_list', 'declination', 'inclination', 'earth_field',
-                  'model_azimuth', 'susceptibilities', 'angle_a', 'angle_b', 'remanence',
+                  'obs_mag_name_list', 'earth_field',
+                  'model_azimuth', 'susceptibilities', 'angle_a', 'angle_b',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms', 'xy_name_list', 'xy_list_save',
                   'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect', 'faults', 'fault_names_list',
@@ -1541,8 +1530,8 @@ class Gmg(wx.Frame):
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
                         self.well_list_hidden, self.well_list_switch, self.segy_name_list, self.segy_dimension_list,
                         self.obs_grav_list_save, self.obs_grav_name_list, self.obs_mag_list_save,
-                        self.obs_mag_name_list, self.declination, self.inclination, self.earth_field,
-                        self.model_azimuth, self.susceptibilities, self.angle_a, self.angle_b, self.remanence,
+                        self.obs_mag_name_list, self.earth_field,
+                        self.model_azimuth, self.susceptibilities, self.angle_a, self.angle_b,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms, self.xy_name_list, self.xy_list_save,
                         self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect, self.faults,
@@ -2112,7 +2101,6 @@ class Gmg(wx.Frame):
         mag_box = MagDialog(self, -1, 'Segy Dimensions', self.area)
         answer = mag_box.ShowModal()
         self.model_azimuth = mag_box.model_azimuth
-        self.inclination = mag_box.inc
         self.earth_field = mag_box.earth_field
         self.draw()
 
@@ -2616,7 +2604,6 @@ class Gmg(wx.Frame):
         # UPDATE LAYER DATA
         self.set_density(self)
         self.set_susceptibility(self)
-        self.set_remanence(self)
         self.set_angle_a(self)
         self.set_angle_b(self)
 
@@ -3529,7 +3516,6 @@ class Gmg(wx.Frame):
             self.susceptibilities.append(0.)
             self.angle_a.append(0.)
             self.angle_b.append(0.)
-            self.remanence.append(0)
             self.layer_lock_list.append(0)
             self.boundary_lock_list.append(0)
             self.layer_lock_status.append('locked')
@@ -3588,7 +3574,6 @@ class Gmg(wx.Frame):
             self.densities.append(0.)
             self.reference_densities.append(0.)
             self.susceptibilities.append(0.)
-            self.remanence.append(0)
             self.angle_a.append(0.)
             self.angle_b.append(0.)
             self.layer_lock_list.append(1)
@@ -3653,7 +3638,6 @@ class Gmg(wx.Frame):
         self.densities.append(0.)
         self.reference_densities.append(0.)
         self.susceptibilities.append(0.)
-        self.remanence.append(0)
         self.angle_a.append(0.)
         self.angle_b.append(0.)
         self.layer_lock_list.append(1)
@@ -3719,7 +3703,6 @@ class Gmg(wx.Frame):
         del self.susceptibilities[self.i]
         del self.angle_a[self.i]
         del self.angle_b[self.i]
-        del self.remanence[self.i]
         del self.layer_lock_list[self.i]
         del self.boundary_lock_list[self.i]
         del self.layer_lock_status[self.i]
@@ -3757,12 +3740,6 @@ class Gmg(wx.Frame):
         # self.background_density_upper = float((grav_box.background_density_lid))
         self.absolute_densities = True
         self.draw()
-
-    def set_remanence(self, value):
-        if self.remanent_mag_checkbox.GetValue():
-            self.remanence[self.i] = 1
-        else:
-            self.remanence[self.i] = 0
 
     def set_density(self, value):
         if self.density_input.GetValue() == 0:
@@ -4145,11 +4122,12 @@ class Gmg(wx.Frame):
             polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
-            self.prednt = talwani_and_heirtzler.ntT(self.xp, self.zp, polys, self.model_azimuth, self.declination,
-                                                    self.inclination, self.earth_field,
-                                                    self.remanence, self.angle_a, self.angle_b)
+            self.prednt = talwani_and_heirtzler.ntz(self.xp, self.zp, polys, self.model_azimuth, self.earth_field,
+                                                    self.angle_a, self.angle_b)
         else:
             self.prednt = np.zeros_like(self.xp)
+
+        # PLOT MAGNETIC PROFILE
         self.prednt_plot.set_data(self.xp * 0.001, self.prednt)
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -4602,18 +4580,10 @@ class MagDialog(wx.Dialog):
                                                                          | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
         '# MODEL AZIMUTH'
-        self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth:")
+        self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth\n(angle C):")
         self.model_azimuth_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.model_azimuth_units = wx.StaticText(input_panel, -1, "Degrees")
         self.model_azimuth_text.SetInsertionPoint(0)
-        '# INCLINATION'
-        self.set_inc = wx.StaticText(input_panel, -1, "Inclination:")
-        self.inc_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
-        self.inc_units = wx.StaticText(input_panel, -1, "Degrees")
-        '# DECLINATION'
-        self.set_dec = wx.StaticText(input_panel, -1, "Declination:")
-        self.dec_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
-        self.dec_units = wx.StaticText(input_panel, -1, "Degrees")
         '# EARTHS FIELD'
         self.set_earth_field = wx.StaticText(input_panel, -1, "Earth's Field:")
         self.earth_field_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
@@ -4622,8 +4592,6 @@ class MagDialog(wx.Dialog):
         self.b_set_button_mag = wx.Button(input_panel, -1, "Set")
         self.Bind(wx.EVT_BUTTON, self.set_button_mag, self.b_set_button_mag)
         sizer.AddMany([self.set_model_azimuth, self.model_azimuth_text, self.model_azimuth_units,
-                       self.set_inc, self.inc_text, self.inc_units,
-                       self.set_dec, self.dec_text, self.dec_units,
                        self.set_earth_field, self.earth_field_text, self.earth_field_units,
                        self.b_set_button_mag])
         input_panel.SetSizerAndFit(sizer)
@@ -4631,7 +4599,6 @@ class MagDialog(wx.Dialog):
 
     def set_button_mag(self, event):
         self.model_azimuth = float(self.model_azimuth_text.GetValue())
-        self.inc = float(self.inc_text.GetValue())
         self.earth_field = float(self.earth_field_text.GetValue())
         self.EndModal(1)
 

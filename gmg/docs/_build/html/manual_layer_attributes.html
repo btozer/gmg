@@ -200,13 +200,13 @@
 the predicted gravity and magnetic anomalies. These include:</p>
 <ul class="simple">
 <li>Layer bulk density</li>
-<li>Model reference density</li>
+<li>Layer reference bulk density</li>
 <li>Layer susceptibility contrast</li>
 <li>Magnetic field vector angle A</li>
 <li>Magnetic field vector angle B</li>
 </ul>
 <p>Layer attributes are set using the <strong>Attributes</strong> sidebar within the modelling window or from the
-<strong>Attribute Table</strong> which can be accessed from the top menubar. gmg is designed such that attributes can be
+<strong>Attribute Table</strong> which can be accessed from the top menubar. GMG is designed such that attributes can be
 easily varied when modelling, to allow for rapid assessment of the effect of varying each attribute. A given attribute
 need only be set if required for the given layer, if attributes are not set, the given layer will not contribute to
 the modelled anomaly, be that gravity or magnetic. Angles A and B need only be set if the given layers magnetic vector
@@ -219,41 +219,54 @@ differs from the inducing field, as may be the case for remanent magnetism.</p>
 <li>A bulk density</li>
 <li>A reference density</li>
 </ol>
-<p>gmg defaults to a reference density of 0 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>. Hence, densities should be input as bulk <strong>density contrasts</strong>.
-If you would rather input densities as absolute values, then you can set the reference density to your chosen value.
-For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> depending on
-the particular geology in the region of interest. Set the paper by Hinze (2003) for more details.</p>
-<p>YOu can als use a different reference density for different layers. This is useful if you which to model
-crustal structure and relative to, for example, an upper crust of 2670 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>, lower crust
-2900 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> and upper mantle of 3330 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.</p>
+<p>gmg defaults to a reference density of 0 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>. In this case, densities should be input as
+<strong>density contrasts</strong> e.g. 0.2 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>.</p>
+<p>If you would prefer to use absolute values, then you can set the reference density to your chosen value and gmg will
+determine the density contrast to use when calculating the gravity anomaly.
+For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>
+depending on the particular geology in the region of interest. Set the paper by Hinze (2003) for more details.</p>
+<p>You can als use a different reference density for different layers. This is useful if you wish to model
+crustal structure and relative to, for example, an upper crust of 2670 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>, lower crust
+2900 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span> and upper mantle of 3330 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>.</p>
+<p>To assign density values use the <em>Attribute Sidebar</em> or the <em>Attribute table</em>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">All densities must be input using SI units <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.
-To assign density values use the <em>Attribute Sidebar</em> or the <em>Attribute table</em>.</p>
+<p class="last">All densities must be input using SI units: <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>.</p>
 </div>
 <p>For each layer both the bulk absolute density and the reference density must be set.</p>
 <div class="admonition-example admonition">
 <p class="first admonition-title">Example</p>
-<p>To model a sedimentary basin typical absolute density values may be 2400 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> for the basin and
-2670 <img class="math" src="_images/math/c27624e6654e61ca06171ca78767379f338ba287.png" alt="kg/m^3"/> as the reference density for the upper continental crust.</p>
+<p>To model a sedimentary basin typical absolute density values may be 2400 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span> for the
+basin and 2670 <span class="math">\(kg/m^3\)</span> as the reference density for the upper continental crust.</p>
 <p class="last">To model crustal thickened from a reference crustal thickness of 32 km, thickened to 36 km, a lower crustal
-density of 2800 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/> maybe be modelled against a upper most mantle reference density
-of 3330 <img class="math" src="_images/math/764b657171cb53bf4399ebfd8a503ec83b6eea88.png" alt="kg"/> <img class="math" src="_images/math/cbecfc733ca9dedc245ef8f340198b5486a9755e.png" alt="m^{-3}"/>.</p>
+density of 2800 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span> maybe be modelled against a upper most mantle reference density
+of 3330 <span class="math">\(kg\)</span> <span class="math">\(m^{-3}\)</span>.</p>
 </div>
 <div class="admonition tip">
 <p class="first admonition-title">Tip</p>
-<p class="last">To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure)
-navigate to <em>‘Gavity Field’</em> -&gt; <em>‘Set background density’</em>.</p>
+<p>To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure), in
+the menubar navigate to:</p>
+<div class="last highlight-none"><div class="highlight"><pre><span></span>Gavity Field -&gt; Set background density...
+</pre></div>
+</div>
 </div>
 </div>
 <div class="section" id="magnetic-susceptibility">
 <h2>3.2 Magnetic Susceptibility<a class="headerlink" href="#magnetic-susceptibility" title="Permalink to this headline">¶</a></h2>
-<p>Susceptibility must be input using SI units.</p>
+<p>Magnetic susceptibility, <span class="math">\(k\)</span>, is related to the intensity of magnetisation, <span class="math">\(J_{i}\)</span>, and the strength of the
+magnetising force, <span class="math">\(H\)</span> by:</p>
+<div class="math">
+\[k = \frac{J_{i}}{H}\]</div>
+<p>As both <span class="math">\(J_{i}\)</span> and <span class="math">\(H\)</span> have SI units <span class="math">\(A m^{-1}\)</span>, magnetic susceptibility is dimensionless.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">GMG uses SI units, hence magnetic susceptibilities are <span class="math">\(4 \pi\)</span> larger than c.g.s values</p>
+</div>
 <p>A ‘<em>strike</em>’ must also be assigned for each unit.</p>
 <div class="admonition important">
 <p class="first admonition-title">Important</p>
 <p class="last"><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
-(the angle is positive when measured counterclockwise) See Won and Bevis (1987) for a diagram and further details.
+(the angle is positive when measured counterclockwise). See <a class="reference internal" href="manual_magnetic_algorithm.html#magnetic-algorithm"><span class="std std-ref">A2</span></a> and further details.
 The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).</p>
 </div>
 <div class="admonition-example admonition">
@@ -288,7 +301,7 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Sep 12, 2018.
+      Last updated on Sep 13, 2018.
 
     </p>
   </div>
@@ -321,6 +334,7 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
       <script type="text/javascript" src="_static/jquery.js"></script>
       <script type="text/javascript" src="_static/underscore.js"></script>
       <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   
 

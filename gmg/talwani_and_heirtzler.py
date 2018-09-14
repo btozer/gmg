@@ -20,16 +20,16 @@ arbitrary shape. In: Computers in the mineral industries, Part 1 (ed.) Parks G A
 Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), Fatiando a Terra: a Python package
 for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 ----
-
 """
 
 import numpy as np
 import math as m
 
-def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanence, angle_a, angle_b):
+
+def ntz(xp, zp, polygons, model_azimuth, F, angle_a, angle_b):
 
     """
-    Calculates the :math:`nt_T` magnetic field strength.
+    Calculates the :math:`ntz` magnetic field strength.
 
     .. note:: The coordinate system of the input parameters is z -> **DOWN**.
 
@@ -44,50 +44,57 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
         Polygons must have the property ``'susceptibility'``. Polygons that don't have
         this property will be ignored in the computations. Elements of
         *polygons* that are None will also be ignored.
-    * susceptibility : float or None
-    * angle_a : float or None
-    * angle_b : float or None
+    * model_azimuth : float
+        Angle "C" from documentation. The angle between the positive x axis and geographic north,
+        measured clockwise from geographic north, in degrees.
+    * F : float
+        The total magnetic regional field intensity, in nT.
+    * angle_a : float
+        The angle to magnetisation vector, measured in the vertical plane from zero at the horizontal and positive
+        downwards, in degrees. Will equal I, the inclination of earth's field, if magnetisation is induced only.
+    * angle_b : float
+        The angle between the horizontal projection of magnetisation vector and geographic north, measured in the
+        horizontal plane, in a positive clockwise direction from geographic north, in degrees. Will equal D, the
+        declination of earth's field, if magnetisation is induced only.
 
         .. note:: The y coordinate of the polygons is used as z!
         .. note:: Data are numpy arrays
         .. note:: Uses numpy arrays to calculate magnetic effect for slope of node pairs
-                  at all Xp observation points simultaneously
+                  at all xp observation points simultaneously
     Returns:
 
-    * nt_T : array
-        The :math:`nt_T` (TASUM) component calculated on the computation points
-
+    * ntz : array
+        The :math:`ntz` (TASUM) component calculated on the computation points
     """
 
-    '# %INITIALISE ARRAYS'
+    # INITIALISE ARRAYS
     VASUM = np.zeros_like(xp)
     HASUM = np.zeros_like(xp)
     TASUM = np.zeros_like(xp)
 
-    '# %ITERATE OVER ALL POLYGONS'
+    # ITERATE OVER ALL POLYGONS
     i = 0
     for polygon in polygons:
 
         if polygon is None or 'susceptibility' not in polygon.props:
             continue
         else:
-            C = (polygon.props['susceptibility'])  # %CONVERT FROM SI INPUT TO e.m.u (USED IN ORIGINAL CODE)
-        if C == 0.0:  # %IF C = 0 THEN SKIP THIS POLYGON; ELSE RUN THE CODE
+            k = (polygon.props['susceptibility'])
+            k = k/(4*m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
+        if k == 0.0:  # IF C = 0 THEN SKIP THIS POLYGON; ELSE RUN THE CODE
             continue
         else:
-            '# %DETERMINE ANGLES IN RADIANS'
-            print remanence[i]
-            if remanence[i] == 1:
-                inclination = angle_a[i]
-                declination = angle_b[i]
+            # DETERMINE ANGLES IN RADIANS
+            inclination = angle_a[i]
+            declination = angle_b[i]
 
             CDIP = m.cos(m.radians(inclination))
             CDIPD = m.cos(m.radians(inclination))
             SDIP = m.sin(m.radians(inclination))
             SDIPD = m.sin(m.radians(inclination))
 
-            SD = m.cos(m.radians(profile_azimuth-declination))
-            SDD = m.cos(m.radians(profile_azimuth-declination))
+            SD = m.cos(m.radians(model_azimuth-declination))
+            SDD = m.cos(m.radians(model_azimuth-declination))
             x = polygon.x
             z = polygon.y
             nverts = polygon.nverts
@@ -95,11 +102,11 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
             PSUM  = np.zeros_like(xp)
             QSUM  = np.zeros_like(xp)
 
-            '# %SET VERTICE'
+            # SET VERTICE
             for v in range(0, nverts):
                 xv = x[v] - xp
                 zv = z[v] - zp
-                '# %SET NEXT VERT: (NB. THE LAST VERTICE PAIRS WITH THE FIRST)'
+                # SET NEXT VERT (NB. THE LAST VERTICE PAIRS WITH THE FIRST)
                 if v == nverts - 1:
                     xv2 = x[0] - xp
                     zv2 = z[0] - zp
@@ -107,7 +114,7 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
                     xv2 = x[v + 1] - xp
                     zv2 = z[v + 1] - zp
 
-                '# %RUN ALGORITHM'
+                # RUN ALGORITHM
                 R1s = (xv**2)+(zv**2)
                 theta = np.arctan2(zv, xv)
                 R2s = (xv2**2)+(zv2**2)
@@ -128,8 +135,8 @@ def ntT(xp, zp, polygons, profile_azimuth, declination, inclination, F, remanenc
                 PSUM = P + PSUM
                 QSUM = Q + QSUM
 
-            VASUM = VASUM + 2.*C*F*((CDIP*SD*QSUM)-(SDIP*PSUM))
-            HASUM = HASUM + 2.*C*F*((CDIP*SD*PSUM)+(SDIP*QSUM))
+            VASUM = VASUM + 2.*k*F*((CDIP*SD*QSUM)-(SDIP*PSUM))
+            HASUM = HASUM + 2.*k*F*((CDIP*SD*PSUM)+(SDIP*QSUM))
         TASUM = (HASUM*CDIPD*SDD)+(VASUM*SDIPD)
         i += 1
     return TASUM

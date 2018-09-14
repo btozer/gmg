@@ -42,10 +42,10 @@ Or on Windows use::
     deactivate
 
 **OS Support:**
-.. note::
-    gmg is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems.
-    It is anticipated that issues may arise when trying to install on other distributions, particularly Windows.
-    Please raise any information regarding installation problems on github.
+
+GMG is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems. It is possible
+that issues may arise when trying to install on other distributions. Please raise any information regarding
+installation problems on github.
 
 Installing gmg
 --------------
@@ -71,7 +71,7 @@ GMG depends on several other packages to run. These are:
 * `fatiando a terra <http://www.fatiando.org/>`_
 * `ObsPy <http://docs.obspy.org/>`_
 
-These dependencies can be installed in your py27 environment using the command::
+These dependencies can be installed in your py27-gmg environment using the command::
 
     conda install wxpython numpy scipy matplotlib fatiando obspy
 
