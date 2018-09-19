@@ -30,7 +30,7 @@ Key features
 * Calculate the predicted magnetic anomaly produced by any combination of model layers.
 * Model magnetic anomalies using induced and/or remanent magnetism.
 * Display well horizon tops.
-* Display XY data (e.g., earthquake hypocenters or geological surface contacts).
+* Display XY data (e.g., earthquake hypocenters, geological surface contacts or rays from a auxiliary velocity model).
 * Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.
 * Save model figures as vector or raster graphics in various formats (.png .ps .eps .pdf).
 
