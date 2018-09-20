@@ -1095,14 +1095,14 @@ class Gmg(wx.Frame):
         'PLOT OBSERVED TOPO DATA'
         if self.tcanvas is not None:
             pass
-            # for x in xrange(len(self.obs_topo_list_save)):
+            # for x in range(len(self.obs_topo_list_save)):
             #     if self.obs_topo_list_save[x] is not None:
             #         topo = self.obs_topo_list_save[x]
             #         self.obs_topo_list[x] = self.dcanvas.scatter(topo[:, 0], topo[:, 1], marker='o',
             #                                                      color=self.obs_topo_colors[x], s=5, gid=x)
         'PLOT OBSERVED GRAVITY DATA'
         if self.dcanvas is not None:
-            for x in xrange(len(self.obs_grav_list_save)):
+            for x in range(len(self.obs_grav_list_save)):
                 if len(self.obs_grav_list_save[x]) >= 1:
                     grav = self.obs_grav_list_save[x]
                     grav_x = grav[:, 0]
@@ -1579,7 +1579,7 @@ class Gmg(wx.Frame):
             del gc.garbage[:]
 
             # LOAD DATA INTO MODEL
-            for x in xrange(len(model_data)):
+            for x in range(len(model_data)):
                 setattr(self, model_data.keys()[x], model_data.values()[x])
 
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
@@ -1591,7 +1591,7 @@ class Gmg(wx.Frame):
 
             # SET LAYERS self.boundary_lock_status
             self.boundary_lock_status = [[]]
-            for x in xrange(len(self.boundary_lock_list)):
+            for x in range(len(self.boundary_lock_list)):
                 if self.boundary_lock_list[x] == 0:
                     self.boundary_lock_status[x] = ['locked']
                     self.boundary_lock_status.append([])
@@ -1601,7 +1601,7 @@ class Gmg(wx.Frame):
 
             # SET LAYERS self.layer_lock_status
             self.layer_lock_status = [[]]
-            for x in xrange(len(self.layer_lock_list)):
+            for x in range(len(self.layer_lock_list)):
                 if self.layer_lock_list[x] == 0:
                     self.layer_lock_status[x] = ['locked']
                     self.layer_lock_status.append([])
@@ -1634,14 +1634,14 @@ class Gmg(wx.Frame):
             self.polygons = []
 
             if self.layer_colors == [[]]:
-                self.layer_colors = ['black' for x in xrange(self.i + 1)]
+                self.layer_colors = ['black' for x in range(self.i + 1)]
 
             # LOAD LAYER TREE ITEMS
             self.tree.DeleteAllItems()  # DELETE CURRENT LAYER TREE
             self.root = self.tree.AddRoot("Layers:")  # CREATE NEW TREE
             self.tree.SetItemPyData(self.root, None)
 
-            for i in xrange(1, len(self.loaded_tree_items)):
+            for i in range(1, len(self.loaded_tree_items)):
                 tree_item = self.tree.AppendItem(self.root, "%s" % self.loaded_tree_items[i], ct_type=1)
                 tree_item.Check(checked=True)
                 self.tree.SetItemPyData(tree_item, i)
@@ -1651,7 +1651,7 @@ class Gmg(wx.Frame):
             self.tree_items = self.loaded_tree_items
 
             # LOAD FAULT TREE ITEMS
-            for i in xrange(0, len(self.loaded_fault_tree_items)):
+            for i in range(0, len(self.loaded_fault_tree_items)):
                 print self.loaded_fault_tree_items[i]
                 fault_tree_item = self.fault_tree.AppendItem(self.fault_tree_root, "%s" %
                                                              self.loaded_fault_tree_items[i], ct_type=1)
@@ -1661,8 +1661,8 @@ class Gmg(wx.Frame):
             self.fault_tree_items = self.loaded_fault_tree_items
 
             # MAKE LAYER LINES AND POLYGONS
-            self.layer_lines = [[] for x in xrange(self.i + 1)]
-            self.polygon_fills = [[] for x in xrange(self.i + 1)]
+            self.layer_lines = [[] for x in range(self.i + 1)]
+            self.polygon_fills = [[] for x in range(self.i + 1)]
 
             # LOAD LAYERS
             self.load_layer_data()
@@ -1683,7 +1683,7 @@ class Gmg(wx.Frame):
 
             # LOAD WELL MENU --- SET WELL MENU - IDs start at 2000
             self.count = 0
-            for x in xrange(len(self.well_name_list)):
+            for x in range(len(self.well_name_list)):
                 if self.well_name_list[x] == "None" or self.well_name_list[x] == []:
                     self.count += 1
                     continue
@@ -2477,7 +2477,7 @@ class Gmg(wx.Frame):
         # DRAW MARKERS
         self.well_labels = [None] * len(self.contact_data)
         self.contacts = [None] * len(self.contact_data)
-        for i in xrange(len(self.contact_data)):
+        for i in range(len(self.contact_data)):
             x1 = self.contact_data[i, 0].astype(float)
             y1 = self.contact_data[i, 1].astype(float)
             y2 = self.contact_data[i, 2].astype(float)
@@ -2492,7 +2492,7 @@ class Gmg(wx.Frame):
         self.text_labels = [None] * len(self.contacts)
         text = zip(self.contact_data[:, 0].astype(float), self.contact_data[:, 1].astype(float),
                    self.contact_data[:, 3].astype(str))
-        for i in xrange(len(self.contacts)):
+        for i in range(len(self.contacts)):
 
             # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
             if i % 2 == 0:
@@ -2975,7 +2975,7 @@ class Gmg(wx.Frame):
 
             # REMOVE PINCHED NODES
             if self.pinch_switch != 0:
-                for k in xrange(len(self.index_arg2_list)):
+                for k in range(len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
                         next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[
                             k]  # GET THE NODE LIST OF THE NEXT LAYER
@@ -3707,7 +3707,7 @@ class Gmg(wx.Frame):
         self.tree.Delete(layers[self.i])
         # RESET TREE ITEM ID'S
         layers = self.tree.GetRootItem().GetChildren()
-        for i in xrange(len(layers)):
+        for i in range(len(layers)):
             self.tree.SetPyData(layers[i], i)
 
         # UPDATE COUNTERS
@@ -3760,20 +3760,20 @@ class Gmg(wx.Frame):
 
         'WELL DATA'
         'LOOP THROUGH ALL WELL NAMES'
-        for i in xrange(len(self.well_name_text)):
+        for i in range(len(self.well_name_text)):
             if self.well_name_text[i] != "None" and self.well_name_text[i] != []:
                 self.well_name_text[i].set_size(self.textsize)
         'LOOP THROUGH ALL WELL HORIZON LABELS'
-        for i in xrange(len(self.well_labels)):
+        for i in range(len(self.well_labels)):
             labels = self.well_labels[i]
             for l in range(2, len(labels)):
                 if labels[l] != "None" and labels[l] != []:
                     labels[l].set_size(self.textsize)
 
         'CONTACT DATA'
-        for i in xrange(self.contact_data_count):
+        for i in range(self.contact_data_count):
             contact_text = self.contact_text_list[i]
-            for k in xrange(len(contact_text)):
+            for k in range(len(contact_text)):
                 if contact_text[k] is not None:
                     contact_text[k].set_size(self.textsize)
                 else:
@@ -4076,14 +4076,14 @@ class Gmg(wx.Frame):
         if not self.absolute_densities:
             self.density_contrasts = self.absolute_densities
         else:
-            for i in xrange(len(self.densities)):
+            for i in range(len(self.densities)):
                 self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
 
         # ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT
         if self.polygons and self.calc_grav_switch is True:
             # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             polygons_to_use, densities_to_use = [], []
-            for layer in xrange(len(self.densities)):
+            for layer in range(len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     densities_to_use.append(self.density_contrasts[layer])
@@ -4827,7 +4827,7 @@ class MedianFilterDialog(wx.Dialog):
         self.output_name = str(self.output_name_text.GetValue())
         self.output_color = str(self.output_color_text.GetValue())
 
-        for i in xrange(len(self.obs_grav_name_list)):
+        for i in range(len(self.obs_grav_name_list)):
             # CHECK GRAV
             if self.obs_grav_name_list[i] == self.obs_to_filter:
                 self.filter_type = str('gravity')
@@ -4838,7 +4838,7 @@ class MedianFilterDialog(wx.Dialog):
                 self.filtered_output[:, 1] = signal.medfilt(self.obs_input[:, 1], self.filter_length)
                 self.EndModal(1)
 
-        for i in xrange(len(self.obs_mag_name_list)):
+        for i in range(len(self.obs_mag_name_list)):
             # CHECK MAG
             if self.obs_mag_name_list[i] == self.obs_to_filter:
                 self.filter_type = str('magnetics')
@@ -4964,7 +4964,7 @@ class SetObsRmsDialog(wx.Dialog):
         obs_mag = str(self.obs_combo_list_mag.GetValue())
 
         if obs_grav is not None:
-            for i in xrange(len(self.obs_grav_name_list)):
+            for i in range(len(self.obs_grav_name_list)):
                 '# CHECK GRAV AND SET VALUES'
                 if self.obs_grav_name_list[i] == obs_grav:
                     self.obs_gravity_data_for_rms = self.obs_grav_list_save[i]
@@ -4973,7 +4973,7 @@ class SetObsRmsDialog(wx.Dialog):
 
         if obs_mag is not None:
             '# CHECK MAG AND SET VALUES'
-            for i in xrange(len(self.obs_mag_name_list)):
+            for i in range(len(self.obs_mag_name_list)):
                 if self.obs_mag_name_list[i] == obs_mag:
                     self.obs_mag_data_for_rms = self.obs_mag_list_save[i]
         else:
