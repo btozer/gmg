@@ -152,33 +152,33 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         'CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 975), style=wx.SP_NOBORDER | wx.EXPAND)
-        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 662),
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1100), style=wx.SP_NOBORDER | wx.EXPAND)
+        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 705),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
         'FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 360),
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(-1, -1),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 370),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 395),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
                                                                        foldIcons=images)
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
         'SECOND PANE; LEFT PANEL (=LAYERS)'
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 380),
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(-1, -1),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 380),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 455),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
         'THIRD PANE; LEFT PANEL (=FAULTS)'
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 331),
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(-1, -1),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 331),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 250),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
@@ -194,10 +194,10 @@ class Gmg(wx.Frame):
         self.splitter_left_panel_three.SetScrollbar(1, 1, 10, 10)
 
         'CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)'
-        self.rightPanel = wx.Panel(self, -1, size=(1520, 800), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
+        self.rightPanel = wx.Panel(self, -1, size=(1700, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
 
         'CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)'
-        self.ConsolePanel = wx.Panel(self, -1, size=(1800, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
+        self.ConsolePanel = wx.Panel(self, -1, size=(1700, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         intro = "###############################################################\r" \
                 "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
                 "ctrl+up FOR COMMAND HISTORY                                    \r" \
@@ -652,6 +652,7 @@ class Gmg(wx.Frame):
         self.colors = "bmycbmycbmyc"  # OBSERVED COLOR LIST
         self.colors_index = 0
         self.model_azimuth = 0.
+        self.mag_observation_elv = 0.
 
         'INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)'
         self.mag_polygons = []
@@ -928,7 +929,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def frame_adjustment(self, event):
-        """# FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
+        """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
 
         self.current_xlim = self.mcanvas.get_xlim()
         self.current_ylim = self.mcanvas.get_ylim()
@@ -1325,7 +1326,7 @@ class Gmg(wx.Frame):
         self.run_algorithms()
 
     def on_begin_edit_label(self, event):
-        pass
+        self.DoGetBestSize()
 
     def on_end_edit_label(self, event):
         self.i = self.tree.GetPyData(event.GetItem())
@@ -1505,8 +1506,8 @@ class Gmg(wx.Frame):
     # SAVE/LOAD MODEL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def save_model(self, event):
-        """#SAVE MODEL TO DISC IN .Pickle FORMAT"""
-        save_file_dialog = wx.FileDialog(self, "Save XYZ file", "", "", "Model files (*.model)|*.model", wx.FD_SAVE
+        """SAVE MODEL TO DISC IN .Pickle FORMAT"""
+        save_file_dialog = wx.FileDialog(self, "Save model file", "", "", "Model files (*.model)|*.model", wx.FD_SAVE
                                          | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # USER CHANGED THEIR MIND
@@ -1519,7 +1520,7 @@ class Gmg(wx.Frame):
                   'well_list_hidden', 'well_list_switch', 'segy_name_list', 'segy_dimension_list',
                   'obs_grav_list_save', 'obs_grav_name_list', 'obs_mag_list_save',
                   'obs_mag_name_list', 'earth_field',
-                  'model_azimuth', 'susceptibilities', 'angle_a', 'angle_b',
+                  'model_azimuth', 'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms', 'xy_name_list', 'xy_list_save',
                   'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect', 'faults', 'fault_names_list',
@@ -1531,7 +1532,7 @@ class Gmg(wx.Frame):
                         self.well_list_hidden, self.well_list_switch, self.segy_name_list, self.segy_dimension_list,
                         self.obs_grav_list_save, self.obs_grav_name_list, self.obs_mag_list_save,
                         self.obs_mag_name_list, self.earth_field,
-                        self.model_azimuth, self.susceptibilities, self.angle_a, self.angle_b,
+                        self.model_azimuth, self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms, self.xy_name_list, self.xy_list_save,
                         self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect, self.faults,
@@ -1560,7 +1561,7 @@ class Gmg(wx.Frame):
                 if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
                                  wx.ICON_QUESTION | wx.YES_NO, self) == wx.NO:
                     return
-                open_file_dialog = wx.FileDialog(self, "Open XYZ file", "", "", "XYZ files (*.model)|*.model",
+                open_file_dialog = wx.FileDialog(self, "Open model file", "", "", "Model files (*.model)|*.model",
                                                  wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
                 if open_file_dialog.ShowModal() == wx.ID_CANCEL:
                     return  # USER CHANGED THEIR MIND
@@ -1580,9 +1581,6 @@ class Gmg(wx.Frame):
             # LOAD DATA INTO MODEL
             for x in xrange(len(model_data)):
                 setattr(self, model_data.keys()[x], model_data.values()[x])
-
-            print "self.faults = "
-            print self.faults
 
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
@@ -1671,8 +1669,6 @@ class Gmg(wx.Frame):
 
             for i in range(0, self.fault_counter):
                 # DRAW FAULTS
-                print self.fault_x_coords_list[i]
-                print self.fault_y_coords_list[i]
                 self.faults[i] = self.mcanvas.plot(self.fault_x_coords_list[i], self.fault_y_coords_list[i],
                                                                     color='k', linewidth=0.5, zorder=1, marker='s',
                                                                     alpha=1.0)
@@ -1711,7 +1707,6 @@ class Gmg(wx.Frame):
             self.Hide()
             self.Show()
 
-            print self.faults
             # UPDATE LAYER DATA AND PLOT
             self.draw()
             self.update_layer_data()
@@ -2053,7 +2048,6 @@ class Gmg(wx.Frame):
         self.obs_mag_colors[self.obs_mag_count] = str(self.color)
 
         self.obs_mag = np.genfromtxt(obs_m_input, delimiter=' ', dtype=float)
-        print "self.obs_mag = %s" % self.obs_mag
         self.obs_mz = self.obs_mag[:, 1]
         self.obs_mag_list_save[self.obs_mag_count] = self.obs_mag
         self.obs_mag_list_save.append([])
@@ -2100,6 +2094,7 @@ class Gmg(wx.Frame):
     def set_mag_variables(self, event):
         mag_box = MagDialog(self, -1, 'Segy Dimensions', self.area)
         answer = mag_box.ShowModal()
+        self.mag_observation_elv = mag_box.mag_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
         self.model_azimuth = mag_box.model_azimuth
         self.earth_field = mag_box.earth_field
         self.draw()
@@ -2121,8 +2116,6 @@ class Gmg(wx.Frame):
         answer = seismic_data_box.ShowModal()
         self.d = seismic_data_box.dimensions
         self.segy_name = seismic_data_box.segy_name_input
-        print "self.d = %s" % self.d
-        print "self.segy_name = %s" % self.segy_name
         self.sx1, self.sx2, self.sz1, self.sz2 = self.d
         self.load_segy(self)
 
@@ -2151,7 +2144,7 @@ class Gmg(wx.Frame):
             self.segy_on = True
             self.update_layer_data()
 
-            '''ADD SEGY_NAME TO SEGY MENU'''
+            # ADD SEGY_NAME TO SEGY MENU
             # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
             self.segy_name_submenu = wx.Menu()
             self.m_segy_submenu.Append(self.segy_count + 1000, self.segy_name_list[self.segy_count],
@@ -2776,7 +2769,6 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
-            print "MOVING: GMG IS IN FAULT MODE"
 
             # ASSIGN NEW X AND Y POINTS
             self.new_x = event.xdata  # GET X OF NEW POINT
@@ -2819,7 +2811,6 @@ class Gmg(wx.Frame):
 
         'GMG IS IN LAYER MODE'
         if  self.fault_picking_switch is False:
-            print "MOVING: GMG IS IN FAULT MODE"
             if self.boundary_lock_list[self.i] == 0:
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
@@ -3521,8 +3512,8 @@ class Gmg(wx.Frame):
             self.layer_lock_status.append('locked')
             self.boundary_lock_status.append('locked')
             self.layer_colors.append('black')
-            self.tree_items.append('layer %s' % (int(self.i)))
-            self.item = 'layer %s' % (int(self.i))
+            self.tree_items.append('layer %s' % (int(self.i-1)))
+            self.item = 'layer %s' % (int(self.i-1))
             self.layers_calculation_switch.append(0)
             self.add_new_tree_nodes(self.root, self.item, self.i)
 
@@ -4071,7 +4062,7 @@ class Gmg(wx.Frame):
 
         # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
         # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY
-        if self.calc_grav_switch:
+        if self.calc_grav_switch is True or self.calc_mag_switch is True:
             if len(self.polygons) > 1:
                 for i in range(0, len(self.polygons)):
                     self.polygons[i] = self.polygons[i][::-1]
@@ -4123,7 +4114,7 @@ class Gmg(wx.Frame):
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
             self.prednt = talwani_and_heirtzler.ntz(self.xp, self.zp, polys, self.model_azimuth, self.earth_field,
-                                                    self.angle_a, self.angle_b)
+                                                    self.angle_a, self.angle_b, self.mag_observation_elv)
         else:
             self.prednt = np.zeros_like(self.xp)
 
@@ -4391,6 +4382,7 @@ class Gmg(wx.Frame):
 
 
 class NewModelDialog(wx.Dialog):
+    """CREATE A NEW MODEL. RETURNS MODEL PARAMETERS AND CALCULATION INCREMENT"""
     def __init__(self, parent, id, title, m_x1=None, m_x2=None, m_z1=None, m_z2=None):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL
                            | wx.BORDER_RAISED)
@@ -4467,35 +4459,37 @@ class NewModelDialog(wx.Dialog):
 
 
 class LoadObservedDataFrame(wx.Frame):
+    """LOAD OBSERVED DATA"""
     def __init__(self, parent, id, title, type):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'Load observed data')
 
         floating_panel = wx.Panel(self, -1)
 
-        '''CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES'''
+        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
         self.parent = parent
 
-        'SET TYPE OF DATA BEING LOADED'
+        # SET TYPE OF DATA BEING LOADED
         self.type = type
 
-        'FILE PATH'
+        # FILE PATH
         self.file_path_text = wx.TextCtrl(floating_panel, -1, value="input_file", size=(150, -1))
         self.b_file_path = wx.Button(floating_panel, -1, "File...")
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
 
-        'OBSERVED NAME'
+        # OBSERVED NAME
         self.observed_name_text = wx.StaticText(floating_panel, -1, "Name for Observed data:")
         self.observed_name = wx.TextCtrl(floating_panel, -1, value="Observed_name", size=(150, -1))
-        'COLOR'
+
+        # COLOR
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'black', 'purple', 'pink']
         self.color_text = wx.StaticText(floating_panel, -1, "Color:")
         self.color_picked = wx.ComboBox(floating_panel, -1, value='blue', choices=self.colors, size=(75, -1),
                                         style=wx.CB_DROPDOWN)
-        'LOAD BUTTON'
+        # LOAD BUTTON
         self.b_load_button = wx.Button(floating_panel, -1, "Load")
         self.Bind(wx.EVT_BUTTON, self.load_button, self.b_load_button)
 
-        'SIZER'
+        # SIZER
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         sizer.AddMany([self.file_path_text, self.b_file_path,
                        self.observed_name_text, self.observed_name,
@@ -4533,6 +4527,7 @@ class LoadObservedDataFrame(wx.Frame):
 
 
 class SeisDialog(wx.Dialog):
+    """LOAD SEGY DATA"""
     def __init__(self, parent, id, title, area):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX
                                                           | wx.MAXIMIZE_BOX )
@@ -4575,35 +4570,47 @@ class SeisDialog(wx.Dialog):
 
 
 class MagDialog(wx.Dialog):
+    """SET MAGNETIC FIELD PARAMETERS"""
     def __init__(self, parent, id, title, area):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                          | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
-        '# MODEL AZIMUTH'
+
+        # OBSERVATION ELEVATION
+        self.set_mag_observation_elv = wx.StaticText(input_panel, -1, "Observation\nElevation:")
+        self.mag_observation_elv_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
+        self.mag_observation_elv_units = wx.StaticText(input_panel, -1, "km")
+        self.mag_observation_elv_text.SetInsertionPoint(0)
+
+        # MODEL AZIMUTH
         self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth\n(angle C):")
-        self.model_azimuth_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
+        self.model_azimuth_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
         self.model_azimuth_units = wx.StaticText(input_panel, -1, "Degrees")
         self.model_azimuth_text.SetInsertionPoint(0)
-        '# EARTHS FIELD'
-        self.set_earth_field = wx.StaticText(input_panel, -1, "Earth's Field:")
-        self.earth_field_text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
+
+        # EARTHS FIELD
+        self.set_earth_field = wx.StaticText(input_panel, -1, "Earth's Regional\nField Intensity:")
+        self.earth_field_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
         self.earth_field_units = wx.StaticText(input_panel, -1, "nT")
         sizer = wx.FlexGridSizer(cols=3, hgap=7, vgap=7)
         self.b_set_button_mag = wx.Button(input_panel, -1, "Set")
         self.Bind(wx.EVT_BUTTON, self.set_button_mag, self.b_set_button_mag)
-        sizer.AddMany([self.set_model_azimuth, self.model_azimuth_text, self.model_azimuth_units,
+        sizer.AddMany([self.set_mag_observation_elv, self.mag_observation_elv_text, self.mag_observation_elv_units,
+                       self.set_model_azimuth, self.model_azimuth_text, self.model_azimuth_units,
                        self.set_earth_field, self.earth_field_text, self.earth_field_units,
                        self.b_set_button_mag])
         input_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
     def set_button_mag(self, event):
+        self.mag_observation_elv = float(self.mag_observation_elv_text.GetValue())
         self.model_azimuth = float(self.model_azimuth_text.GetValue())
         self.earth_field = float(self.earth_field_text.GetValue())
         self.EndModal(1)
 
 
 class PinchDialog(wx.Dialog):
+    """PINCH A LAYER TO ANOTHER LAYER"""
     def __init__(self, parent, id, title, plotx_list, ploty_list, i):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX )
@@ -4635,24 +4642,24 @@ class PinchDialog(wx.Dialog):
         above_x = self.plotx_list[self.i - 1]
         above_y = self.ploty_list[self.i - 1]
 
-        '# REMOVE PINCHED NODES'
+        # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
             i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.pinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
             i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
-        '# FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE'
+        # FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE
         new_xs = [tup for i, tup in enumerate(above_x) if
                   p_start < above_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
         new_ys = [tup for i, tup in enumerate(above_y) if
                   p_start < above_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
 
-        '# DETERMINE INSERT POSITION'
+        # DETERMINE INSERT POSITION
         insert_point = 0
         for i in range(0, len(self.pinched_x)):
             if self.pinched_x[i] < p_start:
                 insert_point = i + 1
-        '# INSERT NEW NODES'
+        # INSERT NEW NODES
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
@@ -4667,7 +4674,7 @@ class PinchDialog(wx.Dialog):
         below_x = self.plotx_list[self.i + 1]
         below_y = self.ploty_list[self.i + 1]
 
-        '# REMOVE PINCHED NODES'
+        # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
             i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.pinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
@@ -4679,13 +4686,13 @@ class PinchDialog(wx.Dialog):
         new_ys = [tup for i, tup in enumerate(below_y) if
                   p_start < below_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
 
-        '# DETERMINE INSERT POSITION'
+        # DETERMINE INSERT POSITION
         insert_point = 0
         for i in range(0, len(self.pinched_x)):
             if self.pinched_x[i] < p_start:
                 insert_point = i + 1
 
-        '# INSERT NEW NODES'
+        # INSERT NEW NODES
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
@@ -4693,6 +4700,7 @@ class PinchDialog(wx.Dialog):
 
 
 class DepinchDialog(wx.Dialog):
+    """DEPINCH A LAYER"""
     def __init__(self, parent, id, title, plotx_list, ploty_list, i, layer_count):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -4727,13 +4735,13 @@ class DepinchDialog(wx.Dialog):
             below_x = self.plotx_list[self.i + 1]
             below_y = self.ploty_list[self.i + 1]
 
-        '# REMOVE PINCHED NODES'
+        # REMOVE PINCHED NODES
         self.depinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
             i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.depinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
             i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
-        '# FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST'
+        # FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST
         # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
         new_xs = [tup for i, tup in enumerate(above_x) if p_start < above_x[i] < p_end]
         # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
@@ -4746,13 +4754,13 @@ class DepinchDialog(wx.Dialog):
 
         new_ys_list = [y + 0.1 for y in new_ys]
 
-        '# DETERMINE INSERT POSITION'
+        # DETERMINE INSERT POSITION
         insert_point = 0
         for i in range(0, len(self.depinched_x)):
             if self.depinched_x[i] < p_start:
                 insert_point = i + 1
 
-        '# INSERT NEW NODES'
+        # INSERT NEW NODES
         self.depinched_x[insert_point:1] = new_xs
         self.depinched_y[insert_point:1] = new_ys_list
 
@@ -4760,19 +4768,20 @@ class DepinchDialog(wx.Dialog):
 
 
 class MedianFilterDialog(wx.Dialog):
+    """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, "Apply Median Filter", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX
                                                                           )
         input_panel = wx.Panel(self, -1)
 
-        '# GET OBSERVED DATA FROM gmg'
+        # GET OBSERVED DATA FROM gmg
         self.obs_grav_name_list = obs_grav_name_list
         self.obs_grav_list_save = obs_grav_list_save
         self.obs_mag_name_list = obs_mag_name_list
         self.obs_mag_list_save = obs_mag_list_save
 
-        '# CHOOSE INPUT OBSERVED DATA'
+        # CHOOSE INPUT OBSERVED DATA
         self.obs_combo_list_text = wx.StaticText(input_panel, -1, "Input Data:")
         self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
         for i in self.obs_grav_name_list:
@@ -4785,25 +4794,25 @@ class MedianFilterDialog(wx.Dialog):
                 self.obs_combo_list.Append(i)
             except:
                 pass
-        '# DEFINE FILTER LENGTH'
+        # DEFINE FILTER LENGTH
         self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
         self.filter_window_text = wx.TextCtrl(input_panel, -1, "9")
 
-        '# DEFINE OUTPUT NAME'
+        # DEFINE OUTPUT NAME
         self.output_name = wx.StaticText(input_panel, -1, "OUTPUT DATA NAME:")
         self.output_name_text = wx.TextCtrl(input_panel, -1)
 
-        '# DEFINE OUTPUT COLOR'
+        # DEFINE OUTPUT COLOR
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
         self.output_color = wx.StaticText(input_panel, -1, "OUTPUT DATA COLOR:")
         self.output_color_text = wx.ComboBox(input_panel, -1, value='green', choices=self.colors, size=(75, -1),
                                              style=wx.CB_DROPDOWN)
 
-        '# DEFINE SET BUTTON'
+        # DEFINE SET BUTTON
         self.b_apply_filter = wx.Button(input_panel, -1, "Apply")
         self.Bind(wx.EVT_BUTTON, self.median_pass, self.b_apply_filter)
 
-        '# DEFINE SIZER'
+        # DEFINE SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.obs_combo_list_text, self.obs_combo_list, self.output_name, self.output_name_text,
                        self.output_color, self.output_color_text, self.filter_window, self.filter_window_text,
@@ -4812,14 +4821,14 @@ class MedianFilterDialog(wx.Dialog):
         sizer.Fit(self)
 
     def median_pass(self, event):
-        """Apply a median filter to observed data"""
+        """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
         self.obs_to_filter = str(self.obs_combo_list.GetValue())
         self.filter_length = int(self.filter_window_text.GetValue())
         self.output_name = str(self.output_name_text.GetValue())
         self.output_color = str(self.output_color_text.GetValue())
 
         for i in xrange(len(self.obs_grav_name_list)):
-            '# CHECK GRAV'
+            # CHECK GRAV
             if self.obs_grav_name_list[i] == self.obs_to_filter:
                 self.filter_type = str('gravity')
                 self.obs_input = self.obs_grav_list_save[i]
@@ -4830,7 +4839,7 @@ class MedianFilterDialog(wx.Dialog):
                 self.EndModal(1)
 
         for i in xrange(len(self.obs_mag_name_list)):
-            '# CHECK MAG'
+            # CHECK MAG
             if self.obs_mag_name_list[i] == self.obs_to_filter:
                 self.filter_type = str('magnetics')
                 self.obs_input = self.obs_mag_list_save[i]
@@ -4847,7 +4856,7 @@ class SetBackgroundDensityDialog(wx.Dialog):
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
         input_panel = wx.Panel(self, -1)
 
-        '#  CHOOSE BACKGROUND DENSITY'
+        # CHOOSE BACKGROUND DENSITY
         self.background_den_label_upper = wx.StaticText(input_panel, -1, "Reference density (g/cm^3):")
         self.background_density_text_input_upper = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.background_density_text_input_upper.SetInsertionPoint(0)
@@ -4855,10 +4864,12 @@ class SetBackgroundDensityDialog(wx.Dialog):
         # self.background_density_text_input_lower = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         # self.background_den_label_lid = wx.StaticText(input_panel, -1, "Mantle Lid (g/cm^3):")
         # self.background_density_text_input_lid = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
-        '# DEFINE SET BUTTON'
+
+        # DEFINE SET BUTTON
         self.b_apply_background_den = wx.Button(input_panel, -1, "Apply")
         self.Bind(wx.EVT_BUTTON, self.set_background_density, self.b_apply_background_den)
-        '# DEFINE SIZER'
+
+        # DEFINE SIZER
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.background_den_label_upper, self.background_density_text_input_upper,
                        # self.background_den_label_lower, self.background_density_text_input_lower,
@@ -4875,6 +4886,7 @@ class SetBackgroundDensityDialog(wx.Dialog):
 
 
 class BulkShiftDialog(wx.Dialog):
+    """APPLY A BULK SHIFT OF A LAYER IN THE Z DIRECTION"""
     def __init__(self, parent, id, title, plotx_list, ploty_list, i):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -4901,13 +4913,15 @@ class BulkShiftDialog(wx.Dialog):
         self.y_shift_value = float(self.bulk_panel_y_Text.GetValue())
         current_y = self.ploty_list[self.i]
         current_x = self.plotx_list[self.i]
-        '# BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0'
+
+        #BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0
         self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
         self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0. else 0.01 for y in current_y]
         self.EndModal(1)
 
 
 class SetObsRmsDialog(wx.Dialog):
+    """SET THE DATASET TO USE FOR CALCULATING THE RMS MISFIT"""
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX )
@@ -4968,6 +4982,7 @@ class SetObsRmsDialog(wx.Dialog):
 
 
 class NewLayerDialog(wx.Dialog):
+    """CREATE A NEW MODEL LAYER"""
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -5005,7 +5020,7 @@ class NewLayerDialog(wx.Dialog):
         self.EndModal(1)
 
     class SetNewThickness(wx.Dialog):
-        """ APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
+        """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                               | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -5026,8 +5041,7 @@ class NewLayerDialog(wx.Dialog):
             self.EndModal(1)
 
     class SetFloatingLayer(wx.Dialog):
-        """ APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION"""
-
+        """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                               | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -5073,6 +5087,7 @@ class NewLayerDialog(wx.Dialog):
 
 
 class NewFaultDialog(wx.Dialog):
+    """CREATE A NEW FAULT. RETURNS XY NODE POSITIONS"""
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
@@ -5105,8 +5120,7 @@ class NewFaultDialog(wx.Dialog):
 
 
 class MessageDialog(wx.MessageDialog):
-    """ # GENERIC MESSAGE DIALOG"""
-
+    """GENERIC MESSAGE DIALOG BOX"""
     def __init__(self, parent, id, message_text, title):
         wx.MessageDialog.__init__(self, parent, message_text, title)
         dlg = wx.MessageDialog(self, message_text, title, wx.OK)
@@ -5120,6 +5134,7 @@ class MessageDialog(wx.MessageDialog):
 '''# FRAMES ARE STORED HERE'''
 
 class CaptureCoordinates(wx.Frame):
+    """CAPTURE MOUSE CLICK COORDINATES AND WRITE TO DISK FILE. RETURNS ASCII TEXT FILE"""
     def __init__(coordinate_list, parent, id, title):
         wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
         coordinate_list.input_panel = wx.Panel(coordinate_list)
@@ -5174,6 +5189,7 @@ class CaptureCoordinates(wx.Frame):
 
 
 class PlotSettingsDialog(wx.Frame):
+    """CREATE AN EXTERNAL FIGURE PLOT FROM THE MODEL. RETURNS DRAW PARAMETERS"""
     def __init__(self, parent, id, title, model_aspect, dcanvas_aspect):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'Figure settings')
         input_panel = wx.Panel(self, -1)
@@ -5421,6 +5437,7 @@ class PlotSettingsDialog(wx.Frame):
 
 
 class AttributeEditor(wx.Frame):
+    """OPENS A TABLE FOR VIEWING AND EDITING LABEL ATTRIBUTES"""
     def __init__(attribute_edit, parent, id, title, tree_items, densities, reference_densities, susceptibilities,
                  angle_a, angle_b, layer_colors):
         wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(650, 1000))
@@ -5524,29 +5541,27 @@ class AttributeEditor(wx.Frame):
 
     def selection(attribute_edit):
         # SHOW CELL SELECTION
-
         # IF SELECTION IS CELL
         if attribute_edit.attr_grid.GetSelectedCells():
-            print "Selected cells " + str(attribute_edit.GetSelectedCells())
+            print("Selected cells " + str(attribute_edit.GetSelectedCells()))
         # IF SELECTION IS BLOCK
         if attribute_edit.attr_grid.GetSelectionBlockTopLeft():
-            print "Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft())
+            print("Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft()))
         if attribute_edit.attr_grid.GetSelectionBlockbottomRight():
-            print "Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight())
+            print("Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight()))
         # IF SELECTION IS COL
         if attribute_edit.attr_grid.GetSelectedCols():
-            print "Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols())
-
+            print("Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols()))
         # IF SELECTION IS ROW
         if attribute_edit.attr_grid.GetSelectedRows():
-            print "Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows())
+            print("Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows()))
 
     def currentcell(attribute_edit):
-        # Show cursor position
+        # SHOW CURSOR POSITION
         row = attribute_edit.attr_grid.GetGridCursorRow()
         col = attribute_edit.attr_grid.GetGridCursorCol()
         cell = (row, col)
-        print "Current cell " + str(cell)
+        print("Current cell " + str(cell))
 
     def copy(attribute_edit):
         # NUMBER OF ROWS AND COLS
@@ -5603,9 +5618,6 @@ class AttributeEditor(wx.Frame):
             attribute_edit.angle_b.append(float(attribute_edit.attr_grid.GetCellValue(i, 5)))
             attribute_edit.layer_colors.append(str(attribute_edit.attr_grid.GetCellValue(i, 6)))
 
-
-        print "attribute_edit.tree_items = "
-        print attribute_edit.tree_items
         # UPDATE MAIN FRAME
         attribute_edit.parent.attribute_set(attribute_edit.tree_items, attribute_edit.densities,
                                             attribute_edit.reference_densities, attribute_edit.susceptibilities,

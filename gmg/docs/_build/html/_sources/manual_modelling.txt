@@ -39,8 +39,8 @@ at which the predicted anomalies will be calculated (NB. all units are km).
 
     If you require a very fine spatial resolution for the predicted anomaly increment (relative to the total length of
     the model), then it may be computationally beneficial to set the spacing as a relatively coarse value for initial
-    modelling, then later reduce this to the fine spacing required for the final model. This will ensure gmg runs
-    smoothly during the initial forward modelling.
+    modelling, and then later reduce this to the fine spacing required for the final model. This will ensure gmg runs
+    smoothly during the initial modelling phase.
 
 ------------------
 1.2 Saving a Model

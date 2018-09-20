@@ -205,6 +205,17 @@ can help speed up the GUI response time if the model becomes complex (many layer
 <p class="last">You must set the magnetic inclination and Earth Field value under the <em>Magnetic Field</em> menu before</p>
 </div>
 <p>the predicted anomaly can be calculated.</p>
+<div class="admonition important">
+<p class="first admonition-title">Important</p>
+<p class="last"><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
+(the angle is positive when measured counterclockwise). See <a class="reference internal" href="manual_magnetic_algorithm.html#magnetic-algorithm"><span class="std std-ref">A2</span></a> and further details.
+The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).</p>
+</div>
+<div class="admonition-example admonition">
+<p class="first admonition-title">Example</p>
+<p>If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.</p>
+<p class="last">If the model was orientated North-South the angle would be 68 deg.</p>
+</div>
 </div>
 <div class="section" id="loading-observed-potential-field-data">
 <h2><strong>4.2 Loading observed potential field data</strong><a class="headerlink" href="#loading-observed-potential-field-data" title="Permalink to this headline">¶</a></h2>
@@ -241,7 +252,7 @@ The file will automatically be loaded into the canvas.</p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Sep 13, 2018.
+      Last updated on Sep 14, 2018.
 
     </p>
   </div>

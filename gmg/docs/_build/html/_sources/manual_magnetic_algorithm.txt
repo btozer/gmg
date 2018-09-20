@@ -54,15 +54,18 @@ To account for the bodies magnetisation vector and its relationship with the mod
 
 where angle **A** is measured in the vertical plane from zero at the horizontal and positive downwards.
 Angles **B** and **C** are measured in the horizontal plane, in a positive clockwise direction from geographic north,
-as shown in :numref:`talwani_mag_angles`. For the case when magnetisation is induced only:
+as shown in :numref:`talwani_mag_angles`.
+
+For the case when magnetisation is induced only:
 
 .. math:: J = kH
     :label: talwani_mag_J_induced
 
 where :math:`k` is the susceptibility contrast between the body and surrounding material and :math:`H` is the strength
 of inducing field. Also, **A** will be equal to the inclination (**I**) and **B** will be equal to the declination
-(**D**) Talwani and Heirtzler (1964) :cite:`talwani1964`. For the case when magnetisation is remanent or a combination
-of remanent and induced, the angles **A** and **B** will require modification by the user to account for the difference
+(**D**) of Earth's field Talwani and Heirtzler (1964) :cite:`talwani1964`.
+
+For the case when magnetisation is remanent or a combination of remanent and induced, the angles **A** and **B** will require modification by the user to account for the difference
 between the inducing field vector and remanent field vector.
 
 .. figure:: _static/talwani_magnetic.png
@@ -107,11 +110,15 @@ is given by, for example, Reford (1964) :cite:`reford1964` as:
     b^{2} = 1 - \cos{^2}i\sin{^2}D
     :label: b
 
+.. math::
+    I = tan^{-1}[ tan(i) cos(D) ]
+    :label: i
+
 Where :math:`k` is the magnetic susceptibility contrast between the sheet and its surroundings; :math:`T` is the
 strength of the inducing field; :math:`w` is the width of the flat top of the sheet; :math:`h` is the depth to the
-top of the dyke; :math:`I` is the angle of inclination measured downwards from the horizontal and projected onto the
-x-z plane; :math:`D` is the angle between magnetic north and the positive x axis (model profile azimuth); :math:`d` is
-the dip of the dyke measured clockwise from the positive x axis (e.g. :numref:`talwani_mag_angles`).
+top of the dyke; :math:`i` is the angle of inclination measured downwards from the horizontal; :math:`D` is the angle
+between magnetic north and the positive x axis (model profile azimuth); :math:`d` is the dip of the dyke measured
+clockwise from the positive x axis (e.g. :numref:`talwani_mag_angles`).
 
 This solution is used to simulate a vertical dyke of finite depth extent by calculating the anomalies
 produced by two bodies, one where :math:`h=d_{1}` (the top of the dyke) and a second where :math:`h = d_{2}` (the
@@ -131,5 +138,5 @@ declination are both 0 \degree, and the model azimuth is due north, such that, t
     (grey line) and the Talwani and Heirtzler (1964) :cite:`talwani1964` algorithm (red dashed line). b) Simple thin
     sheet model polygon used to simulate a vertical dyke. Inset table lists model parameters (:math:`\Delta \lambda`)
     susceptibility contrast; :math:`w =` width of the flat top of the sheet; Inc. and Dec. :math:`=` Inclination and
-    Declination of inducing field. Inducing field strength is set as :math:`50,000 nT`.
+    Declination of inducing field. Inducing field strength is set as :math:`50000` :math:`nT`.
     The profile azimuth is east-west.

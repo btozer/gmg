@@ -231,13 +231,14 @@ parametrisation for a two-dimensional body shown in <a class="reference internal
 <span class="eqno">(7)<a class="headerlink" href="#equation-talwani_mag_J_vertical" title="Permalink to this equation">¶</a></span>\[J_{z} = J \sin A\]</div>
 <p>where angle <strong>A</strong> is measured in the vertical plane from zero at the horizontal and positive downwards.
 Angles <strong>B</strong> and <strong>C</strong> are measured in the horizontal plane, in a positive clockwise direction from geographic north,
-as shown in <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>. For the case when magnetisation is induced only:</p>
+as shown in <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>.</p>
+<p>For the case when magnetisation is induced only:</p>
 <div class="math" id="equation-talwani_mag_J_induced">
 <span class="eqno">(8)<a class="headerlink" href="#equation-talwani_mag_J_induced" title="Permalink to this equation">¶</a></span>\[J = kH\]</div>
 <p>where <span class="math">\(k\)</span> is the susceptibility contrast between the body and surrounding material and <span class="math">\(H\)</span> is the strength
 of inducing field. Also, <strong>A</strong> will be equal to the inclination (<strong>I</strong>) and <strong>B</strong> will be equal to the declination
-(<strong>D</strong>) Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id3">[6]</a>. For the case when magnetisation is remanent or a combination
-of remanent and induced, the angles <strong>A</strong> and <strong>B</strong> will require modification by the user to account for the difference
+(<strong>D</strong>) of Earth’s field Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id3">[6]</a>.</p>
+<p>For the case when magnetisation is remanent or a combination of remanent and induced, the angles <strong>A</strong> and <strong>B</strong> will require modification by the user to account for the difference
 between the inducing field vector and remanent field vector.</p>
 <div class="figure" id="talwani-mag-method">
 <img alt="_images/talwani_magnetic.png" src="_images/talwani_magnetic.png" />
@@ -268,11 +269,13 @@ is given by, for example, Reford (1964) <a class="reference internal" href="manu
 <span class="eqno">(10)<a class="headerlink" href="#equation-reford_dyke" title="Permalink to this equation">¶</a></span>\[\Delta T = 2kTb^{2}w  \left[ \frac{h}{R^{2}} \sin (2I-d) - \frac{x}{R^{2}} \cos(2I-d) \right]\]</div>
 <div class="math" id="equation-b">
 <span class="eqno">(11)<a class="headerlink" href="#equation-b" title="Permalink to this equation">¶</a></span>\[b^{2} = 1 - \cos{^2}i\sin{^2}D\]</div>
+<div class="math" id="equation-i">
+<span class="eqno">(12)<a class="headerlink" href="#equation-i" title="Permalink to this equation">¶</a></span>\[I = tan^{-1}[ tan(i) cos(D) ]\]</div>
 <p>Where <span class="math">\(k\)</span> is the magnetic susceptibility contrast between the sheet and its surroundings; <span class="math">\(T\)</span> is the
 strength of the inducing field; <span class="math">\(w\)</span> is the width of the flat top of the sheet; <span class="math">\(h\)</span> is the depth to the
-top of the dyke; <span class="math">\(I\)</span> is the angle of inclination measured downwards from the horizontal and projected onto the
-x-z plane; <span class="math">\(D\)</span> is the angle between magnetic north and the positive x axis (model profile azimuth); <span class="math">\(d\)</span> is
-the dip of the dyke measured clockwise from the positive x axis (e.g. <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>).</p>
+top of the dyke; <span class="math">\(i\)</span> is the angle of inclination measured downwards from the horizontal; <span class="math">\(D\)</span> is the angle
+between magnetic north and the positive x axis (model profile azimuth); <span class="math">\(d\)</span> is the dip of the dyke measured
+clockwise from the positive x axis (e.g. <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>).</p>
 <p>This solution is used to simulate a vertical dyke of finite depth extent by calculating the anomalies
 produced by two bodies, one where <span class="math">\(h=d_{1}\)</span> (the top of the dyke) and a second where <span class="math">\(h = d_{2}\)</span> (the
 base of the dyke). The effect of the second dyke is subtracted from the first to leave the anomaly caused by a dyke
@@ -287,7 +290,7 @@ declination are both 0 degree, and the model azimuth is due north, such that, th
 (grey line) and the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id9">[6]</a> algorithm (red dashed line). b) Simple thin
 sheet model polygon used to simulate a vertical dyke. Inset table lists model parameters (<span class="math">\(\Delta \lambda\)</span>)
 susceptibility contrast; <span class="math">\(w =\)</span> width of the flat top of the sheet; Inc. and Dec. <span class="math">\(=\)</span> Inclination and
-Declination of inducing field. Inducing field strength is set as <span class="math">\(50,000 nT\)</span>.
+Declination of inducing field. Inducing field strength is set as <span class="math">\(50000\)</span> <span class="math">\(nT\)</span>.
 The profile azimuth is east-west.</span></p>
 </div>
 </div>
@@ -314,7 +317,7 @@ The profile azimuth is east-west.</span></p>
   <div role="contentinfo">
     <p>
         &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Sep 13, 2018.
+      Last updated on Sep 14, 2018.
 
     </p>
   </div>

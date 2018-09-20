@@ -26,19 +26,21 @@ import numpy as np
 import math as m
 
 
-def ntz(xp, zp, polygons, model_azimuth, F, angle_a, angle_b):
+def ntz(xp, zp, polygons, model_azimuth, F, angle_a, angle_b, mag_observation_elv):
 
     """
     Calculates the :math:`ntz` magnetic field strength.
 
     .. note:: The coordinate system of the input parameters is z -> **DOWN**.
 
-    .. note:: All input values in **SI** units(!) and output in **nT**!
+    .. note:: All input values in **SI** units and output in **nT**
 
     Parameters:
 
-    * xp, zp : arrays
-        The x and z coordinates of the computation points.
+    * xp : array
+        The x coordinates of the computation points.
+    * zp : array
+        The z coordinates of the computation points.
     * polygons : list of :func:`~fatiando.mesher.Polygon`
         The susceptibility model used.
         Polygons must have the property ``'susceptibility'``. Polygons that don't have
@@ -64,13 +66,16 @@ def ntz(xp, zp, polygons, model_azimuth, F, angle_a, angle_b):
     Returns:
 
     * ntz : array
-        The :math:`ntz` (TASUM) component calculated on the computation points
+        The :math:`ntz` (TASUM) component calculated on the computation points (xp, zp)
     """
 
     # INITIALISE ARRAYS
     VASUM = np.zeros_like(xp)
     HASUM = np.zeros_like(xp)
     TASUM = np.zeros_like(xp)
+
+    # SET OBSERVATION ELEVATION
+    zp = zp + mag_observation_elv
 
     # ITERATE OVER ALL POLYGONS
     i = 0
@@ -81,7 +86,7 @@ def ntz(xp, zp, polygons, model_azimuth, F, angle_a, angle_b):
         else:
             k = (polygon.props['susceptibility'])
             k = k/(4*m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
-        if k == 0.0:  # IF C = 0 THEN SKIP THIS POLYGON; ELSE RUN THE CODE
+        if k == 0.0:  # IF C = 0 THEN SKIP THIS POLYGON; ELSE RUN THE ALGORITHM
             continue
         else:
             # DETERMINE ANGLES IN RADIANS
