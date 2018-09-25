@@ -11,10 +11,7 @@ from matplotlib import rcParams
 
 
 def draw_line(file_name, ax3):
-    """
-    DRAW ADDITIONAL XY LINES ON FIGURE
-    """
-
+    """DRAW AUXILIARY XY LINES ON FIGURE"""
     # READ IN DATA
     line = np.genfromtxt(file_name, dtype=str, autostrip=True, delimiter=' ', filling_values='>')
 
@@ -215,15 +212,10 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
         if segy_plot_list[s]:
             ax4.add_image(copy.copy(segy_plot_list[s]))
 
-    print "draw faults ="
-    print draw_faults
     if draw_faults is True:
         # PLOT FAULTS
         for i in range(0, len(faults)-1):
             fault = faults[i][0]
-            print i
-            print fault
-            print fault.get_visible()
             # CHECK IF FAULT IS SET AS VISIBLE; IF YES, THEN PLOT
             if fault.get_visible() == True:
                 x = fault.get_xdata()
@@ -289,8 +281,8 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
                 plotx_polygon = np.append(np.array(plotx_list[i]), np.array(plotx_list[i-1])[::-1])
                 ploty_polygon = np.append(np.array(ploty_list[i]), np.array(ploty_list[i-1])[::-1])
             else:
-                 plotx_polygon = np.array(plotx_list[i])
-                 ploty_polygon = np.array(ploty_list[i])
+                plotx_polygon = np.array(plotx_list[i])
+                ploty_polygon = np.array(ploty_list[i])
 
             # DEFINE COLOR MAP
             colormap = cm.coolwarm

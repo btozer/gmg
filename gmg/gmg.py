@@ -99,7 +99,6 @@ import math as m
 import os
 import sys
 from sys import platform
-import subprocess
 from obspy import read
 import cPickle as Pickle
 from scipy import signal
@@ -134,31 +133,31 @@ class Gmg(wx.Frame):
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
-        'DIR CONTAINING PROGRAM ICONS'
+        # DIR CONTAINING PROGRAM ICONS
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         self.gui_icons_dir = self.script_dir + '/icons/'
 
-        'START AUI WINDOW MANAGER'
+        # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
 
-        'TELL AUI WHICH FRAME TO USE'
+        # TELL AUI WHICH FRAME TO USE
         self.mgr.SetManagedWindow(self)
 
-        'SET SPLITTER WINDOW TOGGLE IMAGES'
+        # SET AUI ICON SIZING AND STYLES (ARROWS)
         images = wx.ImageList(16, 16)
         top = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16, 16))
         bottom = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16, 16))
         images.Add(top)
         images.Add(bottom)
 
-        'CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL'
+        # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL
         self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1100), style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 705),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
-        'FIRST PANE; LEFT PANEL (=ATTRIBUTES)'
+        # FIRST PANE; LEFT PANEL (=ATTRIBUTES)
         self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(-1, -1),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 395),
@@ -167,7 +166,7 @@ class Gmg(wx.Frame):
                                                                        foldIcons=images)
         self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
-        'SECOND PANE; LEFT PANEL (=LAYERS)'
+        # SECOND PANE; LEFT PANEL (=LAYERS)
         self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(-1, -1),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 455),
@@ -175,7 +174,7 @@ class Gmg(wx.Frame):
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
 
-        'THIRD PANE; LEFT PANEL (=FAULTS)'
+        # THIRD PANE; LEFT PANEL (=FAULTS)
         self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(-1, -1),
                                                            style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 250),
@@ -183,7 +182,7 @@ class Gmg(wx.Frame):
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
 
-        'SET SPLITTERS'
+        # SET SPLITTERS
         self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three)
         self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b)
 
@@ -193,10 +192,10 @@ class Gmg(wx.Frame):
         self.splitter_left_panel_two.SetScrollbar(1, 1, 10, 10)
         self.splitter_left_panel_three.SetScrollbar(1, 1, 10, 10)
 
-        'CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)'
+        # CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)
         self.rightPanel = wx.Panel(self, -1, size=(1700, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
 
-        'CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)'
+        # CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)
         self.ConsolePanel = wx.Panel(self, -1, size=(1700, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         intro = "###############################################################\r" \
                 "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
@@ -206,39 +205,38 @@ class Gmg(wx.Frame):
         sys.Gmg = self
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
 
-
-        'ADD THE PANES TO THE AUI MANAGER'
+        # ADD THE PANES TO THE AUI MANAGER
         self.mgr.AddPane(self.leftPanel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
         self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
         self.mgr.GetPaneByName('console').Hide()  # HIDE PYTHON CONSOLE BY DEFAULT
         self.mgr.Update()
 
-        'CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)'
+        # CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)
         self.create_menu()
 
-        'CREATE STATUS BAR'
+        # CREATE STATUS BAR
         self.statusbar = self.CreateStatusBar(3)
         self.controls_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'large_up_16.png'),
                                                pos=(0, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_controls, self.controls_button)
 
-        'PYTHON CONSOLE'
+        # PYTHON CONSOLE
         self.console_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'python_16.png'),
                                               pos=(24, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_console, self.console_button)
 
-        'TOPOGRAPHY'
+        # TOPOGRAPHY TOGGLE BUTTON
         self.topography_button = GenBitmapButton(self.statusbar, 601, wx.Bitmap(self.gui_icons_dir + 'T_16.png'),
                                                  pos=(48, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.topography_button)
 
-        'GRAVITY'
+        # GRAVITY TOGGLE BUTTON
         self.gravity_button = GenBitmapButton(self.statusbar, 602, wx.Bitmap(self.gui_icons_dir + 'G_16.png'),
                                               pos=(72, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.gravity_button)
 
-        'MAGNETIC'
+        # MAGNETIC TOGGLE BUTTON
         self.magnetic_button = GenBitmapButton(self.statusbar, 603, wx.Bitmap(self.gui_icons_dir + 'M_16.png'),
                                                pos=(96, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
@@ -248,18 +246,18 @@ class Gmg(wx.Frame):
         self.statusbar.SetStatusText(self.status_text, 2)
         self.statusbar.SetSize((1800, 24))
 
-        'SET PROGRAM STATUS'
+        # SET PROGRAM STATUS
         self.model_saved = False
         self.newmodel = False
 
-        'BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION'
+        # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
 
-        'MAXIMIZE FRAME'
+        # MAXIMIZE FRAME
         self.Maximize(True)
 
     def create_menu(self):
-        """# CREATES GUI MENUBAR"""
+        """CREATE GUI MENUBAR"""
         self.menubar = wx.MenuBar()
         menu_file = wx.Menu()
         m_new_model = menu_file.Append(-1, "New Model...\tCtrl-N", "New Model...")
@@ -280,17 +278,17 @@ class Gmg(wx.Frame):
         m_exit = menu_file.Append(-1, "Exit...\tCtrl-X", "Exit...")
         self.Bind(wx.EVT_MENU, self.exit, m_exit)
 
-        'DRAW MENU'
+        # DRAW MENU
         self.menubar.Append(menu_file, "&File")
 
-        'MODEL VIEW MENU'
+        # MODEL VIEW MENU
         model_view_file = wx.Menu()
         m_modify_model_dimensions = model_view_file.Append(-1, "Modify Current Model Dimensions...\tCtrl-M",
                                                            "Modify Current Model Dimensions...")
         self.Bind(wx.EVT_MENU, self.modify_model_dimensions, m_modify_model_dimensions)
         model_view_file.AppendSeparator()
 
-        'PROGRAM FRAME WINDOW SWITCHES'
+        # PROGRAM FRAME WINDOW SWITCHES
         self.t_canvas = True
         self.d_canvas = True
         self.nt_canvas = True
@@ -312,7 +310,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.aspect_decrease, m_aspect_decrease)
         self.menubar.Append(model_view_file, "&Model View")
 
-        'GRAVITY DATA'
+        # GRAVITY DATA MENU --------------------------------------------------------------------------------------------
         self.gravity_data = wx.Menu()
         # LOAD OBSERVED GRAVITY DATA
         m_load_obs_g = self.gravity_data.Append(-1, "&Load Gravity Anomaly...\tCtrl-L", "Load Observed Gravity Data...")
@@ -339,8 +337,9 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.save_modelled_grav, m_save_g_submenu)
         # DRAW MENU
         self.menubar.Append(self.gravity_data, "&Gravity")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'MAGNETIC DATA'
+        # MAGNETIC DATA MENU -------------------------------------------------------------------------------------------
         self.magnetic_data = wx.Menu()
         # LOAD OBSERVED MAGNETIC DATA
         m_load_obs_m = self.magnetic_data.Append(-1, "&Load Magnetic Anomaly...\tCtrl-L",
@@ -368,8 +367,9 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.save_modelled_mag, m_save_mag_submenu)
         # DRAW MENU
         self.menubar.Append(self.magnetic_data, "&Magnetics")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'TOPOGRAPHY DATA'
+        # TOPOGRAPHY DATA MENU -----------------------------------------------------------------------------------------
         self.topography_data = wx.Menu()
         # LOAD OBSERVED TOPO DATA
         m_load_topo = self.topography_data.Append(-1, "&Load Topography...\tCtrl-L", "Load Observed Topography...")
@@ -379,8 +379,9 @@ class Gmg(wx.Frame):
         self.topography_data.Append(-1, 'Topography Data', self.m_topo_submenu)
         # DRAW MENU
         self.menubar.Append(self.topography_data, "&Topography")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'XY DATA'
+        # XY DATA MENU -------------------------------------------------------------------------------------------------
         self.xy_data = wx.Menu()
         # LOAD XY DATA
         m_load_xy = self.xy_data.Append(-1, "&Load XY Points...\tCtrl-L", "Load XY Points...")
@@ -392,8 +393,9 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.delete_all_xy, id=102)
         # DRAW MENU
         self.menubar.Append(self.xy_data, "&XY Data")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'SEISMIC DATA'
+        # SEISMIC DATA -------------------------------------------------------------------------------------------------
         self.seismic_data = wx.Menu()
         #SEGY LOAD
         self.m_load_segy = self.seismic_data.Append(-1, "&Load Segy...\tCtrl-y", "Load Segy Data")
@@ -422,8 +424,9 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.gain_decrease, self.m_gain_decrease)
         # DRAW MENU
         self.menubar.Append(self.seismic_data, "&Seismic Data")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'WELL DATA'
+        # WELL DATA MENU -----------------------------------------------------------------------------------------------
         self.well_data = wx.Menu()
         self.m_load_well = self.well_data.Append(-1, "&Load...\tCtrl-Shift-w", "Load Well Horizons")
         self.Bind(wx.EVT_MENU, self.load_well, self.m_load_well)
@@ -432,16 +435,18 @@ class Gmg(wx.Frame):
         self.well_data.Append(-1, 'Well...', self.m_wells_submenu)
         # DRAW MENU
         self.menubar.Append(self.well_data, "&Well Data")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'CONTACTS MENU'
+        # CONTACTS MENU ------------------------------------------------------------------------------------------------
         self.contact_file = wx.Menu()
         self.m_load_contact_data = self.contact_file.Append(-1, "&Load Outcrops...\tCtrl-Shift-w", "Load Outcrop Data")
         self.Bind(wx.EVT_MENU, self.load_contact_data, self.m_load_contact_data)
 
         self.m_contacts_submenu = wx.Menu()
         self.menubar.Append(self.contact_file, "&Outcrop data")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'LAYERS MENU'
+        # MODEL LAYERS MENU --------------------------------------------------------------------------------------------
         self.layer_file = wx.Menu()
         #NEW LAYER
         self.m_new_layer = self.layer_file.Append(-1, "New Layer...", "New Layer...")
@@ -466,23 +471,26 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.delete_layer, self.m_delete_layer)
         #APPEND MENU
         self.menubar.Append(self.layer_file, "&Layers")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'PINCH MENU'
+        # PINCH MENU ---------------------------------------------------------------------------------------------------
         layer_file = wx.Menu()
         m_pinch_layer = layer_file.Append(-1, "&Pinch Out Layer...\tCtrl-shift-up", "Pinch Out Layer...")
         self.Bind(wx.EVT_MENU, self.pinch_out_layer, m_pinch_layer)
         m_depinch_layer = layer_file.Append(-1, "&Depinch Layer...\tCtrl-shift-up", "Depinch Layer...")
         self.Bind(wx.EVT_MENU, self.depinch_layer, m_depinch_layer)
         self.menubar.Append(layer_file, "&Pinch Layer")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'ATTRIBUTE MENU'
+        # ATTRIBUTE TABLE MENU -----------------------------------------------------------------------------------------
         attribute_file = wx.Menu()
         m_attribute_table = attribute_file.Append(-1, "&Open Attribute Table...\tCtrl-shift-a",
                                                   "Open Attribute Table...")
         self.Bind(wx.EVT_MENU, self.open_attribute_table, m_attribute_table)
         self.menubar.Append(attribute_file, "&Attribute Table")
+        # --------------------------------------------------------------------------------------------------------------
 
-        'HELP MENU'
+        # HELP MENU ----------------------------------------------------------------------------------------------------
         help_file = wx.Menu()
         m_help = help_file.Append(-1, "&Documentation...", "Open Documentation html...")
         self.Bind(wx.EVT_MENU, self.open_documentation, m_help)
@@ -491,6 +499,7 @@ class Gmg(wx.Frame):
         m_legal = help_file.Append(-1, "&Legal...", "Legal...")
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
         self.menubar.Append(help_file, "&Help")
+        # --------------------------------------------------------------------------------------------------------------
 
         'SET MENUBAR'
         self.SetMenuBar(self.menubar)
@@ -1658,7 +1667,6 @@ class Gmg(wx.Frame):
 
             # LOAD FAULT TREE ITEMS
             for i in range(0, len(self.loaded_fault_tree_items)):
-                print self.loaded_fault_tree_items[i]
                 fault_tree_item = self.fault_tree.AppendItem(self.fault_tree_root, "%s" %
                                                              self.loaded_fault_tree_items[i], ct_type=1)
                 fault_tree_item.Check(checked=True)
@@ -2160,11 +2168,8 @@ class Gmg(wx.Frame):
                       id=self.segy_count + 1000)  # ID IS SET TO +1000 TO AVOID CONFLICT WITH GRAV SUB MENU IDS
 
             self.segy_count = self.segy_count + 1
-        except:
-            print "**********"
-            print "LOAD ERROR"
-            print "**********"
-            raise
+        except AttributeEditor:
+            load_error = MessageDialog(self, -1, "SEGY LOAD ERROR", "segy load error")
 
     def remove_all_segy(self, event):
         self.segy_plot_list = []
@@ -2188,7 +2193,6 @@ class Gmg(wx.Frame):
     def segy_color_adjustment(self, event):
         if event.Id == 901:
             if self.segy_on is False:
-                print "no segy"
                 return 0
             else:
                 for s in range(0, len(self.segy_plot_list)):
@@ -2196,10 +2200,8 @@ class Gmg(wx.Frame):
                         self.segy_plot_list[s].set_cmap(cm.gray)
                 self.draw()
         else:
-            print "gain is a min value"
         if event.Id == 902:
             if self.segy_on is False:
-                print "no segy"
                 return 0
             else:
                 for s in range(0, len(self.segy_plot_list)):
@@ -2645,11 +2647,7 @@ class Gmg(wx.Frame):
             return self.index_arg, self.index_arg2_list
 
     def get_fault_node_under_point(self, event):
-        """
-        GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
-        """
-
-        print "GETTING FAULT NODE UNDER CLICK"
+        """GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
         # GET FAULT NODE XY DATA
         xy_data = self.faultline.get_xydata()
         x = xy_data[:, 0]
@@ -3200,16 +3198,12 @@ class Gmg(wx.Frame):
 
         '< = INCREMENT WHICH FAULT IS BEING EDITED'
         if event.key == ',':
-            print "< was pressed"
             if self.current_fault_index <= self.fault_counter-1 and self.current_fault_index > 0:
                 # INCREMENT TO NEXT FAULT
                 self.current_fault_index -= 1
             else:
                 # GO TO NEWEST FAULT
                 self.current_fault_index = self.fault_counter-1
-
-            print "self.current_fault_index = "
-            print self.current_fault_index
 
             # UPDATE CURRENT PLOT GRAPHICS
             self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
@@ -3220,16 +3214,12 @@ class Gmg(wx.Frame):
 
         '> = INCREMENT WHICH FAULT IS BEING EDITED'
         if event.key == '.':
-            print "> was pressed"
             if self.current_fault_index < self.fault_counter-1:
                 # INCREMENT TO NEXT FAULT
                 self.current_fault_index += 1
             elif self.current_fault_index == self.fault_counter-1:
                 # GO BACK TO FIRST FAULT
                 self.current_fault_index = 0
-
-            print "self.current_fault_index = "
-            print self.current_fault_index
 
             # UPDATE CURRENT PLOT GRAPHICS
             self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
@@ -3267,9 +3257,6 @@ class Gmg(wx.Frame):
 
             # SET THE CURRENT FAULT INDEX AS THE NEW FAULT
             self.current_fault_index = self.fault_counter - 1
-            print "created new fault with index"
-            print self.current_fault_index
-            print ""
 
             # APPEND BLANKS TO THE OBJECTS (USED FOR THE NEXT NEW FAULT)
             self.faults.append([])
@@ -3993,9 +3980,8 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
+
             # UPDATE FAULT LINE GRAPHICS
-            print("self.fault_counter =")
-            print(self.fault_counter)
             for i in range(0, self.fault_counter):
                 try:
                     self.faults[i][0].set_xdata(self.fault_x_coords_list[i])
@@ -4006,7 +3992,6 @@ class Gmg(wx.Frame):
 
             print(self.fault_x_coords_list)
             print(self.fault_y_coords_list)
-            print "Current fault values = "
             print(self.fault_x_coords_list[self.current_fault_index])
             print(self.fault_y_coords_list[self.current_fault_index ])
             
@@ -4024,7 +4009,7 @@ class Gmg(wx.Frame):
             self.polygons = []
             self.mag_polygons = []
 
-            # CREATE UPDATED POLYGON XYs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            # CREATE UPDATED POLYGON XYs -------------------------------------------------------------------------------
             # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
             # ISN'T PASSED TO SELF.POLYPLOTS)
             for i in range(0, self.layer_count + 1):
@@ -4057,6 +4042,7 @@ class Gmg(wx.Frame):
                     self.ploty_polygon = np.array(self.ploty_list[i])
 
                 self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
+            #-----------------------------------------------------------------------------------------------------------
 
             # UPDATE LAYER POLYGONS AND LINES
             for i in range(0, self.layer_count + 1):
@@ -4069,7 +4055,7 @@ class Gmg(wx.Frame):
                     # NO REF DENSITY, SO JUST USE DENSITY VALUE
                     next_color = self.colormap.to_rgba(0.001 * self.densities[i])
                 else:
-                    # NO DEISNITY HAS BEEN SET SO LEAVE BLANK
+                    # NO DENSITY HAS BEEN SET SO LEAVE BLANK
                     next_color = self.colormap.to_rgba(0.)
 
                 # UPDATE POLYGON XY AND COLOR FILL
@@ -4099,8 +4085,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def run_algorithms(self):
-        """RUN MODEL ALGORITHMS"""
-
+        """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
         # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY
         if self.calc_grav_switch is True or self.calc_mag_switch is True:
