@@ -3329,13 +3329,13 @@ class Gmg(wx.Frame):
 
         # SHOW FAULT
         i = self.fault_tree.GetPyData(event.GetItem())
-        if self.faults[i][i].get_visible() == True:
+        if self.faults[i][0].get_visible() == True:
             # HIDE FAULT
-            self.faults[i][i].set_visible(False)
+            self.faults[i][0].set_visible(False)
             self.faultline.set_visible(False)
         else:
             # SHOW FAULT
-            self.faults[i][i].set_visible(True)
+            self.faults[i][0].set_visible(True)
             self.faultline.set_visible(True)
 
         # UPDATE CURRENT PLOT GRAPHICS
@@ -3349,13 +3349,13 @@ class Gmg(wx.Frame):
         """TOGGLE WHETHER OR NOT A FAULT WILL BE PLOTTED IN THE MODEL FIGURE"""
         i = self.fault_tree.GetPyData(event.GetItem())
 
-        if self.faults[i][i].get_visible() == True:
+        if self.faults[i][0].get_visible() == True:
             # HIDE FAULT
-            self.faults[i][i].set_visible(False)
+            self.faults[i][0].set_visible(False)
             self.faultline.set_visible(False)
         else:
             # SHOW FAULT
-            self.faults[i][i].set_visible(True)
+            self.faults[i][0].set_visible(True)
             self.faultline.set_visible(True)
 
         # UPDATE FIGURE
@@ -4290,7 +4290,7 @@ class Gmg(wx.Frame):
                                        self.colorbar_size_x, self.colorbar_size_y, self.layer_line_width,
                                        self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min,
                                        self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells, self.well_fs,
-                                       self.well_line_width, self.draw_faults)
+                                       self.well_line_width, self.draw_faults, self.faults)
         del fig_plot
 
         # # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER

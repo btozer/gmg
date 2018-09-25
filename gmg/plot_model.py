@@ -45,7 +45,7 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
              ms, lw, font_type, layer_colors, draw_polygons, draw_layers, draw_floating_layers, draw_colorbar,
              draw_xy_data, xy_size, xy_color, colorbar_x, colorbar_y, colorbar_size_x, colorbar_size_y,
              layer_line_width, layer_alpha, grav_rms_value, mag_rms_value, grav_y_min, grav_y_max, xy_list_save,
-             draw_wells, wells, well_fs, well_line_width, draw_faults):
+             draw_wells, wells, well_fs, well_line_width, draw_faults, faults):
     """PLOT FIGURE TO EXTERNAL FILE USING USER SPECIFIED PLOTTING OPTIONS"""
     ### FUTURE:
     # 1. external_lines
@@ -215,16 +215,25 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
         if segy_plot_list[s]:
             ax4.add_image(copy.copy(segy_plot_list[s]))
 
-    # PLOT FAULTS
-    if draw_faults:
-        # for f in range (0, len(fault_list)):
-        #     if fault_name_list[f] == "None" or well_name_list[w] == []:
-        #         continue
-        #     else:
-        pass
+    print "draw faults ="
+    print draw_faults
+    if draw_faults is True:
+        # PLOT FAULTS
+        for i in range(0, len(faults)-1):
+            fault = faults[i][0]
+            print i
+            print fault
+            print fault.get_visible()
+            # CHECK IF FAULT IS SET AS VISIBLE; IF YES, THEN PLOT
+            if fault.get_visible() == True:
+                x = fault.get_xdata()
+                y = fault.get_ydata()
+                ax4.plot(x, y, color='k', linewidth=0.5, zorder=1, alpha=1.0)
+            else:
+                continue
 
     if draw_wells:
-        # PLOT WELL DATA'
+        # PLOT WELL DATA
         for w in range(0, len(well_list)):
             if well_name_list[w] == "None" or well_name_list[w] == []:
                 continue
