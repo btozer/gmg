@@ -24,7 +24,7 @@ def draw_line(file_name, ax3):
 
     # EXTRACT LINES. ">" IS USED TO INDICATE A NEW LINE SEGMENT
     r = 0
-    for i in xrange(len(line)):
+    for i in range(0, len(line)):
         if line[i, 0] != ">":
             plotx_ray_list[r].append(line[i, 0])
             ploty_ray_list[r].append(line[i, 1])
@@ -39,21 +39,16 @@ def draw_line(file_name, ax3):
         ax3.plot(plotx_ray_list[l], ploty_ray_list[l], color='r', linewidth=.08)
 
 
-def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_mag, layer_count, layer_lock_list,
-             plotx_list,ploty_list, densities, absolute_densities, reference_densities, segy_plot_list, well_list,
-             well_name_list,t_canvas, d_canvas, nt_canvas, model_aspect, use_tight_layout, poly_alpha, fs, ms, lw,
-             font_type, layer_colors, draw_polygons, draw_layers, draw_floating_layers, draw_colorbar, draw_xy_data,
-             xy_size, xy_color, colorbar_x, colorbar_y, colorbar_size_x, colorbar_size_y, layer_line_width, layer_alpha,
-             grav_rms_value, mag_rms_value, grav_y_min, grav_y_max, xy_list_save, draw_wells, wells, well_fs,
-             well_line_width):
-
-    # FUTURE:
-    #   1. external_lines
-
-    """
-    PLOT FIGURE TO EXTERNAL FILE USING USER SPECIFIED PLOTTING OPTIONS
-
-    """
+def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc_grav, obs_mag, calc_mag, layer_count,
+             layer_lock_list, plotx_list,ploty_list, densities, absolute_densities, reference_densities, segy_plot_list,
+             well_list, well_name_list,t_canvas, d_canvas, nt_canvas, model_aspect, use_tight_layout, poly_alpha, fs,
+             ms, lw, font_type, layer_colors, draw_polygons, draw_layers, draw_floating_layers, draw_colorbar,
+             draw_xy_data, xy_size, xy_color, colorbar_x, colorbar_y, colorbar_size_x, colorbar_size_y,
+             layer_line_width, layer_alpha, grav_rms_value, mag_rms_value, grav_y_min, grav_y_max, xy_list_save,
+             draw_wells, wells, well_fs, well_line_width, draw_faults):
+    """PLOT FIGURE TO EXTERNAL FILE USING USER SPECIFIED PLOTTING OPTIONS"""
+    ### FUTURE:
+    # 1. external_lines
 
     # SET DEFAULT PLOTTING PARAMS
 
@@ -86,25 +81,29 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
     # DIR CONTAINING BOREHOLE ICON
     borehole_dir = os.path.dirname(__file__)+'/icons/'
 
-    # NUMBER OF ROWS IN PLOT'
+    # NUMBER OF ROWS IN PLOT
     if t_canvas is True and d_canvas is True and nt_canvas is True:
         num_rows = 12  # %DETERMINES AXES SIZING
     if t_canvas is False and d_canvas is True and nt_canvas is True:
-        num_rows = 11  # %DETERMINES AXES SIZING
+        num_rows = 11  # DETERMINES AXES SIZING
     if t_canvas is True and d_canvas is False and nt_canvas is True:
-        num_rows = 11  # %DETERMINES AXES SIZING
+        num_rows = 11  # DETERMINES AXES SIZING
     if t_canvas is True and d_canvas is True and nt_canvas is False:
-        num_rows = 11  # %DETERMINES AXES SIZING
+        num_rows = 11  # DETERMINES AXES SIZING
     if t_canvas is False and d_canvas is False and nt_canvas is True:
-        num_rows = 10  # %DETERMINES AXES SIZING
+        num_rows = 10  # DETERMINES AXES SIZING
     if t_canvas is True and d_canvas is False and nt_canvas is False:
-        num_rows = 10  # %DETERMINES AXES SIZING
+        num_rows = 10  # DETERMINES AXES SIZING
     if t_canvas is False and d_canvas is True and nt_canvas is False:
-        num_rows = 10  # %DETERMINES AXES SIZING
+        num_rows = 10  # DETERMINES AXES SIZING
     if t_canvas is False and d_canvas is False and nt_canvas is False:
-        num_rows = 9  # %DETERMINES AXES SIZING
+        num_rows = 9  # DETERMINES AXES SIZING
 
     # DETERMINE AXES
+    if obs_topo:
+        y_start_topo = np.append(obs_topo[:, 1], calc_grav).min() - abs(np.append(obs_topo[:, 1], calc_topo).min()/20)
+        y_end_topo = np.append(obs_topo[:, 1], calc_grav).max() + (np.append(obs_topo[:, 1], calc_topo).max()/20)
+
     if obs_grav:
         y_start_grav = np.append(obs_grav[:, 1], calc_grav).min() - abs(np.append(obs_grav[:, 1], calc_grav).min()/20)
         y_end_grav = np.append(obs_grav[:, 1], calc_grav).max() + (np.append(obs_grav[:, 1], calc_grav).max()/20)
@@ -123,14 +122,14 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
     row_counter = 0
 
     # PLOT TOPOGRAPHY CANVAS
-    if t_canvas:
+    if t_canvas and obs_topo:
         ax1 = plt.subplot2grid((num_rows, 1), (row_counter, 0), rowspan=1, colspan=1)
         row_counter += 1
 
         # AXIS OPTIONS
         plt.ylabel('Topography. (km)', fontsize=fs)
         plt.xlim(x_start_model, x_end_model)
-        plt.ylim(y_start_grav, y_end_grav)
+        plt.ylim(y_start_topo, y_end_topo)
         ax1.set_xticks([])
 
         # PLOT TOPO DATA'
@@ -143,8 +142,8 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
         ax1.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
         ax1.tick_params(axis='y', which='both', left='on', right='off', labelright='off')
 
-    # %PLOT GRAVITY CANVAS
-    if d_canvas:
+    # PLOT GRAVITY CANVAS
+    if d_canvas and obs_grav:
         ax2 = plt.subplot2grid((num_rows, 1), (row_counter, 0), rowspan=1, colspan=1)
         row_counter += 1
 
@@ -174,7 +173,7 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
                          fontsize=fs, horizontalalignment='left', clip_on=False)
 
     # PLOT MAGNETIC CANVAS
-    if nt_canvas:
+    if nt_canvas and obs_mag:
         ax3 = plt.subplot2grid((num_rows, 1), (row_counter, 0), rowspan=1, colspan=1)
         row_counter += 1
 
@@ -212,9 +211,17 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
     labelbottom='on')  # LABELS ALONG THE BOTTOM EDGE ARE OFF
 
     # PLOT SEISMIC DATA
-    for s in xrange(len(segy_plot_list)):
+    for s in range(0, len(segy_plot_list)):
         if segy_plot_list[s]:
             ax4.add_image(copy.copy(segy_plot_list[s]))
+
+    # PLOT FAULTS
+    if draw_faults:
+        # for f in range (0, len(fault_list)):
+        #     if fault_name_list[f] == "None" or well_name_list[w] == []:
+        #         continue
+        #     else:
+        pass
 
     if draw_wells:
         # PLOT WELL DATA'
@@ -226,9 +233,6 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
                     continue
                 else:
                     well_data = np.array(well_list[w])
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!"
-                    print "well_data = %s" % well_data
-                    print "!!!!!!!!!!!!!!!!!!!!!!!!"
                     y1 = well_data[0, 1].astype(float)* -1.
                     y2 = well_data[-1, -1].astype(float)+(y1.astype(float))
                     well_x_location = well_data[1, 1]
@@ -318,14 +322,14 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
 
     # DRAW OTHER XY DATA e.g. EARTHQUAKE HYPOCENTERS
     if draw_xy_data:
-        for i in xrange(len(xy_list_save)):
+        for i in range(0, len(xy_list_save)):
             if xy_list_save[i]:
                 xy = xy_list_save[i]
                 ax4.scatter(xy[:, 0], xy[:, 1], marker='o', edgecolors='none', facecolors=xy_color,
                             s=xy_size, gid=i, alpha=1.0, zorder=2)
 
-    # %PLOT OTHER LINES
-    # for i in xrange(len(external_lines)):
+    # PLOT EXTERNAL LINES
+    # for i in range(0, len(external_lines)):
     #     # READ FILE PATH OF LINE'
     #     line_file_path = external_lines[i]
     #     #  DRAW LINE ON FIGURE'
@@ -342,15 +346,15 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    # SET AXIS DIMENSIONS SO XAXIS IS THE SAME AS THE MODEL PLOT
+    # SET AXIS DIMENSIONS SO X AXIS IS THE SAME AS THE MODEL PLOT
     pos1 = ax4.get_position()
-    if t_canvas:
+    if t_canvas and obs_topo:
         pos2 = ax1.get_position()
         ax1.set_position([pos1.x0, pos2.y0, pos1.width, pos2.height])
-    if d_canvas:
+    if d_canvas and obs_grav:
         pos2 = ax2.get_position()
         ax2.set_position([pos1.x0, pos2.y0, pos1.width, pos2.height*2])
-    if nt_canvas:
+    if nt_canvas and obs_mag:
         pos2 = ax3.get_position()
         ax3.set_position([pos1.x0, pos2.y0, pos1.width, pos2.height])
 
@@ -372,13 +376,25 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
 
     # WRITE OUT FIG
     if use_tight_layout:
-        # plt.savefig(outdir+fig_name+'.svg', bbox_inches='tight', dpi=720, format='svg')
-        plt.savefig(file_path, bbox_inches='tight', dpi=720, format='pdf')
-        # plt.savefig(outdir+fig_name+'.ps', bbox_inches='tight', dpi=720, format='ps')
-        # plt.savefig(outdir+fig_name+'.eps', bbox_inches='tight', dpi=720, format='eps')
+        if file_type == "svg":
+            plt.savefig(file_path+'.'+file_type, bbox_inches='tight', dpi=720, format='svg')
+        elif file_type == "pdf":
+            plt.savefig(file_path+'.'+file_type, bbox_inches='tight', dpi=720, format='pdf')
+        elif file_type == "ps":
+            plt.savefig(file_path+'.'+file_type, bbox_inches='tight', dpi=720, format='ps')
+        elif file_type == "eps":
+            plt.savefig(file_path+'.'+file_type, bbox_inches='tight', dpi=720, format='eps')
+        elif file_type == "png":
+            plt.savefig(file_path+'.'+file_type, bbox_inches='tight', dpi=720, format='png')
     else:
-        # plt.savefig(file_path, dpi=720, format='svg')
-        plt.savefig(file_path, dpi=720, format='pdf')
-        # plt.savefig(file_path, dpi=720, format='ps')
-        # plt.savefig(file_path, dpi=720, format='eps')
+        if file_type == "svg":
+            plt.savefig(file_path+'.'+file_type, dpi=720, format='svg')
+        elif file_type == "pdf":
+            plt.savefig(file_path+'.'+file_type, dpi=720, format='pdf')
+        elif file_type == "ps":
+            plt.savefig(file_path+'.'+file_type, dpi=720, format='ps')
+        elif file_type == "eps":
+            plt.savefig(file_path+'.'+file_type, dpi=720, format='eps')
+        elif file_type == "png":
+            plt.savefig(file_path+'.'+file_type, dpi=720, format='png')
     return

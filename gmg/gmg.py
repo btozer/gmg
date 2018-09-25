@@ -643,6 +643,7 @@ class Gmg(wx.Frame):
         self.i = 0  #LAYER COUNTER
         self.node_layer_reference = 0
         self.index_node = None  # THE ACTIVE NODE
+        self.predtopo = None # FUTURE - PREDICTED TOPOGRAPHY FROM MOHO (ISOSTATIC FUNC)
         self.predgz = None  # THE CALCULATED GRAVITY RESPONSE
         self.prednt = None  # THE CALCULATED MAGNETIC RESPONSE
         self.gz = None
@@ -902,7 +903,7 @@ class Gmg(wx.Frame):
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
         self.tree_items = ["Layer 0"]
-        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
+        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked, self.tree)
 
         self.error = 0.
         self.last_layer = 0
@@ -920,7 +921,7 @@ class Gmg(wx.Frame):
         self.fault_tree_root = self.fault_tree.AddRoot("Faults:")
         self.fault_tree.SetItemPyData(self.fault_tree_root, None)
         self.fault_tree_items = []
-        ### self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked)
+        self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.fault_checked, self.fault_tree)
 
         'UPDATE INFO BAR'
         self.display_info()
@@ -1303,6 +1304,7 @@ class Gmg(wx.Frame):
 
     def add_new_tree_nodes(self, parent_item, item, data):
         new_item = self.tree.AppendItem(parent_item, item, ct_type=1)
+        new_item.Check(checked=True)
         self.tree.SetItemPyData(new_item, data)
 
     def get_item_text(self, item):
@@ -1312,6 +1314,11 @@ class Gmg(wx.Frame):
             return
 
     def on_activated(self, event):
+        # FIRST CHECK IS FAULT PICKING MODE IS ON, IF IT IS, THEN TURN IT OFF
+        if self.fault_picking_switch is True:
+            self.fault_picking_switch == False
+
+        # SET OBJECTS WITH THE CHOSEN LAYER
         self.i = self.tree.GetPyData(event.GetItem())
         self.nextdens = self.densities[self.i]
         self.density_input.SetValue(0.001 * self.densities[self.i])
@@ -1348,10 +1355,9 @@ class Gmg(wx.Frame):
     def display_info(self):
         self.statusbar.SetStatusText("                                                                                 "
                                      "                                                   "
-                                     " || Currently Editing Layer: %s  || Layer Status: %s "
+                                     " || Currently Editing Layer: %s  || "
                                      " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
-                                     " || MAG RMS = %s  ||" % (self.i, self.layer_lock_status[self.i],
-                                                             self.mcanvas.get_aspect(), self.grav_rms_value,
+                                     " || MAG RMS = %s  ||" % (self.i,  self.mcanvas.get_aspect(), self.grav_rms_value,
                                                              self.mag_rms_value), 2)
         self.statusbar.Update()
 
@@ -3272,13 +3278,15 @@ class Gmg(wx.Frame):
             self.fault_y_coords_list.append([])
             self.fault_colors.append('k')
 
-            # APPEND THE NEW FAULT TO THE FAULT TREE SIDE PANEL
+            # LIST OF FAULT NAMES
             self.fault_tree_items.append('fault %s' % (int(self.current_fault_index)))
+
+            # APPEND THE NEW FAULT TO THE FAULT TREE SIDE PANEL USING add_new_tree_nodes FUNC
             self.fault_item = 'fault %s' % (int(self.current_fault_index))
             self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.current_fault_index)
+
             self.fold_panel_three.Collapse()
             self.fold_panel_three.Expand()
-
 
             # ADD NAME FOR NEW FAULT
             self.fault_names_list[self.current_fault_index] = 'Fault'
@@ -3287,7 +3295,7 @@ class Gmg(wx.Frame):
             self.fault_x_coords_list[self.current_fault_index] = [self.new_x1, self.new_x2]
             self.fault_y_coords_list[self.current_fault_index] = [self.new_y1, self.new_y2]
 
-                # SET CURRENT FAULT X AND Y ARRAYS
+            # SET CURRENT FAULT X AND Y ARRAYS
             self.xt = [self.new_x1, self.new_x2]
             self.yt = [self.new_y1, self.new_y2]
 
@@ -3313,12 +3321,45 @@ class Gmg(wx.Frame):
         # GET THE SELECTED FAULT INDEX NUMBER
         self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
 
+        if self.fault_picking_switch is False:
+            self.fault_picking_switch == True
+
+        # SET CHECKBOX AS CHECKED
+        self.fault_tree.GetSelection().Check(checked=True)
+
+        # SHOW FAULT
+        i = self.fault_tree.GetPyData(event.GetItem())
+        if self.faults[i][i].get_visible() == True:
+            # HIDE FAULT
+            self.faults[i][i].set_visible(False)
+            self.faultline.set_visible(False)
+        else:
+            # SHOW FAULT
+            self.faults[i][i].set_visible(True)
+            self.faultline.set_visible(True)
+
         # UPDATE CURRENT PLOT GRAPHICS
         self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
                                 self.fault_y_coords_list[self.current_fault_index])
         
         # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
         self.update_layer_data()
+
+    def fault_checked(self, event):
+        """TOGGLE WHETHER OR NOT A FAULT WILL BE PLOTTED IN THE MODEL FIGURE"""
+        i = self.fault_tree.GetPyData(event.GetItem())
+
+        if self.faults[i][i].get_visible() == True:
+            # HIDE FAULT
+            self.faults[i][i].set_visible(False)
+            self.faultline.set_visible(False)
+        else:
+            # SHOW FAULT
+            self.faults[i][i].set_visible(True)
+            self.faultline.set_visible(True)
+
+        # UPDATE FIGURE
+        self.draw()
 
     def on_begin_edit_fault_label(self, event):
         self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
@@ -4070,6 +4111,10 @@ class Gmg(wx.Frame):
                 self.polygons[0] = self.polygons[0][::-1]
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # TOPOGRAPHY - :FURTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
+        self.predtopo = np.zeros_like(self.xp)
+
+        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # GRAVITY
         # ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM
         self.density_contrasts = np.zeros(len(self.densities))
@@ -4199,6 +4244,7 @@ class Gmg(wx.Frame):
 
     def draw_model(self):
         self.file_path = self.set_values.file_path
+        self.file_type = self.set_values.file_type
         self.fs = self.set_values.fs
         self.ms = self.set_values.ms
         self.lw = self.set_values.lw
@@ -4214,6 +4260,7 @@ class Gmg(wx.Frame):
         self.draw_xy_data = self.set_values.draw_xy_data
         self.well_fs = self.set_values.well_fs
         self.well_line_width = self.set_values.well_line_width
+        self.draw_faults = self.set_values.draw_faults
         self.xy_size = self.set_values.xy_size
         self.xy_color = self.set_values.xy_color
         self.colorbar_x = self.set_values.colorbar_x
@@ -4231,27 +4278,27 @@ class Gmg(wx.Frame):
         area = np.array([xmin, xmax, ymin, ymax])
 
         # RUN PLOT MODEL CODE
-        fig_plot = plot_model.plot_fig(self.file_path, area, self.xp, self.obs_topo, self.obs_grav, self.predgz,
-                                       self.obs_mag, self.prednt, self.layer_count, self.layer_lock_list,
-                                       self.plotx_list, self.ploty_list, self.densities, self.absolute_densities,
-                                       self.reference_densities, self.segy_plot_list, self.well_list,
-                                       self.well_name_list, self.t_canvas, self.d_canvas, self.nt_canvas,
-                                       self.aspect_ratio, self.use_tight_layout, self.poly_alpha, self.fs,
-                                       self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons,
+        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, area, self.xp, self.obs_topo, self.predtopo,
+                                       self.obs_grav, self.predgz, self.obs_mag, self.prednt, self.layer_count,
+                                       self.layer_lock_list, self.plotx_list, self.ploty_list, self.densities,
+                                       self.absolute_densities, self.reference_densities, self.segy_plot_list,
+                                       self.well_list, self.well_name_list, self.t_canvas, self.d_canvas,
+                                       self.nt_canvas,self.aspect_ratio, self.use_tight_layout, self.poly_alpha,
+                                       self.fs, self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons,
                                        self.draw_layers, self.floating_layers, self.draw_colorbar, self.draw_xy_data,
                                        self.xy_size, self.xy_color, self.colorbar_x, self.colorbar_y,
                                        self.colorbar_size_x, self.colorbar_size_y, self.layer_line_width,
                                        self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min,
                                        self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells, self.well_fs,
-                                       self.well_line_width)
+                                       self.well_line_width, self.draw_faults)
         del fig_plot
 
-        # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-        if sys.platform == 'linux2':
-            subprocess.call(["xdg-open", self.file_path])
-        # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-        elif sys.platform == 'darwin':
-            os.startfile(self.file_path)
+        # # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+        # if sys.platform == 'linux2':
+        #     subprocess.call(["xdg-open", self.file_path])
+        # # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+        # elif sys.platform == 'darwin':
+        #     os.open(self.file_path)
 
         # UPDATE GMG
         self.update_layer_data()
@@ -5200,11 +5247,17 @@ class PlotSettingsDialog(wx.Frame):
         self.model_aspect = model_aspect
         self.dcanvas_aspect = dcanvas_aspect
 
+        # CREATE MAIN WINDOW FRAME
+        self.main_box = wx.BoxSizer(wx.HORIZONTAL)
+
         # FIGURE FILE
-        self.file_path_text = wx.TextCtrl(input_panel, -1, value="output.pdf", size=(150, -1))
+        self.file_path_text = wx.TextCtrl(input_panel, -1, value="model_figure", size=(150, -1))
+        self.file_types = ['pdf', 'png', 'eps', 'ps']
+        self.file_type_text = wx.ComboBox(input_panel, -1, value='pdf', choices=self.file_types, size=(75, -1),
+                                          style=wx.CB_DROPDOWN)
         self.b_file_path = wx.Button(input_panel, -1, "File...")
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
-        self.place_holder_text_01 = wx.StaticText(input_panel, -1, "")
+
 
         # FIGURE FONT SIZE
         self.set_fs = wx.StaticText(input_panel, -1, "Text size:")
@@ -5218,9 +5271,6 @@ class PlotSettingsDialog(wx.Frame):
         self.set_aspect_ratio = wx.StaticText(input_panel, -1, "Model Aspect ratio:")
         self.aspect_ratio_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=2000.0, increment=0.1,
                                               value=self.model_aspect, size=(75, -1))
-
-        # TIGHT LAYOUT?
-        self.use_tight_layout_checkbox = wx.CheckBox(input_panel, -1, " Tight \n layout?")
 
         # POLYGON ALPHA VALUE
         self.set_poly_alpha = wx.StaticText(input_panel, -1, " Polygon \n alpha val:")
@@ -5280,13 +5330,23 @@ class PlotSettingsDialog(wx.Frame):
         self.draw_wells_checkbox.SetValue(True)
         self.place_holder_text_09 = wx.StaticText(input_panel, -1, "")
 
+        # DRAW FAULTS
+        self.draw_faults_checkbox = wx.CheckBox(input_panel, -1, "Draw Faults")
+        self.draw_faults_checkbox.SetValue(True)
+        self.place_holder_text_10 = wx.StaticText(input_panel, -1, "")
+
+        # TIGHT LAYOUT
+        self.use_tight_layout_checkbox = wx.CheckBox(input_panel, -1, " Tight \n layout?")
+        self.draw_wells_checkbox.SetValue(True)
+        self.place_holder_text_11 = wx.StaticText(input_panel, -1, "")
+
         # WELL FONT SIZE
         self.set_well_font_size = wx.StaticText(input_panel, -1, "Well font size:")
         self.well_font_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
                                                 size=(75, -1))
         self.well_font_size_text.SetFormat("%f")
         self.well_font_size_text.SetDigits(2)
-        self.place_holder_text_10 = wx.StaticText(input_panel, -1, "")
+        self.place_holder_text_12 = wx.StaticText(input_panel, -1, "")
 
         # WELL LINE WIDTH
         self.set_well_lw = wx.StaticText(input_panel, -1, "Well line width:")
@@ -5294,7 +5354,7 @@ class PlotSettingsDialog(wx.Frame):
                                          size=(75, -1))
         self.well_lw_text.SetFormat("%f")
         self.well_lw_text.SetDigits(3)
-        self.place_holder_text_11 = wx.StaticText(input_panel, -1, "")
+        self.place_holder_text_13 = wx.StaticText(input_panel, -1, "")
 
         # XY POINT SIZE
         self.set_xy_size = wx.StaticText(input_panel, -1, "XY point size:")
@@ -5302,14 +5362,14 @@ class PlotSettingsDialog(wx.Frame):
                                          size=(75, -1))
         self.xy_size_text.SetFormat("%f")
         self.xy_size_text.SetDigits(2)
-        self.place_holder_text_12 = wx.StaticText(input_panel, -1, "")
+        self.place_holder_text_14 = wx.StaticText(input_panel, -1, "")
 
         # XY COLOR
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
         self.set_xy_color = wx.StaticText(input_panel, -1, "XY color:")
         self.xy_color_text = wx.ComboBox(input_panel, -1, value='black', choices=self.colors, size=(75, -1),
                                          style=wx.CB_DROPDOWN)
-        self.place_holder_text_13 = wx.StaticText(input_panel, -1, "")
+        self.place_holder_text_15 = wx.StaticText(input_panel, -1, "")
 
         # LAYER LINE WIDTH
         self.set_layer_lw = wx.StaticText(input_panel, -1, "Layer line width:")
@@ -5317,7 +5377,7 @@ class PlotSettingsDialog(wx.Frame):
                                           size=(75, -1))
         self.layer_lw_text.SetFormat("%f")
         self.layer_lw_text.SetDigits(3)
-        self.place_holder_text_14 = wx.StaticText(input_panel, -1, "")
+        self.place_holder_text_16 = wx.StaticText(input_panel, -1, "")
 
         # LAYER TRANSPARENCY
         self.set_layer_alpha = wx.StaticText(input_panel, -1, "Layer transparency:")
@@ -5325,7 +5385,7 @@ class PlotSettingsDialog(wx.Frame):
                                              size=(75, -1))
         self.layer_alpha_text.SetFormat("%f")
         self.layer_alpha_text.SetDigits(2)
-        self.place_holder_text_15 = wx.StaticText(input_panel, -1, "")
+        self.place_holder_text_17 = wx.StaticText(input_panel, -1, "")
 
         # COLORBAR XY
         self.colorbar_xy = wx.StaticText(input_panel, -1, "Colorbar xy position:")
@@ -5370,31 +5430,35 @@ class PlotSettingsDialog(wx.Frame):
 
         # MAKE SIZER
         sizer = wx.FlexGridSizer(cols=3, hgap=8, vgap=8)
-        sizer.AddMany([self.file_path_text, self.b_file_path, self.place_holder_text_01,
-                       self.set_fs, self.fs_text, self.use_tight_layout_checkbox,
-                       self.set_aspect_ratio, self.aspect_ratio_text, self.place_holder_text_02,
-                       self.set_poly_alpha, self.poly_alpha_text, self.place_holder_text_03,
-                       self.set_ms, self.ms_text, self.place_holder_text_04,
-                       self.set_lw, self.lw_text, self.place_holder_text_05,
-                       self.set_font_type, self.font_type_text, self.place_holder_text_06,
-                       self.draw_polygons_checkbox, self.draw_layer_lines_checkbox, self.place_holder_text_07,
-                       self.draw_floating_layer_lines_checkbox, self.draw_colorbar_checkbox, self.place_holder_text_08,
-                       self.draw_xy_checkbox, self.draw_wells_checkbox, self.place_holder_text_09,
-                       self.set_well_font_size, self.well_font_size_text, self.place_holder_text_10,
-                       self.set_well_lw, self.well_lw_text, self.place_holder_text_11,
-                       self.set_xy_size, self.xy_size_text, self.place_holder_text_12,
-                       self.set_xy_color, self.xy_color_text, self.place_holder_text_13,
-                       self.set_layer_lw, self.layer_lw_text, self.place_holder_text_14,
-                       self.set_layer_alpha, self.layer_alpha_text, self.place_holder_text_15,
+        sizer.AddMany([self.file_path_text, self.file_type_text, self.b_file_path,
+                       self.set_fs, self.fs_text, self.place_holder_text_02,
+                       self.set_aspect_ratio, self.aspect_ratio_text, self.place_holder_text_03,
+                       self.set_poly_alpha, self.poly_alpha_text, self.place_holder_text_04,
+                       self.set_ms, self.ms_text, self.place_holder_text_05,
+                       self.set_lw, self.lw_text, self.place_holder_text_06,
+                       self.set_font_type, self.font_type_text, self.place_holder_text_07,
+                       self.draw_polygons_checkbox, self.draw_layer_lines_checkbox, self.place_holder_text_08,
+                       self.draw_floating_layer_lines_checkbox, self.draw_colorbar_checkbox, self.place_holder_text_09,
+                       self.draw_xy_checkbox, self.draw_wells_checkbox, self.place_holder_text_10,
+                       self.draw_faults_checkbox, self.use_tight_layout_checkbox, self.place_holder_text_11,
+                       self.set_well_font_size, self.well_font_size_text, self.place_holder_text_12,
+                       self.set_well_lw, self.well_lw_text, self.place_holder_text_13,
+                       self.set_xy_size, self.xy_size_text, self.place_holder_text_14,
+                       self.set_xy_color, self.xy_color_text, self.place_holder_text_15,
+                       self.set_layer_lw, self.layer_lw_text, self.place_holder_text_16,
+                       self.set_layer_alpha, self.layer_alpha_text, self.place_holder_text_17,
                        self.colorbar_xy, self.colorbar_x_text, self.colorbar_y_text,
                        self.colorbar_size, self.colorbar_size_x_text, self.colorbar_size_y_text,
                        self.grav_frame_text, self.grav_min_text, self.grav_max_text,
                        self.b_draw_button, self.b_exit])
-        input_panel.SetSizerAndFit(sizer)
-        sizer.Fit(self)
+
+        self.main_box.Add(sizer, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
+        input_panel.SetSizerAndFit(self.main_box)
+        self.main_box.Fit(self)
 
     def draw_button(self, event):
         self.file_path = str(self.file_path_text.GetValue())
+        self.file_type = str(self.file_type_text.GetValue())
         self.fs = float(self.fs_text.GetValue())
         self.ms = float(self.ms_text.GetValue())
         self.lw = float(self.lw_text.GetValue())
@@ -5407,9 +5471,10 @@ class PlotSettingsDialog(wx.Frame):
         self.draw_floating_layers = self.draw_floating_layer_lines_checkbox.GetValue()
         self.draw_colorbar = self.draw_colorbar_checkbox.GetValue()
         self.draw_wells = self.draw_wells_checkbox.GetValue()
-        self.draw_xy_data = self.draw_xy_checkbox.GetValue()
         self.well_fs = float(self.well_font_size_text.GetValue())
         self.well_line_width = float(self.well_lw_text.GetValue())
+        self.draw_faults = self.draw_faults_checkbox.GetValue()
+        self.draw_xy_data = self.draw_xy_checkbox.GetValue()
         self.xy_size = self.xy_size_text.GetValue()
         self.xy_color = str(self.xy_color_text.GetValue())
         self.colorbar_x = float(self.colorbar_x_text.GetValue())
@@ -5427,7 +5492,7 @@ class PlotSettingsDialog(wx.Frame):
         self.Destroy()
 
     def file_path(self, event):
-        self.save_file_dialog = wx.FileDialog(self, "Save As", "", "", "Pdf files (*.pdf)|*.pdf",
+        self.save_file_dialog = wx.FileDialog(self, "Save As", "", "", "Figure files (*.*)|*.*",
                                               wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if self.save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # the user changed idea...
