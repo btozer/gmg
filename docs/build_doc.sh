@@ -2,7 +2,7 @@
 
 #% HTML
 rm -r  _build/html
-sphinx-build -b html _sources/ _build/html/
+sphinx-build -b html _sources/ ./
 
 #% LATEX
 #rm -r  _build/latex
