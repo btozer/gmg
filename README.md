@@ -1,5 +1,9 @@
 ![alt text](https://github.com/btozer/gmg/blob/master/docs/_sources/_static/gmg_logo.png)
 
+---
+[Visit the GMG documentation page](https://btozer.github.io/gmg/)
+---
+
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
 
 Statement of need
