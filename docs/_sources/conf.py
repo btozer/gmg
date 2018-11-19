@@ -143,7 +143,7 @@ html_context = {
     "github_user": "btozer",  # Username
     "github_repo": "gmg",  # Repo name
     "github_version": "master",  # Version
-    "conf_py_path": "/gmg/docs/_sources/",  # Path in the checkout to the docs root
+    "conf_py_path": "/docs/_sources/",  # Path in the checkout to the docs root
 }
 
 #Theme config
