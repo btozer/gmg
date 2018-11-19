@@ -55,7 +55,7 @@
         <counts>
           <entry key="Python Console" value="153" />
           <entry key="css" value="57" />
-          <entry key="html" value="4" />
+          <entry key="html" value="9" />
           <entry key="in" value="10" />
           <entry key="py" value="6966" />
           <entry key="rst" value="472" />
@@ -65,7 +65,7 @@
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="CSS" value="57" />
-          <entry key="HTML" value="4" />
+          <entry key="HTML" value="9" />
           <entry key="PLAIN_TEXT" value="5553" />
           <entry key="Python" value="7119" />
           <entry key="ReST" value="472" />
@@ -77,10 +77,10 @@
           <entry key="bib" value="1" />
           <entry key="css" value="2" />
           <entry key="gitignore" value="1" />
-          <entry key="html" value="1" />
+          <entry key="html" value="2" />
           <entry key="in" value="1" />
           <entry key="json" value="1" />
-          <entry key="py" value="23" />
+          <entry key="py" value="24" />
           <entry key="rst" value="2" />
           <entry key="txt" value="30" />
           <entry key="yml" value="1" />
@@ -90,10 +90,10 @@
         <counts>
           <entry key="BibTeX bibliography file" value="1" />
           <entry key="CSS" value="2" />
-          <entry key="HTML" value="1" />
+          <entry key="HTML" value="2" />
           <entry key="JSON" value="1" />
           <entry key="PLAIN_TEXT" value="33" />
-          <entry key="Python" value="23" />
+          <entry key="Python" value="24" />
           <entry key="ReST" value="2" />
           <entry key="YAML" value="1" />
         </counts>
@@ -122,11 +122,29 @@
               </provider>
             </entry>
           </file>
-          <file pinned="false" current-in-tab="true">
+          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/docs/_sources/manual_layer_attributes.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="330">
-                  <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
+                <state relative-caret-position="279">
+                  <caret line="63" selection-start-line="63" selection-end-line="63" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/docs/index.html">
+              <provider selected="true" editor-type-id="text-editor">
+                <state>
+                  <caret column="50" selection-start-column="50" selection-end-column="50" />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/docs/_sources/conf.py">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="149">
+                  <caret line="300" column="40" selection-start-line="300" selection-start-column="40" selection-end-line="300" selection-end-column="40" />
                 </state>
               </provider>
             </entry>
@@ -168,16 +186,6 @@
             </entry>
           </file>
           <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/codemeta.json">
-              <provider selected="true" editor-type-id="text-editor" />
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/LICENSE">
-              <provider selected="true" editor-type-id="text-editor" />
-            </entry>
-          </file>
-          <file pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/MANIFEST.in">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="17">
@@ -212,8 +220,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>y_start_grav</find>
-      <find>self.predgz</find>
       <find>on</find>
       <find>startfile</find>
       <find>self.file_path_text</find>
@@ -242,6 +248,8 @@
       <find>predtopo</find>
       <find>os.path</find>
       <find>dir</find>
+      <find>git</find>
+      <find>docs</find>
     </findStrings>
     <replaceStrings>
       <replace>bott</replace>
@@ -282,8 +290,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/tmp/paper.md" />
-        <option value="$PROJECT_DIR$/tmp/paper.bib" />
         <option value="$PROJECT_DIR$/paper/gmg.md" />
         <option value="$PROJECT_DIR$/paper/paper.bib" />
         <option value="$PROJECT_DIR$/paper/compile.sh" />
@@ -333,6 +339,8 @@
         <option value="$PROJECT_DIR$/gmg/gmg.py" />
         <option value="$PROJECT_DIR$/docs/_sources/manual_PF.txt" />
         <option value="$PROJECT_DIR$/docs/_sources/manual_layer_attributes.txt" />
+        <option value="$PROJECT_DIR$/docs/index.html" />
+        <option value="$PROJECT_DIR$/docs/_sources/conf.py" />
       </list>
     </option>
   </component>
@@ -359,17 +367,6 @@
             <path>
               <item name="gmg" type="b2602c69:ProjectViewProjectNode" />
               <item name="gmg" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gmg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gmg" type="462c0819:PsiDirectoryNode" />
-              <item name="docs" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="gmg" type="b2602c69:ProjectViewProjectNode" />
-              <item name="gmg" type="462c0819:PsiDirectoryNode" />
-              <item name="docs" type="462c0819:PsiDirectoryNode" />
-              <item name="_sources" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -582,8 +579,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-800" y="-1177" width="1858" height="1165" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.34979424" visible="true" weight="0.22301762" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.34979424" visible="true" weight="0.22301762" />
       <window_info id="Structure" order="1" sideWeight="0.64972526" side_tool="true" weight="0.22301762" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -596,7 +594,7 @@
       <window_info anchor="bottom" id="TODO" order="7" sideWeight="0.4997319" weight="0.3308481" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.33810574" side_tool="true" weight="0.32152843" />
       <window_info anchor="bottom" id="Python Console" order="9" weight="0.027979275" />
-      <window_info active="true" anchor="bottom" x="158" y="283" width="1395" height="608" id="Terminal" order="10" sideWeight="0.66189426" visible="true" weight="0.40354148" />
+      <window_info anchor="bottom" x="158" y="283" width="1395" height="608" id="Terminal" order="10" sideWeight="0.66189426" visible="true" weight="0.20037279" />
       <window_info anchor="bottom" id="Inspection Results" order="11" sideWeight="0.7946381" weight="0.33643988" />
       <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="13" sideWeight="0.49865952" weight="0.32898417" />
@@ -668,23 +666,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$USER_HOME$/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/wx/core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="151">
-          <caret line="1791" column="24" selection-start-line="1791" selection-start-column="24" selection-end-line="1791" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="117">
-            <caret line="162" column="4" selection-start-line="162" selection-start-column="4" selection-end-line="162" selection-end-column="4" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/python_stubs/-932321291/wx/_core/Window.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="230">
@@ -972,8 +953,22 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/docs/_sources/manual_layer_attributes.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="66" column="8" selection-start-line="66" selection-start-column="8" selection-end-line="66" selection-end-column="8" />
+        <state relative-caret-position="279">
+          <caret line="63" selection-start-line="63" selection-end-line="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docs/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="50" selection-start-column="50" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/docs/_sources/conf.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="300" column="40" selection-start-line="300" selection-start-column="40" selection-end-line="300" selection-end-column="40" />
         </state>
       </provider>
     </entry>
