@@ -79,6 +79,7 @@ NB. before launching gmg, run:
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
+
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -111,6 +112,7 @@ import struct
 import gc
 import webbrowser
 
+
 # FUTURE
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
@@ -128,7 +130,6 @@ class Gmg(wx.Frame):
     Additional classes are used for "pop out" windows (Dialog boxes).
     Objects are passed between the master class and Dialog boxes.
     """
-
 
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
@@ -397,7 +398,7 @@ class Gmg(wx.Frame):
 
         # SEISMIC DATA -------------------------------------------------------------------------------------------------
         self.seismic_data = wx.Menu()
-        #SEGY LOAD
+        # SEGY LOAD
         self.m_load_segy = self.seismic_data.Append(-1, "&Load Segy...\tCtrl-y", "Load Segy Data")
         self.Bind(wx.EVT_MENU, self.segy_input, self.m_load_segy)
         # SEGY REMOVE_ALL
@@ -448,28 +449,28 @@ class Gmg(wx.Frame):
 
         # MODEL LAYERS MENU --------------------------------------------------------------------------------------------
         self.layer_file = wx.Menu()
-        #NEW LAYER
+        # NEW LAYER
         self.m_new_layer = self.layer_file.Append(-1, "New Layer...", "New Layer...")
         self.Bind(wx.EVT_MENU, self.new_layer, self.m_new_layer)
-        #LOAD LAYER
+        # LOAD LAYER
         self.m_load_layer = self.layer_file.Append(-1, "Load Layer...", "Load Layer...")
         self.Bind(wx.EVT_MENU, self.load_layer, self.m_load_layer)
-        #TRANSPARENCY
+        # TRANSPARENCY
         self.m_layer_transperency = wx.Menu()
         self.layer_file.Append(-1, 'Transperency', self.m_layer_transperency)
-        #TRANSPARENCY INCREASE
+        # TRANSPARENCY INCREASE
         self.m_layer_transparency_increase = self.m_layer_transperency.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.transparency_increase, self.m_layer_transparency_increase)
-        #TRANSPARENCY DECREASE
+        # TRANSPARENCY DECREASE
         self.m_layer_transparency_decrease = self.m_layer_transperency.Append(-1, "Decrease...", "Decrease...")
         self.Bind(wx.EVT_MENU, self.transparency_decrease, self.m_layer_transparency_decrease)
-        #BULK SHIFT
+        # BULK SHIFT
         self.m_bulk_shift = self.layer_file.Append(-1, "Bulk Shift...", "Bulk Shift...")
         self.Bind(wx.EVT_MENU, self.bulk_shift, self.m_bulk_shift)
-        #DELETE LAYER
+        # DELETE LAYER
         self.m_delete_layer = self.layer_file.Append(-1, "Delete Current Layer...", "Delete Current Layer...")
         self.Bind(wx.EVT_MENU, self.delete_layer, self.m_delete_layer)
-        #APPEND MENU
+        # APPEND MENU
         self.menubar.Append(self.layer_file, "&Layers")
         # --------------------------------------------------------------------------------------------------------------
 
@@ -508,91 +509,103 @@ class Gmg(wx.Frame):
         self.toolbar = self.CreateToolBar()
 
         t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
-                                    shortHelp="Save model")
+                                            shortHelp="Save model")
         self.Bind(wx.EVT_TOOL, self.save_model, t_save_model)
 
         t_load_model = self.toolbar.AddTool(wx.ID_ANY, "Load model", wx.Bitmap(self.gui_icons_dir + 'load_24.png'),
-                                    shortHelp="Load model")
+                                            shortHelp="Load model")
         self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
 
         t_calc_topo = self.toolbar.AddTool(wx.ID_ANY, "Calculate topography",
-                                    wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
+                                           wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
         ### self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
         t_calc_model_bott = self.toolbar.AddTool(wx.ID_ANY, "Calculate gravity",
-                                    wx.Bitmap(self.gui_icons_dir + 'G_24.png'), shortHelp="Calculate gravity")
+                                                 wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
+                                                 shortHelp="Calculate gravity")
         self.Bind(wx.EVT_TOOL, self.calc_grav_switch, t_calc_model_bott)
 
         t_calc_mag = self.toolbar.AddTool(wx.ID_ANY, "Calculate magnetic",
-                                    wx.Bitmap(self.gui_icons_dir + 'M_24.png'), shortHelp="Calculate magnetic")
+                                          wx.Bitmap(self.gui_icons_dir + 'M_24.png'), shortHelp="Calculate magnetic")
         self.Bind(wx.EVT_TOOL, self.calc_mag_switch, t_calc_mag)
 
         t_capture_coordinates = self.toolbar.AddTool(wx.ID_ANY, "Capture coordinates",
-                                    wx.Bitmap(self.gui_icons_dir + 'C_24.png'), shortHelp="Capture coordinates")
+                                                     wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
+                                                     shortHelp="Capture coordinates")
         self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
 
         t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
-                                wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'), shortHelp="Aspect increase")
+                                                 wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'),
+                                                 shortHelp="Aspect increase")
         self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
 
         t_aspect_decrease = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease",
-                                wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'), shortHelp="Aspect decrease")
+                                                 wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'),
+                                                 shortHelp="Aspect decrease")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease, t_aspect_decrease)
 
         t_aspect_increase2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase x2",
-                                wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'), shortHelp="Aspect increase x2")
+                                                  wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'),
+                                                  shortHelp="Aspect increase x2")
         self.Bind(wx.EVT_TOOL, self.aspect_increase2, t_aspect_increase2)
 
         t_aspect_decrease2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease x2",
-                                wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'), shortHelp="Aspect decrease x2")
+                                                  wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'),
+                                                  shortHelp="Aspect decrease x2")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
 
         t_zoom = self.toolbar.AddTool(wx.ID_ANY, "Zoom in",
-                                wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'), shortHelp="Zoom in")
+                                      wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'), shortHelp="Zoom in")
         self.Bind(wx.EVT_TOOL, self.zoom, t_zoom)
 
         t_zoom_out = self.toolbar.AddTool(wx.ID_ANY, "Zoom out",
-                                wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'), shortHelp="Zoom out")
+                                          wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'), shortHelp="Zoom out")
         self.Bind(wx.EVT_TOOL, self.zoom_out, t_zoom_out)
 
         t_full_extent = self.toolbar.AddTool(wx.ID_ANY, "Full extent",
-                                wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'), shortHelp="Full extent")
+                                             wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'),
+                                             shortHelp="Full extent")
         self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
 
         t_pan = self.toolbar.AddTool(wx.ID_ANY, "Pan",
-                                wx.Bitmap(self.gui_icons_dir + 'pan_24.png'), shortHelp="Pan")
+                                     wx.Bitmap(self.gui_icons_dir + 'pan_24.png'), shortHelp="Pan")
         self.Bind(wx.EVT_TOOL, self.pan, t_pan)
 
         t_gain_down = self.toolbar.AddTool(wx.ID_ANY, "Gain down",
-                                wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'), shortHelp="Gain down")
+                                           wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'), shortHelp="Gain down")
         self.Bind(wx.EVT_TOOL, self.gain_decrease, t_gain_down)
 
         t_gain_up = self.toolbar.AddTool(wx.ID_ANY, "Gain up",
-                                wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'), shortHelp="Gain up")
+                                         wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'), shortHelp="Gain up")
         self.Bind(wx.EVT_TOOL, self.gain_increase, t_gain_up)
 
         t_transparency_down = self.toolbar.AddTool(wx.ID_ANY, "Transparency down",
-                                wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'), shortHelp="Transparency down")
+                                                   wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'),
+                                                   shortHelp="Transparency down")
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
 
         # INCREASE TRANSPERANCY ICON
         t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
-                                wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'), shortHelp="Transparency up")
+                                                 wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'),
+                                                 shortHelp="Transparency up")
         self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
 
         # LOAD WELL ICON
         t_load_well = self.toolbar.AddTool(wx.ID_ANY, "Load well horizons",
-                                wx.Bitmap(self.gui_icons_dir + 'well_24.png'), shortHelp="Load well horizons")
+                                           wx.Bitmap(self.gui_icons_dir + 'well_24.png'),
+                                           shortHelp="Load well horizons")
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
 
         # TOOGLE FAULT PICKING MODE
         t_toogle_fault_mode = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                wx.Bitmap(self.gui_icons_dir + 'F_24.png'), shortHelp="Toogle fault picking")
+                                                   wx.Bitmap(self.gui_icons_dir + 'F_24.png'),
+                                                   shortHelp="Toogle fault picking")
         self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, t_toogle_fault_mode)
 
         # FAULT PICKER ICON
         t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'), shortHelp="Fault picker")
+                                            wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'),
+                                            shortHelp="Fault picker")
         self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
 
         # CREATE TOOLBAR
@@ -600,7 +613,7 @@ class Gmg(wx.Frame):
         self.toolbar.SetSize((1790, 36))
 
     def start(self, area, xp, zp):
-        """#CREATE MPL FIGURE CANVAS"""
+        """CREATE MPL FIGURE CANVAS"""
 
         self.fig = plt.figure()  # CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
@@ -649,10 +662,10 @@ class Gmg(wx.Frame):
         self.boundary_lock = True
         self.calc_padding = 5000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
         self.padding = 50000.  # PADDING FOR LAYERS
-        self.i = 0  #LAYER COUNTER
+        self.i = 0  # LAYER COUNTER
         self.node_layer_reference = 0
         self.index_node = None  # THE ACTIVE NODE
-        self.predtopo = None # FUTURE - PREDICTED TOPOGRAPHY FROM MOHO (ISOSTATIC FUNC)
+        self.pred_topo = None  # FUTURE - PREDICTED TOPOGRAPHY FROM MOHO (ISOSTATIC FUNC)
         self.predgz = None  # THE CALCULATED GRAVITY RESPONSE
         self.prednt = None  # THE CALCULATED MAGNETIC RESPONSE
         self.gz = None
@@ -899,7 +912,6 @@ class Gmg(wx.Frame):
         self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.ntcanvas.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
-
         'MAKE LAYER TREE'
         self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
@@ -919,7 +931,7 @@ class Gmg(wx.Frame):
 
         'MAKE FAULT TREE'
         self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 331),
-                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
+                                            agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
         self.fault_tree.SetIndent(0.0)
 
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.fault_activated, self.fault_tree)
@@ -1134,7 +1146,7 @@ class Gmg(wx.Frame):
         self.run_algorithms()
 
     def size_handler(self):
-        """# CREATE CANVAS BOX"""
+        """ CREATE CANVAS BOX"""
         self.canvas_box = wx.BoxSizer(wx.HORIZONTAL)
         self.canvas_box.Add(self.canvas, 1, wx.ALL | wx.ALIGN_CENTER | wx.EXPAND, border=2)
 
@@ -1223,12 +1235,12 @@ class Gmg(wx.Frame):
         self.rightPanel.SetSize(self.GetSize())
 
     def show_controls(self, event):
-        """# SHOW CONTROL PANE"""
+        """ SHOW CONTROL PANE"""
         self.mgr.GetPaneByName('left').Show()
         self.mgr.Update()
 
     def show_console(self, event):
-        """# SHOW PYTHON CONSOLE"""
+        """ SHOW PYTHON CONSOLE"""
         self.mgr.GetPaneByName('console').Show()
         self.mgr.Update()
 
@@ -1263,7 +1275,6 @@ class Gmg(wx.Frame):
         else:
             self.newmodel = False
             return  # THE USER CHANGED THERE MIND
-
 
     def modify_model_dimensions(self, event):
         """MODIFY MODEL DIMENSIONS"""
@@ -1366,8 +1377,8 @@ class Gmg(wx.Frame):
                                      "                                                   "
                                      " || Currently Editing Layer: %s  || "
                                      " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
-                                     " || MAG RMS = %s  ||" % (self.i,  self.mcanvas.get_aspect(), self.grav_rms_value,
-                                                             self.mag_rms_value), 2)
+                                     " || MAG RMS = %s  ||" % (self.i, self.mcanvas.get_aspect(), self.grav_rms_value,
+                                                               self.mag_rms_value), 2)
         self.statusbar.Update()
 
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1392,14 +1403,14 @@ class Gmg(wx.Frame):
         self.draw()
 
     def full_extent(self, event):
-        """#REDRAW MODEL FRAME WITH FULL EXTENT"""
+        """REDRAW MODEL FRAME WITH FULL EXTENT"""
         self.full_extent_adjustment()
         self.update_layer_data()
         self.run_algorithms()
         self.draw()
 
     def full_extent_adjustment(self):
-        """#FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
+        """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
         if not self.tcanvas.get_visible():
             self.tcanvas.set_visible(True)
         if not self.dcanvas.get_visible():
@@ -1428,7 +1439,7 @@ class Gmg(wx.Frame):
             self.ntcanvas.set_visible(False)
 
     def pan(self, event):
-        """#PAN MODEL VIEW USING MOUSE DRAG"""
+        """PAN MODEL VIEW USING MOUSE DRAG"""
         if self.nodes:
             self.nodes = False
             self.nav_toolbar.pan()
@@ -1440,7 +1451,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def calc_grav_switch(self, event):
-        """#PREDICTED ANOMALY CALCULATION SWITCHES: SWITCH CALCULATED ANOMALIES ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
+        """PREDICTED ANOMALY CALCULATION SWITCHES: SWITCH CALCULATED ANOMALIES ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_grav_switch is True:
             self.calc_grav_switch = False
             if self.grav_residuals != [] and self.obs_gravity_data_for_rms != []:
@@ -1553,7 +1564,6 @@ class Gmg(wx.Frame):
                         self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect, self.faults,
                         self.fault_names_list, self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
                         self.fault_y_coords_list, self.fault_tree_items, self.fault_counter]
-
 
         for i in range(0, len(model_params)):
             self.save_dict[header[i]] = model_params[i]
@@ -1684,11 +1694,11 @@ class Gmg(wx.Frame):
             for i in range(0, self.fault_counter):
                 # DRAW FAULTS
                 self.faults[i] = self.mcanvas.plot(self.fault_x_coords_list[i], self.fault_y_coords_list[i],
-                                                                    color='k', linewidth=0.5, zorder=1, marker='s',
-                                                                    alpha=1.0)
+                                                   color='k', linewidth=0.5, zorder=1, marker='s',
+                                                   alpha=1.0)
             # CREATE NEW CURRENT FAULT GRAPHIC
             self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
-                                                                                    alpha=1.0, zorder=2, picker=True)
+                                                alpha=1.0, zorder=2, picker=True)
 
             # DRAW CONTACT DATA
             # self.draw_contact_text()
@@ -1783,7 +1793,7 @@ class Gmg(wx.Frame):
                     continue
 
     def plot_obs_xy(self):
-        """#PLOT OBSERVED XY"""
+        """PLOT OBSERVED XY"""
         self.xy_list = [[]]
         for x in range(0, len(self.xy_name_list)):
             self.xy_list.append([])
@@ -1803,7 +1813,7 @@ class Gmg(wx.Frame):
                 self.xy_count += 1
 
     def plot_obs_topo(self):
-        """#PLOT OBSERVED TOPOGRAPHY"""
+        """PLOT OBSERVED TOPOGRAPHY"""
 
         self.obs_topo_list = [[]]
         for x in range(0, len(self.obs_topo_name_list)):
@@ -1825,7 +1835,7 @@ class Gmg(wx.Frame):
                 self.obs_topo_count += 1
 
     def plot_obs_grav(self):
-        """#PLOT OBSERVED GRAVITY"""
+        """PLOT OBSERVED GRAVITY"""
         self.obs_grav_list = [[]]
         for x in range(0, len(self.obs_grav_name_list)):
             self.obs_grav_list.append([])
@@ -1846,7 +1856,7 @@ class Gmg(wx.Frame):
                 self.obs_grav_count += 1
 
     def plot_obs_mag(self):
-        """#PLOT OBSERVED MAG"""
+        """PLOT OBSERVED MAG"""
         self.obs_mag_list = [[]]
         for x in range(0, len(self.obs_mag_name_list)):
             self.obs_mag_list.append([])
@@ -1867,7 +1877,7 @@ class Gmg(wx.Frame):
                 self.obs_mag_count += 1
 
     def load_xy(self, event):
-        """#LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS"""
+        """LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS"""
 
         open_file_dialog = wx.FileDialog(self, "Open XY file", "", "", "All files (*.*)|*.*", wx.FD_OPEN |
                                          wx.FD_FILE_MUST_EXIST)
@@ -1905,11 +1915,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_xy(self, event):
-
-        """"
-        #DELETE OBS XY DATA
-        """
-
+        """"DELETE OBSERVED XY DATA"""
         self.m_xy_submenu.DestroyId(event.Id)
         self.xy_list[event.Id].set_visible(False)
         self.xy_list[event.Id] = []
@@ -1981,7 +1987,7 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_g(self):
-        """# GET VALUES FROM LOAD WINDOW"""
+        """GET VALUES FROM LOAD WINDOW"""
         obs_g_input = self.load_window.file_path
         self.obs_name = self.load_window.observed_name
         self.color = self.load_window.color_picked
@@ -2035,7 +2041,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def save_modelled_grav(self, event):
-        """#SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
+        """SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
         save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2119,7 +2125,7 @@ class Gmg(wx.Frame):
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # THE USER CHANGED THEIR MIND
 
-        #SAVE TO DISC
+        # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
         np.savetxt(outputfile, zip((self.xp * 0.001), self.prednt), delimiter=' ', fmt='%.6f %.6f')
 
@@ -2162,7 +2168,7 @@ class Gmg(wx.Frame):
             # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
             self.segy_name_submenu = wx.Menu()
             self.m_segy_submenu.Append(self.segy_count + 1000, self.segy_name_list[self.segy_count],
-                                           self.segy_name_submenu)
+                                       self.segy_name_submenu)
             self.segy_name_submenu.Append(self.segy_count + 1000, 'delete segy')
             self.Bind(wx.EVT_MENU, self.remove_segy,
                       id=self.segy_count + 1000)  # ID IS SET TO +1000 TO AVOID CONFLICT WITH GRAV SUB MENU IDS
@@ -2200,14 +2206,14 @@ class Gmg(wx.Frame):
                         self.segy_plot_list[s].set_cmap(cm.gray)
                 self.draw()
         else:
-        if event.Id == 902:
-            if self.segy_on is False:
-                return 0
-            else:
-                for s in range(0, len(self.segy_plot_list)):
-                    if self.segy_plot_list[s]:
-                        self.segy_plot_list[s].set_cmap(cm.seismic)
-                self.draw()
+            if event.Id == 902:
+                if self.segy_on is False:
+                    return 0
+                else:
+                    for s in range(0, len(self.segy_plot_list)):
+                        if self.segy_plot_list[s]:
+                            self.segy_plot_list[s].set_cmap(cm.seismic)
+                    self.draw()
 
     def gain_increase(self, event):
         if self.segy_on is False:
@@ -2814,7 +2820,7 @@ class Gmg(wx.Frame):
                 self.current_node.set_offsets([self.new_x, self.new_y])
 
         'GMG IS IN LAYER MODE'
-        if  self.fault_picking_switch is False:
+        if self.fault_picking_switch is False:
             if self.boundary_lock_list[self.i] == 0:
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
@@ -2858,7 +2864,6 @@ class Gmg(wx.Frame):
             if self.pinch_switch != 0:
                 for k in range(0, len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
-
                         # GET THE NODE LIST OF THE NEXT LAYER
                         next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
 
@@ -2991,7 +2996,7 @@ class Gmg(wx.Frame):
                             k] = next_x_list, next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
 
             # SHIFT CURRENT NODE COLORING TO PREVIOUS NODE
-            self.current_node.set_offsets([xt[self.index_arg-1], yt[self.index_arg-1]])
+            self.current_node.set_offsets([xt[self.index_arg - 1], yt[self.index_arg - 1]])
 
             # UPDATE GMG
             self.update_layer_data()
@@ -3198,12 +3203,12 @@ class Gmg(wx.Frame):
 
         '< = INCREMENT WHICH FAULT IS BEING EDITED'
         if event.key == ',':
-            if self.current_fault_index <= self.fault_counter-1 and self.current_fault_index > 0:
+            if self.current_fault_index <= self.fault_counter - 1 and self.current_fault_index > 0:
                 # INCREMENT TO NEXT FAULT
                 self.current_fault_index -= 1
             else:
                 # GO TO NEWEST FAULT
-                self.current_fault_index = self.fault_counter-1
+                self.current_fault_index = self.fault_counter - 1
 
             # UPDATE CURRENT PLOT GRAPHICS
             self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
@@ -3214,10 +3219,10 @@ class Gmg(wx.Frame):
 
         '> = INCREMENT WHICH FAULT IS BEING EDITED'
         if event.key == '.':
-            if self.current_fault_index < self.fault_counter-1:
+            if self.current_fault_index < self.fault_counter - 1:
                 # INCREMENT TO NEXT FAULT
                 self.current_fault_index += 1
-            elif self.current_fault_index == self.fault_counter-1:
+            elif self.current_fault_index == self.fault_counter - 1:
                 # GO BACK TO FIRST FAULT
                 self.current_fault_index = 0
 
@@ -3230,7 +3235,6 @@ class Gmg(wx.Frame):
 
         # UPDATE GMG
         self.update_layer_data()
-
 
     def pick_new_fault(self, event):
         """FAULT PICKING/LINE DRAWING MODE"""
@@ -3251,7 +3255,7 @@ class Gmg(wx.Frame):
             if self.fault_counter == 0:
                 # CREATE NEW CURRENT FAULT GRAPHIC
                 self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
-                                                                                    alpha=1.0, zorder=2, picker=True)
+                                                    alpha=1.0, zorder=2, picker=True)
             # INCREMENT THE TOTAL FAULT COUNT
             self.fault_counter += 1
 
@@ -3288,9 +3292,9 @@ class Gmg(wx.Frame):
 
             # ADD FAULT LINE TO CANVAS
             self.faults[self.current_fault_index] = self.mcanvas.plot(
-                                                                self.fault_x_coords_list[self.current_fault_index],
-                                                                self.fault_y_coords_list[self.current_fault_index],
-                                                                color='k', linewidth=0.5, zorder=1, alpha=1.0)
+                self.fault_x_coords_list[self.current_fault_index],
+                self.fault_y_coords_list[self.current_fault_index],
+                color='k', linewidth=0.5, zorder=1, alpha=1.0)
 
             # UPDATE CURRENT PLOT GRAPHICS
             self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
@@ -3328,7 +3332,7 @@ class Gmg(wx.Frame):
         # UPDATE CURRENT PLOT GRAPHICS
         self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
                                 self.fault_y_coords_list[self.current_fault_index])
-        
+
         # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
         self.update_layer_data()
 
@@ -3354,7 +3358,6 @@ class Gmg(wx.Frame):
     def on_end_edit_fault_label(self, event):
         new_label = self.fault_tree.GetItemText(event.GetItem())
         self.fault_tree_items[self.current_fault_index] = str(new_label)
-
 
     def write_layers_xy(self, event):
         """OUTPUT LAYER DATA TO FILE"""
@@ -3502,22 +3505,23 @@ class Gmg(wx.Frame):
     def new_layer(self, event):
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer')
         answer = new_layer_dialogbox.ShowModal()
-
+        
         if new_layer_dialogbox.fixed:
-            # DETERMINE LAST FIXED LAYER X AND Y VALUES
+            # DETERMINE THE LAST "FIXED LAYER" X AND Y VALUES; SET THIS LAYER AS "k"
             if self.layer_count > 0:
                 for i in range(0, self.layer_count):
                     if self.layer_lock_list[i] == 0:
-                        k = i + 1
+                        k = i
                     else:
                         continue
             else:
                 k = 0
+
             # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
             layer_above_x = np.array(self.plotx_list[k])
             layer_above_y = np.array(self.ploty_list[k])
 
-            # INCREMENT THE LAYER COUNT
+            # INCREMENT THE CURRENT LAYER INDEX VALUE (self.i)
             self.i = self.layer_count
             self.i += 1
 
@@ -3540,9 +3544,9 @@ class Gmg(wx.Frame):
             self.layer_lock_status.append('locked')
             self.boundary_lock_status.append('locked')
             self.layer_colors.append('black')
-            self.tree_items.append('layer %s' % (int(self.i-1)))
-            self.item = 'layer %s' % (int(self.i-1))
-            self.layers_calculation_switch.append(0)
+            self.tree_items.append('layer %s' % (int(self.i)))
+            self.item = 'layer %s' % (int(self.i ))
+            self.layers_calculation_switch.append(1)
             self.add_new_tree_nodes(self.root, self.item, self.i)
 
             # SET NEW LAYER NODES
@@ -3561,6 +3565,7 @@ class Gmg(wx.Frame):
                                                            alpha=self.layer_transparency, closed=True, linewidth=None,
                                                            ec=None)
             # UPDATE LAYER DATA
+            self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
             self.nextdens = self.densities[self.i]
             self.density_input.SetValue(0.001 * self.densities[self.i])
             self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
@@ -3599,10 +3604,10 @@ class Gmg(wx.Frame):
             self.boundary_lock_list.append(1)
             self.layer_lock_status.append('unlocked')
             self.boundary_lock_status.append('unlocked')
-            self.tree_items.append('layer %s' % (int(self.i + 1)))
-            self.item = 'layer %s' % (int(self.i + 1))
+            self.tree_items.append('layer %s' % (int(self.i)))
+            self.item = 'layer %s' % (int(self.i))
             self.add_new_tree_nodes(self.root, self.item, self.i)
-            self.layers_calculation_switch.append(0)
+            self.layers_calculation_switch.append(1)
             self.plotx = [self.new_x1, self.new_x2, self.new_x3, self.new_x4]
             self.ploty = [self.new_y1, self.new_y2, self.new_y3, self.new_y4]
             self.nextpoly = zip(self.plotx, self.ploty)
@@ -3618,6 +3623,7 @@ class Gmg(wx.Frame):
                                                            ec=None)
 
             # UPDATE LAYER DATA
+            self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
             self.nextdens = self.densities[self.i]
             self.density_input.SetValue(0.001 * self.densities[self.i])
             self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
@@ -3741,7 +3747,7 @@ class Gmg(wx.Frame):
         # UPDATE COUNTERS
         self.layer_count -= 1
 
-        #UPDATE
+        # UPDATE
         self.update_layer_data()
         self.run_algorithms()
         self.draw()
@@ -3782,23 +3788,23 @@ class Gmg(wx.Frame):
         self.angle_b[self.i] = float(self.angle_b_input.GetValue())
 
     def set_text_size(self, value):
-        """ GET NEW TEXT SIZE"""
+        """GET NEW TEXT SIZE"""
 
         self.textsize = float(self.text_size_input.GetValue())
 
-        'WELL DATA'
-        'LOOP THROUGH ALL WELL NAMES'
+        # WELL DATA
+        # LOOP THROUGH ALL WELL NAMES
         for i in range(len(self.well_name_text)):
             if self.well_name_text[i] != "None" and self.well_name_text[i] != []:
                 self.well_name_text[i].set_size(self.textsize)
-        'LOOP THROUGH ALL WELL HORIZON LABELS'
+        # LOOP THROUGH ALL WELL HORIZON LABELS
         for i in range(len(self.well_labels)):
             labels = self.well_labels[i]
             for l in range(2, len(labels)):
                 if labels[l] != "None" and labels[l] != []:
                     labels[l].set_size(self.textsize)
 
-        'CONTACT DATA'
+        # CONTACT DATA
         for i in range(self.contact_data_count):
             contact_text = self.contact_text_list[i]
             for k in range(len(contact_text)):
@@ -3807,7 +3813,7 @@ class Gmg(wx.Frame):
                 else:
                     pass
 
-        'REDRAW ANNOTATIONS WITH NEW TEXT SIZE'
+        # REDRAW ANNOTATIONS WITH NEW TEXT SIZE
         self.draw()
 
     def set_obs_rms(self, value):
@@ -3818,14 +3824,12 @@ class Gmg(wx.Frame):
         self.obs_mag_data_for_rms = set_values.obs_mag_data_for_rms
 
     def model_rms(self, xp):
-        """ CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
-        # print self.obs_gravity_data_for_rms
-        # print self.calc_grav_switch
+        """CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
         if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
             x = xp * 0.001
             y = self.predgz
             self.grav_rms_value, self.grav_residuals = model_stats.rms(self.obs_gravity_data_for_rms[:, 0],
-                                                           self.obs_gravity_data_for_rms[:, 1], x, y)
+                                                                       self.obs_gravity_data_for_rms[:, 1], x, y)
         else:
             pass
 
@@ -3833,7 +3837,7 @@ class Gmg(wx.Frame):
             x = self.xp * 0.001
             y = self.prednt
             self.mag_rms_value, self.mag_residuals = model_stats.rms(self.obs_mag_data_for_rms[:, 0],
-                                                         self.obs_mag_data_for_rms[:, 1], x, y)
+                                                                     self.obs_mag_data_for_rms[:, 1], x, y)
         else:
             pass
 
@@ -3847,13 +3851,12 @@ class Gmg(wx.Frame):
 
     def attribute_set(self, new_tree_items, densities, reference_densities, susceptibilities, angle_a, angle_b,
                       layer_colors):
-
         """UPDATE GMG ATTRIBUTES WITH NEW ATTRIBUTES FROM THE ATTRIBUTE TABLE"""
 
         # UPDATE MAIN FRAME TREE LIST
         current_tree_items = self.tree.GetRootItem().GetChildren()
-        for i in range(0, len(self.tree_items)-1):
-            self.tree.SetItemText(current_tree_items[i], new_tree_items[i+1])
+        for i in range(0, len(self.tree_items) - 1):
+            self.tree.SetItemText(current_tree_items[i], new_tree_items[i + 1])
 
         # UPDATE MAIN FRAME ATTRIBUTES
         self.densities = densities
@@ -3877,7 +3880,7 @@ class Gmg(wx.Frame):
         self.dcanvas.set_xlim(xmin, xmax)
         self.ntcanvas.set_xlim(xmin, xmax)
 
-        #SET LISTS WITH UPDATED LAYER DATA
+        # SET LISTS WITH UPDATED LAYER DATA
         self.plotx_list[self.i] = self.plotx
         self.ploty_list[self.i] = self.ploty
 
@@ -3969,6 +3972,8 @@ class Gmg(wx.Frame):
     def update_layer_data(self):
         """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE (REDRAWS EVERYTHING)"""
 
+        print "self.i = %s" % self.i
+
         # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
@@ -3993,11 +3998,11 @@ class Gmg(wx.Frame):
             print(self.fault_x_coords_list)
             print(self.fault_y_coords_list)
             print(self.fault_x_coords_list[self.current_fault_index])
-            print(self.fault_y_coords_list[self.current_fault_index ])
-            
+            print(self.fault_y_coords_list[self.current_fault_index])
+
             # UPDATE CURRENT PLOT GRAPHICS
-            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index ],
-                                  self.fault_y_coords_list[self.current_fault_index ])
+            self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
+                                    self.fault_y_coords_list[self.current_fault_index])
 
         else:
             # GMG IS IN LAYER MODE
@@ -4010,8 +4015,8 @@ class Gmg(wx.Frame):
             self.mag_polygons = []
 
             # CREATE UPDATED POLYGON XYs -------------------------------------------------------------------------------
-            # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - DONE FIRST SO THE WHOLE POLYGON
-            # ISN'T PASSED TO SELF.POLYPLOTS)
+            # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - (THIS DONE FIRST SO THE WHOLE
+            # POLYGON ISN'T PASSED TO SELF.POLYPLOTS)
             for i in range(0, self.layer_count + 1):
                 # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE BOTT ALGORITHM
                 # FIRST SET UP XY DATA; IF THE LAYER IS BELOW LAYER 1 THEN ATTACH THE ABOVE LAYER TO COMPLETE POLYGON;
@@ -4042,7 +4047,7 @@ class Gmg(wx.Frame):
                     self.ploty_polygon = np.array(self.ploty_list[i])
 
                 self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
-            #-----------------------------------------------------------------------------------------------------------
+            # -----------------------------------------------------------------------------------------------------------
 
             # UPDATE LAYER POLYGONS AND LINES
             for i in range(0, self.layer_count + 1):
@@ -4096,18 +4101,15 @@ class Gmg(wx.Frame):
                 self.polygons[0] = self.polygons[0][::-1]
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # TOPOGRAPHY - :FURTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
-        self.predtopo = np.zeros_like(self.xp)
+        # TOPOGRAPHY - :FUTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
+        self.pred_topo = np.zeros_like(self.xp)
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # GRAVITY
         # ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM
         self.density_contrasts = np.zeros(len(self.densities))
-        if not self.absolute_densities:
-            self.density_contrasts = self.absolute_densities
-        else:
-            for i in range(len(self.densities)):
-                self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
+        for i in range(len(self.densities)):
+            self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
 
         # ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT
         if self.polygons and self.calc_grav_switch is True:
@@ -4115,6 +4117,7 @@ class Gmg(wx.Frame):
             polygons_to_use, densities_to_use = [], []
             for layer in range(len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
+
                     polygons_to_use.append(self.polygons[layer])
                     densities_to_use.append(self.density_contrasts[layer])
 
@@ -4177,7 +4180,6 @@ class Gmg(wx.Frame):
                                        np.zeros_like(self.obs_mag_data_for_rms[:, 0]))
         else:
             pass
-
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4263,12 +4265,12 @@ class Gmg(wx.Frame):
         area = np.array([xmin, xmax, ymin, ymax])
 
         # RUN PLOT MODEL CODE
-        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, area, self.xp, self.obs_topo, self.predtopo,
+        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, area, self.xp, self.obs_topo, self.pred_topo,
                                        self.obs_grav, self.predgz, self.obs_mag, self.prednt, self.layer_count,
                                        self.layer_lock_list, self.plotx_list, self.ploty_list, self.densities,
                                        self.absolute_densities, self.reference_densities, self.segy_plot_list,
                                        self.well_list, self.well_name_list, self.t_canvas, self.d_canvas,
-                                       self.nt_canvas,self.aspect_ratio, self.use_tight_layout, self.poly_alpha,
+                                       self.nt_canvas, self.aspect_ratio, self.use_tight_layout, self.poly_alpha,
                                        self.fs, self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons,
                                        self.draw_layers, self.floating_layers, self.draw_colorbar, self.draw_xy_data,
                                        self.xy_size, self.xy_color, self.colorbar_x, self.colorbar_y,
@@ -4296,7 +4298,7 @@ class Gmg(wx.Frame):
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_documentation(self, event):
-        """ OPENS DOCUMENTATION HTML"""
+        """OPEN DOCUMENTATION HTML"""
 
         self.doc_dir = os.path.dirname(os.path.abspath(__file__))
         doc_url = self.doc_dir + '/docs/_build/html/gmg_documentation.html'
@@ -4311,7 +4313,6 @@ class Gmg(wx.Frame):
         elif platform == "win32":
             # WINDOWS
             webbrowser.open_new(doc_url)
-
 
     def about_gmg(self, event):
         """ SHOW SOFTWARE INFORMATION"""
@@ -4415,9 +4416,10 @@ class Gmg(wx.Frame):
 
 class NewModelDialog(wx.Dialog):
     """CREATE A NEW MODEL. RETURNS MODEL PARAMETERS AND CALCULATION INCREMENT"""
+
     def __init__(self, parent, id, title, m_x1=None, m_x2=None, m_z1=None, m_z2=None):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL
-                           | wx.BORDER_RAISED)
+                                                          | wx.BORDER_RAISED)
 
         self.floating_panel = wx.Panel(self, -1)
         self.set_button = False
@@ -4458,8 +4460,9 @@ class NewModelDialog(wx.Dialog):
         self.line3 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
 
         self.footer_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.footer_text = wx.StaticText(self.floating_panel, -1, "NB. these values can be modified during modelling,\n"
-                                                                 "it may be beneficial to begin with a coarse spacing.")
+        self.footer_text = wx.StaticText(self.floating_panel, -1,
+                                         "NB. these values can be modified during modelling,\n"
+                                         "it may be beneficial to begin with a coarse spacing.")
         self.footer_sizer.Add(self.footer_text)
 
         #  POPULATE BOX WITH EXISTING VALUES
@@ -4492,6 +4495,7 @@ class NewModelDialog(wx.Dialog):
 
 class LoadObservedDataFrame(wx.Frame):
     """LOAD OBSERVED DATA"""
+
     def __init__(self, parent, id, title, type):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'Load observed data')
 
@@ -4560,9 +4564,10 @@ class LoadObservedDataFrame(wx.Frame):
 
 class SeisDialog(wx.Dialog):
     """LOAD SEGY DATA"""
+
     def __init__(self, parent, id, title, area):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER | wx.MAXIMIZE_BOX
-                                                          | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
         self.area = area
         x1, x2, z1, z2 = 0.001 * np.array(self.area)
@@ -4603,9 +4608,10 @@ class SeisDialog(wx.Dialog):
 
 class MagDialog(wx.Dialog):
     """SET MAGNETIC FIELD PARAMETERS"""
+
     def __init__(self, parent, id, title, area):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                                         | wx.MAXIMIZE_BOX )
+                                                                         | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
         # OBSERVATION ELEVATION
@@ -4643,9 +4649,10 @@ class MagDialog(wx.Dialog):
 
 class PinchDialog(wx.Dialog):
     """PINCH A LAYER TO ANOTHER LAYER"""
+
     def __init__(self, parent, id, title, plotx_list, ploty_list, i):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
         self.plotx_list = plotx_list
         self.ploty_list = ploty_list
@@ -4676,15 +4683,15 @@ class PinchDialog(wx.Dialog):
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH range
         self.pinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH range
 
         # FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE
         new_xs = [tup for i, tup in enumerate(above_x) if
-                  p_start < above_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < above_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH range
         new_ys = [tup for i, tup in enumerate(above_y) if
-                  p_start < above_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < above_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH range
 
         # DETERMINE INSERT POSITION
         insert_point = 0
@@ -4708,15 +4715,15 @@ class PinchDialog(wx.Dialog):
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH range
         self.pinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH range
 
         #  FIND NODES OF ABOVE LAYER WITHIN PINCH ZONE
         new_xs = [tup for i, tup in enumerate(below_x) if
-                  p_start < below_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < below_x[i] < p_end]  # PASS X VALUES IF THEY ARE INSIDE THE PINCH range
         new_ys = [tup for i, tup in enumerate(below_y) if
-                  p_start < below_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+                  p_start < below_x[i] < p_end]  # PASS Y VALUES IF THEY ARE INSIDE THE PINCH range
 
         # DETERMINE INSERT POSITION
         insert_point = 0
@@ -4733,9 +4740,10 @@ class PinchDialog(wx.Dialog):
 
 class DepinchDialog(wx.Dialog):
     """DEPINCH A LAYER"""
+
     def __init__(self, parent, id, title, plotx_list, ploty_list, i, layer_count):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
         self.plotx_list = plotx_list
         self.ploty_list = ploty_list
@@ -4769,19 +4777,19 @@ class DepinchDialog(wx.Dialog):
 
         # REMOVE PINCHED NODES
         self.depinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH range
         self.depinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH range
 
         # FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST
-        # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+        # PASS X VALUES IF THEY ARE INSIDE THE PINCH range
         new_xs = [tup for i, tup in enumerate(above_x) if p_start < above_x[i] < p_end]
-        # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+        # PASS Y VALUES IF THEY ARE INSIDE THE PINCH range
         new_ys = [tup for i, tup in enumerate(above_y) if p_start < above_x[i] < p_end]
         if not new_xs:
-            # PASS X VALUES IF THEY ARE INSIDE THE PINCH RANGE
+            # PASS X VALUES IF THEY ARE INSIDE THE PINCH range
             new_xs = [tup for i, tup in enumerate(below_x) if p_start < below_x[i] < p_end]
-            # PASS Y VALUES IF THEY ARE INSIDE THE PINCH RANGE
+            # PASS Y VALUES IF THEY ARE INSIDE THE PINCH range
             new_ys = [tup for i, tup in enumerate(below_y) if p_start < below_x[i] < p_end]
 
         new_ys_list = [y + 0.1 for y in new_ys]
@@ -4801,10 +4809,11 @@ class DepinchDialog(wx.Dialog):
 
 class MedianFilterDialog(wx.Dialog):
     """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
+
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, "Apply Median Filter", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX
-                                                                          )
+                           )
         input_panel = wx.Panel(self, -1)
 
         # GET OBSERVED DATA FROM gmg
@@ -4885,7 +4894,7 @@ class MedianFilterDialog(wx.Dialog):
 class SetBackgroundDensityDialog(wx.Dialog):
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
         # CHOOSE BACKGROUND DENSITY
@@ -4919,9 +4928,10 @@ class SetBackgroundDensityDialog(wx.Dialog):
 
 class BulkShiftDialog(wx.Dialog):
     """APPLY A BULK SHIFT OF A LAYER IN THE Z DIRECTION"""
+
     def __init__(self, parent, id, title, plotx_list, ploty_list, i):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
         self.ploty_list = ploty_list
         self.plotx_list = plotx_list
@@ -4946,7 +4956,7 @@ class BulkShiftDialog(wx.Dialog):
         current_y = self.ploty_list[self.i]
         current_x = self.plotx_list[self.i]
 
-        #BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0
+        # BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0
         self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
         self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0. else 0.01 for y in current_y]
         self.EndModal(1)
@@ -4954,9 +4964,10 @@ class BulkShiftDialog(wx.Dialog):
 
 class SetObsRmsDialog(wx.Dialog):
     """SET THE DATASET TO USE FOR CALCULATING THE RMS MISFIT"""
+
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
         self.obs_grav_name_list = obs_grav_name_list
@@ -5015,9 +5026,10 @@ class SetObsRmsDialog(wx.Dialog):
 
 class NewLayerDialog(wx.Dialog):
     """CREATE A NEW MODEL LAYER"""
+
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
         # CREATE FIXED LAYER BUTTON
@@ -5053,9 +5065,10 @@ class NewLayerDialog(wx.Dialog):
 
     class SetNewThickness(wx.Dialog):
         """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""
+
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
             floating_panel = wx.Panel(self, -1)
 
             self.new_Text = wx.StaticText(floating_panel, -1, "Set New layer thickness (km)")
@@ -5074,9 +5087,10 @@ class NewLayerDialog(wx.Dialog):
 
     class SetFloatingLayer(wx.Dialog):
         """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""
+
         def __init__(self, parent, id, title):
             wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                              | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
             floating_panel = wx.Panel(self, -1)
 
             self.n1_sizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -5120,9 +5134,10 @@ class NewLayerDialog(wx.Dialog):
 
 class NewFaultDialog(wx.Dialog):
     """CREATE A NEW FAULT. RETURNS XY NODE POSITIONS"""
+
     def __init__(self, parent, id, title):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX )
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
 
         floating_panel = wx.Panel(self, -1)
 
@@ -5153,6 +5168,7 @@ class NewFaultDialog(wx.Dialog):
 
 class MessageDialog(wx.MessageDialog):
     """GENERIC MESSAGE DIALOG BOX"""
+
     def __init__(self, parent, id, message_text, title):
         wx.MessageDialog.__init__(self, parent, message_text, title)
         dlg = wx.MessageDialog(self, message_text, title, wx.OK)
@@ -5165,8 +5181,10 @@ class MessageDialog(wx.MessageDialog):
 
 '''# FRAMES ARE STORED HERE'''
 
+
 class CaptureCoordinates(wx.Frame):
     """CAPTURE MOUSE CLICK COORDINATES AND WRITE TO DISK FILE. RETURNS ASCII TEXT FILE"""
+
     def __init__(coordinate_list, parent, id, title):
         wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
         coordinate_list.input_panel = wx.Panel(coordinate_list)
@@ -5186,11 +5204,10 @@ class CaptureCoordinates(wx.Frame):
         coordinate_list.save_btn = wx.Button(coordinate_list.input_panel, label="Save coordinates")
         coordinate_list.save_btn.Bind(wx.EVT_BUTTON, coordinate_list.on_save)
 
-
         # ADD FEATURES TO SIZER
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(coordinate_list.table, 0, wx.ALL|wx.EXPAND, 5)
-        sizer.Add(coordinate_list.save_btn, 0, wx.ALL|wx.CENTER, 5)
+        sizer.Add(coordinate_list.table, 0, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(coordinate_list.save_btn, 0, wx.ALL | wx.CENTER, 5)
         coordinate_list.input_panel.SetSizer(sizer)
         sizer.Fit(coordinate_list)
 
@@ -5222,6 +5239,7 @@ class CaptureCoordinates(wx.Frame):
 
 class PlotSettingsDialog(wx.Frame):
     """CREATE AN EXTERNAL FIGURE PLOT FROM THE MODEL. RETURNS DRAW PARAMETERS"""
+
     def __init__(self, parent, id, title, model_aspect, dcanvas_aspect):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'Figure settings')
         input_panel = wx.Panel(self, -1)
@@ -5242,7 +5260,6 @@ class PlotSettingsDialog(wx.Frame):
                                           style=wx.CB_DROPDOWN)
         self.b_file_path = wx.Button(input_panel, -1, "File...")
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
-
 
         # FIGURE FONT SIZE
         self.set_fs = wx.StaticText(input_panel, -1, "Text size:")
@@ -5488,6 +5505,7 @@ class PlotSettingsDialog(wx.Frame):
 
 class AttributeEditor(wx.Frame):
     """OPENS A TABLE FOR VIEWING AND EDITING LABEL ATTRIBUTES"""
+
     def __init__(attribute_edit, parent, id, title, tree_items, densities, reference_densities, susceptibilities,
                  angle_a, angle_b, layer_colors):
         wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(650, 1000))
@@ -5507,7 +5525,7 @@ class AttributeEditor(wx.Frame):
 
         # DEFINE ATTRIBUTE GRID
         attribute_edit.attr_grid = gridlib.Grid(attribute_edit.input_panel, -1, size=(650, 980))
-        attribute_edit.attr_grid.CreateGrid(len(attribute_edit.tree_items)-1, 7)
+        attribute_edit.attr_grid.CreateGrid(len(attribute_edit.tree_items) - 1, 7)
         attribute_edit.attr_grid.SetColLabelValue(0, 'Layer Name')
         attribute_edit.attr_grid.SetColLabelValue(1, 'Density')
         attribute_edit.attr_grid.SetColLabelValue(2, 'Density Reference')
@@ -5531,13 +5549,13 @@ class AttributeEditor(wx.Frame):
         attribute_edit.length = len(attribute_edit.tree_items)
 
         for i in range(attribute_edit.length - 1):
-            attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i+1])
-            attribute_edit.attr_grid.SetCellValue(i, 1, str(float(attribute_edit.densities[i+1]) / 1000.))
-            attribute_edit.attr_grid.SetCellValue(i, 2, str(float(attribute_edit.reference_densities[i+1]) / 1000.))
+            attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i + 1])
+            attribute_edit.attr_grid.SetCellValue(i, 1, str(float(attribute_edit.densities[i + 1]) / 1000.))
+            attribute_edit.attr_grid.SetCellValue(i, 2, str(float(attribute_edit.reference_densities[i + 1]) / 1000.))
             attribute_edit.attr_grid.SetCellValue(i, 3, str(attribute_edit.susceptibilities[i]))
-            attribute_edit.attr_grid.SetCellValue(i, 4, str(attribute_edit.angle_a[i+1]))
-            attribute_edit.attr_grid.SetCellValue(i, 5, str(attribute_edit.angle_b[i+1]))
-            attribute_edit.attr_grid.SetCellValue(i, 6, str(attribute_edit.layer_colors[i+1]))
+            attribute_edit.attr_grid.SetCellValue(i, 4, str(attribute_edit.angle_a[i + 1]))
+            attribute_edit.attr_grid.SetCellValue(i, 5, str(attribute_edit.angle_b[i + 1]))
+            attribute_edit.attr_grid.SetCellValue(i, 6, str(attribute_edit.layer_colors[i + 1]))
 
         # SET SIZER
         for col in range(6):
@@ -5623,7 +5641,7 @@ class AttributeEditor(wx.Frame):
         # DATA VARIABLE CONTAIN TEXT THAT MUST BE SET IN THE CLIPBOARD
         data = ''
 
-        # FOR EACH CELL IN SELECTED RANGE APPEND THE CELL VALUE IN THE DATA VARIABLE
+        # FOR EACH CELL IN SELECTED range APPEND THE CELL VALUE IN THE DATA VARIABLE
         # TABS '\t' FOR COLS AND '\r' FOR ROWS
         for r in range(rows):
             for c in range(cols):
@@ -5677,7 +5695,7 @@ class AttributeEditor(wx.Frame):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''# START SOFTWARE'''
+"""START SOFTWARE"""
 if __name__ == "__main__":
     app = wx.App(False)
     fr = wx.Frame(None, title='GMG: Geophysical Modelling GUI')
