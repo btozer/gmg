@@ -7,78 +7,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c5d0ba6-d345-43fa-98b6-b3576e65b555" name="Default" comment="&quot;well loading fixed&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/gmg.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gmg.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/C_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/F_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/G_16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/G_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/M_16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/M_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/T_16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/T_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/back.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/blank.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/borehole.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/borehole.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/circle_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/compass_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/convert_icon_size.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/disk.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/down.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/down2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/down2_h.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/down_h.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/faultline_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/faultlon_off_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/faultlon_off_24.png.ai" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/fold_arrow.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/forward.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/full_extent_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/large_down_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/large_left_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/large_right_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/large_up_16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/large_up_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/left_small_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/load_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/mountain_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/new_zealand_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/north_island_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/oil_pump_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/oil_rig_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/pan2.xcf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/pan_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/pan_circle_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/python_16.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/python_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/redock.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/redock_1.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/redock_2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/right_small_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/rock_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/satellite_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/save_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/small_down_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/small_up_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/south_island_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/up.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/up2.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/up2_h.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/up_h.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/up_small_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/well2_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/well_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/zoom_in_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/icons/zoom_out_24.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/GRAVITY_DATA/bott_grav.xg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/MAGNETIC_DATA/bott_mag_track.enxm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/MAGNETIC_DATA/bott_mag_track.xm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/MODELS/bott.model" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/WELL_DATA/Rookhope.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/gravity_map.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tutorial/magnetic_map.pdf" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
