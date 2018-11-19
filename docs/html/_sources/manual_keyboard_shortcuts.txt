@@ -1,0 +1,19 @@
+.. _keys:
+
+**Keyboard Shortcuts**
+=======================
+
+=================== =========================== =================== ===========================
+Key                 Function                    Key                 Function
+=================== =========================== =================== ===========================
+**i**               Insert node                 **a**               Reset view (1:1 aspect)
+**d**               Delete node                 **shift+p**         Pan view
+**n**               Create new layer            **up arrow**        Increase aspect ratio
+**p**               Pinch node :math:`^{*}`     **down arrow**      Decrease aspect ratio
+**>**               Edit next layer             **ctrl+up arrow**   Increase aspect ratio x2
+**<**               Edit previous layer         **ctrl+down arrow** Decrease aspect ratio x2
+**z**               Zoom                        **ctrl+i**          Increase layer transparency
+**ctrl+z**          Zoom out                    **ctrl+d**          Decrease layer transparency
+=================== =========================== =================== ===========================
+
+:math:`^{*}` Left click selects node to pinch, now change layer and select the node to pinch onto.

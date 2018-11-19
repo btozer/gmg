@@ -1,0 +1,12 @@
+.. attribute_table:
+
+=======================
+**9.0 Attribute table**
+=======================
+
+The attribute table contains all the layer attributes, displayed in popout window table.
+Layer attribute can be edited from this table. To access the attribute table navigate to::
+
+    Attribute table -> Open Attribute table...
+
+Updates to attributes can then be assigned to layers using the **Set** button.

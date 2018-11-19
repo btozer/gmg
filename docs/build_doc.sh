@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #% HTML
-rm -r  _build/html
-sphinx-build -b html _sources/ ./
+rm -r  html/
+sphinx-build -b html _sources/ html/
 
 #% LATEX
 #rm -r  _build/latex

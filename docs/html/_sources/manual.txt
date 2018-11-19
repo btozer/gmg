@@ -1,0 +1,26 @@
+.. _manual:
+
+**Manual**
+==========
+
+.. toctree::
+   :maxdepth: 1
+
+   manual_icons
+   manual_keyboard_shortcuts
+   manual_modelling
+   manual_model_layers
+   manual_layer_attributes
+   manual_PF
+   manual_segy
+   manual_wells
+   manual_XY_data
+   manual_geology
+   manual_export_figure
+   manual_attribute_table
+   manual_python_console
+   manual_gravity_algorithm
+   manual_magnetic_algorithm
+   manual_references
+
+.. bibliography:: manual.bib

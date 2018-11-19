@@ -1,0 +1,7 @@
+.. _getting_started:
+
+**Getting Started**
+====================
+
+The best way to get started is to read through the :ref:`Manual <manual>` and then work your way through the
+:ref:`Tutorial <tutorial>`.
