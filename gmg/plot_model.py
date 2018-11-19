@@ -76,7 +76,8 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
     #plt.rc('grid', c='0.5', ls='-', lw=1)
 
     # DIR CONTAINING BOREHOLE ICON
-    borehole_dir = os.path.dirname(__file__)+'/icons/'
+
+    borehole_dir = os.path.dirname(os.path.abspath(__file__))+'../docs/icons/'
 
     # NUMBER OF ROWS IN PLOT
     if t_canvas is True and d_canvas is True and nt_canvas is True:

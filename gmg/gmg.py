@@ -79,7 +79,6 @@ NB. before launching gmg, run:
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
-
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -135,8 +134,8 @@ class Gmg(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
         # DIR CONTAINING PROGRAM ICONS
-        self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        self.gui_icons_dir = self.script_dir + '/icons/'
+        self.dir = os.path.dirname(os.path.abspath(__file__)).split("/")
+        self.gui_icons_dir = "/"+self.dir[1]+"/"+self.dir[2]+"/"+self.dir[3]+"/docs/icons/"
 
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
