@@ -5,21 +5,22 @@
 ------------------------------------
 **4.1 Potential field calculations**
 ------------------------------------
-The Menubar contains buttons labelled *G* and *M*.
-These are used for switching the calculations of the potential fields on and off. Turing off the predicted anomalies
-can help speed up the GUI response time if the model becomes complex (many layers and nodes).
+The Menubar contains buttons **G** and **M**.
+These are used as switches for turning potential field calculations for the gravity and magnetic anomalies on and off.
 
+.. hint::
 
-
+    Turing off the predicted anomalies can help speed up the GUI response time if the model becomes complex
+    (i.e. contains many layers and nodes).
 
 .. note::
 
     You must set the magnetic inclination and Earth Field value under the *Magnetic Field* menu before
-    the predicted anomaly can be calculated.
+    the predicted magnetic anomaly can be calculated.
 
 .. Important::
     *Strike* is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
-    (the angle is positive when measured counterclockwise). See :ref:`A2 <magnetic_algorithm>` and further details.
+    (the angle is positive when measured counterclockwise). See :ref:`A2 <magnetic_algorithm>` for further details.
     The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).
 
 .. admonition:: Example
@@ -27,8 +28,6 @@ can help speed up the GUI response time if the model becomes complex (many layer
     If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.
 
     If the model was orientated North-South the angle would be 68 deg.
-
-
 
 
 ---------------------------------------------

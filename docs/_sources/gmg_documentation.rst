@@ -72,4 +72,5 @@ Last updated: |today|
 Notices:
 --------
 
-Please send comments, feature requests and report all bugs to: btozer@ucsd.edu
+For commenting, creating a feature request or reporting a bug please use github, or
+alternatively, send an e-mail to: btozer@ucsd.edu

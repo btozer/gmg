@@ -13,12 +13,12 @@ the predicted gravity and magnetic anomalies. Each layer contains five attribute
 
 Layer attributes are set using the **Attributes** sidebar within the modelling window or from the
 **Attribute Table** which can be accessed from the top menubar. GMG is designed such that attributes can be
-easily varied when modelling, to allow for rapid assessment of the effect of varying each attribute. A given attribute
-need only be set if required for the given layer, if attributes are not set, the given layer will not contribute to
+easily varied when modelling. This allows for rapid assessment of the effect of varying each attribute. A given attribute
+need only be set if required for the layer, if attributes are not set, the given layer will not contribute to
 the modelled anomaly, be that gravity or magnetic.
 
 .. Note::
-        For the case when a layer requires remanent magnetism, angles A and B will differ from the
+        For the case when a layer requires a remanent magnetism, angles A and B will differ from the
         Inclination and Declination.
 
 ----------------
@@ -32,7 +32,7 @@ Each layer requires:
 1. A bulk density
 2. A reference density
 
-gmg defaults to a reference density of 0 :math:`kg` :math:`m^{-3}`. In this case, densities should be input as
+GMG defaults to a reference density of 0 :math:`kg` :math:`m^{-3}`. In this case, densities should be input as
 **density contrasts** e.g. 0.2 :math:`kg` :math:`m^{-3}`.
 
 If you would prefer to use absolute values, then you can set the reference density to your chosen value and gmg will

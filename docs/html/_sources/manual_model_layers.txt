@@ -10,7 +10,8 @@
 
 To add a new layer to the model navigate to the *'Layers'* menu and select *'New Layer'*::
 
-    Layers -> New Layer
+    Layers -> New Layer -> New fixed layer
+                        -> New floating layer
 
 Alternatively, use the keyboard shortcut, **n** key.
 
@@ -26,13 +27,14 @@ Fixed layers span the entire width of the model and are useful for modelling fea
 formations. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
 
 ..note:
+
     Fixed layers are automatically *'padded'* horizontally from the boundary nodes by an additional 400 km in order to
     avoid edge effects.
 
 --------------------------------
 2.2 Adding a new node to a layer
 --------------------------------
-To add a node to a layer place the mouse cursor at the position where you would like to add the new node and
+To add a node to a layer: Place the mouse cursor at the position where you would like to add the new node and
 press the *'i'* key to insert the new node.
 
 .. Note:: Nodes are inserted to the right of the currently selected node (which is highlighted red).
@@ -40,7 +42,7 @@ press the *'i'* key to insert the new node.
 --------------------------------
 2.3 Deleting a node from a layer
 --------------------------------
-To delete a node from a layer place the mouse cursor over the node you would like to delete and
+To delete a node from a layer: Place the mouse cursor over the node you would like to delete and
 press the *'d'* key to delete the node.
 
 ------------------
