@@ -28,7 +28,7 @@ around the polygon and summing the contribution of each side (Equation :eq:`bott
 .. math:: \Delta g = \sum_{i=1}^{N} \Delta g_{i}
     :label: bott_sum
 
-When :math:`$z_{2} > z_{1}$` the contribution is positive and when :math:`$z_{2} < z_{1}$` the contribution is
+When :math:`z_{2} > z_{1}` the contribution is positive and when :math:`z_{2} < z_{1}` the contribution is
 negative, such that, in the summation, the contributions outside of the polygon cancel, leaving only the gravity
 anomaly produced by the polygon itself (:numref:`bott_method`).
 
