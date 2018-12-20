@@ -123,11 +123,11 @@ import webbrowser
 
 class Gmg(wx.Frame):
     """
-    Master class for program.
+    Master Class for GMG GUI.
     Most functions are contained in this Class.
-    Sets Panels, sizer's and event bindings.
-    Additional classes are used for "pop out" windows (Dialog boxes).
-    Objects are passed between the master class and Dialog boxes.
+    Upon startup this sets the panels, sizer's and event bindings.
+    Additional classes are used for handling "pop out" windows (Dialog boxes).
+    Objects are passed between this Master Class and the Dialog Boxes as I/O.
     """
 
     def __init__(self, *args, **kwds):
@@ -2550,7 +2550,7 @@ class Gmg(wx.Frame):
 
     def b_node_set_button(self, event):
         """
-        CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT THEN PASS THIS PART AND ONLY UPDATE ATTRIBUTES
+        CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT, THEN SKIP THIS PART AND ONLY UPDATE ATTRIBUTES
         """
 
         new_x = float(self.x_input.GetValue())
@@ -3971,8 +3971,6 @@ class Gmg(wx.Frame):
     def update_layer_data(self):
         """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE (REDRAWS EVERYTHING)"""
 
-        print "self.i = %s" % self.i
-
         # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
@@ -4091,7 +4089,7 @@ class Gmg(wx.Frame):
     def run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
-        # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER (ANTI CLOCKWISE) IN NUMPY ARRAY
+        # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER IN THE NUMPY ARRAYS
         if self.calc_grav_switch is True or self.calc_mag_switch is True:
             if len(self.polygons) > 1:
                 for i in range(0, len(self.polygons)):
@@ -4133,19 +4131,19 @@ class Gmg(wx.Frame):
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # MAGNETICS
         # ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM
-        if self.polygons and self.earth_field >= 1.0 and self.calc_mag_switch is True:
+        if self.polygons and self.earth_field != 0.0 and self.calc_mag_switch is True:
             # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             polygons_to_use, susceptibilities_to_use = [], []
-            for layer in range(0, len(self.densities)):
+            for layer in range(0, len(self.polygons)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
                     susceptibilities_to_use.append(self.susceptibilities[layer])
 
             # PASS TO TALWANI AND HEIRTZLER ALGORITHM
-            polys = []
+            self.polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
-                polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
-            self.prednt = talwani_and_heirtzler.ntz(self.xp, self.zp, polys, self.model_azimuth, self.earth_field,
+                self.polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
+            self.prednt = talwani_and_heirtzler.ntz(self.xp, self.zp, self.polys, self.model_azimuth, self.earth_field,
                                                     self.angle_a, self.angle_b, self.mag_observation_elv)
         else:
             self.prednt = np.zeros_like(self.xp)
