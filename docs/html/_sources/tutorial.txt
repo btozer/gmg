@@ -2,3 +2,25 @@
 
 **Tutorial**
 ============
+
+**Introduction**
+
+In this tutorial we investigate the gravity and magnetic anomalies produced by the Weardale granite in the Northern
+Pennines, UK, using the data and paper published by \cite{bott1967}. The tutorial will walk through the following steps:
+
+
+1. Create a new GMG 2D model.
+
+2. Load observed 2D profiles of both Bouguer gravity and magnetic anomalies into the GMG environment.
+
+3. Load observed well horizon data into the GMG environment.
+
+4. Add new layers to the modelling environment and assign attributes to these features.
+
+5. Calculate the predicted gravity and magnetic anomalies.
+
+6. Practice forward modelling.
+
+7. Write predicted anomaly profiles to disc.
+
+8. Produce a raster figure and save this to disc using GMGs input figure constructor.

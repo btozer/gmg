@@ -79,6 +79,25 @@ As both :math:`J_{i}` and :math:`H` have SI units :math:`A m^{-1}`, magnetic sus
 
 .. note:: GMG uses SI units, hence magnetic susceptibilities are :math:`4 \pi` larger than c.g.s values
 
+------------------------
+3.3 Magnetisation Vector
+------------------------
+
+Angle A
+-------
+
+For induced magnetisation, Angle A is equal to the inclination of Earth's field. If magnetistion is remenant or a mix of
+remenant and induced, then the direction of magnetisation will likely differ from Earth's inclination and Angle A must
+be  calculated outside of GMG.
+
+Angle B
+-------
+
+For induced magnetisation, Angle B is equal to the declination of Earth's field. If magnetistion is remenant or a mix of
+remenant and induced, then the direction of magnetisation will likely differ from Earth's declination and Angle B must
+be calculated outside of GMG.
+
+
 ----------------------
 3.3 Remenant Magnetism
 ----------------------

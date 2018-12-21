@@ -17,7 +17,7 @@ and the magnetisation vector must also be considered.
 
 These complexities are handled by considering the vertical and horizontal components of the total magnetisation
 vector separately and then summing these components at the final calculation step. Following the trigonometric
-parametrisation for a two-dimensional body shown in :numref:`talwani_mag_method`, Talwani and Heirtzler's
+parametrisation for a two-dimensional body shown in :numref:`talwani_mag_method`, Talwani and Heirtzler
 (1964) :cite:`talwani1964` showed that the horizontal and vertical components of the total magnetic field are given by:
 
 
