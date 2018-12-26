@@ -1,26 +1,36 @@
 .. _tutorial:
 
+============
 **Tutorial**
 ============
 
-**Introduction**
+---------------------
+** 1.0 Introduction**
+---------------------
 
-In this tutorial we investigate the gravity and magnetic anomalies produced by the Weardale granite in the Northern
-Pennines, UK, using the data and paper published by \cite{bott1967}. The tutorial will walk through the following steps:
+In this tutorial we model the gravity and magnetic anomalies produced by the Weardale granite in the Northern
+Pennines, UK, using data published by \cite{bott1967}. The tutorial will walk through the following steps:
 
 
-1. Create a new GMG 2D model.
+1. How to create a new 2D model and save this to disc for reloading later.
 
-2. Load observed 2D profiles of both Bouguer gravity and magnetic anomalies into the GMG environment.
+2. How to load observed 2D profile data (both Bouguer gravity and magnetic anomalies) into your GMG modelling
+   environment.
 
-3. Load observed well horizon data into the GMG environment.
+3. How to load borehole horizon top data your GMG modelling environment.
 
-4. Add new layers to the modelling environment and assign attributes to these features.
+4. How to add new layers to your model and assign attributes (e.g. bulk density) to them.
 
-5. Calculate the predicted gravity and magnetic anomalies.
+5. How to set your model profiles magnetic field attributes (e.g. the strength of Earth's field).
 
-6. Practice forward modelling.
+6. How to run forward model calculations of the predicted gravity and magnetic anomalies.
 
-7. Write predicted anomaly profiles to disc.
+7. How to use the GMG interface for forward modelling.
 
-8. Produce a raster figure and save this to disc using GMGs input figure constructor.
+8. How to save the predicted anomaly profiles as text files.
+
+9. How to produce a raster figure and save this to disc using GMGs input figure production module.
+
+-----------------------------
+** 2.0 Creating a new model**
+-----------------------------

@@ -21,6 +21,9 @@ modeling tasks. Inspiration came from fatiando a terra and GMT.
 
 It is anticipated that GMG will also be useful for teaching purposes.
 
+**NB: GMG is in development. Some documentation is
+incomplete and some features may not work as expected.**
+
 Key features
 ------------
 * Data I/O is made as simple as possible using space delimited ASCII text files.
@@ -74,3 +77,8 @@ Notices:
 
 For commenting, creating a feature request or reporting a bug please use github, or
 alternatively, send an e-mail to: btozer@ucsd.edu
+
+Citing:
+-------
+
+If you use GMG, please cite this github repository.
