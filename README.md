@@ -22,7 +22,7 @@ The project was instigated after failing to find an adequate open-source option
 (in which the source code can be viewed and modified by the user) for performing 2D 
 geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
 
-NB: GMG is in development. Some documentation is incomplete and some features may not work as expected. 
+**NB: GMG is in development. Some documentation is incomplete and some features may not work as expected.**
 
 Key features
 ------------
