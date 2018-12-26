@@ -214,3 +214,8 @@ Please use the subject line:
     GMG bug report: "short bug description"
 
 and include as much detail as possible when describing the bug.
+
+Citing:
+-------
+
+If you use GMG, please cite this github repository.
