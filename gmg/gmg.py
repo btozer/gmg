@@ -954,6 +954,7 @@ class Gmg(wx.Frame):
 
         self.current_xlim = self.mcanvas.get_xlim()
         self.current_ylim = self.mcanvas.get_ylim()
+
         if event.Id == 601:
             if self.t_canvas is True:
                 self.tcanvas.set_visible(False)
@@ -1137,12 +1138,15 @@ class Gmg(wx.Frame):
                     mag = self.obs_mag_list_save[x]
                     mag_x = mag[:, 0]
                     mag_y = mag[:, 1]
-                    self.obs_mag_list[x] = self.dcanvas.scatter(mag_x, mag_y, marker='o',
+                    self.obs_mag_list[x] = self.ntcanvas.scatter(mag_x, mag_y, marker='o',
                                                                 color=self.obs_mag_colors[x], s=5, gid=x)
 
         'UPDATE FRAMES'
         self.update_layer_data()
         self.run_algorithms()
+        self.set_frame_limits()
+        self.mcanvas.grid(True)
+        self.draw()
 
     def size_handler(self):
         """ CREATE CANVAS BOX"""
@@ -1847,8 +1851,8 @@ class Gmg(wx.Frame):
                 self.obs_name = self.obs_grav_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_grav_count, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count)
+                self.obs_submenu.Append(self.obs_grav_count+1, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+1)
                 self.obs_grav_count += 1
                 self.grav_obs_switch = True
             else:
@@ -1868,8 +1872,8 @@ class Gmg(wx.Frame):
                 self.obs_mag_name = self.obs_mag_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_mag_count, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
+                self.obs_submenu.Append(self.obs_mag_count+1, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count+1)
                 self.obs_mag_count += 1
                 self.mag_obs_switch = True
             else:
@@ -1996,6 +2000,7 @@ class Gmg(wx.Frame):
         self.obs_grav_colors.append([])
         self.obs_grav_colors[self.obs_grav_count] = str(self.color)
 
+        # DRAW LOADED DATA IN GRAVITY FRAME
         self.obs_grav = np.genfromtxt(obs_g_input, delimiter=' ', dtype=float)
         self.obs_gz = self.obs_grav[:, 1]
         self.obs_grav_list_save.append([])
@@ -2008,25 +2013,27 @@ class Gmg(wx.Frame):
         self.obs_grav_list.append([])
         self.grav_obs_switch = True
         self.obs_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
-        self.obs_submenu.Append(self.obs_grav_count, 'delete observed data')
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count)
+        self.m_obs_g_submenu.Append(self.obs_grav_count+1, self.obs_name, self.obs_submenu)
+        self.obs_submenu.Append(self.obs_grav_count+1, 'delete observed data')
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+1)
         self.obs_grav_count = self.obs_grav_count + 1
+
+        # UPDATE GMG GUI
         self.update_layer_data()
-        self.draw()
+        self.set_frame_limits()
 
     def delete_obs_grav(self, event):
-        self.m_obs_g_submenu.DestroyId(event.Id)
-        self.obs_grav_list[event.Id].set_visible(False)
-        self.obs_grav_list[event.Id] = []
-        self.obs_grav_list_save[event.Id] = []
+        self.m_obs_g_submenu.DestroyItem(event.Id)
+        self.obs_grav_list[event.Id-1].set_visible(False)
+        self.obs_grav_list[event.Id-1] = []
+        self.obs_grav_list_save[event.Id-1] = []
         self.update_layer_data()
         self.draw()
 
     def delete_all_obs_grav(self, event):
         for x in range(0, self.obs_grav_count):
             try:
-                self.m_obs_g_submenu.DestroyId(x)
+                self.m_obs_g_submenu.DestroyItem(x)
                 self.obs_grav_list[x].set_visible(False)
             except IndexError:
                 continue
@@ -2078,19 +2085,21 @@ class Gmg(wx.Frame):
         self.mag_obs_switch = True
 
         self.obs_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
-        self.obs_submenu.Append(self.obs_mag_count, 'delete observed data')
+        self.m_obs_mag_submenu.Append(self.obs_mag_count+1, self.obs_mag_name, self.obs_submenu)
+        self.obs_submenu.Append(self.obs_mag_count+1, 'delete observed data')
         self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
         self.obs_mag_count = self.obs_mag_count + 1
+
+        # UPDATE GMG GUI
         self.update_layer_data()
-        self.draw()
+        self.set_frame_limits()
 
     def delete_obs_mag(self, event):
         self.m_obs_mag_submenu.DestroyId(event.Id)
         self.obs_mag_list[event.Id].set_visible(False)
-        self.obs_mag_list[event.Id] = []
-        self.obs_mag_name_list[event.Id] = []
-        self.obs_mag_list_save[event.Id] = []
+        self.obs_mag_list[event.Id-1] = []
+        self.obs_mag_name_list[event.Id-1] = []
+        self.obs_mag_list_save[event.Id-1] = []
         self.update_layer_data()
         self.draw()
 
@@ -2258,8 +2267,8 @@ class Gmg(wx.Frame):
         self.well_name_list.append(str(self.well_name))
 
         with open(well_in, 'r') as f:
-            well_data = [line.strip().split(' ') for line in f]
-        self.well_list.append(well_data)
+            input_well_data = [line.strip().split(' ') for line in f]
+        self.well_list.append(input_well_data)
 
         # CREATE FILE MENU DATA
         self.well_name_submenu = wx.Menu()
@@ -2271,10 +2280,10 @@ class Gmg(wx.Frame):
         self.well_count += 1
 
         # DRAW WELL
-        well_data = np.array(self.well_list[self.well_count - 1][0:])  # CREATE NP ARRAY WITHOUT HEADER INFO
-        y1 = well_data[0, 1].astype(float)
-        y2 = well_data[-1, -1].astype(float)
-        well_x_location = well_data[1, 1]
+        well_data = np.array(self.well_list[self.well_count - 1][1:])  # CREATE NP ARRAY WITHOUT HEADER INFO
+        y1 = well_data[0][1].astype(float)
+        y2 = well_data[-1][-1].astype(float)
+        well_x_location = well_data[1][1].astype(float)
         wellx = (well_x_location, well_x_location)
         welly = (y1, y2)
         self.wells.append([])
@@ -2298,17 +2307,17 @@ class Gmg(wx.Frame):
         self.well_labels[self.well_count - 1] = [None] * len(well_data)
         self.horizons[self.well_count - 1] = [None] * len(well_data)
         for i in range(2, len(well_data)):
-            y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
-            x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
+            y = [well_data[i][1].astype(float), well_data[i][1].astype(float)]
+            x = [well_data[1][1].astype(float) - 1, well_data[1][1].astype(float) + 1]
 
             # PLOT HORIZON LINE
             self.horizons[self.well_count - 1][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-            horizon_y_pos = well_data[i, 1].astype(float)
-            horizon = well_data[i, 0].astype(str)
+            horizon_y_pos = well_data[i][1].astype(float)
+            horizon = well_data[i][0].astype(str)
 
             # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
             if i % 2 == 0:
-                horizon_x_pos = well_data[1, 1].astype(float) - 1.05
+                horizon_x_pos = well_data[1][1].astype(float) - 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2321,7 +2330,7 @@ class Gmg(wx.Frame):
                                                                                            fc="0.8", ec='None'),
                                                                                  clip_on=True)
             else:
-                horizon_x_pos = well_data[1, 1].astype(float) + 1.05
+                horizon_x_pos = well_data[1][1].astype(float) + 1.05
                 self.well_labels[self.well_count - 1][i] = self.mcanvas.annotate(horizon,
                                                                                  xy=(horizon_x_pos, horizon_y_pos),
                                                                                  xytext=(horizon_x_pos, horizon_y_pos),
@@ -2446,7 +2455,8 @@ class Gmg(wx.Frame):
 
     def delete_well(self, event):
         """REMOVE PLOT GRAPHICS"""
-
+        print("event = ")
+        print(event.Id)
         self.wells[event.Id - 3000][0].set_visible(False)
         self.well_name_text[event.Id - 3000].set_visible(False)
         horizons = self.horizons[event.Id - 3000]
@@ -2465,7 +2475,7 @@ class Gmg(wx.Frame):
         self.well_name_text[event.Id - 3000] = "None"
 
         # REMOVE SUBMENU
-        self.m_wells_submenu.DestroyId(event.Id)
+        self.m_wells_submenu.DestroyItem(event.Id)
         self.update_layer_data()
 
     # GEOLOGY OUTCROP DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4178,9 +4188,20 @@ class Gmg(wx.Frame):
         else:
             pass
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # SET CANVAS LIMITS
+
+        # SET FRAME X AND Y LIMITS
+        self.set_frame_limits()
+
+        # AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED
+        self.model_saved = False
+
+        # UPDATE GMG GRAPHICS
+        self.draw()
+
+    def set_frame_limits(self):
+        """SET FRAME X AND Y LIMITS"""
+
         # SET GRAVITY DISPLAY BOX LIMITS
         if self.grav_obs_switch is True and self.grav_residuals != []:
             ymin = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).min()) - 2.0
@@ -4207,10 +4228,6 @@ class Gmg(wx.Frame):
             ymax_mag = (self.prednt.max()) + 2.
         if self.ntcanvas is not None:
             self.ntcanvas.set_ylim(ymin_mag, ymax_mag)
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-        # AFTER RUNNING ALGORITHMS, SET MODEL AS UNSAVED
-        self.model_saved = False
 
         # UPDATE GMG GRAPHICS
         self.draw()
@@ -4556,8 +4573,7 @@ class LoadObservedDataFrame(wx.Frame):
             self.parent.open_obs_t()
         else:
             pass
-        self.EndModal(1)
-
+        self.Destroy()
 
 class SeisDialog(wx.Dialog):
     """LOAD SEGY DATA"""
