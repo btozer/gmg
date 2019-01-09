@@ -31,6 +31,132 @@ Pennines, UK, using data published by \cite{bott1967}. The tutorial will walk th
 
 9. How to produce a raster figure and save this to disc using GMGs input figure production module.
 
+We'll also create a separate model
+
 -----------------------------
 ** 2.0 Creating a new model**
 -----------------------------
+
+To create a new model, on the Menubar navigate to::
+
+    File -> New model...
+
+You will be prompted with a window to set the model X and Z dimensions in kilometers as well as the increment with which
+the predicted gravity and magnetic anomalies will be calculated at. Our model profile is 50 km long, so lets set the
+X-coordinates as 0 and 50 km. We will be modelling the upper crustal structure, so lets set the Z-coordinates as
+0 and 10 km. Lets set the increment as 0.5 km. Note, you can always change the increment at a later time,
+for example, once you are reasonably happy with your starting model and want to make smaller, fine scale changes
+towards completion of your model.
+
+
+Also note, you can also change the model dimensions at anytime by navigating
+to::
+
+    Model View -> Modify current model dimensions...
+
+------------------------------
+** 3.0 Loading observed data**
+------------------------------
+
+To add a new layer to the model navigate to the *'Layers'* menu and select *'New Layer'*::
+
+    Layers -> New Layer -> New fixed layer
+                        -> New floating layer
+
+Alternatively, use the keyboard shortcut, **n** key.
+
+You will be prompted with the option of adding a *'New fixed layer'* or a *'New floating layer'*.
+
+**Floating layers:**
+
+Floating layers are polygons that are fully contained within the model space. For example, a narrow salt dome.
+
+**Fixed layers:**
+
+Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basin
+formations. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
+
+..note:
+
+    Fixed layers are automatically *'padded'* horizontally from the boundary nodes by an additional 400 km in order to
+    avoid edge effects.
+
+---------------------------
+** 3.0 Create a new layer**
+---------------------------
+
+
+---------------------
+** 0.0 Seismic data**
+---------------------
+Any 2D Seismic SEGY data can be loaded into GMG models, however, to be useful, it is highly recommended these data are
+pre-processed in the depth domain.
+
+As an example, we will download the freely available Society of exploration geophysicists (SEG) Advanced Modeling
+Program (SEAM) Phase 1 data. This is a synthetic 35 x 40 x 15 km 3D cube that simulates a realistic salt canopy.
+
+These data can be accessed by following this link::
+
+    https://seg.org/News-Resources/Research-Data/Open-Data
+
+And then by clicking the link::
+
+    Interpretation Challenge I - Depth
+
+This will direct you to a google drive folder containing the data.
+
+Once you have downloaded the directory SEAM_Interpretation_Challenge_1_Depth/ move this to
+"YOUR_GMG_PATH"/gmg/docs/tutorial/SEISMIC_DATA e.g.::
+
+    mv SEAM_Interpretation_Challenge_1_Depth/ "YOUR_GMG_PATH"/gmg/docs/tutorial/SEISMIC_DATA
+
+Now, to plot a profile with GMG lets extract a 2D profile from the 3D volume using an ObsPy routine.
+
+A script is provided with this tutorial to preform the extraction of a profile at Y-location 24 km. This profile passes
+through a borehole location that can alos be loaded into GMG for aiding interpretation.
+
+To run the profile extraction follow these commands::
+
+    cd "YOUR_GMG_PATH"/gmg/docs/tutorial/SEISMIC_DATA
+    mv ../cut_2d_profile.py .
+    python cut_2d_profile.py SEAM_Interpretation_Challenge_1_Depth.sgy
+
+.. note::
+
+    The next step is not required, but if you have Seismic Un*x installed on your computer, or are willing to install
+    it (see https://github.com/JohnWStockwellJr/SeisUnix), then the following is recommended.
+
+Now, lets use the open source seismic processing package SeismicUnix to apply an automatic gain control (AGC) to our
+SEGY profile in order to balance the amplitudes before we load the profile into GMG for viewing/interpretation::
+
+    segyread tape=2d_profile_24000N.segy verbose=1 endian=0 | segyclean > 2d_profile_24000N.su
+
+    sugain agc=1 < 2d_profile_24000N.su > 2d_profile_24000N_agc.su
+
+    segyhdrs < agc.su hfile=hheader bfile=bheader
+
+    segywrite < 2d_profile_24000N_agc.su verbose=1 buff=1 tape=2d_profile_24000N_agc.segy bfile=bheader hfile=hheader
+
+We now have a SEGY file ready for importing to GMG.
+
+Open a new GMG window and create a new model (as outlined in Section 1) with dimensions 35 x 15 km. Now, navigate to the
+SEGY Data menu in the menubar and select *Load SEGY...*.
+
+You will be prompted by a window in which to enter the dimensions of the SEGY file and name of the segy file. Input the
+dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now select *Set Coordinates*.
+
+A file explorer will now load. Naivage to the SEGY file (i.e. either 2d_profile_24000N_agc.segy or
+2d_profile_24000N.segy) you want to load and select *Open*.
+
+You should now see the seismic profile in your GMG modelling frame!
+
+Try Changing the color palette from grey scale to Red-white-Blue by using::
+
+    Seismic Data -> Color palette -> Seismic
+
+Now try adjusting the display Gain using::
+
+     Seismic Data -> Gain -> Increase...
+
+or the left and right arrow keyboard shortcuts.
+

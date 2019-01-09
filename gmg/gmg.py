@@ -1880,7 +1880,10 @@ class Gmg(wx.Frame):
                 self.obs_mag_count += 1
 
     def load_xy(self, event):
-        """LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS"""
+        """
+        LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS
+        NB: ID's start at 5000
+        """
 
         open_file_dialog = wx.FileDialog(self, "Open XY file", "", "", "All files (*.*)|*.*", wx.FD_OPEN |
                                          wx.FD_FILE_MUST_EXIST)
@@ -1892,6 +1895,7 @@ class Gmg(wx.Frame):
             answer = xy_name_box.ShowModal()
 
         try:
+            print(self.xy_count)
             self.xy_name = xy_name_box.GetValue()
             self.xy_name_list.append([])
             self.xy_name_list[self.xy_count] = str(self.xy_name)
@@ -1906,8 +1910,8 @@ class Gmg(wx.Frame):
 
             self.obs_submenu = wx.Menu()
             self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
-            self.obs_submenu.Append(self.xy_count, 'delete observed data')
-            self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count)
+            self.obs_submenu.Append(5000+self.xy_count, 'delete observed data')
+            self.Bind(wx.EVT_MENU, self.delete_xy, id=5000+self.xy_count)
             self.xy_count += 1
         except IndexError:
             error_message = "ERROR IN LOADING PROCESS - FILE MUST BE ASCII SPACE DELIMITED"
@@ -1918,19 +1922,23 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_xy(self, event):
-        """"DELETE OBSERVED XY DATA"""
-        self.m_xy_submenu.DestroyId(event.Id)
-        self.xy_list[event.Id].set_visible(False)
-        self.xy_list[event.Id] = []
-        self.xy_list_save[event.Id] = []
+        """"
+        DELETE OBSERVED XY DATA
+        NB: ID's start at 5000
+        """
+        id = event.Id-5000
+        self.m_xy_submenu.DestroyItem(id)
+        self.xy_list[id].set_visible(False)
+        self.xy_list[id] = []
+        self.xy_list_save[id] = []
         self.update_layer_data()
         self.draw()
 
     def delete_all_xy(self):
-        for x in range(0, self.xy_count):
+        for i in range(0, self.xy_count):
             try:
-                self.m_xy_submenu.DestroyId(x)
-                self.xy_list[x].set_visible(False)
+                self.m_xy_submenu.DestroyId(i)
+                self.xy_list[i].set_visible(False)
             except:
                 continue
         self.xy = []
@@ -2366,10 +2374,10 @@ class Gmg(wx.Frame):
                 continue
             else:
 
-                well_data = np.array(self.well_list[w][0:])  # CREATE NP ARRAY WITHOUT HEADER INFO
-                y1 = well_data[0, 1].astype(float)
-                y2 = well_data[-1, -1].astype(float)
-                well_x_location = well_data[1, 1]
+                self.wd = np.array(self.well_list[w][1:])  # CREATE NP ARRAY WITHOUT HEADER INFO
+                y1 = float(self.wd[0][1])
+                y2 = float(self.wd[-1][-1])
+                well_x_location = float(self.wd[1][1])
                 wellx = (well_x_location, well_x_location)
                 welly = (y1, y2)
 
@@ -2386,20 +2394,20 @@ class Gmg(wx.Frame):
 
                 # PLOT WELL HORIZONS
                 # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
-                self.well_labels[w] = [None] * len(well_data)
-                self.horizons[w] = [None] * len(well_data)
-                for i in range(2, len(well_data)):
-                    y = [well_data[i, 1].astype(float), well_data[i, 1].astype(float)]
-                    x = [well_data[1, 1].astype(float) - 1, well_data[1, 1].astype(float) + 1]
+                self.well_labels[w] = [None] * len(self.wd)
+                self.horizons[w] = [None] * len(self.wd)
+                for i in range(2, len(self.wd)):
+                    y = [self.wd[i][1].astype(float), self.wd[i][1].astype(float)]
+                    x = [self.wd[1][1].astype(float) - 1, self.wd[1][1].astype(float) + 1]
 
                     # PLOT HORIZON LINE
                     self.horizons[w][i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
-                    horizon_y_pos = well_data[i, 1].astype(float)
-                    horizon = well_data[i, 0].astype(str)
+                    horizon_y_pos = self.wd[i, 1].astype(float)
+                    horizon = self.wd[i, 0].astype(str)
 
                     # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
                     if i % 2 == 0:
-                        horizon_x_pos = well_data[1, 1].astype(float) - 1.05
+                        horizon_x_pos = self.wd[1, 1].astype(float) - 1.05
                         self.well_labels[w][i] = self.mcanvas.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
                                                                        xytext=(horizon_x_pos, horizon_y_pos),
                                                                        fontsize=self.well_textsize,
@@ -2410,7 +2418,7 @@ class Gmg(wx.Frame):
                                                                                  ec='None'),
                                                                        clip_on=True)
                     else:
-                        horizon_x_pos = well_data[1, 1].astype(float) + 1.05
+                        horizon_x_pos = self.wd[1][1].astype(float) + 1.05
                         self.well_labels[w][i] = self.mcanvas.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
                                                                        xytext=(horizon_x_pos, horizon_y_pos),
                                                                        fontsize=self.well_textsize,

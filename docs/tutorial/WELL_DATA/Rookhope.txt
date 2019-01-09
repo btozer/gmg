@@ -1,5 +1,5 @@
 #HEADER: easting=393756 northing=542789 elevation(Ordance Datum)=1058.92ft =322.758816m
 elevation: -0.32276
-x_position: 35.0
+x_position: 21.789
 Granite 0.06724
 Well_Bottom 0.48525
