@@ -133,7 +133,7 @@ SEGY profile in order to balance the amplitudes before we load the profile into 
 
     sugain agc=1 < 2d_profile_24000N.su > 2d_profile_24000N_agc.su
 
-    segyhdrs < agc.su hfile=hheader bfile=bheader
+    segyhdrs < 2d_profile_24000N_agc.su hfile=hheader bfile=bheader
 
     segywrite < 2d_profile_24000N_agc.su verbose=1 buff=1 tape=2d_profile_24000N_agc.segy bfile=bheader hfile=hheader
 
