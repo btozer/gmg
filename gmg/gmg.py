@@ -3778,7 +3778,7 @@ class Gmg(wx.Frame):
                                        self.xy_size, self.xy_color, self.colorbar_x, self.colorbar_y,
                                        self.colorbar_size_x, self.colorbar_size_y, self.layer_line_width,
                                        self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min,
-                                       self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells, self.well_fs,
+                                       self.grav_y_max, self.xy_list_save, self.draw_wells, self.well_fs,
                                        self.well_line_width)
         del fig_plot
 

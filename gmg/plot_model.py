@@ -43,7 +43,7 @@ def plot_fig(file_path, area, xp, obs_topo, obs_grav, calc_grav, obs_mag, calc_m
              t_canvas, d_canvas, nt_canvas, model_aspect, use_tight_layout, poly_alpha, fs, ms, lw, font_type,
              layer_colors, draw_polygons, draw_layers, draw_floating_layers, draw_colorbar, draw_xy_data, xy_size,
              xy_color, colorbar_x, colorbar_y, colorbar_size_x, colorbar_size_y, layer_line_width, layer_alpha,
-             grav_rms_value, mag_rms_value, grav_y_min, grav_y_max, xy_list_save, draw_wells, wells, well_fs,
+             grav_rms_value, mag_rms_value, grav_y_min, grav_y_max, xy_list_save, draw_wells, well_fs,
              well_line_width):
     # FUTRUE: external_lines
     """PLOT FIGURE TO EXTERNAL FILE USING USER SPECIFIED PLOTTING OPTIONS"""
