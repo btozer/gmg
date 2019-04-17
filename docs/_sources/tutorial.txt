@@ -1,67 +1,144 @@
 .. _tutorial:
 
-============
 **Tutorial**
 ============
 
----------------------
-** 1.0 Introduction**
----------------------
+**1.0 Introduction**
+--------------------
 
-In this tutorial we model the gravity and magnetic anomalies produced by the Weardale granite in the Northern
-Pennines, UK, using data published by \cite{bott1967}. The tutorial will walk through the following steps:
+In this tutorial we will learn how to use GMG by modelling an example data set. We will systematically work through the
+steps required to load data and model the gravity and magnetic anomalies produced by the Weardale granite in the
+Northern Pennines, UK. Thereby recreating the study published by a renowned British geophysicist, the late Martin
+Bott (Bott, 1967) :cite:`bott1967`.
+
+The tutorial will walk through the following steps::
+
+    1. Creating a new model and how to save and reload models.
+
+    2. Loading observed 2D profile data (both Bouguer gravity and magnetic anomalies) into your GMG modelling
+       environment.
+
+    3. Loading borehole horizon top data into your GMG modelling environment.
+
+    4. Adding new layers to your model and assigning attributes (e.g. bulk density) to them.
+
+    5. Setting magnetic field attributes in your model (e.g. the strength of Earth's field).
+
+    6. Running forward model calculations of the predicted gravity and magnetic anomalies.
+
+    7. How to use the GMG interface for forward modelling.
+
+    8. How to save the predicted anomaly profiles as external text files.
+
+    9. How to produce a raster figure and save this to disc using GMGs inbuilt figure production module.
+
+    10. How to load 2D seismic reflection data into a model.
+
+The Weardale granite is located in the Northern Pennines, UK. The presence of this Caledonian-aged granite was first
+proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby outcrops. Later gravity
+surveys and magnetic surveys by various authors strongly  corroborated this suggestion. :numref:`gravity_map` and
+:numref:`magnetic_map` show collations of these data published by Bott, (1967) :cite:`bott1967`. Its presence was
+finally confirmed with the drilling of the Rookhope borehole (Dunham et al., 1961). The location of this borehole is
+shown as the yellow circle in :numref:`gravity_map` and :numref:`magnetic_map`.
+
+.. figure:: _static/gravity_map.png
+    :name: gravity_map
+
+    Land based Bouguer gravity anomaly contoured at 1 mGal increments (digitized after, Fig. 2 from :cite:`bott1967`). The red line
+    A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well (yellow circle).
+    The data are projected on a local cartesian grid.
 
 
-1. How to create a new 2D model and save this to disc for reloading later.
+.. figure:: _static/magnetic_map.png
+    :name: magnetic_map
 
-2. How to load observed 2D profile data (both Bouguer gravity and magnetic anomalies) into your GMG modelling
-   environment.
+    Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface,
+    flown with a line spacing and 2 km and contoured at 10 nT increments.
 
-3. How to load borehole horizon top data your GMG modelling environment.
 
-4. How to add new layers to your model and assign attributes (e.g. bulk density) to them.
+**2.0 Creating a new model**
+----------------------------
 
-5. How to set your model profiles magnetic field attributes (e.g. the strength of Earth's field).
-
-6. How to run forward model calculations of the predicted gravity and magnetic anomalies.
-
-7. How to use the GMG interface for forward modelling.
-
-8. How to save the predicted anomaly profiles as text files.
-
-9. How to produce a raster figure and save this to disc using GMGs input figure production module.
-
-We'll also create a separate model
-
------------------------------
-** 2.0 Creating a new model**
------------------------------
-
-To create a new model, on the Menubar navigate to::
+Once you have opened GMG (follow the instructions on the :ref:`installation` page if this is your first
+time using the software) you can create a new model by navigating to the Menubar and selecting::
 
     File -> New model...
 
-You will be prompted with a window to set the model X and Z dimensions in kilometers as well as the increment with which
-the predicted gravity and magnetic anomalies will be calculated at. Our model profile is 50 km long, so lets set the
-X-coordinates as 0 and 50 km. We will be modelling the upper crustal structure, so lets set the Z-coordinates as
-0 and 10 km. Lets set the increment as 0.5 km. Note, you can always change the increment at a later time,
-for example, once you are reasonably happy with your starting model and want to make smaller, fine scale changes
-towards completion of your model.
+A window for setting the model dimensions will appear. Here we wil assign the model X and Z dimensions in
+kilometers, as well as the increment at which the predicted gravity and magnetic anomalies will be calculated at.
+In this example our model profile is 50 km long, so lets set the X-coordinates as 0 and 50 km. We will be modelling the
+upper crustal structure, so lets set the Z-coordinates as 0 and 10 km and the calculation increment as 0.5 km.
+
+.. note::
+
+    you can always change the model dimensions and increment at a later time. For example, you may start out by
+    modelling with a coarse spacing to ensure GMG runs smoothly. Then, once you are satisfied with your starting model
+    and are ready to make smaller, fine scale changes towards completion of your model you might then lower the
+    calculation interval.
+
+    To modify the model dimensions at anytime, navigate to::
+
+        Model View -> Modify current model dimensions...
+
+**3.0 Loading observed porifle data**
+-------------------------------------
+
+Now we have creating our model, we can load the observed gravity and magnetic anomaly data into the modelling
+environment. First, lets load the gravity data by navigating to::
+
+    Gravity -> Load Gravity Anomaly...
+
+Now select the **File...** button and use the file explorer to navigate to and select the file
+**bott_Bouguer_gravity.xg**. This file is located in the directory::
+
+    gmg/docs/tutorial/GRAVITY_DATA
+
+Now lets name the data **Bouguer anomaly** and leave the display color as the default **blue**. Finally, select the
+**Load** button to load the data.
+
+You should now see the observed Bouguer gravity anomaly in the Gravity panel.
+
+Lets repeat this process for the magnetic anomaly data **bott_Magnetic_anomaly.xm** located in the directory::
+
+    gmg/docs/tutorial/MAGNETIC_DATA
+
+**4.0 Loading well data**
+-------------------------
+
+THe Rookhope exploration well was drilled above the Weardale granite between November 1960 - July 1961 in order to
+prove its existence. The well was drilled at a location 322.76 m Above mean sea level (AMSL) and revealed a 390 m thick
+sequence of Carboniferous sediment before penetrating the granite (at a depth of 67.24 m BMSL) and continued through the
+granite reaching a bottom depth of 808 m (485.25 m BMSL) while still within the pluton.
+
+This record provides a``ground-truth" point with which to constrain our forward model. THe petrological data from the
+well also provides constrain on the density of the granite.
+
+Now lets load the well record into our modelling environment by navigating to::
+
+    Well data -> Load well record...
+
+Now use the file explorer to navigate to the file **Rookhope.txt** located in the directory::
+
+    /gmg/docs/tutorial/WELL_DATA
+
+You will be prompted to provide a name for the new well record, let call it Rookhope.
+
+The well record will now be visible in the model frame. We can hide/show the well by navigating to::
+
+    Well data -> Wells... -> Rookhope -> Hide/Show
+
+We can also change the text size of the well horizons labels using the **Label Text Size** slider in the Layer
+Attributes tool box located on the left hand side of the modelling environment.
 
 
-Also note, you can also change the model dimensions at anytime by navigating
-to::
-
-    Model View -> Modify current model dimensions...
-
+**5.0 Creating a model layer**
 ------------------------------
-** 3.0 Loading observed data**
-------------------------------
+
+Now we have loaded our observed anomaly data into the model environment, we are ready to start constructing our model.
 
 To add a new layer to the model navigate to the *'Layers'* menu and select *'New Layer'*::
 
-    Layers -> New Layer -> New fixed layer
-                        -> New floating layer
+    Layers -> New Layer
 
 Alternatively, use the keyboard shortcut, **n** key.
 
@@ -73,22 +150,56 @@ Floating layers are polygons that are fully contained within the model space. Fo
 
 **Fixed layers:**
 
-Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basin
-formations. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
+Fixed layers span the entire width of the model and are useful for modelling *layers*, such as sedimentary basin
+strata. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
 
-..note:
+.. note::
 
     Fixed layers are automatically *'padded'* horizontally from the boundary nodes by an additional 400 km in order to
     avoid edge effects.
 
----------------------------
-** 3.0 Create a new layer**
----------------------------
+Lets chose to create a new **floating** layer, which we will use to represent the Weardale granite.
+
+When creating a new floating layer, you must assign the X and Y coordinates of four nodes that will define the layer.
+These nodes **must** be input in anti-clockwise order to ensure layers field effects are calculated with the correct
+sign. Beside the ordering of the nodes, there actual positions are not important as then can easily be modified using
+the mouse once the layer has been created.
+
+Lets set the initial node positions for our new floating layer as follows::
+
+    X1: 10    Y1: 1
+    X2: 10    Y2: 8
+    X3: 30    Y3: 8
+    X4: 30    Y4: 1
+
+Finally, select ``Create layer". The new layer will appear in the modelling environment.
+
+We can rename the layer from its default name of ``layer 1" by twice single clicking its name under the ``Layers" menu
+on the middle left ``Controls panel". Lets rename the layer ``Weardale".
 
 
----------------------
-** 0.0 Seismic data**
----------------------
+**6.0 Setting layer attributes**
+--------------------------------
+
+Now that we have created a new floating layer to represent the Weardale granite, lets assign its bulk density for
+gravity modelling. We will also assign a ``background density" used to represent the surrounding basement rock. The
+difference between these two values represents the ``density contrast" used for calculating the gravity effect of the
+granite.
+
+:cite:`Kimbell2010` Kimbell et al., (2010) suggest that 2.78 g/cm3 is a reasonable bulk density for the Lower Palaeozoic
+rocks of the ``Alston Block", within which the Weardale granite is found. While measurements made on rock fragments
+recovered from the Rookhope borehole suggest the granites bulk density is close to 2.63 g/cm3 (Bott, 1967)
+:cite:`bott1967`.
+
+Lets use these values to begin our modelling. To set the bulk density of our first layer.
+
+First, select the ``Weardale" layer under the menu by double clicking on its name. We can now set the bulk density and
+reference density values under the ``Layer Attributes" top left control panel. Once you have assigned the values click
+``Set layer attributes" to make the changes.
+
+
+**0.0 Seismic data**
+--------------------
 Any 2D Seismic SEGY data can be loaded into GMG models, however, to be useful, it is highly recommended these data are
 pre-processed in the depth domain.
 

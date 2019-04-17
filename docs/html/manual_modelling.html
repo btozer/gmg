@@ -18,13 +18,20 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -33,21 +40,16 @@
     <link rel="prev" title="Keyboard Shortcuts" href="manual_keyboard_shortcuts.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -201,19 +203,19 @@
 <p>Before creating a new model, it is recommended that you create a project directory structure in which you will store
 and save all of the data related to the model. This can be structured in any way the user wishes, however, the
 directory structure outlined in this section is a useful template. First create a new root directory for your project:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>mkdir GMG_MODEL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mkdir GMG_MODEL
 </pre></div>
 </div>
 <p>Then:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>cd GMG_MODEL
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd GMG_MODEL
 </pre></div>
 </div>
 <p>and create the following directory structure:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>mkdir MODELS GRAVITY_DATA MAGNETIC_DATA SEGY_DATA WELL_DATA GEOLOGICAL_DATA POINT_DATA EXPORTS FIGURES
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mkdir MODELS GRAVITY_DATA MAGNETIC_DATA SEGY_DATA WELL_DATA GEOLOGICAL_DATA POINT_DATA EXPORTS FIGURES
 </pre></div>
 </div>
 <p>You are now ready to start modelling. Launch gmg and navigate to:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>File -&gt; New Model...
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>File -&gt; New Model...
 </pre></div>
 </div>
 <p>A pop-up window will appear in which you will enter the new model’s dimensions and the spacing increment
@@ -222,7 +224,7 @@ at which the predicted anomalies will be calculated (NB. all units are km).</p>
 <p class="first admonition-title">Note</p>
 <p>The model dimensions and spacing at which potential field data is calculated can be modified later by navigating
 to:</p>
-<div class="last highlight-none"><div class="highlight"><pre><span></span>Model View -&gt; Modify current Model Dimensions...
+<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>Model View -&gt; Modify current Model Dimensions...
 </pre></div>
 </div>
 </div>
@@ -237,7 +239,7 @@ smoothly during the initial modelling phase.</p>
 <div class="section" id="saving-a-model">
 <h2>1.2 Saving a Model<a class="headerlink" href="#saving-a-model" title="Permalink to this headline">¶</a></h2>
 <p>To save a model use the Save model icon (see <a class="reference internal" href="manual_icons.html#icons"><span class="std std-ref">Icon Shortcuts</span></a>) or navigate to:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>File -&gt; Save Model...
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>File -&gt; Save Model...
 </pre></div>
 </div>
 <p>This will prompt a save file menu, from which you can navigate to the directory where you would like to save your model.
@@ -257,7 +259,7 @@ For example: gmg_testing/MODELS/</p>
 <div class="section" id="loading-a-model">
 <h2>1.3 Loading a Model<a class="headerlink" href="#loading-a-model" title="Permalink to this headline">¶</a></h2>
 <p>To load a model use the Load model icon (see <a class="reference internal" href="manual_icons.html#icons"><span class="std std-ref">Icon Shortcuts</span></a>) or navigate to:</p>
-<div class="highlight-none"><div class="highlight"><pre><span></span>Files -&gt; Load Model -&gt; navigate to your required .model -&gt; Open
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Files -&gt; Load Model -&gt; navigate to your required .model -&gt; Open
 </pre></div>
 </div>
 <p>Your model will be loaded into the current gmg window.</p>
@@ -275,7 +277,7 @@ For example: gmg_testing/MODELS/</p>
         <a href="manual_model_layers.html" class="btn btn-neutral float-right" title="2.0 Model Layers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="manual_keyboard_shortcuts.html" class="btn btn-neutral" title="Keyboard Shortcuts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="manual_keyboard_shortcuts.html" class="btn btn-neutral float-left" title="Keyboard Shortcuts" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -284,8 +286,10 @@ For example: gmg_testing/MODELS/</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Dec 21, 2018.
+        &copy; Copyright 2014-2019, B. Tozer
+      <span class="lastupdated">
+        Last updated on Apr 12, 2019.
+      </span>
 
     </p>
   </div>
@@ -302,33 +306,16 @@ For example: gmg_testing/MODELS/</p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

@@ -18,13 +18,20 @@
   
 
   
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
@@ -33,21 +40,16 @@
     <link rel="prev" title="A1 Bott (1969) 2D gravity algorithm" href="manual_gravity_algorithm.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -208,38 +210,39 @@ and the magnetisation vector must also be considered.</p>
 vector separately and then summing these components at the final calculation step. Following the trigonometric
 parametrisation for a two-dimensional body shown in <a class="reference internal" href="#talwani-mag-method"><span class="std std-numref">Figure 4</span></a>, Talwani and Heirtzler
 (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id2">[6]</a> showed that the horizontal and vertical components of the total magnetic field are given by:</p>
-<div class="math" id="equation-﻿talwani_mag_vertical">
-<span class="eqno">(1)<a class="headerlink" href="#equation-﻿talwani_mag_vertical" title="Permalink to this equation">¶</a></span>\[V = 2(J_{x}Q - J_{z}P)\]</div>
-<div class="math" id="equation-talwani_mag_horizontal">
-<span class="eqno">(2)<a class="headerlink" href="#equation-talwani_mag_horizontal" title="Permalink to this equation">¶</a></span>\[H = 2(J_{x}Q + J_{z}P)\]</div>
+<div class="math notranslate nohighlight" id="equation-talwani-mag-vertical">
+<span class="eqno">(4)<a class="headerlink" href="#equation-talwani-mag-vertical" title="Permalink to this equation">¶</a></span>\[V = 2(J_{x}Q - J_{z}P)\]</div>
+<div class="math notranslate nohighlight" id="equation-talwani-mag-horizontal">
+<span class="eqno">(5)<a class="headerlink" href="#equation-talwani-mag-horizontal" title="Permalink to this equation">¶</a></span>\[H = 2(J_{x}Q + J_{z}P)\]</div>
 <p>where:</p>
-<div class="math" id="equation-﻿talwani_mag_P">
-<span class="eqno">(3)<a class="headerlink" href="#equation-﻿talwani_mag_P" title="Permalink to this equation">¶</a></span>\[P = \frac{z_{21}^2}{z_{21}^2+x_{12}^2}(\theta_{1}-\theta_{2}) +
+<div class="math notranslate nohighlight" id="equation-talwani-mag-p">
+<span class="eqno">(6)<a class="headerlink" href="#equation-talwani-mag-p" title="Permalink to this equation">¶</a></span>\[P = \frac{z_{21}^2}{z_{21}^2+x_{12}^2}(\theta_{1}-\theta_{2}) +
 \frac{z_{21}x_{12}}{z_{21}^2+x_{12}^2} \log \frac{r_{2}}{r_1}\]</div>
-<div class="math" id="equation-﻿talwani_mag_Q">
-<span class="eqno">(4)<a class="headerlink" href="#equation-﻿talwani_mag_Q" title="Permalink to this equation">¶</a></span>\[Q = \frac{z_{21}x_{12}}{z_{21}^2+x_{12}^2}(\theta_{1}-\theta_{2}) -
+<div class="math notranslate nohighlight" id="equation-talwani-mag-q">
+<span class="eqno">(7)<a class="headerlink" href="#equation-talwani-mag-q" title="Permalink to this equation">¶</a></span>\[Q = \frac{z_{21}x_{12}}{z_{21}^2+x_{12}^2}(\theta_{1}-\theta_{2}) -
 \frac{z_{21}^2}{z_{21}^2+x_{12}^2} \log \frac{r_{2}}{r_1}\]</div>
 <p>and:</p>
-<div class="math" id="equation-﻿talwani_mag_X">
-<span class="eqno">(5)<a class="headerlink" href="#equation-﻿talwani_mag_X" title="Permalink to this equation">¶</a></span>\[x_{12}=x_{1}-{x_2} \qquad z_{21}=z_{2}-z_{1} \qquad z_{1}=\sqrt{x_{1}^2+z_{1}^2}
+<div class="math notranslate nohighlight" id="equation-talwani-mag-x">
+<span class="eqno">(8)<a class="headerlink" href="#equation-talwani-mag-x" title="Permalink to this equation">¶</a></span>\[x_{12}=x_{1}-{x_2} \qquad z_{21}=z_{2}-z_{1} \qquad z_{1}=\sqrt{x_{1}^2+z_{1}^2}
 \qquad z_{2}=\sqrt{x_{2}^2+z_{2}^2}\]</div>
 <p>To account for the bodies magnetisation vector and its relationship with the model profile azimuth
-<span class="math">\(J_{x}\)</span> and <span class="math">\(J_{z}\)</span> are then given by:</p>
-<div class="math" id="equation-talwani_mag_J_horizontal">
-<span class="eqno">(6)<a class="headerlink" href="#equation-talwani_mag_J_horizontal" title="Permalink to this equation">¶</a></span>\[J_{x} = J \cos A \cos(C-B)\]</div>
-<div class="math" id="equation-talwani_mag_J_vertical">
-<span class="eqno">(7)<a class="headerlink" href="#equation-talwani_mag_J_vertical" title="Permalink to this equation">¶</a></span>\[J_{z} = J \sin A\]</div>
+<span class="math notranslate nohighlight">\(J_{x}\)</span> and <span class="math notranslate nohighlight">\(J_{z}\)</span> are then given by:</p>
+<div class="math notranslate nohighlight" id="equation-talwani-mag-j-horizontal">
+<span class="eqno">(9)<a class="headerlink" href="#equation-talwani-mag-j-horizontal" title="Permalink to this equation">¶</a></span>\[J_{x} = J \cos A \cos(C-B)\]</div>
+<div class="math notranslate nohighlight" id="equation-talwani-mag-j-vertical">
+<span class="eqno">(10)<a class="headerlink" href="#equation-talwani-mag-j-vertical" title="Permalink to this equation">¶</a></span>\[J_{z} = J \sin A\]</div>
 <p>where angle <strong>A</strong> is measured in the vertical plane from zero at the horizontal and positive downwards.
 Angles <strong>B</strong> and <strong>C</strong> are measured in the horizontal plane, in a positive clockwise direction from geographic north,
 as shown in <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>.</p>
 <p>For the case when magnetisation is induced only:</p>
-<div class="math" id="equation-talwani_mag_J_induced">
-<span class="eqno">(8)<a class="headerlink" href="#equation-talwani_mag_J_induced" title="Permalink to this equation">¶</a></span>\[J = kH\]</div>
-<p>where <span class="math">\(k\)</span> is the susceptibility contrast between the body and surrounding material and <span class="math">\(H\)</span> is the strength
+<div class="math notranslate nohighlight" id="equation-talwani-mag-j-induced">
+<span class="eqno">(11)<a class="headerlink" href="#equation-talwani-mag-j-induced" title="Permalink to this equation">¶</a></span>\[J = kH\]</div>
+<p>where <span class="math notranslate nohighlight">\(k\)</span> is the susceptibility contrast between the body and surrounding material and <span class="math notranslate nohighlight">\(H\)</span> is the strength
 of inducing field. Also, <strong>A</strong> will be equal to the inclination (<strong>I</strong>) and <strong>B</strong> will be equal to the declination
 (<strong>D</strong>) of Earth’s field Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id3">[6]</a>.</p>
-<p>For the case when magnetisation is remanent or a combination of remanent and induced, the angles <strong>A</strong> and <strong>B</strong> will require modification by the user to account for the difference
-between the inducing field vector and remanent field vector.</p>
+<p>For the case when magnetisation is remanent or a combination of remanent and induced, the angles <strong>A</strong> and <strong>B</strong> will
+require modification by the user to account for the difference between the inducing field vector and remanent field
+vector.</p>
 <div class="figure" id="talwani-mag-method">
 <img alt="_images/talwani_magnetic.png" src="_images/talwani_magnetic.png" />
 <p class="caption"><span class="caption-number">Figure 4 </span><span class="caption-text">a) Geometric parameters used for solving for the magnetic anomaly produced by an infinite body with one
@@ -248,50 +251,50 @@ five nodal points (A-E) (modified after, Talwani and Heirtzler (1964) <a class="
 </div>
 <div class="figure" id="talwani-mag-angles">
 <img alt="_images/talwani_mag_angles.png" src="_images/talwani_mag_angles.png" />
-<p class="caption"><span class="caption-number">Figure 5 </span><span class="caption-text">Perspective three-dimensional view of the total magnetisation vector <span class="math">\(\vec{J}\)</span>. Grey shade is a
-vertical plane connecting <span class="math">\(\vec{J}\)</span> to the horizontal x-y surface. A is the dip angle of <span class="math">\(\vec{J}\)</span>,
+<p class="caption"><span class="caption-number">Figure 5 </span><span class="caption-text">Perspective three-dimensional view of the total magnetisation vector <span class="math notranslate nohighlight">\(\vec{J}\)</span>. Grey shade is a
+vertical plane connecting <span class="math notranslate nohighlight">\(\vec{J}\)</span> to the horizontal x-y surface. A is the dip angle of <span class="math notranslate nohighlight">\(\vec{J}\)</span>,
 measured in the vertical plane and equal to the inclination for induced magnetisation. B and C are
-the angles between geographic north and the horizontal projection of <span class="math">\(\vec{J}\)</span> and model profile
+the angles between geographic north and the horizontal projection of <span class="math notranslate nohighlight">\(\vec{J}\)</span> and model profile
 (positive x-axis) respectively. These are measured clockwise from geographic north and B is equal
 to declination for induced magnetisation (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id5">[6]</a>).</span></p>
 </div>
 <p>The total magnetic anomaly is then given as the sum of the horizontal and vertical components in the model plane:</p>
-<div class="math" id="equation-talwani_mag_total">
-<span class="eqno">(9)<a class="headerlink" href="#equation-talwani_mag_total" title="Permalink to this equation">¶</a></span>\[T = V \sin A + H \cos A \cos (C-B)\]</div>
+<div class="math notranslate nohighlight" id="equation-talwani-mag-total">
+<span class="eqno">(12)<a class="headerlink" href="#equation-talwani-mag-total" title="Permalink to this equation">¶</a></span>\[T = V \sin A + H \cos A \cos (C-B)\]</div>
 <div class="section" id="talwani-and-heirtzler-1964-method-testing">
 <h2>Talwani and Heirtzler (1964) method testing<a class="headerlink" href="#talwani-and-heirtzler-1964-method-testing" title="Permalink to this headline">¶</a></h2>
 <p>To assess the accuracy of the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id6">[6]</a> method, the magnetic anomaly determined
 using the algorithm is compared to that of an exact analytic solution for a simple body. In this case, the solution
-for a thin (width <span class="math">\(&lt;&lt;\)</span> depth) flat topped vertical sheet with a constant dip angle and magnetisation, which
+for a thin (width <span class="math notranslate nohighlight">\(&lt;&lt;\)</span> depth) flat topped vertical sheet with a constant dip angle and magnetisation, which
 extends infinitely into and out of the model plane and infinitely in depth is solved. The solution for this case
 is given by, for example, Reford (1964) <a class="reference internal" href="manual_references.html#reford1964" id="id7">[5]</a> as:</p>
-<div class="math" id="equation-reford_dyke">
-<span class="eqno">(10)<a class="headerlink" href="#equation-reford_dyke" title="Permalink to this equation">¶</a></span>\[\Delta T = 2kTb^{2}w  \left[ \frac{h}{R^{2}} \sin (2I-d) - \frac{x}{R^{2}} \cos(2I-d) \right]\]</div>
-<div class="math" id="equation-b">
-<span class="eqno">(11)<a class="headerlink" href="#equation-b" title="Permalink to this equation">¶</a></span>\[b^{2} = 1 - \cos{^2}i\sin{^2}D\]</div>
-<div class="math" id="equation-i">
-<span class="eqno">(12)<a class="headerlink" href="#equation-i" title="Permalink to this equation">¶</a></span>\[I = tan^{-1}[ tan(i) cos(D) ]\]</div>
-<p>Where <span class="math">\(k\)</span> is the magnetic susceptibility contrast between the sheet and its surroundings; <span class="math">\(T\)</span> is the
-strength of the inducing field; <span class="math">\(w\)</span> is the width of the flat top of the sheet; <span class="math">\(h\)</span> is the depth to the
-top of the dyke; <span class="math">\(i\)</span> is the angle of inclination measured downwards from the horizontal; <span class="math">\(I\)</span> is the angle
-of inclination of the component of i in the model plane; <span class="math">\(D\)</span> is the angle between magnetic north and the positive
-x axis (model profile azimuth); <span class="math">\(d\)</span> is the dip of the dyke measured clockwise from the positive x axis
+<div class="math notranslate nohighlight" id="equation-reford-dyke">
+<span class="eqno">(13)<a class="headerlink" href="#equation-reford-dyke" title="Permalink to this equation">¶</a></span>\[\Delta T = 2kTb^{2}w  \left[ \frac{h}{R^{2}} \sin (2I-d) - \frac{x}{R^{2}} \cos(2I-d) \right]\]</div>
+<div class="math notranslate nohighlight" id="equation-b">
+<span class="eqno">(14)<a class="headerlink" href="#equation-b" title="Permalink to this equation">¶</a></span>\[b^{2} = 1 - \cos{^2}i\sin{^2}D\]</div>
+<div class="math notranslate nohighlight" id="equation-i">
+<span class="eqno">(15)<a class="headerlink" href="#equation-i" title="Permalink to this equation">¶</a></span>\[I = tan^{-1}[ tan(i) cos(D) ]\]</div>
+<p>Where <span class="math notranslate nohighlight">\(k\)</span> is the magnetic susceptibility contrast between the sheet and its surroundings; <span class="math notranslate nohighlight">\(T\)</span> is the
+strength of the inducing field; <span class="math notranslate nohighlight">\(w\)</span> is the width of the flat top of the sheet; <span class="math notranslate nohighlight">\(h\)</span> is the depth to the
+top of the dyke; <span class="math notranslate nohighlight">\(i\)</span> is the angle of inclination measured downwards from the horizontal; <span class="math notranslate nohighlight">\(I\)</span> is the angle
+of inclination of the component of i in the model plane; <span class="math notranslate nohighlight">\(D\)</span> is the angle between magnetic north and the positive
+x axis (model profile azimuth); <span class="math notranslate nohighlight">\(d\)</span> is the dip of the dyke measured clockwise from the positive x axis
 (e.g. <a class="reference internal" href="#talwani-mag-angles"><span class="std std-numref">Figure 5</span></a>).</p>
 <p>This solution is used to simulate a vertical dyke of finite depth extent by calculating the anomalies
-produced by two bodies, one where <span class="math">\(h=d_{1}\)</span> (the top of the dyke) and a second where <span class="math">\(h = d_{2}\)</span> (the
+produced by two bodies, one where <span class="math notranslate nohighlight">\(h=d_{1}\)</span> (the top of the dyke) and a second where <span class="math notranslate nohighlight">\(h = d_{2}\)</span> (the
 base of the dyke). The effect of the second dyke is subtracted from the first to leave the anomaly caused by a dyke
-of finite depth extent <span class="math">\(d_{2}\)</span>.</p>
+of finite depth extent <span class="math notranslate nohighlight">\(d_{2}\)</span>.</p>
 <p><a class="reference internal" href="#talwani-heirtz-test"><span class="std std-numref">Figure 6</span></a> shows anomalies calculated using the analytic solution and
 the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id8">[6]</a> algorithm for a thin vertical sheet beginning at a depth of
-1 <span class="math">\(km\)</span> and extending to 10 <span class="math">\(km\)</span> with no dip and a magnetic susceptibility of 0.001. Inclination and
+1 <span class="math notranslate nohighlight">\(km\)</span> and extending to 10 <span class="math notranslate nohighlight">\(km\)</span> with no dip and a magnetic susceptibility of 0.001. Inclination and
 declination are both 0 degree, and the model azimuth is due north, such that, the sheet strikes east-west.</p>
 <div class="figure" id="talwani-heirtz-test">
 <img alt="_images/magnetic_anomaly_comparison.png" src="_images/magnetic_anomaly_comparison.png" />
 <p class="caption"><span class="caption-number">Figure 6 </span><span class="caption-text">a) Predicted magnetic anomalies for the model shown in (b) using the analytic solution for a thin sheet
 (grey line) and the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id9">[6]</a> algorithm (red dashed line). b) Simple thin
-sheet model polygon used to simulate a vertical dyke. Inset table lists model parameters (<span class="math">\(\Delta \lambda\)</span>)
-susceptibility contrast; <span class="math">\(w =\)</span> width of the flat top of the sheet; Inc. and Dec. <span class="math">\(=\)</span> Inclination and
-Declination of inducing field. Inducing field strength is set as <span class="math">\(50000\)</span> <span class="math">\(nT\)</span>.
+sheet model polygon used to simulate a vertical dyke. Inset table lists model parameters (<span class="math notranslate nohighlight">\(\Delta \lambda\)</span>)
+susceptibility contrast; <span class="math notranslate nohighlight">\(w =\)</span> width of the flat top of the sheet; Inc. and Dec. <span class="math notranslate nohighlight">\(=\)</span> Inclination and
+Declination of inducing field. Inducing field strength is set as <span class="math notranslate nohighlight">\(50000\)</span> <span class="math notranslate nohighlight">\(nT\)</span>.
 The profile azimuth is east-west.</span></p>
 </div>
 </div>
@@ -308,7 +311,7 @@ The profile azimuth is east-west.</span></p>
         <a href="manual_references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="manual_gravity_algorithm.html" class="btn btn-neutral" title="A1 Bott (1969) 2D gravity algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="manual_gravity_algorithm.html" class="btn btn-neutral float-left" title="A1 Bott (1969) 2D gravity algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -317,8 +320,10 @@ The profile azimuth is east-west.</span></p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2014-2018, B. Tozer.
-      Last updated on Dec 21, 2018.
+        &copy; Copyright 2014-2019, B. Tozer
+      <span class="lastupdated">
+        Last updated on Apr 12, 2019.
+      </span>
 
     </p>
   </div>
@@ -335,33 +340,16 @@ The profile azimuth is east-west.</span></p>
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'1',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>

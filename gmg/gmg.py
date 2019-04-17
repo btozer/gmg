@@ -428,18 +428,19 @@ class Gmg(wx.Frame):
 
         # WELL DATA MENU -----------------------------------------------------------------------------------------------
         self.well_data = wx.Menu()
-        self.m_load_well = self.well_data.Append(-1, "&Load...\tCtrl-Shift-w", "Load Well Horizons")
+        self.m_load_well = self.well_data.Append(-1, "&Load well record...\tCtrl-Shift-w", "Load well record")
         self.Bind(wx.EVT_MENU, self.load_well, self.m_load_well)
         # WELL SUBMENU
         self.m_wells_submenu = wx.Menu()
-        self.well_data.Append(-1, 'Well...', self.m_wells_submenu)
+        self.well_data.Append(-1, 'Wells...', self.m_wells_submenu)
         # DRAW MENU
         self.menubar.Append(self.well_data, "&Well Data")
         # --------------------------------------------------------------------------------------------------------------
 
         # CONTACTS MENU ------------------------------------------------------------------------------------------------
         self.contact_file = wx.Menu()
-        self.m_load_contact_data = self.contact_file.Append(-1, "&Load Outcrops...\tCtrl-Shift-w", "Load Outcrop Data")
+        self.m_load_contact_data = self.contact_file.Append(-1, "&Load Outcrop data...\tCtrl-Shift-w",
+                                                            "Load outcrop data")
         self.Bind(wx.EVT_MENU, self.load_contact_data, self.m_load_contact_data)
 
         self.m_contacts_submenu = wx.Menu()
@@ -1717,8 +1718,8 @@ class Gmg(wx.Frame):
                 else:
                     self.well_name_submenu = wx.Menu()
                     self.m_wells_submenu.Append(self.count + 3000, self.well_name_list[x], self.well_name_submenu)
-                    self.well_name_submenu.Append(self.count + 2000, 'hide/show')
-                    self.well_name_submenu.Append(self.count + 3000, 'delete well')
+                    self.well_name_submenu.Append(self.count + 2000, 'Hide/Show')
+                    self.well_name_submenu.Append(self.count + 3000, 'Delete well')
                     self.Bind(wx.EVT_MENU, self.show_hide_well, id=self.count + 2000)
                     self.Bind(wx.EVT_MENU, self.delete_well, id=self.count + 3000)
                     self.count += 1
@@ -2268,7 +2269,7 @@ class Gmg(wx.Frame):
             return  # THE USER CHANGED THEIR MIND
         else:
             well_in = open_file_dialog.GetPath()
-            well_name_box = wx.TextEntryDialog(None, 'Name for the new well:')
+            well_name_box = wx.TextEntryDialog(None, 'Please provide a name for the new well record:')
             answer = well_name_box.ShowModal()
 
         self.well_name = well_name_box.GetValue()
@@ -2281,8 +2282,8 @@ class Gmg(wx.Frame):
         # CREATE FILE MENU DATA
         self.well_name_submenu = wx.Menu()
         self.m_wells_submenu.Append(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
-        self.well_name_submenu.Append(int(self.well_count) + 2000, 'hide/show')
-        self.well_name_submenu.Append(int(self.well_count) + 3000, 'delete well')
+        self.well_name_submenu.Append(int(self.well_count) + 2000, 'Hide/Show')
+        self.well_name_submenu.Append(int(self.well_count) + 3000, 'Delete well')
         self.Bind(wx.EVT_MENU, self.show_hide_well, id=int(self.well_count) + 2000)
         self.Bind(wx.EVT_MENU, self.delete_well, id=int(self.well_count) + 3000)
         self.well_count += 1
@@ -2497,7 +2498,7 @@ class Gmg(wx.Frame):
             return  # THE USER CHANGED THERE MIND
         else:
             contact_data_in = open_file_dialog.GetPath()
-            contact_name_box = wx.TextEntryDialog(None, 'Name for new data:')
+            contact_name_box = wx.TextEntryDialog(None, 'Please provide a name for the new data:')
             contact_name_box.ShowModal()
 
         # LOAD DATA
@@ -4535,12 +4536,12 @@ class LoadObservedDataFrame(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
 
         # OBSERVED NAME
-        self.observed_name_text = wx.StaticText(floating_panel, -1, "Name for Observed data:")
+        self.observed_name_text = wx.StaticText(floating_panel, -1, "Name for observed data:")
         self.observed_name = wx.TextCtrl(floating_panel, -1, value="Observed_name", size=(150, -1))
 
         # COLOR
         self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'black', 'purple', 'pink']
-        self.color_text = wx.StaticText(floating_panel, -1, "Color:")
+        self.color_text = wx.StaticText(floating_panel, -1, "Display color:")
         self.color_picked = wx.ComboBox(floating_panel, -1, value='blue', choices=self.colors, size=(75, -1),
                                         style=wx.CB_DROPDOWN)
         # LOAD BUTTON

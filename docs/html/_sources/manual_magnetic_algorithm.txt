@@ -65,8 +65,9 @@ where :math:`k` is the susceptibility contrast between the body and surrounding 
 of inducing field. Also, **A** will be equal to the inclination (**I**) and **B** will be equal to the declination
 (**D**) of Earth's field Talwani and Heirtzler (1964) :cite:`talwani1964`.
 
-For the case when magnetisation is remanent or a combination of remanent and induced, the angles **A** and **B** will require modification by the user to account for the difference
-between the inducing field vector and remanent field vector.
+For the case when magnetisation is remanent or a combination of remanent and induced, the angles **A** and **B** will
+require modification by the user to account for the difference between the inducing field vector and remanent field
+vector.
 
 .. figure:: _static/talwani_magnetic.png
     :name: talwani_mag_method
