@@ -657,7 +657,7 @@ class Gmg(wx.Frame):
         self.nodes = True
         self.zoom_on = False
         self.pan_on = False
-        self.node_click_limit = 2
+        self.node_click_limit = 0.1
         self.layer_lock = True
         self.boundary_lock = True
         self.calc_padding = 5000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
@@ -795,26 +795,27 @@ class Gmg(wx.Frame):
 
     def draw_main_frame(self):
         """DRAW THE PROGRAM CANVASES"""
-
+        columns=93
+        x_orig=9
         'TOPO CANVAS'
-        self.tcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=2, colspan=12)
+        self.tcanvas = plt.subplot2grid((26, 100), (0, x_orig), rowspan=2, colspan=columns)
         self.tcanvas.set_ylabel("Topo (m)")
         self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.tcanvas.grid()
         'GRAV CANVAS'
-        self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=3, colspan=12)
+        self.dcanvas = plt.subplot2grid((26, 100), (2, x_orig), rowspan=3, colspan=columns)
         self.dcanvas.set_ylabel("Grav (mGal)")
         self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.dcanvas.grid()
         self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         'MAG CANVAS'
-        self.ntcanvas = plt.subplot2grid((26, 12), (5, 1), rowspan=3, colspan=12)
+        self.ntcanvas = plt.subplot2grid((26, 100), (5, x_orig), rowspan=3, colspan=columns)
         self.ntcanvas.set_ylabel("Mag (nT)")
         self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.ntcanvas.grid()
         self.ntcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         'MODEL CANVAS'
-        self.mcanvas = plt.subplot2grid((26, 12), (8, 1), rowspan=17, colspan=12)
+        self.mcanvas = plt.subplot2grid((26, 100), (8, x_orig), rowspan=17, colspan=columns)
         self.mcanvas.set_ylabel("Depth (km)")
         self.mcanvas.set_xlabel("x (km)")
 
@@ -1357,7 +1358,8 @@ class Gmg(wx.Frame):
         self.run_algorithms()
 
     def on_begin_edit_label(self, event):
-        self.DoGetBestSize()
+        # self.DoGetBestSize()
+        pass
 
     def on_end_edit_label(self, event):
         self.i = self.tree.GetPyData(event.GetItem())
@@ -1881,10 +1883,7 @@ class Gmg(wx.Frame):
                 self.obs_mag_count += 1
 
     def load_xy(self, event):
-        """
-        LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS
-        NB: ID's start at 5000
-        """
+        """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS NB: ID's start at 5000"""
 
         open_file_dialog = wx.FileDialog(self, "Open XY file", "", "", "All files (*.*)|*.*", wx.FD_OPEN |
                                          wx.FD_FILE_MUST_EXIST)
@@ -1923,10 +1922,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_xy(self, event):
-        """"
-        DELETE OBSERVED XY DATA
-        NB: ID's start at 5000
-        """
+        """" DELETE OBSERVED XY DATA NB: ID's start at 5000"""
         id = event.Id-5000
         self.m_xy_submenu.DestroyItem(id)
         self.xy_list[id].set_visible(False)
@@ -2033,9 +2029,13 @@ class Gmg(wx.Frame):
 
     def delete_obs_grav(self, event):
         self.m_obs_g_submenu.DestroyItem(event.Id)
+        self.obs_grav_name_list[event.Id-1] = []
         self.obs_grav_list[event.Id-1].set_visible(False)
         self.obs_grav_list[event.Id-1] = []
         self.obs_grav_list_save[event.Id-1] = []
+
+        print self.obs_grav_name_list
+
         self.update_layer_data()
         self.draw()
 
@@ -2104,7 +2104,7 @@ class Gmg(wx.Frame):
         self.set_frame_limits()
 
     def delete_obs_mag(self, event):
-        self.m_obs_mag_submenu.DestroyId(event.Id)
+        self.m_obs_mag_submenu.DestroyItem(event.Id)
         self.obs_mag_list[event.Id].set_visible(False)
         self.obs_mag_list[event.Id-1] = []
         self.obs_mag_name_list[event.Id-1] = []
@@ -2115,7 +2115,7 @@ class Gmg(wx.Frame):
     def delete_all_obs_mag(self, event):
         for x in range(0, self.obs_mag_count):
             try:
-                self.m_obs_mag_submenu.DestroyId(x)
+                self.m_obs_mag_submenu.DestroyItem(x)
                 self.obs_mag_list[x].set_visible(False)
             except:
                 continue
@@ -2504,10 +2504,10 @@ class Gmg(wx.Frame):
         # LOAD DATA
         self.contact_name = contact_name_box.GetValue()
         self.contact_name_list.append(str(self.contact_name))
-        self.contact_data = np.genfromtxt(contact_data_in, autostrip=True, delimiter=' ', dtype=str)
+        self.contact_data = np.genfromtxt(contact_data_in, autostrip=True, delimiter=' ', dtype=str, comments='#')
 
         # DRAW MARKERS
-        self.well_labels = [None] * len(self.contact_data)
+        self.contact_labels = [None] * len(self.contact_data)
         self.contacts = [None] * len(self.contact_data)
         for i in range(len(self.contact_data)):
             x1 = self.contact_data[i, 0].astype(float)
@@ -3812,24 +3812,27 @@ class Gmg(wx.Frame):
 
         # WELL DATA
         # LOOP THROUGH ALL WELL NAMES
-        for i in range(len(self.well_name_text)):
-            if self.well_name_text[i] != "None" and self.well_name_text[i] != []:
-                self.well_name_text[i].set_size(self.textsize)
+        if len(self.well_name_text) > 0:
+            for i in range(len(self.well_name_text)):
+                if self.well_name_text[i] != "None" and self.well_name_text[i] != []:
+                    self.well_name_text[i].set_size(self.textsize)
         # LOOP THROUGH ALL WELL HORIZON LABELS
-        for i in range(len(self.well_labels)):
-            labels = self.well_labels[i]
-            for l in range(2, len(labels)):
-                if labels[l] != "None" and labels[l] != []:
-                    labels[l].set_size(self.textsize)
+        if len(self.well_labels) > 0:
+            for i in range(len(self.well_labels)):
+                labels = self.well_labels[i]
+                for l in range(2, len(labels)):
+                    if labels[l] != "None" and labels[l] != []:
+                        labels[l].set_size(self.textsize)
 
         # CONTACT DATA
-        for i in range(self.contact_data_count):
-            contact_text = self.contact_text_list[i]
-            for k in range(len(contact_text)):
-                if contact_text[k] is not None:
-                    contact_text[k].set_size(self.textsize)
-                else:
-                    pass
+        if self.contact_data_count > 0:
+            for i in range(self.contact_data_count):
+                contact_text = self.contact_text_list[i]
+                for k in range(len(contact_text)):
+                    if contact_text[k] is not None:
+                        contact_text[k].set_size(self.textsize)
+                    else:
+                        pass
 
         # REDRAW ANNOTATIONS WITH NEW TEXT SIZE
         self.draw()
@@ -3874,6 +3877,7 @@ class Gmg(wx.Frame):
         # UPDATE MAIN FRAME TREE LIST
         current_tree_items = self.tree.GetRootItem().GetChildren()
         for i in range(0, len(self.tree_items) - 1):
+            new_label = new_tree_items[i]
             self.tree.SetItemText(current_tree_items[i], new_tree_items[i + 1])
 
         # UPDATE MAIN FRAME ATTRIBUTES
@@ -5712,6 +5716,10 @@ class AttributeEditor(wx.Frame):
         attribute_edit.parent.attribute_set(attribute_edit.tree_items, attribute_edit.densities,
                                             attribute_edit.reference_densities, attribute_edit.susceptibilities,
                                             attribute_edit.angle_a, attribute_edit.angle_b, attribute_edit.layer_colors)
+
+        attribute_edit.parent.update_layer_data()
+        attribute_edit.parent.run_algorithms()
+        attribute_edit.parent.draw()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
