@@ -1111,10 +1111,10 @@ class Gmg(wx.Frame):
         'INITALISE CALCULATED P.F. LINES'
         if self.dcanvas is not None:
             self.predplot, = self.dcanvas.plot([], [], '-r', linewidth=2)
-            self.grav_rms_plot, = self.dcanvas.plot([], [], color='pink', linewidth=1)
+            self.grav_rms_plot, = self.dcanvas.plot([], [], color='purple', linewidth=1.5)
         if self.ntcanvas is not None:
             self.prednt_plot, = self.ntcanvas.plot([], [], '-g', linewidth=2)
-            self.mag_rms_plot, = self.ntcanvas.plot([], [], color='pink', linewidth=1)
+            self.mag_rms_plot, = self.ntcanvas.plot([], [], color='purple', linewidth=1.5)
 
         'PLOT OBSERVED TOPO DATA'
         if self.tcanvas is not None:
@@ -1341,7 +1341,7 @@ class Gmg(wx.Frame):
     def on_activated(self, event):
         # FIRST CHECK IS FAULT PICKING MODE IS ON, IF IT IS, THEN TURN IT OFF
         if self.fault_picking_switch is True:
-            self.fault_picking_switch == False
+            self.fault_picking_switch = False
 
         # SET OBJECTS WITH THE CHOSEN LAYER
         self.i = self.tree.GetPyData(event.GetItem())
@@ -1457,7 +1457,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def calc_grav_switch(self, event):
-        """PREDICTED ANOMALY CALCULATION SWITCHES: SWITCH CALCULATED ANOMALIES ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
+        """PREDICTED ANOMALY CALCULATION SWITCH: ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_grav_switch is True:
             self.calc_grav_switch = False
             if self.grav_residuals != [] and self.obs_gravity_data_for_rms != []:
@@ -1470,6 +1470,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def calc_mag_switch(self, event):
+        """PREDICTED ANOMALY CALCULATION SWITCH: ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_mag_switch is True:
             self.calc_mag_switch = False
             if self.mag_residuals != [] and self.obs_mag_data_for_rms != []:
@@ -1948,12 +1949,12 @@ class Gmg(wx.Frame):
 
     # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def load_topo(self):
+    def load_topo(self, event):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'topography')
         self.load_window.Show(True)
 
-    def open_obs_t(self, event):
-        # GET VALUES FROM LOAD WINDOW
+    def open_obs_t(self):
+        """LOAD OBSERVE TOPO DATA: IDs start at 10000"""
         obs_t_input = self.load_window.file_path
         self.obs_name = self.load_window.observed_name
         self.color = self.load_window.color_picked
@@ -1972,19 +1973,32 @@ class Gmg(wx.Frame):
         self.colors_index += 1
         self.obs_topo_list.append([])
 
-        self.submenu = wx.Menu()
-        self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.submenu)
-        self.submenu.Append(self.obs_topo_count, 'delete observed data')
-        self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count)
-        self.obs_topo_count = self.obs_topo_count + 1
+        #  APPEND NEW DATA MENU TO 'Topo data MENU'
+        self.topo_submenu = wx.Menu()
+        self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.topo_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.topo_submenu.Append(10000+self.obs_topo_count, 'delete observed data')
+
+        # BIND TO DEL TOPO FUNC
+        self.Bind(wx.EVT_MENU, self.delete_topo, id=10000+self.obs_topo_count)
+
+        self.obs_topo_count += 1
+
+        # UPDATE GMG GUI
         self.update_layer_data()
+        self.set_frame_limits()
         self.draw()
 
     def delete_topo(self, event):
-        self.m_topo_submenu.DestroyId(event.Id)
-        self.obs_topo_list[event.Id].set_visible(False)
-        self.obs_topo_list[event.Id] = []
-        self.obs_topo_list_save[event.Id] = []
+        """DELETE AN OBSERVED TOPO DATA RECORD"""
+        self.m_topo_submenu.DestroyItem(event.Id-10000)
+        self.obs_topo_name_list[event.Id-10000] = []
+        self.obs_topo_list[event.Id-10000].set_visible(False)
+        self.obs_topo_list[event.Id-10000] = []
+        self.obs_topo_list_save[event.Id-10000] = []
+
+        # UPDATE MODEL
         self.update_layer_data()
         self.draw()
 
@@ -1995,7 +2009,7 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_g(self):
-        """GET VALUES FROM LOAD WINDOW"""
+        """LOAD OBSERVE GRAVITY DATA: IDs start at 11000"""
         obs_g_input = self.load_window.file_path
         self.obs_name = self.load_window.observed_name
         self.color = self.load_window.color_picked
@@ -2017,25 +2031,33 @@ class Gmg(wx.Frame):
         self.colors_index += 1
         self.obs_grav_list.append([])
         self.grav_obs_switch = True
-        self.obs_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(self.obs_grav_count+1, self.obs_name, self.obs_submenu)
-        self.obs_submenu.Append(self.obs_grav_count+1, 'delete observed data')
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+1)
-        self.obs_grav_count = self.obs_grav_count + 1
+
+        #  APPEND NEW DATA MENU TO 'Topo data MENU'
+        self.grav_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.grav_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.grav_submenu.Append(11000+self.obs_grav_count, 'delete observed data')
+
+        # BIND TO DEL TOPO FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+self.obs_grav_count)
+
+        # INCREMENT GRAV COUNTER
+        self.obs_grav_count += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
         self.set_frame_limits()
+        self.draw()
 
     def delete_obs_grav(self, event):
-        self.m_obs_g_submenu.DestroyItem(event.Id)
-        self.obs_grav_name_list[event.Id-1] = []
-        self.obs_grav_list[event.Id-1].set_visible(False)
-        self.obs_grav_list[event.Id-1] = []
-        self.obs_grav_list_save[event.Id-1] = []
+        self.m_obs_g_submenu.DestroyItem(event.Id-11000)
+        self.obs_grav_name_list[event.Id-11000] = []
+        self.obs_grav_list[event.Id-11000].set_visible(False)
+        self.obs_grav_list[event.Id-11000] = []
+        self.obs_grav_list_save[event.Id-11000] = []
 
-        print self.obs_grav_name_list
-
+        # UPDATE MODEL
         self.update_layer_data()
         self.draw()
 
@@ -2072,6 +2094,7 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_m(self):
+        """LOAD OBSERVE MAGNETIC DATA: IDs start at 12000"""
         # GET VALUES FROM LOAD WINDOW
         obs_m_input = self.load_window.file_path
         self.obs_mag_name = self.load_window.observed_name
@@ -2093,22 +2116,31 @@ class Gmg(wx.Frame):
         self.obs_mag_list.append([])
         self.mag_obs_switch = True
 
-        self.obs_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(self.obs_mag_count+1, self.obs_mag_name, self.obs_submenu)
-        self.obs_submenu.Append(self.obs_mag_count+1, 'delete observed data')
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
-        self.obs_mag_count = self.obs_mag_count + 1
+        #  APPEND NEW DATA MENU TO 'Mag data MENU'
+        self.obs_mag_submenu = wx.Menu()
+        self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_mag_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.obs_mag_submenu.Append(12000+self.obs_mag_count, 'delete observed data')
+
+        # BIND TO DEL MAG FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.obs_mag_count)
+
+        self.obs_mag_count += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
         self.set_frame_limits()
+        self.draw()
 
     def delete_obs_mag(self, event):
-        self.m_obs_mag_submenu.DestroyItem(event.Id)
+        self.obs_mag_submenu.DestroyItem(event.Id-12000)
         self.obs_mag_list[event.Id].set_visible(False)
-        self.obs_mag_list[event.Id-1] = []
-        self.obs_mag_name_list[event.Id-1] = []
-        self.obs_mag_list_save[event.Id-1] = []
+        self.obs_mag_list[event.Id-12000] = []
+        self.obs_mag_name_list[event.Id-12000] = []
+        self.obs_mag_list_save[event.Id-12000] = []
+
+        # UPDATE MODEL
         self.update_layer_data()
         self.draw()
 
@@ -2696,7 +2728,7 @@ class Gmg(wx.Frame):
             return
 
         if self.fault_picking_switch is False and self.capture is False:
-            # GMG IS IN LAYER MODE
+            # THEN GMG IS IN LAYER MODE
 
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
             self.index_node, self.index_arg2_list = self.get_node_under_point(event)
@@ -2837,6 +2869,8 @@ class Gmg(wx.Frame):
             else:
                 self.current_node.set_offsets([self.new_x, self.new_y])
 
+            self.update_layer_data()  # UPDATE LAYER DATA
+
         'GMG IS IN LAYER MODE'
         if self.fault_picking_switch is False:
             if self.boundary_lock_list[self.i] == 0:
@@ -2924,8 +2958,10 @@ class Gmg(wx.Frame):
 
         # UPDATE LAYERS
         self.update_layer_data()
+
         # RUN MODELLING ALGORITHMS
-        self.run_algorithms()
+        if self.fault_picking_switch is False:
+            self.run_algorithms()
 
     def key_press(self, event):
         """DEFINE KEY PRESS LINKS"""
@@ -3205,8 +3241,10 @@ class Gmg(wx.Frame):
             self.index_arg = np.argmin(d)
             self.distance = d[self.index_arg]
 
-            if self.index_arg == 0 or self.index_arg == 1:
+            if self.index_arg == 0 or self.index_arg == (len(self.fault_x_coords_list[self.current_fault_index])-1):
                 # PREVENT END NODES BEING DELETED
+                print "self.index_arg = "
+                print self.index_arg
                 return 0
             if self.distance >= self.node_click_limit:
                 # CLICK WAS TO FAR AWAY FROM A NODE TO DELETE IT
@@ -3218,6 +3256,15 @@ class Gmg(wx.Frame):
 
                 self.fault_y_coords_list[self.current_fault_index] = \
                     [tup for i, tup in enumerate(self.yt) if i != self.index_arg]  # DELETE Y
+
+                # RESET CURRENT NOT POSITION TO FIRST NODE
+                self.current_node.set_offsets([self.xt[0], self.yt[0]])
+
+                # UPDATE CURRENT FAULT OVERLAY GRAPHIC
+                self.faultline.set_data(self.xt, self.yt)
+
+            # UPDATE GMG
+            self.update_layer_data()
 
         '< = INCREMENT WHICH FAULT IS BEING EDITED'
         if event.key == ',':
@@ -3331,21 +3378,10 @@ class Gmg(wx.Frame):
         self.current_fault_index = self.fault_tree.GetPyData(event.GetItem())
 
         if self.fault_picking_switch is False:
-            self.fault_picking_switch == True
+            self.fault_picking_switch = True
 
         # SET CHECKBOX AS CHECKED
         self.fault_tree.GetSelection().Check(checked=True)
-
-        # SHOW FAULT
-        i = self.fault_tree.GetPyData(event.GetItem())
-        if self.faults[i][0].get_visible() == True:
-            # HIDE FAULT
-            self.faults[i][0].set_visible(False)
-            self.faultline.set_visible(False)
-        else:
-            # SHOW FAULT
-            self.faults[i][0].set_visible(True)
-            self.faultline.set_visible(True)
 
         # UPDATE CURRENT PLOT GRAPHICS
         self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
@@ -3496,11 +3532,21 @@ class Gmg(wx.Frame):
             self.obs_grav_list[self.obs_grav_count] = self.dcanvas.scatter(filtered_data[:, 0], filtered_data[:, 1],
                                                                            marker='o', color=filtered_color, s=5,
                                                                            gid=self.obs_grav_count)
-            self.obs_submenu = wx.Menu()
-            self.m_obs_g_submenu.Append(self.obs_grav_count, filtered_name, self.obs_submenu)
-            self.obs_submenu.Append(self.obs_grav_count, 'delete observed data')
-            self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count)
+
+            #  APPEND NEW DATA MENU TO 'Topo data MENU'
+            self.grav_submenu = wx.Menu()
+            self.m_obs_g_submenu.Append(self.obs_grav_count,filtered_name, self.grav_submenu)
+
+            # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+            self.grav_submenu.Append(11000 + self.obs_grav_count, 'delete observed data')
+
+            # BIND TO DEL TOPO FUNC
+            self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.obs_grav_count)
+
+            # INCREMENT GRAV COUNTER
             self.obs_grav_count += 1
+
+            # UPDATE GMG GUI
             self.update_layer_data()
             self.draw()
 
@@ -3512,13 +3558,24 @@ class Gmg(wx.Frame):
             self.obs_mag_list[self.obs_mag_count] = self.dcanvas.scatter(filtered_data[:, 0], filtered_data[:, 1],
                                                                          marker='o', color=filtered_color, s=5,
                                                                          gid=self.obs_mag_count)
-            self.obs_submenu = wx.Menu()
-            self.m_obs_mag_submenu.Append(self.obs_mag_count, filtered_name, self.obs_submenu)
-            self.obs_submenu.Append(self.obs_mag_count, 'delete observed data')
-            self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count)
-            self.obs_mag_count += 1
-            self.update_layer_data()
-            self.draw()
+
+        #  APPEND NEW DATA MENU TO 'Mag data MENU'
+        self.obs_mag_submenu = wx.Menu()
+        self.m_obs_mag_submenu.Append(self.obs_mag_count, filtered_name, self.obs_mag_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.obs_mag_submenu.Append(12000+self.obs_mag_count, 'delete observed data')
+
+        # BIND TO DEL MAG FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.obs_mag_count)
+
+        self.obs_mag_count += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
 
     def new_layer(self, event):
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer')
@@ -4327,8 +4384,11 @@ class Gmg(wx.Frame):
     def open_documentation(self, event):
         """OPEN DOCUMENTATION HTML"""
 
-        self.doc_dir = os.path.dirname(os.path.abspath(__file__))
-        doc_url = self.doc_dir + '/docs/_build/html/gmg_documentation.html'
+        self.doc_dir = os.path.dirname(os.path.abspath(__file__)).split('/')
+        doc_url = self.doc_dir[0] + '/' + self.doc_dir[1] + '/' + self.doc_dir[2] + '/' + self.doc_dir[3] + \
+                    '/docs/html/gmg_documentation.html'
+
+        print doc_url
 
         if platform == "linux" or platform == "linux2":
             # LINUX
@@ -4548,16 +4608,21 @@ class LoadObservedDataFrame(wx.Frame):
         self.color_text = wx.StaticText(floating_panel, -1, "Display color:")
         self.color_picked = wx.ComboBox(floating_panel, -1, value='blue', choices=self.colors, size=(75, -1),
                                         style=wx.CB_DROPDOWN)
+
         # LOAD BUTTON
         self.b_load_button = wx.Button(floating_panel, -1, "Load")
         self.Bind(wx.EVT_BUTTON, self.load_button, self.b_load_button)
+
+        # CANCEL BUTTON
+        self.b_cancel_button = wx.Button(floating_panel, -1, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.cancel_button, self.b_cancel_button)
 
         # SIZER
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         sizer.AddMany([self.file_path_text, self.b_file_path,
                        self.observed_name_text, self.observed_name,
                        self.color_text, self.color_picked,
-                       self.b_load_button])
+                       self.b_load_button, self.b_cancel_button])
         floating_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
@@ -4586,6 +4651,10 @@ class LoadObservedDataFrame(wx.Frame):
             self.parent.open_obs_t()
         else:
             pass
+        self.Destroy()
+
+    def cancel_button(self, event):
+        """USER CHANGED THEIR MIND"""
         self.Destroy()
 
 class SeisDialog(wx.Dialog):
