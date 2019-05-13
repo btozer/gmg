@@ -437,14 +437,16 @@ class Gmg(wx.Frame):
         self.menubar.Append(self.well_data, "&Well Data")
         # --------------------------------------------------------------------------------------------------------------
 
-        # CONTACTS MENU ------------------------------------------------------------------------------------------------
-        self.contact_file = wx.Menu()
-        self.m_load_contact_data = self.contact_file.Append(-1, "&Load Outcrop data...\tCtrl-Shift-w",
+        # OUTCROP MENU ------------------------------------------------------------------------------------------------
+        self.outcrop_file = wx.Menu()
+        self.m_load_outcrop_data = self.outcrop_file.Append(-1, "&Load Outcrop data...\tCtrl-Shift-w",
                                                             "Load outcrop data")
-        self.Bind(wx.EVT_MENU, self.load_contact_data, self.m_load_contact_data)
+        self.Bind(wx.EVT_MENU, self.load_outcrop_data, self.m_load_outcrop_data)
 
-        self.m_contacts_submenu = wx.Menu()
-        self.menubar.Append(self.contact_file, "&Outcrop data")
+        self.m_outcrop_submenu = wx.Menu()
+        self.outcrop_file.Append(-1, 'Outcrop Data...', self.m_outcrop_submenu)
+
+        self.menubar.Append(self.outcrop_file, "&Outcrop data")
         # --------------------------------------------------------------------------------------------------------------
 
         # MODEL LAYERS MENU --------------------------------------------------------------------------------------------
@@ -516,8 +518,8 @@ class Gmg(wx.Frame):
                                             shortHelp="Load model")
         self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
 
-        t_calc_topo = self.toolbar.AddTool(wx.ID_ANY, "Calculate topography",
-                                           wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
+        # t_calc_topo = self.toolbar.AddTool(wx.ID_ANY, "Calculate topography",
+        #   wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
         ### self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
         t_calc_model_bott = self.toolbar.AddTool(wx.ID_ANY, "Calculate gravity",
@@ -701,7 +703,17 @@ class Gmg(wx.Frame):
         self.xy_list = [[]]
         self.xy_list_save = [[]]
         self.xy_name_list = []
+        self.xy_color_list =[[]]
         self.xy_count = 0
+
+        'INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
+        self.outcrop_data = [[]]
+        self.outcrop_data_list = [[]]
+        self.outcrop_data_list_save = [[]]
+        self.outcrop_data_name_list = []
+        self.outcrop_data_color_list = [[]]
+        self.outcrop_text_list = [[]]
+        self.outcrop_data_count = 0
 
         'INITIALISE TOPOGRAPHY ATTRIBUTES'
         self.obs_topo = []
@@ -750,13 +762,6 @@ class Gmg(wx.Frame):
         self.segy_plot_list = []
         self.segy_dimension_list = []
         self.segy_count = 0
-
-        'INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
-        self.contact_data_list = [[]]
-        self.contact_text_list = [[]]
-        self.contact_data = [[]]
-        self.contact_name_list = []
-        self.contact_data_count = 0
 
         'INITIALISE Well ATTRIBUTES'
         self.well_list = []
@@ -1539,7 +1544,10 @@ class Gmg(wx.Frame):
     # SAVE/LOAD MODEL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def save_model(self, event):
-        """SAVE MODEL TO DISC IN .Pickle FORMAT"""
+        """
+        SAVE MODEL TO DISC IN .Pickle FORMAT
+        TO ADD NEW OBJECTS ADD THE OBJECT NAME TO BOTH THE header AND model_params. THEN MODIFY THE load_model FUNCTION
+        """
         save_file_dialog = wx.FileDialog(self, "Save model file", "", "", "Model files (*.model)|*.model", wx.FD_SAVE
                                          | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -1551,30 +1559,38 @@ class Gmg(wx.Frame):
         header = ['layer_colors', 'plotx_list', 'ploty_list', 'densities', 'reference_densities',
                   'boundary_lock_list', 'layer_lock_list', 'well_list', 'well_name_list',
                   'well_list_hidden', 'well_list_switch', 'segy_name_list', 'segy_dimension_list',
-                  'obs_grav_list_save', 'obs_grav_name_list', 'obs_mag_list_save',
-                  'obs_mag_name_list', 'earth_field',
-                  'model_azimuth', 'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
+                  'obs_grav_list_save', 'obs_grav_name_list',
+                  'obs_mag_list_save', 'obs_mag_name_list', 'earth_field', 'model_azimuth',
+                  'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms', 'xy_name_list', 'xy_list_save',
-                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect', 'faults', 'fault_names_list',
-                  'fault_counter', 'current_fault_index', 'fault_x_coords_list', 'fault_y_coords_list',
-                  'fault_tree_items', 'fault_counter']
+                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect',
+                  'faults', 'fault_names_list',
+                  'fault_counter', 'current_fault_index', 'fault_x_coords_list',
+                  'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
+                  'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list', 'outcrop_data_color_list',
+                  'outcrop_text_list']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
                         self.well_list_hidden, self.well_list_switch, self.segy_name_list, self.segy_dimension_list,
-                        self.obs_grav_list_save, self.obs_grav_name_list, self.obs_mag_list_save,
-                        self.obs_mag_name_list, self.earth_field,
-                        self.model_azimuth, self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
+                        self.obs_grav_list_save, self.obs_grav_name_list,
+                        self.obs_mag_list_save, self.obs_mag_name_list, self.earth_field, self.model_azimuth,
+                        self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms, self.xy_name_list, self.xy_list_save,
-                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect, self.faults,
-                        self.fault_names_list, self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
-                        self.fault_y_coords_list, self.fault_tree_items, self.fault_counter]
+                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect,
+                        self.faults, self.fault_names_list,
+                        self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
+                        self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
+                        self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
+                        self.outcrop_data_color_list, self.outcrop_text_list]
 
         for i in range(0, len(model_params)):
-            self.save_dict[header[i]] = model_params[i]
-
+            try:
+                self.save_dict[header[i]] = model_params[i]
+            except IOError:
+                print header[i]
         try:
             output_stream = save_file_dialog.GetPath()
             out = open(output_stream, 'w')
@@ -1641,6 +1657,7 @@ class Gmg(wx.Frame):
                     self.layer_lock_status[x] = ['unlocked']
                     self.layer_lock_status.append([])
 
+            # ----------------------------------------------------------------------------------------------------------
             # PLOT OBSERVED DATA
             if self.xy_list_save != [[]]:
                 self.plot_obs_xy()
@@ -1650,10 +1667,14 @@ class Gmg(wx.Frame):
                 self.plot_obs_mag()
             if self.obs_topo_list_save != [[]]:
                 self.plot_obs_topo()
+            # ----------------------------------------------------------------------------------------------------------
 
+            # ----------------------------------------------------------------------------------------------------------
             # LOAD & PLOT SEGY
             self.plot_segy()
+            # ----------------------------------------------------------------------------------------------------------
 
+            # ----------------------------------------------------------------------------------------------------------
             # Set VARIABLE VALUES FROM LOADED DATA
             self.i = (len(self.densities) - 1)
             self.layer_count = (len(self.densities) - 1)
@@ -1664,10 +1685,14 @@ class Gmg(wx.Frame):
             self.obs_grav_count = len(self.obs_grav_list_save) - 1
             self.obs_mag_list_count = len(self.obs_mag_list_save) - 1
             self.polygons = []
+            # ----------------------------------------------------------------------------------------------------------
 
+            # ----------------------------------------------------------------------------------------------------------
             if self.layer_colors == [[]]:
                 self.layer_colors = ['black' for x in range(self.i + 1)]
+            # ----------------------------------------------------------------------------------------------------------
 
+            # ----------------------------------------------------------------------------------------------------------
             # LOAD LAYER TREE ITEMS
             self.tree.DeleteAllItems()  # DELETE CURRENT LAYER TREE
             self.root = self.tree.AddRoot("Layers:")  # CREATE NEW TREE
@@ -1681,7 +1706,9 @@ class Gmg(wx.Frame):
             self.layers_calculation_switch = [1] * len(self.loaded_tree_items)
 
             self.tree_items = self.loaded_tree_items
+            # ----------------------------------------------------------------------------------------------------------
 
+            # ----------------------------------------------------------------------------------------------------------
             # LOAD FAULT TREE ITEMS
             for i in range(0, len(self.loaded_fault_tree_items)):
                 fault_tree_item = self.fault_tree.AppendItem(self.fault_tree_root, "%s" %
@@ -1690,14 +1717,20 @@ class Gmg(wx.Frame):
                 self.fault_tree.SetItemPyData(fault_tree_item, i)
 
             self.fault_tree_items = self.loaded_fault_tree_items
-
+            # ----------------------------------------------------------------------------------------------------------
+            
+            # ----------------------------------------------------------------------------------------------------------
             # MAKE LAYER LINES AND POLYGONS
             self.layer_lines = [[] for x in range(self.i + 1)]
             self.polygon_fills = [[] for x in range(self.i + 1)]
+            # ----------------------------------------------------------------------------------------------------------
 
+            # ----------------------------------------------------------------------------------------------------------
             # LOAD LAYERS
             self.load_layer_data()
-
+            # ----------------------------------------------------------------------------------------------------------
+            
+            # ----------------------------------------------------------------------------------------------------------
             for i in range(0, self.fault_counter):
                 # DRAW FAULTS
                 self.faults[i] = self.mcanvas.plot(self.fault_x_coords_list[i], self.fault_y_coords_list[i],
@@ -1706,12 +1739,23 @@ class Gmg(wx.Frame):
             # CREATE NEW CURRENT FAULT GRAPHIC
             self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
                                                 alpha=1.0, zorder=2, picker=True)
+            # ----------------------------------------------------------------------------------------------------------
 
-            # DRAW CONTACT DATA
-            # self.draw_contact_text()
-            # self.xy_name_list = [[]]
-            # self.xy_count = 0
+            # ----------------------------------------------------------------------------------------------------------
+            # DRAW OUTCROP DATA
+            self.outcrop_data_count = 0
+            for self.x in range(len(self.outcrop_data_name_list)):
+                print self.outcrop_data_count
+                if self.outcrop_data_name_list[self.x] == "None" or self.outcrop_data_name_list[self.x] == []:
+                    self.outcrop_data_count += 1
+                else:
+                    # LOAD DATA INTO MODEL
+                    print self.outcrop_data_count
+                    self.open_outcrop_data('open')
 
+            # ----------------------------------------------------------------------------------------------------------
+
+            # ----------------------------------------------------------------------------------------------------------
             # LOAD WELL MENU --- SET WELL MENU - IDs start at 2000
             self.count = 0
             for x in range(len(self.well_name_list)):
@@ -1727,17 +1771,25 @@ class Gmg(wx.Frame):
                     self.Bind(wx.EVT_MENU, self.delete_well, id=self.count + 3000)
                     self.count += 1
             self.well_count = len(self.well_name_list)
-
+            # ----------------------------------------------------------------------------------------------------------
+            
+            # ----------------------------------------------------------------------------------------------------------
             # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
             self.current_node = self.mcanvas.scatter(-40000., 0., marker='o', color='r', zorder=10)
-
+            # ----------------------------------------------------------------------------------------------------------
+            
+            # ----------------------------------------------------------------------------------------------------------
             # Set Fault PICKIGN SWTICH OFF (DEFAULT TO LAYER MODE)
             self.fault_picking_swtich = False
-
+            # ----------------------------------------------------------------------------------------------------------
+            
+            # ----------------------------------------------------------------------------------------------------------
             # REFRESH SIZER POSITIONS
             self.Hide()
             self.Show()
-
+            # ----------------------------------------------------------------------------------------------------------
+            
+            # ----------------------------------------------------------------------------------------------------------
             # UPDATE LAYER DATA AND PLOT
             self.draw()
             self.update_layer_data()
@@ -1745,7 +1797,9 @@ class Gmg(wx.Frame):
             self.draw()
             self.draw_well()  # DRAW WELLS
             self.Restore()  # FIX'S DISPLAY ISSUE
-
+            # ----------------------------------------------------------------------------------------------------------
+        
+          
         except IOError:
             error_message = "IO ERROR IN LOADING PROCESS - MODEL NOT LOADED"
             MessageDialog(self, -1, error_message, "Load Error")
@@ -1802,15 +1856,15 @@ class Gmg(wx.Frame):
     def plot_obs_xy(self):
         """PLOT OBSERVED XY"""
         self.xy_list = [[]]
-        for x in range(0, len(self.xy_name_list)):
+        for i in range(0, len(self.xy_list_save)-1):
             self.xy_list.append([])
-            if self.xy_name_list[x]:
-                self.xy = self.xy_list_save[x]
-                self.xy_list[x] = self.mcanvas.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
-                                                       color=self.colors[self.colors_index], s=5, gid=self.xy_count)
+            if self.xy_list_save[i] != []:
+                self.xy = self.xy_list_save[i]
+                self.xy_list[i] = self.mcanvas.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
+                                                       color=self.xy_color_list[i], s=5, gid=self.xy_count)
                 self.xy_list.append([])
                 self.colors_index += 1
-                self.xy_name = self.xy_name_list[x]
+                self.xy_name = self.xy_name_list[i]
                 self.xy_submenu = wx.Menu()
                 self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.xy_submenu)
                 self.xy_submenu.Append(self.xy_count, 'delete observed data')
@@ -1884,50 +1938,61 @@ class Gmg(wx.Frame):
                 self.obs_mag_count += 1
 
     def load_xy(self, event):
-        """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS NB: ID's start at 5000"""
+        """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS. NB: ID's start at 5000"""
+        self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'XY')
+        self.load_window.Show(True)
 
-        open_file_dialog = wx.FileDialog(self, "Open XY file", "", "", "All files (*.*)|*.*", wx.FD_OPEN |
-                                         wx.FD_FILE_MUST_EXIST)
-        if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # THE USER CHANGED THEIR MIND
-        else:
-            xy_in = open_file_dialog.GetPath()
-            xy_name_box = wx.TextEntryDialog(None, 'Name for the XY data:')
-            answer = xy_name_box.ShowModal()
+    def open_xy_data(self):
+        """OPEN THE XY DATA SELECTED BY THE USER USING THE load_xy FUNC"""
+        xy_input_file = self.load_window.file_path
+        self.xy_name = self.load_window.observed_name
+        self.xy_color = self.load_window.color_picked
 
-        try:
-            print(self.xy_count)
-            self.xy_name = xy_name_box.GetValue()
-            self.xy_name_list.append([])
-            self.xy_name_list[self.xy_count] = str(self.xy_name)
+        # GET XY DATA NAME
+        self.xy_name_list.append([])
+        self.xy_name_list[self.xy_count] = str(self.xy_name)
 
-            self.xy = np.genfromtxt(xy_in, delimiter=' ', dtype=float)
-            self.xy_list_save.append([])
-            self.xy_list_save[self.xy_count] = self.xy
-            self.xy_list.append([])
-            self.xy_list[self.xy_count] = self.mcanvas.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
-                                                               color='b', s=3, gid=self.xy_count)
-            self.colors_index += 1
+        #GET XY_COLOR
+        self.xy_color_list.append([])
+        self.xy_color_list[self.xy_count] = str(self.xy_color)
 
-            self.obs_submenu = wx.Menu()
-            self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
-            self.obs_submenu.Append(5000+self.xy_count, 'delete observed data')
-            self.Bind(wx.EVT_MENU, self.delete_xy, id=5000+self.xy_count)
-            self.xy_count += 1
-        except IndexError:
-            error_message = "ERROR IN LOADING PROCESS - FILE MUST BE ASCII SPACE DELIMITED"
-            MessageDialog(self, -1, error_message, "Load Error")
-            raise
+        # LOAD DATA
+        self.xy = np.genfromtxt(xy_input_file, delimiter=' ', dtype=float)
+        self.xy_list_save.append([])
+        self.xy_list_save[self.xy_count] = self.xy
+        self.xy_list.append([])
 
+        # PLOT DATA IN MODEL
+        self.xy_list[self.xy_count] = self.mcanvas.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
+                                                           color=self.xy_color_list[self.xy_count], s=3,
+                                                           gid=self.xy_count)
+
+        #  APPEND NEW DATA MENU TO 'XY data MENU'
+        self.obs_submenu = wx.Menu()
+        self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.obs_submenu.Append(5000+self.xy_count, 'delete observed data')
+
+        # BIND TO DEL XY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_xy, id=5000+self.xy_count)
+
+        # INCREMENT XY COUNTER
+        self.xy_count += 1
+
+
+        # UPDATE GMG GUI
         self.update_layer_data()
         self.draw()
 
     def delete_xy(self, event):
-        """" DELETE OBSERVED XY DATA NB: ID's start at 5000"""
+        """"DELETE OBSERVED XY DATA NB: ID's start at 5000"""
         id = event.Id-5000
         self.m_xy_submenu.DestroyItem(id)
         self.xy_list[id].set_visible(False)
         self.xy_list[id] = []
+        self.xy_name_list[id] = []
+        self.xy_color_list[id] = []
         self.xy_list_save[id] = []
         self.update_layer_data()
         self.draw()
@@ -1943,6 +2008,7 @@ class Gmg(wx.Frame):
         self.xy_list = [[]]
         self.xy_list_save = [[]]
         self.xy_name_list = []
+        self.xy_color_list = []
         self.xy_count = 0
         self.update_layer_data()
         self.draw()
@@ -2032,14 +2098,14 @@ class Gmg(wx.Frame):
         self.obs_grav_list.append([])
         self.grav_obs_switch = True
 
-        #  APPEND NEW DATA MENU TO 'Topo data MENU'
+        #  APPEND NEW DATA MENU TO 'GRAV data MENU'
         self.grav_submenu = wx.Menu()
         self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
         self.grav_submenu.Append(11000+self.obs_grav_count, 'delete observed data')
 
-        # BIND TO DEL TOPO FUNC
+        # BIND TO DEL GRAV FUNC
         self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+self.obs_grav_count)
 
         # INCREMENT GRAV COUNTER
@@ -2496,8 +2562,6 @@ class Gmg(wx.Frame):
 
     def delete_well(self, event):
         """REMOVE PLOT GRAPHICS"""
-        print("event = ")
-        print(event.Id)
         self.wells[event.Id - 3000][0].set_visible(False)
         self.well_name_text[event.Id - 3000].set_visible(False)
         horizons = self.horizons[event.Id - 3000]
@@ -2521,42 +2585,57 @@ class Gmg(wx.Frame):
 
     # GEOLOGY OUTCROP DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def load_contact_data(self, event):
-        """CHOSE CONTACT DATA FILE TO LOAD"""
+    def load_outcrop_data(self, event):
+        """ LOAD & PLOT SURFACE CONTACT DATA. E.G. GEOLOGICAL CONTACTS  NB: ID's start at 13000"""
+        self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'outcrop')
+        self.load_window.Show(True)
 
-        open_file_dialog = wx.FileDialog(self, "Open contact data", "", "", "All files (*.*)|*.*",
-                                         wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # THE USER CHANGED THERE MIND
+    def open_outcrop_data(self, type):
+        """OPEN THE OUTCROP DATA SELECTED BY THE USER USING THE load_outcrop_data FUNC"""
+        if type == 'load':
+            outcrop_input_file = self.load_window.file_path
+            self.outcrop_data_name = self.load_window.observed_name
+            self.outcrop_data_color = self.load_window.color_picked
+            self.outcrop_data = np.genfromtxt(outcrop_input_file, autostrip=True, delimiter=' ', dtype=str,
+                                              comments='#')
+            self.outcrop_data_list.append([])
         else:
-            contact_data_in = open_file_dialog.GetPath()
-            contact_name_box = wx.TextEntryDialog(None, 'Please provide a name for the new data:')
-            contact_name_box.ShowModal()
+            self.outcrop_data = self.outcrop_data_list_save[self.x]
+            self.outcrop_data_name =  self.outcrop_data_name_list[self.x]
+            self.outcrop_data_color = self.outcrop_data_color_list[self.x]
+
+        # GET XY DATA NAME
+        self.outcrop_data_name_list.append([])
+        self.outcrop_data_name_list[self.outcrop_data_count] = str(self.outcrop_data_name)
+
+        #GET XY_COLOR
+        self.outcrop_data_color_list.append([])
+        self.outcrop_data_color_list[self.outcrop_data_count] = str(self.outcrop_data_color)
 
         # LOAD DATA
-        self.contact_name = contact_name_box.GetValue()
-        self.contact_name_list.append(str(self.contact_name))
-        self.contact_data = np.genfromtxt(contact_data_in, autostrip=True, delimiter=' ', dtype=str, comments='#')
+        self.outcrop_data_list_save.append([])
+        self.outcrop_data_list_save[self.outcrop_data_count] = self.outcrop_data
 
-        # DRAW MARKERS
-        self.contact_labels = [None] * len(self.contact_data)
-        self.contacts = [None] * len(self.contact_data)
-        for i in range(len(self.contact_data)):
-            x1 = self.contact_data[i, 0].astype(float)
-            y1 = self.contact_data[i, 1].astype(float)
-            y2 = self.contact_data[i, 2].astype(float)
+        # PLOT MARKERS IN MODEL
+        self.contact_labels = [None] * len(self.outcrop_data)
+        self.contacts = [None] * len(self.outcrop_data)
+        lines = [None] * len(self.outcrop_data)
+        for i in range(len(self.outcrop_data)):
+            x1 = self.outcrop_data[i, 0].astype(float)
+            y1 = self.outcrop_data[i, 1].astype(float)
+            y2 = self.outcrop_data[i, 2].astype(float)
             x = (x1, x1)
             y = (y1, y2)
-            self.contacts[i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
+            lines[i] = self.mcanvas.plot(x, y, linestyle='-', linewidth='2', color='black')
 
-        self.contact_data_list[self.contact_data_count] = self.contacts
-        self.contact_data_list.append([])
+        self.outcrop_data_list.append([])
+        self.outcrop_data_list[self.outcrop_data_count] = lines
 
         # DRAW TEXT
-        self.text_labels = [None] * len(self.contacts)
-        text = zip(self.contact_data[:, 0].astype(float), self.contact_data[:, 1].astype(float),
-                   self.contact_data[:, 3].astype(str))
-        for i in range(len(self.contacts)):
+        self.text_labels = [None] * len(self.outcrop_data)
+        text = zip(self.outcrop_data[:, 0].astype(float), self.outcrop_data[:, 1].astype(float),
+                   self.outcrop_data[:, 3].astype(str))
+        for i in range(len(self.outcrop_data)):
 
             # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
             if i % 2 == 0:
@@ -2578,24 +2657,46 @@ class Gmg(wx.Frame):
                                                             bbox=dict(boxstyle="round,pad=.4", fc="0.8", ec='None'),
                                                             clip_on=True)
 
-        self.contact_text_list[self.contact_data_count] = self.text_labels
-        self.contact_text_list.append([])
+        self.outcrop_text_list.append([])
+        self.outcrop_text_list[self.outcrop_data_count] = self.text_labels
 
-        # SETUP NEW CONTACT DATA SUBMENU
-        self.contacts_submenu = wx.Menu()
-        self.m_contacts_submenu.Append(self.contact_data_count + 3000, self.contact_name, self.contacts_submenu)
-        self.contacts_submenu.Append(self.contact_data_count + 3000, 'delete data')
-        self.Bind(wx.EVT_MENU, self.delete_contact_data, id=self.contact_data_count + 3000)
+
+        #  APPEND NEW DATA MENU TO 'OUTCROP DATA MENU'
+        self.outcrop_submenu = wx.Menu()
+        self.m_outcrop_submenu.Append(self.outcrop_data_count, self.outcrop_data_name, self.outcrop_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.outcrop_submenu.Append(13000+self.outcrop_data_count, 'delete observed data')
+
+        # BIND TO DEL XY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_outcrop_data, id=13000+self.outcrop_data_count)
 
         # INCREMENT CONTACT COUNT
-        self.contact_data_count += 1
+        self.outcrop_data_count += 1
 
-        # UPDATE GMG
+        # UPDATE GMG GUI
         self.update_layer_data()
         self.draw()
 
-    def delete_contact_data(self, event):
-        pass
+    def delete_outcrop_data(self, event):
+        """"DELETE OUTCROP DATA NB: ID's start at 13000"""
+        id = event.Id-13000
+        self.m_outcrop_submenu.DestroyItem(id)
+
+        for i in range(0, len(self.outcrop_data_list[id])):
+            self.outcrop_data_list[id][i][0].set_visible(False)
+
+        for i in range (0, len(self.outcrop_text_list[id])):
+            self.outcrop_text_list[id][i].set_visible(False)
+
+        self.outcrop_data_list[id] = []
+        self.outcrop_data_name_list[id] = []
+        self.outcrop_data_color_list[id] = []
+        self.outcrop_data_list_save[id] = []
+        self.outcrop_text_list[id] = []
+
+        self.update_layer_data()
+        self.draw()
 
     # LAYER & NODE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2871,7 +2972,7 @@ class Gmg(wx.Frame):
 
             self.update_layer_data()  # UPDATE LAYER DATA
 
-        'GMG IS IN LAYER MODE'
+        # GMG IS IN LAYER MODE
         if self.fault_picking_switch is False:
             if self.boundary_lock_list[self.i] == 0:
                 x = event.xdata  # GET X OF NEW POINT
@@ -2937,7 +3038,8 @@ class Gmg(wx.Frame):
             else:
                 self.current_node.set_offsets([x, y])
 
-        self.update_layer_data()  # UPDATE LAYER DATA
+        # UPDATE LAYER DATA
+        self.update_layer_data()
 
     def button_release(self, event):
         """WHEN MOUSE BUTTON IS RELEASED"""
@@ -2949,8 +3051,8 @@ class Gmg(wx.Frame):
             return
 
         # UPDATE LAYER ATTRIBUTES TABLE WITH CURRENT COORDINATES
-        self.x_input.SetValue(event.xdata)
-        self.y_input.SetValue(event.ydata)
+        # self.x_input.SetValue(event.xdata)
+        # self.y_input.SetValue(event.ydata)
 
         if self.capture is True:
             # GMG IS IN COORDINATE CAPTURE MODE SO ADD THE CURRENT COORDINATES TO THE TABLE
@@ -3243,8 +3345,6 @@ class Gmg(wx.Frame):
 
             if self.index_arg == 0 or self.index_arg == (len(self.fault_x_coords_list[self.current_fault_index])-1):
                 # PREVENT END NODES BEING DELETED
-                print "self.index_arg = "
-                print self.index_arg
                 return 0
             if self.distance >= self.node_click_limit:
                 # CLICK WAS TO FAR AWAY FROM A NODE TO DELETE IT
@@ -3881,13 +3981,13 @@ class Gmg(wx.Frame):
                     if labels[l] != "None" and labels[l] != []:
                         labels[l].set_size(self.textsize)
 
-        # CONTACT DATA
-        if self.contact_data_count > 0:
-            for i in range(self.contact_data_count):
-                contact_text = self.contact_text_list[i]
-                for k in range(len(contact_text)):
-                    if contact_text[k] is not None:
-                        contact_text[k].set_size(self.textsize)
+        # LOOP THROUGH OUTCROP DATA LABELS
+        if self.outcrop_data_count > 0:
+            for i in range(self.outcrop_data_count):
+                outcrop_text = self.outcrop_text_list[i]
+                for k in range(len(outcrop_text)):
+                    if outcrop_text[k] is not None:
+                        outcrop_text[k].set_size(self.textsize)
                     else:
                         pass
 
@@ -4072,15 +4172,9 @@ class Gmg(wx.Frame):
                     # USED FOR THE CASE WHEN ONLY 1 FAULT EXISTS
                     pass
 
-            print(self.fault_x_coords_list)
-            print(self.fault_y_coords_list)
-            print(self.fault_x_coords_list[self.current_fault_index])
-            print(self.fault_y_coords_list[self.current_fault_index])
-
             # UPDATE CURRENT PLOT GRAPHICS
             self.faultline.set_data(self.fault_x_coords_list[self.current_fault_index],
                                     self.fault_y_coords_list[self.current_fault_index])
-
         else:
             # GMG IS IN LAYER MODE
             # UPDATE PLOT LISTS WITH LATEST EDIT
@@ -4388,8 +4482,6 @@ class Gmg(wx.Frame):
         doc_url = self.doc_dir[0] + '/' + self.doc_dir[1] + '/' + self.doc_dir[2] + '/' + self.doc_dir[3] + \
                     '/docs/html/gmg_documentation.html'
 
-        print doc_url
-
         if platform == "linux" or platform == "linux2":
             # LINUX
             webbrowser.open_new(doc_url)
@@ -4604,7 +4696,7 @@ class LoadObservedDataFrame(wx.Frame):
         self.observed_name = wx.TextCtrl(floating_panel, -1, value="Observed_name", size=(150, -1))
 
         # COLOR
-        self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'black', 'purple', 'pink']
+        self.colors = ['red', 'orange', 'green', 'blue', 'black', 'purple', 'pink']
         self.color_text = wx.StaticText(floating_panel, -1, "Display color:")
         self.color_picked = wx.ComboBox(floating_panel, -1, value='blue', choices=self.colors, size=(75, -1),
                                         style=wx.CB_DROPDOWN)
@@ -4649,6 +4741,10 @@ class LoadObservedDataFrame(wx.Frame):
             self.parent.open_obs_m()
         elif self.type == 'topography':
             self.parent.open_obs_t()
+        elif self.type == 'XY':
+            self.parent.open_xy_data()
+        elif self.type == 'outcrop':
+            self.parent.open_outcrop_data('load')
         else:
             pass
         self.Destroy()
@@ -4668,7 +4764,7 @@ class SeisDialog(wx.Dialog):
         x1, x2, z1, z2 = 0.001 * np.array(self.area)
         self.x2 = str(x2)
         self.z2 = str(z2)
-        #        print self.x2
+
         self.x_start = wx.StaticText(input_panel, -1, "Model X start coordinate:")
         self.x_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.x_start_Text.SetInsertionPoint(0)
