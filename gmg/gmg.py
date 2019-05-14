@@ -1563,13 +1563,14 @@ class Gmg(wx.Frame):
                   'obs_mag_list_save', 'obs_mag_name_list', 'earth_field', 'model_azimuth',
                   'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
-                  'obs_gravity_data_for_rms', 'obs_mag_data_for_rms', 'xy_name_list', 'xy_list_save',
+                  'obs_gravity_data_for_rms', 'obs_mag_data_for_rms',
                   'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect',
                   'faults', 'fault_names_list',
                   'fault_counter', 'current_fault_index', 'fault_x_coords_list',
                   'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
                   'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list', 'outcrop_data_color_list',
-                  'outcrop_text_list']
+                  'outcrop_text_list',
+                  'xy_name_list', 'xy_list_save', 'xy_color_list']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
@@ -1578,13 +1579,14 @@ class Gmg(wx.Frame):
                         self.obs_mag_list_save, self.obs_mag_name_list, self.earth_field, self.model_azimuth,
                         self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
-                        self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms, self.xy_name_list, self.xy_list_save,
+                        self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms,
                         self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect,
                         self.faults, self.fault_names_list,
                         self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
                         self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
                         self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
-                        self.outcrop_data_color_list, self.outcrop_text_list]
+                        self.outcrop_data_color_list, self.outcrop_text_list,
+                        self.xy_name_list, self.xy_list_save, self.xy_color_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -1603,7 +1605,6 @@ class Gmg(wx.Frame):
 
     def load_model(self, event):
         """LOAD MODEL FROM DISC IN .Pickle FORMAT"""
-
         try:
             if not self.model_saved:
                 if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
@@ -1689,7 +1690,7 @@ class Gmg(wx.Frame):
 
             # ----------------------------------------------------------------------------------------------------------
             if self.layer_colors == [[]]:
-                self.layer_colors = ['black' for x in range(self.i + 1)]
+                self.layer_colors = ['black' for _ in range(self.i + 1)]
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1721,8 +1722,8 @@ class Gmg(wx.Frame):
             
             # ----------------------------------------------------------------------------------------------------------
             # MAKE LAYER LINES AND POLYGONS
-            self.layer_lines = [[] for x in range(self.i + 1)]
-            self.polygon_fills = [[] for x in range(self.i + 1)]
+            self.layer_lines = [[] for _ in range(self.i + 1)]
+            self.polygon_fills = [[] for _ in range(self.i + 1)]
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1752,7 +1753,6 @@ class Gmg(wx.Frame):
                     # LOAD DATA INTO MODEL
                     print self.outcrop_data_count
                     self.open_outcrop_data('open')
-
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1798,8 +1798,8 @@ class Gmg(wx.Frame):
             self.draw_well()  # DRAW WELLS
             self.Restore()  # FIX'S DISPLAY ISSUE
             # ----------------------------------------------------------------------------------------------------------
-        
-          
+
+        # LOAD ERRORS
         except IOError:
             error_message = "IO ERROR IN LOADING PROCESS - MODEL NOT LOADED"
             MessageDialog(self, -1, error_message, "Load Error")
@@ -1809,7 +1809,7 @@ class Gmg(wx.Frame):
             MessageDialog(self, -1, error_message, "Load Error")
             raise
 
-        'MAXIMIZE FRAME'
+        # MAXIMIZE FRAME
         self.Maximize(True)
 
     # PLOTTING FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1846,9 +1846,9 @@ class Gmg(wx.Frame):
                     '''ADD SEGY_NAME TO SEGY MENU'''
                     # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
                     self.segy_name_submenu = wx.Menu()
-                    self.m_segy_submenu.Append(s + 1000, self.segy_name_list[s], self.segy_name_submenu)
-                    self.segy_name_submenu.Append(s + 1000, 'delete segy')
-                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s + 1000)  # ID+1000 TO AVOID GRAV SUBMENU ID CONFLICT
+                    self.m_segy_submenu.Append(s+1000, self.segy_name_list[s], self.segy_name_submenu)
+                    self.segy_name_submenu.Append(s+1000, 'delete segy')
+                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s+1000)  # ID+1000 TO AVOID GRAV SUBMENU ID CONFLICT
 
                 else:
                     continue
@@ -1857,6 +1857,8 @@ class Gmg(wx.Frame):
         """PLOT OBSERVED XY"""
         self.xy_list = [[]]
         for i in range(0, len(self.xy_list_save)-1):
+            print("xy count =")
+            print self.xy_count
             self.xy_list.append([])
             if self.xy_list_save[i] != []:
                 self.xy = self.xy_list_save[i]
@@ -1867,15 +1869,14 @@ class Gmg(wx.Frame):
                 self.xy_name = self.xy_name_list[i]
                 self.xy_submenu = wx.Menu()
                 self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.xy_submenu)
-                self.xy_submenu.Append(self.xy_count, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count)
+                self.xy_submenu.Append(self.xy_count+4000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count+4000)
                 self.xy_count += 1
             else:
                 self.xy_count += 1
 
     def plot_obs_topo(self):
         """PLOT OBSERVED TOPOGRAPHY"""
-
         self.obs_topo_list = [[]]
         for x in range(0, len(self.obs_topo_name_list)):
             self.obs_topo_list.append([])
@@ -1888,8 +1889,8 @@ class Gmg(wx.Frame):
                 self.obs_name = self.obs_topo_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_topo_count, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count)
+                self.obs_submenu.Append(self.obs_topo_count+10000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count+10000)
                 self.obs_topo_count += 1
                 self.obs_topo_switch = True
             else:
@@ -1909,8 +1910,8 @@ class Gmg(wx.Frame):
                 self.obs_name = self.obs_grav_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_grav_count+1, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+1)
+                self.obs_submenu.Append(self.obs_grav_count+11000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+11000)
                 self.obs_grav_count += 1
                 self.grav_obs_switch = True
             else:
@@ -1930,8 +1931,8 @@ class Gmg(wx.Frame):
                 self.obs_mag_name = self.obs_mag_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_mag_count+1, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count+1)
+                self.obs_submenu.Append(self.obs_mag_count+12000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count+12000)
                 self.obs_mag_count += 1
                 self.mag_obs_switch = True
             else:
@@ -1943,7 +1944,10 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_xy_data(self):
-        """OPEN THE XY DATA SELECTED BY THE USER USING THE load_xy FUNC"""
+        """
+        OPEN THE XY DATA SELECTED BY THE USER USING THE load_xy FUNC
+        NB: IDs START AT 5000
+        """
         xy_input_file = self.load_window.file_path
         self.xy_name = self.load_window.observed_name
         self.xy_color = self.load_window.color_picked
@@ -1972,44 +1976,48 @@ class Gmg(wx.Frame):
         self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_submenu.Append(5000+self.xy_count, 'delete observed data')
+        self.obs_submenu.Append(4000+self.xy_count, 'delete observed data')
 
         # BIND TO DEL XY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_xy, id=5000+self.xy_count)
+        self.Bind(wx.EVT_MENU, self.delete_xy, id=4000+self.xy_count)
 
         # INCREMENT XY COUNTER
         self.xy_count += 1
-
 
         # UPDATE GMG GUI
         self.update_layer_data()
         self.draw()
 
     def delete_xy(self, event):
-        """"DELETE OBSERVED XY DATA NB: ID's start at 5000"""
-        id = event.Id-5000
+        """"DELETE OBSERVED XY DATA NB: ID's start at 4000"""
+        id = event.Id-4000
         self.m_xy_submenu.DestroyItem(id)
         self.xy_list[id].set_visible(False)
         self.xy_list[id] = []
         self.xy_name_list[id] = []
         self.xy_color_list[id] = []
         self.xy_list_save[id] = []
+
+        # UPDATE GMG
         self.update_layer_data()
         self.draw()
 
-    def delete_all_xy(self):
+    def delete_all_xy(self, event):
         for i in range(0, self.xy_count):
             try:
                 self.m_xy_submenu.DestroyId(i)
                 self.xy_list[i].set_visible(False)
             except:
                 continue
+        # RESET DATA LISTS
         self.xy = []
         self.xy_list = [[]]
         self.xy_list_save = [[]]
         self.xy_name_list = []
         self.xy_color_list = []
         self.xy_count = 0
+
+        # UPDATE GMG
         self.update_layer_data()
         self.draw()
 
