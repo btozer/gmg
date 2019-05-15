@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -117,7 +118,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
@@ -126,6 +127,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -196,31 +198,31 @@
            <div itemprop="articleBody">
             
   <div class="section" id="potential-field-data">
-<h1><strong>4.0 Potential field data</strong><a class="headerlink" href="#potential-field-data" title="Permalink to this headline">¶</a></h1>
+<span id="pf"></span><h1><strong>4.0 Potential field data</strong><a class="headerlink" href="#potential-field-data" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="potential-field-calculations">
 <h2><strong>4.1 Potential field calculations</strong><a class="headerlink" href="#potential-field-calculations" title="Permalink to this headline">¶</a></h2>
 <p>The Menubar contains buttons <strong>G</strong> and <strong>M</strong>.
 These are used as switches for turning potential field calculations for the gravity and magnetic anomalies on and off.</p>
 <div class="admonition hint">
-<p class="first admonition-title">Hint</p>
-<p class="last">If the model becomes complex (i.e. contains many layers and nodes), turing off the predicted anomalies can help
+<p class="admonition-title">Hint</p>
+<p>If the model becomes complex (i.e. contains many layers and nodes), turing off the predicted anomalies can help
 speed up the GUI response time.</p>
 </div>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">You must set the magnetic inclination and Earth Field values under the <em>Magnetic Field</em> Menu before
+<p class="admonition-title">Note</p>
+<p>You must set the magnetic inclination and Earth Field values under the <em>Magnetic Field</em> Menu before
 the predicted magnetic anomaly can be calculated.</p>
 </div>
 <div class="admonition important">
-<p class="first admonition-title">Important</p>
-<p class="last"><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
+<p class="admonition-title">Important</p>
+<p><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
 (the angle is positive when measured counterclockwise). See <a class="reference internal" href="manual_magnetic_algorithm.html#magnetic-algorithm"><span class="std std-ref">A2</span></a> for further details.
 The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).</p>
 </div>
 <div class="admonition-example admonition">
-<p class="first admonition-title">Example</p>
+<p class="admonition-title">Example</p>
 <p>If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.</p>
-<p class="last">If the model was orientated North-South the angle would be 68 deg.</p>
+<p>If the model was orientated North-South the angle would be 68 deg.</p>
 </div>
 </div>
 <div class="section" id="loading-observed-potential-field-data">
@@ -230,8 +232,8 @@ The strike of the unit is assumed to be orthogonal to the model transect (striki
 Next Navigate to the file you want to load and select it.
 The file will automatically be loaded into the canvas.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">These files should be ASCII text files with X values in the first column and the anomaly value
+<p class="admonition-title">Note</p>
+<p>These files should be ASCII text files with X values in the first column and the anomaly value
 in the second column. These files may have any suffix.</p>
 </div>
 </div>
@@ -259,7 +261,7 @@ in the second column. These files may have any suffix.</p>
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

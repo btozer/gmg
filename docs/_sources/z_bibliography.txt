@@ -1,0 +1,7 @@
+.. _tutorial_bibliography:
+
+**Bibliography**
+================
+
+.. bibliography:: manual.bib
+   :style: plain

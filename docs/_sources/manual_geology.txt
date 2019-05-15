@@ -3,3 +3,12 @@
 
 **7.1 Loading geologic data**
 -----------------------------
+
+
+
+Example file containing the locations where fault traces intersect the model profile::
+
+   #X(km)   Y1(km)  Y1(km)  NAME
+    1.910   0.00    0.50    Staindrop
+   40.355   0.00    0.50    Stublick
+   41.394   0.00    0.50    Stublick_splay

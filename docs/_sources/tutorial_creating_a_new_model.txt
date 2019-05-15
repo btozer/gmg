@@ -1,0 +1,27 @@
+.. _creating_a_new_model:
+
+
+
+**3.0 Creating a new model**
+----------------------------
+
+Once you have opened GMG (follow the instructions on the :ref:`installation` page if this is your first
+time using the software) you can create a new model by navigating to the Menubar and selecting::
+
+    File -> New model...
+
+A window for setting the model dimensions will appear. Here we wil assign the model X and Z dimensions in
+kilometers, as well as the increment at which the predicted gravity and magnetic anomalies will be calculated at.
+In this example our model profile is 50 km long, so lets set the X-coordinates as 0 and 50 km. We will be modelling the
+upper crustal structure, so lets set the Z-coordinates as 0 and 10 km and the calculation increment as 0.5 km.
+
+.. note::
+
+    you can always change the model dimensions and increment at a later time. For example, you may start out by
+    modelling with a coarse spacing to ensure GMG runs smoothly. Then, once you are satisfied with your starting model
+    and are ready to make smaller, fine scale changes towards completion of your model you might then lower the
+    calculation interval.
+
+    To modify the model dimensions at anytime, navigate to::
+
+        Model View -> Modify current model dimensions...

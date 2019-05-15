@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -118,7 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
@@ -127,6 +128,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -221,16 +223,16 @@ directory structure outlined in this section is a useful template. First create 
 <p>A pop-up window will appear in which you will enter the new model’s dimensions and the spacing increment
 at which the predicted anomalies will be calculated (NB. all units are km).</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
+<p class="admonition-title">Note</p>
 <p>The model dimensions and spacing at which potential field data is calculated can be modified later by navigating
 to:</p>
-<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>Model View -&gt; Modify current Model Dimensions...
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Model View -&gt; Modify current Model Dimensions...
 </pre></div>
 </div>
 </div>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
-<p class="last">If you require a very fine spatial resolution for the predicted anomaly increment (relative to the total length of
+<p class="admonition-title">Tip</p>
+<p>If you require a very fine spatial resolution for the predicted anomaly increment (relative to the total length of
 the model), then it may be computationally beneficial to set the spacing as a relatively coarse value for initial
 modelling, and then later reduce this to the fine spacing required for the final model. This will ensure gmg runs
 smoothly during the initial modelling phase.</p>
@@ -246,13 +248,14 @@ smoothly during the initial modelling phase.</p>
 For example: gmg_testing/MODELS/</p>
 <p>gmg models are saved as <em>Pickle</em> files and must have a “.model” suffix, for example:</p>
 <blockquote>
-<div>gmg_model_01.model</div></blockquote>
+<div><p>gmg_model_01.model</p>
+</div></blockquote>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
+<p class="admonition-title">Tip</p>
 <p>It is recommended that the user incrementally saves updated models using a incremented suffix such as:</p>
 <p>model_1.model</p>
 <p>model_02.model</p>
-<p class="last">…etc</p>
+<p>…etc</p>
 </div>
 <p>This will ensure you can revert back to previous models if you “corrupt” your current model, or it becomes a “dead end”.</p>
 </div>
@@ -288,7 +291,7 @@ For example: gmg_testing/MODELS/</p>
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

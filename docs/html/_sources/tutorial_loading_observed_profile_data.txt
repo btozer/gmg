@@ -1,0 +1,24 @@
+.. _loading_observed_profile_data:
+
+=====================================
+**4.0 Loading observed profile data**
+=====================================
+
+Now we have creating our model, we can load the observed gravity and magnetic anomaly data into the modelling
+environment. First, lets load the gravity data by navigating to::
+
+    Gravity -> Load Gravity Anomaly...
+
+Now select the **File...** button and use the file explorer to navigate to and select the file
+**bott_Bouguer_gravity.xg**. This file is located in the directory::
+
+    gmg/docs/tutorial/GRAVITY_DATA
+
+Now lets name the data **Bouguer anomaly** and leave the display color as the default **blue**. Finally, select the
+**Load** button to load the data.
+
+You should now see the observed Bouguer gravity anomaly in the Gravity panel.
+
+Lets repeat this process for the magnetic anomaly data **bott_Magnetic_anomaly.xm** located in the directory::
+
+    gmg/docs/tutorial/MAGNETIC_DATA

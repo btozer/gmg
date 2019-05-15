@@ -21,6 +21,4 @@
    manual_python_console
    manual_gravity_algorithm
    manual_magnetic_algorithm
-   manual_references
-
-.. bibliography:: manual.bib
+   z_bibliography

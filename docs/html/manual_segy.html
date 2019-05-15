@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -118,7 +119,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
@@ -127,6 +128,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -204,16 +206,16 @@
 Next Navigate to the file you want to load and select it. You will them be prompted to enter the dimensions of
 the SEGY data. The data will then be loaded into the model canvas using these dimensions (plotted as a pyplot image).</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<ol class="last arabic simple">
-<li>The SEGY data must be in the depth domain.</li>
-<li>Multiple SEGY files may be loaded into a single model. For example if two sections of the model span two distinct
-seismic survey lines.</li>
+<p class="admonition-title">Note</p>
+<ol class="arabic simple">
+<li><p>The SEGY data must be in the depth domain.</p></li>
+<li><p>Multiple SEGY files may be loaded into a single model. For example if two sections of the model span two distinct
+seismic survey lines.</p></li>
 </ol>
 </div>
 <div class="admonition caution">
-<p class="first admonition-title">Caution</p>
-<p class="last">SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values.
+<p class="admonition-title">Caution</p>
+<p>SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values.
 Hence, you may need fill these headers using seismic processing software or ObsPy if they are not already present in
 your data.</p>
 </div>
@@ -223,14 +225,14 @@ your data.</p>
 <p><strong>Gain</strong></p>
 <p>The amplitude gain can be increased and decreased by either:</p>
 <ol class="arabic simple">
-<li>selecting the <em>‘Seismic Data’</em> menu in the Menubar and then selecting <em>‘Gain’</em> <em>‘Increase…’</em> or <em>‘Decrease’</em></li>
-<li>Using the Gain control icons (see <a class="reference internal" href="manual_icons.html#icons"><span class="std std-ref">Icon Shortcuts</span></a>)</li>
+<li><p>selecting the <em>‘Seismic Data’</em> menu in the Menubar and then selecting <em>‘Gain’</em> <em>‘Increase…’</em> or <em>‘Decrease’</em></p></li>
+<li><p>Using the Gain control icons (see <a class="reference internal" href="manual_icons.html#icons"><span class="std std-ref">Icon Shortcuts</span></a>)</p></li>
 </ol>
 <p><strong>Color palette</strong></p>
 <p>There are currently two color palettes to chose from:</p>
 <ol class="arabic simple">
-<li>Seismic (red-white-blue)</li>
-<li>Seismic (grey scale)</li>
+<li><p>Seismic (red-white-blue)</p></li>
+<li><p>Seismic (grey scale)</p></li>
 </ol>
 <p>To change the color palette select the <em>‘Seismic Data’</em> menu in the Menubar and then <em>‘Color Palette’</em> and chose
 from the options listed.</p>
@@ -273,7 +275,7 @@ Menubar and then select <em>‘Segy Data’</em> and then <em>‘Delete’</em> 
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

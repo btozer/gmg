@@ -89,4 +89,5 @@ polygons with many nodes may be necessary.
 
     a) Gravity anomaly calculated for the cylinder shown in (b) using an exact analytical solution and by the
     line-integral methods of Talwani et al., (1959) :cite:`talwani1959` and Bott (1969) :cite:`bott1969`. b) Model
-    cylinder defined using 360 nodes, a radius of 5 :math:`km` and a density contrast of :math:`250 kg` :math:`m^{-3}`.
+    cylinder defined using 360 nodes, a radius of 5 :math:`km` and a density contrast of
+    :math:`250` `kg` :math:`m^{-3}`.

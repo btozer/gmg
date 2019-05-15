@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,7 +37,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="References" href="manual_references.html" />
+    <link rel="next" title="Bibliography" href="z_bibliography.html" />
     <link rel="prev" title="A1 Bott (1969) 2D gravity algorithm" href="manual_gravity_algorithm.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
@@ -116,7 +117,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#talwani-and-heirtzler-1964-method-testing">Talwani and Heirtzler (1964) method testing</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
@@ -125,6 +126,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -196,7 +198,7 @@
             
   <div class="section" id="a2-talwani-and-heirtzler-1964-magnetic-algorithm">
 <span id="magnetic-algorithm"></span><h1><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong><a class="headerlink" href="#a2-talwani-and-heirtzler-1964-magnetic-algorithm" title="Permalink to this headline">¶</a></h1>
-<p>Magnetic anomalies are calculated using a python implementation of Talwani and Heirtzler’s (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id1">[6]</a>
+<p>Magnetic anomalies are calculated using a python implementation of Talwani and Heirtzler’s (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id1">[8]</a>
 algorithm for two-dimensional uniformly magnetised bodies. This employs a similar procedure to that
 described in Section <a class="reference internal" href="manual_gravity_algorithm.html#manual-gravity-algorithm"><span class="std std-ref">A1</span></a> for calculating two-dimensional gravity anomalies
 by treating a body as an n-sided polygon, solving the anomaly for each side and summing the result.
@@ -209,7 +211,7 @@ and the magnetisation vector must also be considered.</p>
 <p>These complexities are handled by considering the vertical and horizontal components of the total magnetisation
 vector separately and then summing these components at the final calculation step. Following the trigonometric
 parametrisation for a two-dimensional body shown in <a class="reference internal" href="#talwani-mag-method"><span class="std std-numref">Figure 4</span></a>, Talwani and Heirtzler
-(1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id2">[6]</a> showed that the horizontal and vertical components of the total magnetic field are given by:</p>
+(1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id2">[8]</a> showed that the horizontal and vertical components of the total magnetic field are given by:</p>
 <div class="math notranslate nohighlight" id="equation-talwani-mag-vertical">
 <span class="eqno">(4)<a class="headerlink" href="#equation-talwani-mag-vertical" title="Permalink to this equation">¶</a></span>\[V = 2(J_{x}Q - J_{z}P)\]</div>
 <div class="math notranslate nohighlight" id="equation-talwani-mag-horizontal">
@@ -239,35 +241,35 @@ as shown in <a class="reference internal" href="#talwani-mag-angles"><span class
 <span class="eqno">(11)<a class="headerlink" href="#equation-talwani-mag-j-induced" title="Permalink to this equation">¶</a></span>\[J = kH\]</div>
 <p>where <span class="math notranslate nohighlight">\(k\)</span> is the susceptibility contrast between the body and surrounding material and <span class="math notranslate nohighlight">\(H\)</span> is the strength
 of inducing field. Also, <strong>A</strong> will be equal to the inclination (<strong>I</strong>) and <strong>B</strong> will be equal to the declination
-(<strong>D</strong>) of Earth’s field Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id3">[6]</a>.</p>
+(<strong>D</strong>) of Earth’s field Talwani and Heirtzler (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id3">[8]</a>.</p>
 <p>For the case when magnetisation is remanent or a combination of remanent and induced, the angles <strong>A</strong> and <strong>B</strong> will
 require modification by the user to account for the difference between the inducing field vector and remanent field
 vector.</p>
-<div class="figure" id="talwani-mag-method">
+<div class="figure align-center" id="talwani-mag-method">
 <img alt="_images/talwani_magnetic.png" src="_images/talwani_magnetic.png" />
 <p class="caption"><span class="caption-number">Figure 4 </span><span class="caption-text">a) Geometric parameters used for solving for the magnetic anomaly produced by an infinite body with one
 sloping interface. b) Diagram showing an example two-dimensional body (red dashed line) estimated using
-five nodal points (A-E) (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id4">[6]</a>).</span></p>
+five nodal points (A-E) (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id4">[8]</a>).</span><a class="headerlink" href="#talwani-mag-method" title="Permalink to this image">¶</a></p>
 </div>
-<div class="figure" id="talwani-mag-angles">
+<div class="figure align-center" id="talwani-mag-angles">
 <img alt="_images/talwani_mag_angles.png" src="_images/talwani_mag_angles.png" />
 <p class="caption"><span class="caption-number">Figure 5 </span><span class="caption-text">Perspective three-dimensional view of the total magnetisation vector <span class="math notranslate nohighlight">\(\vec{J}\)</span>. Grey shade is a
 vertical plane connecting <span class="math notranslate nohighlight">\(\vec{J}\)</span> to the horizontal x-y surface. A is the dip angle of <span class="math notranslate nohighlight">\(\vec{J}\)</span>,
 measured in the vertical plane and equal to the inclination for induced magnetisation. B and C are
 the angles between geographic north and the horizontal projection of <span class="math notranslate nohighlight">\(\vec{J}\)</span> and model profile
 (positive x-axis) respectively. These are measured clockwise from geographic north and B is equal
-to declination for induced magnetisation (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id5">[6]</a>).</span></p>
+to declination for induced magnetisation (modified after, Talwani and Heirtzler (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id5">[8]</a>).</span><a class="headerlink" href="#talwani-mag-angles" title="Permalink to this image">¶</a></p>
 </div>
 <p>The total magnetic anomaly is then given as the sum of the horizontal and vertical components in the model plane:</p>
 <div class="math notranslate nohighlight" id="equation-talwani-mag-total">
 <span class="eqno">(12)<a class="headerlink" href="#equation-talwani-mag-total" title="Permalink to this equation">¶</a></span>\[T = V \sin A + H \cos A \cos (C-B)\]</div>
 <div class="section" id="talwani-and-heirtzler-1964-method-testing">
 <h2>Talwani and Heirtzler (1964) method testing<a class="headerlink" href="#talwani-and-heirtzler-1964-method-testing" title="Permalink to this headline">¶</a></h2>
-<p>To assess the accuracy of the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id6">[6]</a> method, the magnetic anomaly determined
+<p>To assess the accuracy of the Talwani and Heirtzler (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id6">[8]</a> method, the magnetic anomaly determined
 using the algorithm is compared to that of an exact analytic solution for a simple body. In this case, the solution
 for a thin (width <span class="math notranslate nohighlight">\(&lt;&lt;\)</span> depth) flat topped vertical sheet with a constant dip angle and magnetisation, which
 extends infinitely into and out of the model plane and infinitely in depth is solved. The solution for this case
-is given by, for example, Reford (1964) <a class="reference internal" href="manual_references.html#reford1964" id="id7">[5]</a> as:</p>
+is given by, for example, Reford (1964) <a class="reference internal" href="z_bibliography.html#reford1964" id="id7">[7]</a> as:</p>
 <div class="math notranslate nohighlight" id="equation-reford-dyke">
 <span class="eqno">(13)<a class="headerlink" href="#equation-reford-dyke" title="Permalink to this equation">¶</a></span>\[\Delta T = 2kTb^{2}w  \left[ \frac{h}{R^{2}} \sin (2I-d) - \frac{x}{R^{2}} \cos(2I-d) \right]\]</div>
 <div class="math notranslate nohighlight" id="equation-b">
@@ -285,17 +287,17 @@ produced by two bodies, one where <span class="math notranslate nohighlight">\(h
 base of the dyke). The effect of the second dyke is subtracted from the first to leave the anomaly caused by a dyke
 of finite depth extent <span class="math notranslate nohighlight">\(d_{2}\)</span>.</p>
 <p><a class="reference internal" href="#talwani-heirtz-test"><span class="std std-numref">Figure 6</span></a> shows anomalies calculated using the analytic solution and
-the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id8">[6]</a> algorithm for a thin vertical sheet beginning at a depth of
+the Talwani and Heirtzler (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id8">[8]</a> algorithm for a thin vertical sheet beginning at a depth of
 1 <span class="math notranslate nohighlight">\(km\)</span> and extending to 10 <span class="math notranslate nohighlight">\(km\)</span> with no dip and a magnetic susceptibility of 0.001. Inclination and
 declination are both 0 degree, and the model azimuth is due north, such that, the sheet strikes east-west.</p>
-<div class="figure" id="talwani-heirtz-test">
+<div class="figure align-center" id="talwani-heirtz-test">
 <img alt="_images/magnetic_anomaly_comparison.png" src="_images/magnetic_anomaly_comparison.png" />
 <p class="caption"><span class="caption-number">Figure 6 </span><span class="caption-text">a) Predicted magnetic anomalies for the model shown in (b) using the analytic solution for a thin sheet
-(grey line) and the Talwani and Heirtzler (1964) <a class="reference internal" href="manual_references.html#talwani1964" id="id9">[6]</a> algorithm (red dashed line). b) Simple thin
+(grey line) and the Talwani and Heirtzler (1964) <a class="reference internal" href="z_bibliography.html#talwani1964" id="id9">[8]</a> algorithm (red dashed line). b) Simple thin
 sheet model polygon used to simulate a vertical dyke. Inset table lists model parameters (<span class="math notranslate nohighlight">\(\Delta \lambda\)</span>)
 susceptibility contrast; <span class="math notranslate nohighlight">\(w =\)</span> width of the flat top of the sheet; Inc. and Dec. <span class="math notranslate nohighlight">\(=\)</span> Inclination and
 Declination of inducing field. Inducing field strength is set as <span class="math notranslate nohighlight">\(50000\)</span> <span class="math notranslate nohighlight">\(nT\)</span>.
-The profile azimuth is east-west.</span></p>
+The profile azimuth is east-west.</span><a class="headerlink" href="#talwani-heirtz-test" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 </div>
@@ -308,7 +310,7 @@ The profile azimuth is east-west.</span></p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="manual_references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="z_bibliography.html" class="btn btn-neutral float-right" title="Bibliography" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="manual_gravity_algorithm.html" class="btn btn-neutral float-left" title="A1 Bott (1969) 2D gravity algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
@@ -322,7 +324,7 @@ The profile azimuth is east-west.</span></p>
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

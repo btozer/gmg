@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -103,6 +104,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -176,33 +178,32 @@
 </div><div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
 <p>GMG is an open-source Graphical User Interface (GUI) designed principally for modelling
-2D potential field (gravity and magnetic) profiles. GMG is written in python 2.7 using
-wx.python for GUI implementation. GMG makes use of several other open-source python
-packages to preform various tasks (see <a class="reference external" href="references.html">References</a> for a detailed
-listing).</p>
-<p>The project was instigated after failing to find an adequate open-source option (in which
+2D potential field (gravity and magnetic) profiles. GMG is written in python 2.7 and uses
+wxPython for GUI implementation.</p>
+<p>GMG makes use of several other open-source python packages to preform various tasks
+(see <a class="reference external" href="references.html">References</a> for a detailed listing).</p>
+<p>The project was instigated after failing to find an adequate open-source package (in which
 the source code can be viewed and modified by the user) for performing 2D geophysical
 modeling tasks. Inspiration came from fatiando a terra and GMT.</p>
 <p>It is anticipated that GMG will also be useful for teaching purposes.</p>
-<p><strong>NB: GMG is in development. Some documentation is
-incomplete and some features may not work as expected.</strong></p>
+<p><strong>NB: GMG is currently in development. Some documentation is incomplete and some features may not work as expected.</strong></p>
 </div>
 <div class="section" id="key-features">
 <h1>Key features<a class="headerlink" href="#key-features" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li>Data I/O is made as simple as possible using space delimited ASCII text files.</li>
-<li>Import and display observed topography, gravity and magnetic data.</li>
-<li>Apply filters to observed data.</li>
-<li>Import and display seismic reflection data.</li>
-<li>Add and manipulate model layers (subsurface bodies) using a simple interactive interface.</li>
-<li>“Pinch out/snap” layers against adjacent layers.</li>
-<li>Calculate the predicted gravity anomaly produced by any combination of model layers.</li>
-<li>Calculate the predicted magnetic anomaly produced by any combination of model layers.</li>
-<li>Model magnetic anomalies using induced and/or remanent magnetism.</li>
-<li>Display well horizon tops.</li>
-<li>Display XY data (e.g., earthquake hypocenters or geological surface contacts).</li>
-<li>Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.</li>
-<li>Save model figures as vector graphics in Portable Document Format (PDF) file.</li>
+<li><p>Data I/O is made as simple as possible using space delimited ASCII text files.</p></li>
+<li><p>Import and display observed topography, gravity and magnetic data.</p></li>
+<li><p>Apply filters to observed data.</p></li>
+<li><p>Import and display seismic reflection data.</p></li>
+<li><p>Add and manipulate model layers (subsurface bodies) using a simple interactive interface.</p></li>
+<li><p>“Pinch out/snap” layers against adjacent layers.</p></li>
+<li><p>Calculate the predicted gravity anomaly produced by any combination of model layers.</p></li>
+<li><p>Calculate the predicted magnetic anomaly produced by any combination of model layers.</p></li>
+<li><p>Model magnetic anomalies using induced and/or remanent magnetism.</p></li>
+<li><p>Display well horizon tops.</p></li>
+<li><p>Display XY data (e.g., earthquake hypocenters or geological surface contacts).</p></li>
+<li><p>Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.</p></li>
+<li><p>Save model figures as vector graphics in Portable Document Format (PDF) file.</p></li>
 </ul>
 <div class="toctree-wrapper compound">
 </div>
@@ -214,16 +215,16 @@ incomplete and some features may not work as expected.</strong></p>
 <div class="section" id="release-notes">
 <h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this headline">¶</a></h1>
 <p>Version: 1.0.0</p>
-<p>Last updated: Apr 12, 2019</p>
+<p>Last updated: May 15, 2019</p>
 </div>
 <div class="section" id="notices">
 <h1>Notices:<a class="headerlink" href="#notices" title="Permalink to this headline">¶</a></h1>
-<p>For commenting, creating a feature request or reporting a bug please use github, or
-alternatively, send an e-mail to: <a class="reference external" href="mailto:btozer&#37;&#52;&#48;ucsd&#46;edu">btozer<span>&#64;</span>ucsd<span>&#46;</span>edu</a></p>
+<p>If you would like to make a comment, create a feature request or report a bug please use the github page.
+Alternatively, you can send an e-mail to: <a class="reference external" href="mailto:btozer&#37;&#52;&#48;ucsd&#46;edu">btozer<span>&#64;</span>ucsd<span>&#46;</span>edu</a></p>
 </div>
 <div class="section" id="citing">
 <h1>Citing:<a class="headerlink" href="#citing" title="Permalink to this headline">¶</a></h1>
-<p>If you use GMG, please cite this github repository.</p>
+<p>If you use GMG, please cite this github repository (Citation to come once the package is further developed).</p>
 </div>
 
 
@@ -246,7 +247,7 @@ alternatively, send an e-mail to: <a class="reference external" href="mailto:bto
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

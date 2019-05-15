@@ -1,0 +1,47 @@
+.. creating_a_model_layer:
+
+**6.0 Creating a model layer**
+------------------------------
+
+Now we have loaded our observed anomaly data into the model environment, we are ready to start constructing our model.
+
+To add a new layer to the model navigate to the *'Layers'* menu and select *'New Layer'*::
+
+    Layers -> New Layer
+
+Alternatively, use the keyboard shortcut, **n** key.
+
+You will be prompted with the option of adding a *'New fixed layer'* or a *'New floating layer'*.
+
+**Floating layers:**
+
+Floating layers are polygons that are fully contained within the model space. For example, a narrow salt dome.
+
+**Fixed layers:**
+
+Fixed layers span the entire width of the model and are useful for modelling *layers*, such as sedimentary basin
+strata. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.
+
+.. note::
+
+    Fixed layers are automatically *'padded'* horizontally from the boundary nodes by an additional 400 km in order to
+    avoid edge effects.
+
+Lets chose to create a new **floating** layer, which we will use to represent the Weardale granite.
+
+When creating a new floating layer, you must assign the X and Y coordinates of four nodes that will define the layer.
+These nodes **must** be input in anti-clockwise order to ensure layers field effects are calculated with the correct
+sign. Beside the ordering of the nodes, there actual positions are not important as then can easily be modified using
+the mouse once the layer has been created.
+
+Lets set the initial node positions for our new floating layer as follows::
+
+    X1: 10    Y1: 1
+    X2: 10    Y2: 8
+    X3: 30    Y3: 8
+    X4: 30    Y4: 1
+
+Finally, select ``Create layer``. The new layer will appear in the modelling environment.
+
+We can rename the layer from its default name of ``layer 1`` by twice single clicking its name under the ``Layers`` menu
+on the middle left ``Controls panel``. Lets rename the layer ``Weardale``.

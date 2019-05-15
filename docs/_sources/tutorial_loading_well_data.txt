@@ -1,0 +1,30 @@
+.. loading_well_data:
+
+=========================
+**5.0 Loading well data**
+=========================
+
+THe Rookhope exploration well was drilled above the Weardale granite between November 1960 - July 1961 in order to
+prove its existence. The well was drilled at a location 322.76 m Above mean sea level (AMSL) and revealed a 390 m thick
+sequence of Carboniferous sediment before penetrating the granite (at a depth of 67.24 m BMSL) and continued through the
+granite reaching a bottom depth of 808 m (485.25 m BMSL) while still within the pluton.
+
+This record provides a``ground-truth" point with which to constrain our forward model. THe petrological data from the
+well also provides constrain on the density of the granite.
+
+Now lets load the well record into our modelling environment by navigating to::
+
+    Well data -> Load well record...
+
+Now use the file explorer to navigate to the file **Rookhope.txt** located in the directory::
+
+    /gmg/docs/tutorial/WELL_DATA
+
+You will be prompted to provide a name for the new well record, let call it Rookhope.
+
+The well record will now be visible in the model frame. We can hide/show the well by navigating to::
+
+    Well data -> Wells... -> Rookhope -> Hide/Show
+
+We can also change the text size of the well horizons labels using the **Label Text Size** slider in the Layer
+Attributes tool box located on the left hand side of the modelling environment.

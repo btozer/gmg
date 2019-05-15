@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -113,7 +114,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
@@ -122,6 +123,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -193,60 +195,60 @@
             
   <div class="section" id="keyboard-shortcuts">
 <span id="keys"></span><h1><strong>Keyboard Shortcuts</strong><a class="headerlink" href="#keyboard-shortcuts" title="Permalink to this headline">¶</a></h1>
-<table border="1" class="docutils">
+<table class="docutils align-center">
 <colgroup>
-<col width="21%" />
-<col width="29%" />
-<col width="21%" />
-<col width="29%" />
+<col style="width: 21%" />
+<col style="width: 29%" />
+<col style="width: 21%" />
+<col style="width: 29%" />
 </colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Key</th>
-<th class="head">Function</th>
-<th class="head">Key</th>
-<th class="head">Function</th>
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Function</p></th>
+<th class="head"><p>Key</p></th>
+<th class="head"><p>Function</p></th>
 </tr>
 </thead>
-<tbody valign="top">
-<tr class="row-even"><td><strong>i</strong></td>
-<td>Insert node</td>
-<td><strong>a</strong></td>
-<td>Reset view (1:1 aspect)</td>
+<tbody>
+<tr class="row-even"><td><p><strong>i</strong></p></td>
+<td><p>Insert node</p></td>
+<td><p><strong>a</strong></p></td>
+<td><p>Reset view (1:1 aspect)</p></td>
 </tr>
-<tr class="row-odd"><td><strong>d</strong></td>
-<td>Delete node</td>
-<td><strong>shift+p</strong></td>
-<td>Pan view</td>
+<tr class="row-odd"><td><p><strong>d</strong></p></td>
+<td><p>Delete node</p></td>
+<td><p><strong>shift+p</strong></p></td>
+<td><p>Pan view</p></td>
 </tr>
-<tr class="row-even"><td><strong>n</strong></td>
-<td>Create new layer</td>
-<td><strong>up arrow</strong></td>
-<td>Increase aspect ratio</td>
+<tr class="row-even"><td><p><strong>n</strong></p></td>
+<td><p>Create new layer</p></td>
+<td><p><strong>up arrow</strong></p></td>
+<td><p>Increase aspect ratio</p></td>
 </tr>
-<tr class="row-odd"><td><strong>p</strong></td>
-<td>Pinch node <span class="math notranslate nohighlight">\(^{*}\)</span></td>
-<td><strong>down arrow</strong></td>
-<td>Decrease aspect ratio</td>
+<tr class="row-odd"><td><p><strong>p</strong></p></td>
+<td><p>Pinch node <span class="math notranslate nohighlight">\(^{*}\)</span></p></td>
+<td><p><strong>down arrow</strong></p></td>
+<td><p>Decrease aspect ratio</p></td>
 </tr>
-<tr class="row-even"><td><strong>&gt;</strong></td>
-<td>Edit next layer</td>
-<td><strong>ctrl+up arrow</strong></td>
-<td>Increase aspect ratio x2</td>
+<tr class="row-even"><td><p><strong>&gt;</strong></p></td>
+<td><p>Edit next layer</p></td>
+<td><p><strong>ctrl+up arrow</strong></p></td>
+<td><p>Increase aspect ratio x2</p></td>
 </tr>
-<tr class="row-odd"><td><strong>&lt;</strong></td>
-<td>Edit previous layer</td>
-<td><strong>ctrl+down arrow</strong></td>
-<td>Decrease aspect ratio x2</td>
+<tr class="row-odd"><td><p><strong>&lt;</strong></p></td>
+<td><p>Edit previous layer</p></td>
+<td><p><strong>ctrl+down arrow</strong></p></td>
+<td><p>Decrease aspect ratio x2</p></td>
 </tr>
-<tr class="row-even"><td><strong>z</strong></td>
-<td>Zoom</td>
-<td><strong>ctrl+i</strong></td>
-<td>Increase layer transparency</td>
+<tr class="row-even"><td><p><strong>z</strong></p></td>
+<td><p>Zoom</p></td>
+<td><p><strong>ctrl+i</strong></p></td>
+<td><p>Increase layer transparency</p></td>
 </tr>
-<tr class="row-odd"><td><strong>ctrl+z</strong></td>
-<td>Zoom out</td>
-<td><strong>ctrl+d</strong></td>
-<td>Decrease layer transparency</td>
+<tr class="row-odd"><td><p><strong>ctrl+z</strong></p></td>
+<td><p>Zoom out</p></td>
+<td><p><strong>ctrl+d</strong></p></td>
+<td><p>Decrease layer transparency</p></td>
 </tr>
 </tbody>
 </table>
@@ -275,7 +277,7 @@
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

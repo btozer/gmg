@@ -1,0 +1,25 @@
+.. _pre-modelling_considerations:
+
+====================================
+**2.0 Pre-modelling considerations**
+====================================
+
+As we are interested in modelling the structure of the Weardale granite, an important processing step prior to modelling
+is to consider the other factors contributing to the total gravity anomaly.
+
+One common step is to preform a separation of the "regional" component of the gravity anomaly from the total anomaly
+in order to remove the contribution from sub-crustal density anomalies. As these anomalies are generated from deep
+sources, they are of much longer wavelength than that produced by our target, which resides in the upper crust.
+
+There are several strategies for calculating the regional gravity anomaly component but here we will use that determined
+by :cite:`Kimbell2011` as shown in :numref:`regional_gravity_map`. As can be seen there is a long wavelength positive
+anomaly anomaly with amplitudes ranging :math:`\sim` :math:`14-21` :math:`mGal`.
+
+.. figure:: _static/regional_GA.png
+    :name: regional_gravity_map
+
+    Regional gravity anomaly related to long-wavelength sub-crustal density anomalies from :cite:`Kimbell2011`. The
+    red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
+    (yellow circle). The data are projected on a local cartesian grid.
+
+

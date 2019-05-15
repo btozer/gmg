@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -123,7 +124,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_references.html"><strong>References</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
@@ -132,6 +133,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -206,11 +208,11 @@
 <p>Attributes refer to the physical properties assigned to a given model layer(polygon) and are used to calculate
 the predicted gravity and magnetic anomalies. Each layer contains five attributes:</p>
 <ul class="simple">
-<li>Layer bulk density</li>
-<li>Layer reference bulk density</li>
-<li>Layer susceptibility contrast</li>
-<li>Magnetic field vector angle A (Equal to the inclination of Earth’s field if magnetisation is induced only)</li>
-<li>Magnetic field vector angle B (Equal to the declination of Earth’s field if magnetisation is induced only)</li>
+<li><p>Layer bulk density</p></li>
+<li><p>Layer reference bulk density</p></li>
+<li><p>Layer susceptibility contrast</p></li>
+<li><p>Magnetic field vector angle A (Equal to the inclination of Earth’s field if magnetisation is induced only)</p></li>
+<li><p>Magnetic field vector angle B (Equal to the declination of Earth’s field if magnetisation is induced only)</p></li>
 </ul>
 <p>Layer attributes are set using the <strong>Attributes</strong> sidebar within the modelling window or from the
 <strong>Attribute Table</strong> which can be accessed from the top menubar. GMG is designed such that attributes can be
@@ -218,8 +220,8 @@ easily varied when modelling. This allows for rapid assessment of the effect of 
 need only be set if required for the layer, if attributes are not set, the given layer will not contribute to
 the modelled anomaly, be that gravity or magnetic.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">For the case when a layer requires a remanent magnetism, angles A and B will differ from the
+<p class="admonition-title">Note</p>
+<p>For the case when a layer requires a remanent magnetism, angles A and B will differ from the
 Inclination and Declination.</p>
 </div>
 <div class="section" id="bulk-density">
@@ -227,8 +229,8 @@ Inclination and Declination.</p>
 <p>Gravity modelling is achieved using bulk <strong>density contrasts</strong> relative to a <strong>reference density</strong>.</p>
 <p>Each layer requires:</p>
 <ol class="arabic simple">
-<li>A bulk density</li>
-<li>A reference density</li>
+<li><p>A bulk density</p></li>
+<li><p>A reference density</p></li>
 </ol>
 <p>GMG defaults to a reference density of 0 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>. In this case, densities should be input as
 <strong>density contrasts</strong> e.g. 0.2 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
@@ -241,23 +243,23 @@ crustal structure and relative to, for example, an upper crust of 2670 <span cla
 2900 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> and upper mantle of 3330 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
 <p>To assign density values use the <em>Attribute Sidebar</em> or the <em>Attribute table</em>.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">All densities must be input using SI units: <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
+<p class="admonition-title">Note</p>
+<p>All densities must be input using SI units: <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
 </div>
 <p>For each layer both the bulk absolute density and the reference density must be set.</p>
 <div class="admonition-example admonition">
-<p class="first admonition-title">Example</p>
+<p class="admonition-title">Example</p>
 <p>To model a sedimentary basin typical absolute density values may be 2400 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> for the
 basin and 2670 <span class="math notranslate nohighlight">\(kg/m^3\)</span> as the reference density for the upper continental crust.</p>
-<p class="last">To model crustal thickened from a reference crustal thickness of 32 km, thickened to 36 km, a lower crustal
+<p>To model crustal thickened from a reference crustal thickness of 32 km, thickened to 36 km, a lower crustal
 density of 2800 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> maybe be modelled against a upper most mantle reference density
 of 3330 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
 </div>
 <div class="admonition tip">
-<p class="first admonition-title">Tip</p>
+<p class="admonition-title">Tip</p>
 <p>To set all layer reference densities as a single value (e.g. when only modelling upper crustal structure), in
 the menubar navigate to:</p>
-<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>Gavity Field -&gt; Set background density...
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gavity Field -&gt; Set background density...
 </pre></div>
 </div>
 </div>
@@ -270,8 +272,8 @@ magnetising force, <span class="math notranslate nohighlight">\(H\)</span> by:</
 \[k = \frac{J_{i}}{H}\]</div>
 <p>As both <span class="math notranslate nohighlight">\(J_{i}\)</span> and <span class="math notranslate nohighlight">\(H\)</span> have SI units <span class="math notranslate nohighlight">\(A m^{-1}\)</span>, magnetic susceptibility is dimensionless.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">GMG uses SI units, hence magnetic susceptibilities are <span class="math notranslate nohighlight">\(4 \pi\)</span> larger than c.g.s values</p>
+<p class="admonition-title">Note</p>
+<p>GMG uses SI units, hence magnetic susceptibilities are <span class="math notranslate nohighlight">\(4 \pi\)</span> larger than c.g.s values</p>
 </div>
 </div>
 <div class="section" id="magnetisation-vector">
@@ -316,7 +318,7 @@ be calculated outside of GMG.</p>
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>

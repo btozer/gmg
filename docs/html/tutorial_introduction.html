@@ -1,0 +1,299 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>1.0 Introduction &mdash; GMG: An open source geophysical modelling GUI</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="2.0 Pre-modelling considerations" href="tutorial_pre-modelling_considerations.html" />
+    <link rel="prev" title="Tutorial" href="tutorial.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="gmg_documentation.html">
+          
+
+          
+            
+            <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="manual.html"><strong>Manual</strong></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>1.0 Introduction</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pre-modelling_considerations.html"><strong>2.0 Pre-modelling considerations</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Credits</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="gmg_documentation.html">gmg</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="gmg_documentation.html">Docs</a> &raquo;</li>
+        
+          <li><a href="tutorial.html"><strong>Tutorial</strong></a> &raquo;</li>
+        
+      <li><strong>1.0 Introduction</strong></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/tutorial_introduction.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="introduction">
+<span id="tutorial-introduction"></span><h1><strong>1.0 Introduction</strong><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will learn how to use GMG by modelling an example data set.</p>
+<p>We will systematically work through the steps required to load data and model the gravity and magnetic anomalies
+produced by the Weardale granite in the Northern Pennines, UK. Thereby recreating the study published by the British
+geophysicist Martin Bott (Bott, 1967) <a class="reference internal" href="z_bibliography.html#bott1967" id="id1">[2]</a>.</p>
+<p>The tutorial will walk through the following steps:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1. Creating a new model and how to save and reload models.
+
+2. Loading observed 2D profile data (both Bouguer gravity and magnetic anomalies) into your GMG modelling
+   environment.
+
+3. Loading borehole horizon top data into your GMG modelling environment.
+
+4. Adding new layers to your model and assigning attributes (e.g. bulk density) to them.
+
+5. Setting magnetic field attributes in your model (e.g. the strength of Earth&#39;s field).
+
+6. Running forward model calculations of the predicted gravity and magnetic anomalies.
+
+7. How to use the GMG interface for forward modelling.
+
+8. How to save the predicted anomaly profiles as external text files.
+
+9. How to produce a raster figure and save this to disc using GMGs inbuilt figure production module.
+
+10. How to load 2D seismic reflection data into a model.
+</pre></div>
+</div>
+<p><strong>1.1 Geologic background of our example study</strong></p>
+<p>The Weardale granite is located in the Northern Pennines, in Northern England. The presence of this Caledonian-aged
+granite was first proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby
+outcrops. Later gravity surveys and magnetic surveys by various authors strongly  corroborated this suggestion.
+<a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a> show collations of these data published by Bott (1967)
+<a class="reference internal" href="z_bibliography.html#bott1967" id="id2">[2]</a>. Its presence was finally confirmed with the drilling of the Rookhope borehole (Dunham et al., 1961).
+The location of this borehole is shown as the yellow circle in <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and
+<a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a>. In this tutorial, we will model the subsurface structure of this granite using gravity and
+magnetic data as well as structural and physical constraints provided by other data sources (namely the Rookhope
+borehole, geological surface outcrops and fictional seismic reflection reflector picks).</p>
+<p>50 km profile from points:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>A  = 393956 E 521000 N
+A* = 393956 E 571000 N
+</pre></div>
+</div>
+<div class="figure align-center" id="bouguer-gravity-map">
+<img alt="_images/bott_BA_map.png" src="_images/bott_BA_map.png" />
+<p class="caption"><span class="caption-number">Figure 7 </span><span class="caption-text">Land based Bouguer gravity anomaly contoured at 1 mGal increments
+(digitized from Bott (1967) <a class="reference internal" href="z_bibliography.html#bott1967" id="id3">[2]</a> Fig. 2). The red line A-A* shows the profile we will model in this
+tutorial and is chosen to intersect the Rookhope well (yellow circle). The data are projected on a local cartesian
+grid.</span><a class="headerlink" href="#bouguer-gravity-map" title="Permalink to this image">¶</a></p>
+</div>
+<div class="figure align-center" id="magnetic-map">
+<img alt="_images/bott_magnetic_map.png" src="_images/bott_magnetic_map.png" />
+<p class="caption"><span class="caption-number">Figure 8 </span><span class="caption-text">Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface, flown with a line
+spacing and 2 km and contoured at 10 nT increments.</span><a class="headerlink" href="#magnetic-map" title="Permalink to this image">¶</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorial_pre-modelling_considerations.html" class="btn btn-neutral float-right" title="2.0 Pre-modelling considerations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tutorial.html" class="btn btn-neutral float-left" title="Tutorial" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014-2019, B. Tozer
+      <span class="lastupdated">
+        Last updated on May 15, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

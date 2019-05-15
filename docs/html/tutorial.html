@@ -25,7 +25,8 @@
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -36,8 +37,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Contribute" href="contribute.html" />
-    <link rel="prev" title="References" href="manual_references.html" />
+    <link rel="next" title="1.0 Introduction" href="tutorial_introduction.html" />
+    <link rel="prev" title="Bibliography" href="z_bibliography.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -99,12 +100,15 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual.html"><strong>Manual</strong></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><strong>Tutorial</strong></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#introduction"><strong>1.0 Introduction</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#creating-a-new-model"><strong>2.0 Creating a new model</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#loading-observed-porifle-data"><strong>3.0 Loading observed porifle data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#loading-well-data"><strong>4.0 Loading well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#creating-a-model-layer"><strong>5.0 Creating a model layer</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#seismic-data"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_introduction.html"><strong>1.0 Introduction</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_pre-modelling_considerations.html"><strong>2.0 Pre-modelling considerations</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
@@ -112,6 +116,7 @@
 <p class="caption"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
@@ -181,214 +186,18 @@
             
   <div class="section" id="tutorial">
 <span id="id1"></span><h1><strong>Tutorial</strong><a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="introduction">
-<h2><strong>1.0 Introduction</strong><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p>In this tutorial we will learn how to use GMG by modelling an example data set. We will systematically work through the
-steps required to load data and model the gravity and magnetic anomalies produced by the Weardale granite in the
-Northern Pennines, UK. Thereby recreating the study published by a renowned British geophysicist, the late Martin
-Bott (Bott, 1967) [bott1967].</p>
-<p>The tutorial will walk through the following steps:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1. Creating a new model and how to save and reload models.
-
-2. Loading observed 2D profile data (both Bouguer gravity and magnetic anomalies) into your GMG modelling
-   environment.
-
-3. Loading borehole horizon top data into your GMG modelling environment.
-
-4. Adding new layers to your model and assigning attributes (e.g. bulk density) to them.
-
-5. Setting magnetic field attributes in your model (e.g. the strength of Earth&#39;s field).
-
-6. Running forward model calculations of the predicted gravity and magnetic anomalies.
-
-7. How to use the GMG interface for forward modelling.
-
-8. How to save the predicted anomaly profiles as external text files.
-
-9. How to produce a raster figure and save this to disc using GMGs inbuilt figure production module.
-
-10. How to load 2D seismic reflection data into a model.
-</pre></div>
-</div>
-<p>The Weardale granite is located in the Northern Pennines, UK. The presence of this Caledonian-aged granite was first
-proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby outcrops. Later gravity
-surveys and magnetic surveys by various authors strongly  corroborated this suggestion. <a class="reference internal" href="#gravity-map"><span class="std std-numref">Figure 7</span></a> and
-<a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a> show collations of these data published by Bott, (1967) [bott1967]. Its presence was
-finally confirmed with the drilling of the Rookhope borehole (Dunham et al., 1961). The location of this borehole is
-shown as the yellow circle in <a class="reference internal" href="#gravity-map"><span class="std std-numref">Figure 7</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a>.</p>
-<div class="figure" id="gravity-map">
-<img alt="_images/gravity_map.png" src="_images/gravity_map.png" />
-<p class="caption"><span class="caption-number">Figure 7 </span><span class="caption-text">Land based Bouguer gravity anomaly contoured at 1 mGal increments (digitized after, Fig. 2 from [bott1967]). The red line
-A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well (yellow circle).
-The data are projected on a local cartesian grid.</span></p>
-</div>
-<div class="figure" id="magnetic-map">
-<img alt="_images/magnetic_map.png" src="_images/magnetic_map.png" />
-<p class="caption"><span class="caption-number">Figure 8 </span><span class="caption-text">Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface,
-flown with a line spacing and 2 km and contoured at 10 nT increments.</span></p>
-</div>
-</div>
-<div class="section" id="creating-a-new-model">
-<h2><strong>2.0 Creating a new model</strong><a class="headerlink" href="#creating-a-new-model" title="Permalink to this headline">¶</a></h2>
-<p>Once you have opened GMG (follow the instructions on the <a class="reference internal" href="installation.html#installation"><span class="std std-ref">Installation</span></a> page if this is your first
-time using the software) you can create a new model by navigating to the Menubar and selecting:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>File -&gt; New model...
-</pre></div>
-</div>
-<p>A window for setting the model dimensions will appear. Here we wil assign the model X and Z dimensions in
-kilometers, as well as the increment at which the predicted gravity and magnetic anomalies will be calculated at.
-In this example our model profile is 50 km long, so lets set the X-coordinates as 0 and 50 km. We will be modelling the
-upper crustal structure, so lets set the Z-coordinates as 0 and 10 km and the calculation increment as 0.5 km.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>you can always change the model dimensions and increment at a later time. For example, you may start out by
-modelling with a coarse spacing to ensure GMG runs smoothly. Then, once you are satisfied with your starting model
-and are ready to make smaller, fine scale changes towards completion of your model you might then lower the
-calculation interval.</p>
-<p>To modify the model dimensions at anytime, navigate to:</p>
-<div class="last highlight-none notranslate"><div class="highlight"><pre><span></span>Model View -&gt; Modify current model dimensions...
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="loading-observed-porifle-data">
-<h2><strong>3.0 Loading observed porifle data</strong><a class="headerlink" href="#loading-observed-porifle-data" title="Permalink to this headline">¶</a></h2>
-<p>Now we have creating our model, we can load the observed gravity and magnetic anomaly data into the modelling
-environment. First, lets load the gravity data by navigating to:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Load Gravity Anomaly...
-</pre></div>
-</div>
-<p>Now select the <strong>File…</strong> button and use the file explorer to navigate to and select the file
-<strong>bott_Bouguer_gravity.xg</strong>. This file is located in the directory:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gmg/docs/tutorial/GRAVITY_DATA
-</pre></div>
-</div>
-<p>Now lets name the data <strong>Bouguer anomaly</strong> and leave the display color as the default <strong>blue</strong>. Finally, select the
-<strong>Load</strong> button to load the data.</p>
-<p>You should now see the observed Bouguer gravity anomaly in the Gravity panel.</p>
-<p>Lets repeat this process for the magnetic anomaly data <strong>bott_Magnetic_anomaly.xm</strong> located in the directory:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gmg/docs/tutorial/MAGNETIC_DATA
-</pre></div>
-</div>
-</div>
-<div class="section" id="loading-well-data">
-<h2><strong>4.0 Loading well data</strong><a class="headerlink" href="#loading-well-data" title="Permalink to this headline">¶</a></h2>
-<p>THe Rookhope exploration well was drilled above the Weardale granite between November 1960 - July 1961 in order to
-prove its existence. The well was drilled at a location 322.76 m Above mean sea level (AMSL) and revealed a 390 m thick
-sequence of Carboniferous sediment before penetrating the granite (at a depth of 67.24 m BMSL) and continued through the
-granite reaching a bottom depth of 808 m (485.25 m BMSL) while still within the pluton.</p>
-<p>This record provides a``ground-truth” point with which to constrain our forward model. THe petrological data from the
-well also provides constrain on the density of the granite.</p>
-<p>Now lets load the well record into our modelling environment by navigating to:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Well data -&gt; Load well record...
-</pre></div>
-</div>
-<p>Now use the file explorer to navigate to the file <strong>Rookhope.txt</strong> located in the directory:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>/gmg/docs/tutorial/WELL_DATA
-</pre></div>
-</div>
-<p>You will be prompted to provide a name for the new well record, let call it Rookhope.</p>
-<p>The well record will now be visible in the model frame. We can hide/show the well by navigating to:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Well data -&gt; Wells... -&gt; Rookhope -&gt; Hide/Show
-</pre></div>
-</div>
-<p>We can also change the size of the well horzions label text using the <strong>Label Text Size</strong> slider in the Layer Attributes
-tool box located on the left hand side of the modelling environment.</p>
-</div>
-<div class="section" id="creating-a-model-layer">
-<h2><strong>5.0 Creating a model layer</strong><a class="headerlink" href="#creating-a-model-layer" title="Permalink to this headline">¶</a></h2>
-<p>Now we have loaded our observed anomaly data into the model environment, we are ready to start constructing our model.</p>
-<p>To add a new layer to the model navigate to the <em>‘Layers’</em> menu and select <em>‘New Layer’</em>:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Layers -&gt; New Layer
-</pre></div>
-</div>
-<p>Alternatively, use the keyboard shortcut, <strong>n</strong> key.</p>
-<p>You will be prompted with the option of adding a <em>‘New fixed layer’</em> or a <em>‘New floating layer’</em>.</p>
-<p><strong>Floating layers:</strong></p>
-<p>Floating layers are polygons that are fully contained within the model space. For example, a narrow salt dome.</p>
-<p><strong>Fixed layers:</strong></p>
-<p>Fixed layers span the entire width of the model and are useful for modelling <em>layers</em>, such as sedimentary basin
-strata. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Fixed layers are automatically <em>‘padded’</em> horizontally from the boundary nodes by an additional 400 km in order to
-avoid edge effects.</p>
-</div>
-<p>Lets chose to create a new <strong>floating</strong> layer, which we will use to represent the Weardale granite.</p>
-<p>When creating a new floating layer, you must assign the X and Y coordinates of four nodes that will define the layer.
-These nodes <strong>must</strong> be input in anti-clockwise order to ensure layers field effects are calculated with the correct
-sign. Beside the ordering of the nodes, there actual positions are not important as then can easily be modified using
-the mouse once the layer has been created.</p>
-<p>Lets set the initial node positions for our new floating layer as follows:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>X1: 10    Y1: 1
-X2: 10    Y2: 8
-X3: 30    Y3: 8
-X4: 30    Y4: 1
-</pre></div>
-</div>
-</div>
-<div class="section" id="seismic-data">
-<h2><strong>0.0 Seismic data</strong><a class="headerlink" href="#seismic-data" title="Permalink to this headline">¶</a></h2>
-<p>Any 2D Seismic SEGY data can be loaded into GMG models, however, to be useful, it is highly recommended these data are
-pre-processed in the depth domain.</p>
-<p>As an example, we will download the freely available Society of exploration geophysicists (SEG) Advanced Modeling
-Program (SEAM) Phase 1 data. This is a synthetic 35 x 40 x 15 km 3D cube that simulates a realistic salt canopy.</p>
-<p>These data can be accessed by following this link:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>https://seg.org/News-Resources/Research-Data/Open-Data
-</pre></div>
-</div>
-<p>And then by clicking the link:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Interpretation Challenge I - Depth
-</pre></div>
-</div>
-<p>This will direct you to a google drive folder containing the data.</p>
-<p>Once you have downloaded the directory SEAM_Interpretation_Challenge_1_Depth/ move this to
-“YOUR_GMG_PATH”/gmg/docs/tutorial/SEISMIC_DATA e.g.:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>mv SEAM_Interpretation_Challenge_1_Depth/ &quot;YOUR_GMG_PATH&quot;/gmg/docs/tutorial/SEISMIC_DATA
-</pre></div>
-</div>
-<p>Now, to plot a profile with GMG lets extract a 2D profile from the 3D volume using an ObsPy routine.</p>
-<p>A script is provided with this tutorial to preform the extraction of a profile at Y-location 24 km. This profile passes
-through a borehole location that can alos be loaded into GMG for aiding interpretation.</p>
-<p>To run the profile extraction follow these commands:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd &quot;YOUR_GMG_PATH&quot;/gmg/docs/tutorial/SEISMIC_DATA
-mv ../cut_2d_profile.py .
-python cut_2d_profile.py SEAM_Interpretation_Challenge_1_Depth.sgy
-</pre></div>
-</div>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">The next step is not required, but if you have Seismic Un*x installed on your computer, or are willing to install
-it (see <a class="reference external" href="https://github.com/JohnWStockwellJr/SeisUnix">https://github.com/JohnWStockwellJr/SeisUnix</a>), then the following is recommended.</p>
-</div>
-<p>Now, lets use the open source seismic processing package SeismicUnix to apply an automatic gain control (AGC) to our
-SEGY profile in order to balance the amplitudes before we load the profile into GMG for viewing/interpretation:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>segyread tape=2d_profile_24000N.segy verbose=1 endian=0 | segyclean &gt; 2d_profile_24000N.su
-
-sugain agc=1 &lt; 2d_profile_24000N.su &gt; 2d_profile_24000N_agc.su
-
-segyhdrs &lt; agc.su hfile=hheader bfile=bheader
-
-segywrite &lt; 2d_profile_24000N_agc.su verbose=1 buff=1 tape=2d_profile_24000N_agc.segy bfile=bheader hfile=hheader
-</pre></div>
-</div>
-<p>We now have a SEGY file ready for importing to GMG.</p>
-<p>Open a new GMG window and create a new model (as outlined in Section 1) with dimensions 35 x 15 km. Now, navigate to the
-SEGY Data menu in the menubar and select <em>Load SEGY…</em>.</p>
-<p>You will be prompted by a window in which to enter the dimensions of the SEGY file and name of the segy file. Input the
-dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now select <em>Set Coordinates</em>.</p>
-<p>A file explorer will now load. Naivage to the SEGY file (i.e. either 2d_profile_24000N_agc.segy or
-2d_profile_24000N.segy) you want to load and select <em>Open</em>.</p>
-<p>You should now see the seismic profile in your GMG modelling frame!</p>
-<p>Try Changing the color palette from grey scale to Red-white-Blue by using:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Seismic Data -&gt; Color palette -&gt; Seismic
-</pre></div>
-</div>
-<p>Now try adjusting the display Gain using:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Seismic Data -&gt; Gain -&gt; Increase...
-</pre></div>
-</div>
-<p>or the left and right arrow keyboard shortcuts.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_introduction.html"><strong>1.0 Introduction</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_pre-modelling_considerations.html"><strong>2.0 Pre-modelling considerations</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial_seismic_data.html"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
+</ul>
 </div>
 </div>
 
@@ -400,10 +209,10 @@ dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="contribute.html" class="btn btn-neutral float-right" title="Contribute" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorial_introduction.html" class="btn btn-neutral float-right" title="1.0 Introduction" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="manual_references.html" class="btn btn-neutral float-left" title="References" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="z_bibliography.html" class="btn btn-neutral float-left" title="Bibliography" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -414,7 +223,7 @@ dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Apr 12, 2019.
+        Last updated on May 15, 2019.
       </span>
 
     </p>
