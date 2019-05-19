@@ -1,7 +1,7 @@
 """
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 GUI application for Forward modelling 2D potential field profiles.
-Written by Brook Tozer, University of Oxford 2015-17.
+Written by Brook Tozer, University of Oxford 2015-17. SIO 2018-19.
 Includes ability to import seismic reflection, well, surface outcrop and xy points into the model frame.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,7 +70,7 @@ Documentation created using Sphinx.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-NB. before launching gmg, run:
+NB. before launching gmg you must run:
 
     source activate py27-gmg
 
@@ -79,6 +79,7 @@ NB. before launching gmg, run:
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
+
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -102,6 +103,7 @@ from sys import platform
 from obspy import read
 import cPickle as Pickle
 from scipy import signal
+from scipy import interpolate as ip
 from fatiando.mesher import Polygon
 import plot_model
 import bott
@@ -110,14 +112,9 @@ import model_stats
 import struct
 import gc
 import webbrowser
-
-
 # FUTURE
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
-# from scipy import interpolate as ip
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -135,7 +132,7 @@ class Gmg(wx.Frame):
 
         # DIR CONTAINING PROGRAM ICONS
         self.dir = os.path.dirname(os.path.abspath(__file__)).split("/")
-        self.gui_icons_dir = "/"+self.dir[1]+"/"+self.dir[2]+"/"+self.dir[3]+"/docs/icons/"
+        self.gui_icons_dir = "/" + self.dir[1] + "/" + self.dir[2] + "/" + self.dir[3] + "/docs/icons/"
 
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
@@ -319,20 +316,24 @@ class Gmg(wx.Frame):
         self.m_obs_g_submenu = wx.Menu()
         self.gravity_data.Append(-1, 'Gravity Data...', self.m_obs_g_submenu)
         # FILTER MENU
-        grav_m_observed_filter = self.gravity_data.Append(-1, "Filter Anomaly\tCtrl-L", "Filter Observed Anomaly")
+        grav_m_observed_filter = self.gravity_data.Append(-1, "Filter Anomaly...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.observed_filter, grav_m_observed_filter)
+        # HORIZONTAL DERIVATIVE
+        grav_m_horizontal_derivative = self.gravity_data.Append(-1, "Take Horizontal Derivative...",
+                                                                "Take Horizontal Derivative")
+        self.Bind(wx.EVT_MENU, self.take_horizontal_derivative, grav_m_horizontal_derivative)
         # SET RMS OBS ARRAYS
-        grav_m_set_rms_arrays = self.gravity_data.Append(-1, "Set RMS\tCtrl-L", "Set RMS")
+        grav_m_set_rms_arrays = self.gravity_data.Append(-1, "Set RMS input...", "Set RMS")
         self.Bind(wx.EVT_MENU, self.set_obs_rms, grav_m_set_rms_arrays)
         # SET BACKGROUND DENSITY
-        m_set_background_density = self.gravity_data.Append(-1, "&Set Background Density...\tCtrl-shift-down",
+        m_set_background_density = self.gravity_data.Append(-1, "&Set Background Density...",
                                                             "Set Background Density...")
         self.Bind(wx.EVT_MENU, self.set_background_density, m_set_background_density)
         # REMOVE
         self.m_obs_g_submenu.Append(100, 'Remove All Gravity Anomalies')
         self.Bind(wx.EVT_MENU, self.delete_all_obs_grav, id=100)
         # SAVE PREDICTED ANOMALY TO DISC
-        m_save_g_submenu = self.gravity_data.Append(-1, "&Save Predicted Anomaly...\tCtrl-shift-S",
+        m_save_g_submenu = self.gravity_data.Append(-1, "&Save Predicted Anomaly...",
                                                     "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_grav, m_save_g_submenu)
         # DRAW MENU
@@ -414,7 +415,7 @@ class Gmg(wx.Frame):
         self.seismic_data.Append(-1, 'Color Palette', self.m_color_palette)
         self.m_color_palette.Append(901, 'Grey')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=901)
-        self.m_color_palette.Append(902, 'Sesimic')
+        self.m_color_palette.Append(902, 'Seismic')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=902)
         # GAIN INCREASE
         self.m_gain_increase = self.m_gain.Append(-1, "Increase...", "Increase...")
@@ -459,7 +460,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_layer, self.m_load_layer)
         # TRANSPARENCY
         self.m_layer_transperency = wx.Menu()
-        self.layer_file.Append(-1, 'Transperency', self.m_layer_transperency)
+        self.layer_file.Append(-1, 'Transparency', self.m_layer_transperency)
         # TRANSPARENCY INCREASE
         self.m_layer_transparency_increase = self.m_layer_transperency.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.transparency_increase, self.m_layer_transparency_increase)
@@ -520,7 +521,7 @@ class Gmg(wx.Frame):
 
         # t_calc_topo = self.toolbar.AddTool(wx.ID_ANY, "Calculate topography",
         #   wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
-        ### self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
+        # self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
         t_calc_model_bott = self.toolbar.AddTool(wx.ID_ANY, "Calculate gravity",
                                                  wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
@@ -703,7 +704,7 @@ class Gmg(wx.Frame):
         self.xy_list = [[]]
         self.xy_list_save = [[]]
         self.xy_name_list = []
-        self.xy_color_list =[[]]
+        self.xy_color_list = [[]]
         self.xy_count = 0
 
         'INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
@@ -737,6 +738,15 @@ class Gmg(wx.Frame):
         self.obs_gravity_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.grav_rms_value = 0.  # TOTAL RMS MISFIT VALUE
         self.grav_residuals = []  # CALCULATED RESIDUAL
+
+        'INITIALISE GRAVITY DERIVATIVE ATTRIBUTES'
+        self.obs_grav_deriv_ = []
+        self.obs_grav_deriv_list = [[]]
+        self.obs_grav_deriv_list_save = [[]]
+        self.obs_grav_deriv_name_list = []
+        self.obs_grav_deriv_colors = [[]]
+        self.obs_grav_deriv_count = 0
+
 
         'INITIALISE MAGNETIC ATTRIBUTES'
         self.mag_obs_switch = False
@@ -800,21 +810,24 @@ class Gmg(wx.Frame):
 
     def draw_main_frame(self):
         """DRAW THE PROGRAM CANVASES"""
-        columns=93
-        x_orig=9
+        columns = 88
+        x_orig = 9
         'TOPO CANVAS'
         self.tcanvas = plt.subplot2grid((26, 100), (0, x_orig), rowspan=2, colspan=columns)
-        self.tcanvas.set_ylabel("Topo (m)")
+        self.thcanvas = self.tcanvas.twinx()
+        self.tcanvas.set_ylabel("Topo (km)")
         self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.tcanvas.grid()
         'GRAV CANVAS'
         self.dcanvas = plt.subplot2grid((26, 100), (2, x_orig), rowspan=3, colspan=columns)
+        self.dhcanvas = self.dcanvas.twinx()
         self.dcanvas.set_ylabel("Grav (mGal)")
         self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.dcanvas.grid()
         self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         'MAG CANVAS'
         self.ntcanvas = plt.subplot2grid((26, 100), (5, x_orig), rowspan=3, colspan=columns)
+        self.nthcanvas = self.ntcanvas.twinx()
         self.ntcanvas.set_ylabel("Mag (nT)")
         self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.ntcanvas.grid()
@@ -995,6 +1008,7 @@ class Gmg(wx.Frame):
             self.tcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
             'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=3, colspan=12)
+            self.dhcanvas = self.dcanvas.twinx()
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
             self.dcanvas.grid()
@@ -1012,6 +1026,7 @@ class Gmg(wx.Frame):
             # HIDDEN
             'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=4, colspan=12)
+            self.dhcanvas = self.dcanvas.twinx()
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1047,6 +1062,7 @@ class Gmg(wx.Frame):
             self.tcanvas.grid()
             'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (2, 1), rowspan=6, colspan=12)
+            self.dhcanvas = self.dcanvas.twinx()
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1072,6 +1088,7 @@ class Gmg(wx.Frame):
             # HIDDEN
             'GRAV CANVAS'
             self.dcanvas = plt.subplot2grid((26, 12), (0, 1), rowspan=8, colspan=12)
+            self.dhcanvas = self.dcanvas.twinx()
             self.dcanvas.set_ylabel("Grav An. (mGal)")
             self.dcanvas.grid()
             self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1107,10 +1124,13 @@ class Gmg(wx.Frame):
         self.mcanvas.grid()
         if self.tcanvas is not None:
             self.tcanvas.set_xlim(self.mcanvas.get_xlim())
+            self.thcanvas.set_xlim(self.mcanvas.get_xlim())
         if self.dcanvas is not None:
             self.dcanvas.set_xlim(self.mcanvas.get_xlim())
+            self.dhcanvas.set_xlim(self.mcanvas.get_xlim())
         if self.ntcanvas is not None:
             self.ntcanvas.set_xlim(self.mcanvas.get_xlim())
+            self.nthcanvas.set_xlim(self.mcanvas.get_xlim())
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
 
         'INITALISE CALCULATED P.F. LINES'
@@ -1129,15 +1149,22 @@ class Gmg(wx.Frame):
             #         topo = self.obs_topo_list_save[x]
             #         self.obs_topo_list[x] = self.dcanvas.scatter(topo[:, 0], topo[:, 1], marker='o',
             #                                                      color=self.obs_topo_colors[x], s=5, gid=x)
+
         'PLOT OBSERVED GRAVITY DATA'
         if self.dcanvas is not None:
             for x in range(len(self.obs_grav_list_save)):
                 if len(self.obs_grav_list_save[x]) >= 1:
                     grav = self.obs_grav_list_save[x]
-                    grav_x = grav[:, 0]
-                    grav_y = grav[:, 1]
-                    self.obs_grav_list[x] = self.dcanvas.scatter(grav_x, grav_y, marker='o',
+                    self.obs_grav_list[x] = self.dcanvas.scatter(grav[:, 0], grav[:, 1], marker='o',
                                                                  color=self.obs_grav_colors[x], s=5, gid=x)
+            # PLOT HORIZONTAL DERIVATIVES
+            for x in range(len(self.obs_grav_deriv_list_save)):
+                if len(self.obs_grav_deriv_list_save[x]) >= 1:
+                    grav = self.obs_grav_deriv_list_save[x]
+                    print(self.obs_grav_deriv_list_save[x])
+                    self.obs_grav_deriv_list[x] = self.dhcanvas.scatter(grav[:, 0], grav[:, 1], marker='o',
+                                                                 color=self.obs_grav_deriv_colors[x], s=5, gid=x)
+
         'PLOT OBSERVED MAG DATA'
         if self.ntcanvas is not None:
             for x in range(len(self.obs_mag_list_save)):
@@ -1146,7 +1173,7 @@ class Gmg(wx.Frame):
                     mag_x = mag[:, 0]
                     mag_y = mag[:, 1]
                     self.obs_mag_list[x] = self.ntcanvas.scatter(mag_x, mag_y, marker='o',
-                                                                color=self.obs_mag_colors[x], s=5, gid=x)
+                                                                 color=self.obs_mag_colors[x], s=5, gid=x)
 
         'UPDATE FRAMES'
         self.update_layer_data()
@@ -1570,7 +1597,9 @@ class Gmg(wx.Frame):
                   'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
                   'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list', 'outcrop_data_color_list',
                   'outcrop_text_list',
-                  'xy_name_list', 'xy_list_save', 'xy_color_list']
+                  'xy_name_list', 'xy_list_save', 'xy_color_list',
+                  'obs_grav_deriv_list', 'obs_grav_deriv_list_save', 'obs_grav_deriv_name_list',
+                  'obs_grav_deriv_colors']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
@@ -1586,7 +1615,9 @@ class Gmg(wx.Frame):
                         self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
                         self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
                         self.outcrop_data_color_list, self.outcrop_text_list,
-                        self.xy_name_list, self.xy_list_save, self.xy_color_list]
+                        self.xy_name_list, self.xy_list_save, self.xy_color_list,
+                        self.obs_grav_deriv_list, self.obs_grav_deriv_list_save, self.obs_grav_deriv_name_list,
+                        self.obs_grav_deriv_colors]
 
         for i in range(0, len(model_params)):
             try:
@@ -1664,6 +1695,8 @@ class Gmg(wx.Frame):
                 self.plot_obs_xy()
             if self.obs_grav_list_save != [[]]:
                 self.plot_obs_grav()
+            if self.obs_grav_deriv_list_save != [[]]:
+                self.plot_obs_grav_deriv()
             if self.obs_mag_list_save != [[]]:
                 self.plot_obs_mag()
             if self.obs_topo_list_save != [[]]:
@@ -1719,7 +1752,7 @@ class Gmg(wx.Frame):
 
             self.fault_tree_items = self.loaded_fault_tree_items
             # ----------------------------------------------------------------------------------------------------------
-            
+
             # ----------------------------------------------------------------------------------------------------------
             # MAKE LAYER LINES AND POLYGONS
             self.layer_lines = [[] for _ in range(self.i + 1)]
@@ -1730,7 +1763,7 @@ class Gmg(wx.Frame):
             # LOAD LAYERS
             self.load_layer_data()
             # ----------------------------------------------------------------------------------------------------------
-            
+
             # ----------------------------------------------------------------------------------------------------------
             for i in range(0, self.fault_counter):
                 # DRAW FAULTS
@@ -1772,23 +1805,23 @@ class Gmg(wx.Frame):
                     self.count += 1
             self.well_count = len(self.well_name_list)
             # ----------------------------------------------------------------------------------------------------------
-            
+
             # ----------------------------------------------------------------------------------------------------------
             # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
             self.current_node = self.mcanvas.scatter(-40000., 0., marker='o', color='r', zorder=10)
             # ----------------------------------------------------------------------------------------------------------
-            
+
             # ----------------------------------------------------------------------------------------------------------
             # Set Fault PICKIGN SWTICH OFF (DEFAULT TO LAYER MODE)
             self.fault_picking_swtich = False
             # ----------------------------------------------------------------------------------------------------------
-            
+
             # ----------------------------------------------------------------------------------------------------------
             # REFRESH SIZER POSITIONS
             self.Hide()
             self.Show()
             # ----------------------------------------------------------------------------------------------------------
-            
+
             # ----------------------------------------------------------------------------------------------------------
             # UPDATE LAYER DATA AND PLOT
             self.draw()
@@ -1846,9 +1879,9 @@ class Gmg(wx.Frame):
                     '''ADD SEGY_NAME TO SEGY MENU'''
                     # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
                     self.segy_name_submenu = wx.Menu()
-                    self.m_segy_submenu.Append(s+1000, self.segy_name_list[s], self.segy_name_submenu)
-                    self.segy_name_submenu.Append(s+1000, 'delete segy')
-                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s+1000)  # ID+1000 TO AVOID GRAV SUBMENU ID CONFLICT
+                    self.m_segy_submenu.Append(s + 1000, self.segy_name_list[s], self.segy_name_submenu)
+                    self.segy_name_submenu.Append(s + 1000, 'delete segy')
+                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s + 1000)  # ID+1000 TO AVOID GRAV SUBMENU ID CONFLICT
 
                 else:
                     continue
@@ -1856,7 +1889,7 @@ class Gmg(wx.Frame):
     def plot_obs_xy(self):
         """PLOT OBSERVED XY"""
         self.xy_list = [[]]
-        for i in range(0, len(self.xy_list_save)-1):
+        for i in range(0, len(self.xy_list_save) - 1):
             print("xy count =")
             print self.xy_count
             self.xy_list.append([])
@@ -1869,8 +1902,8 @@ class Gmg(wx.Frame):
                 self.xy_name = self.xy_name_list[i]
                 self.xy_submenu = wx.Menu()
                 self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.xy_submenu)
-                self.xy_submenu.Append(self.xy_count+4000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count+4000)
+                self.xy_submenu.Append(self.xy_count + 4000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count + 4000)
                 self.xy_count += 1
             else:
                 self.xy_count += 1
@@ -1889,8 +1922,8 @@ class Gmg(wx.Frame):
                 self.obs_name = self.obs_topo_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_topo_count+10000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count+10000)
+                self.obs_submenu.Append(self.obs_topo_count + 10000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count + 10000)
                 self.obs_topo_count += 1
                 self.obs_topo_switch = True
             else:
@@ -1910,12 +1943,33 @@ class Gmg(wx.Frame):
                 self.obs_name = self.obs_grav_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_grav_count+11000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+11000)
+                self.obs_submenu.Append(self.obs_grav_count + 11000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count + 11000)
                 self.obs_grav_count += 1
                 self.grav_obs_switch = True
             else:
                 self.obs_grav_count += 1
+
+    def plot_obs_grav_deriv(self):
+        """PLOT OBSERVED GRAVITY"""
+        self.obs_grav_deriv_list = [[]]
+        for x in range(0, len(self.obs_grav_deriv_name_list)):
+            self.obs_grav_list.append([])
+            if self.obs_grav_deriv_name_list[x]:
+                self.obs_grav_deriv = self.obs_grav_deriv_list_save[x]
+                self.obs_grav_deriv_list[x] = self.dhcanvas.scatter(self.obs_grav_deriv[:, 0],
+                                                                    self.obs_grav_deriv[:, 1],
+                                                                    marker='o', color=self.obs_grav_deriv_colors[x],
+                                                                    s=5, gid=self.obs_grav_deriv_count)
+                self.obs_grav_deriv_list.append([])
+                self.obs_name = self.obs_grav_deriv_name_list[x]
+                self.obs_submenu = wx.Menu()
+                self.m_obs_g_submenu.Append(self.obs_grav_deriv_count, self.obs_name, self.obs_submenu)
+                self.obs_submenu.Append(self.obs_grav_deriv_count + 14000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_deriv_count + 14000)
+                self.obs_grav_deriv_count += 1
+            else:
+                self.obs_grav_deriv_count += 1
 
     def plot_obs_mag(self):
         """PLOT OBSERVED MAG"""
@@ -1931,8 +1985,8 @@ class Gmg(wx.Frame):
                 self.obs_mag_name = self.obs_mag_name_list[x]
                 self.obs_submenu = wx.Menu()
                 self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_mag_count+12000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count+12000)
+                self.obs_submenu.Append(self.obs_mag_count + 12000, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count + 12000)
                 self.obs_mag_count += 1
                 self.mag_obs_switch = True
             else:
@@ -1956,12 +2010,12 @@ class Gmg(wx.Frame):
         self.xy_name_list.append([])
         self.xy_name_list[self.xy_count] = str(self.xy_name)
 
-        #GET XY_COLOR
+        # GET XY_COLOR
         self.xy_color_list.append([])
         self.xy_color_list[self.xy_count] = str(self.xy_color)
 
         # LOAD DATA
-        self.xy = np.genfromtxt(xy_input_file, delimiter=' ', dtype=float)
+        self.xy = np.genfromtxt(xy_input_file, dtype=float, autostrip=True)
         self.xy_list_save.append([])
         self.xy_list_save[self.xy_count] = self.xy
         self.xy_list.append([])
@@ -1976,10 +2030,10 @@ class Gmg(wx.Frame):
         self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_submenu.Append(4000+self.xy_count, 'delete observed data')
+        self.obs_submenu.Append(4000 + self.xy_count, 'delete observed data')
 
         # BIND TO DEL XY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_xy, id=4000+self.xy_count)
+        self.Bind(wx.EVT_MENU, self.delete_xy, id=4000 + self.xy_count)
 
         # INCREMENT XY COUNTER
         self.xy_count += 1
@@ -1990,7 +2044,7 @@ class Gmg(wx.Frame):
 
     def delete_xy(self, event):
         """"DELETE OBSERVED XY DATA NB: ID's start at 4000"""
-        id = event.Id-4000
+        id = event.Id - 4000
         self.m_xy_submenu.DestroyItem(id)
         self.xy_list[id].set_visible(False)
         self.xy_list[id] = []
@@ -2052,10 +2106,10 @@ class Gmg(wx.Frame):
         self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.topo_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.topo_submenu.Append(10000+self.obs_topo_count, 'delete observed data')
+        self.topo_submenu.Append(10000 + self.obs_topo_count, 'delete observed data')
 
         # BIND TO DEL TOPO FUNC
-        self.Bind(wx.EVT_MENU, self.delete_topo, id=10000+self.obs_topo_count)
+        self.Bind(wx.EVT_MENU, self.delete_topo, id=10000 + self.obs_topo_count)
 
         self.obs_topo_count += 1
 
@@ -2066,11 +2120,11 @@ class Gmg(wx.Frame):
 
     def delete_topo(self, event):
         """DELETE AN OBSERVED TOPO DATA RECORD"""
-        self.m_topo_submenu.DestroyItem(event.Id-10000)
-        self.obs_topo_name_list[event.Id-10000] = []
-        self.obs_topo_list[event.Id-10000].set_visible(False)
-        self.obs_topo_list[event.Id-10000] = []
-        self.obs_topo_list_save[event.Id-10000] = []
+        self.m_topo_submenu.DestroyItem(event.Id - 10000)
+        self.obs_topo_name_list[event.Id - 10000] = []
+        self.obs_topo_list[event.Id - 10000].set_visible(False)
+        self.obs_topo_list[event.Id - 10000] = []
+        self.obs_topo_list_save[event.Id - 10000] = []
 
         # UPDATE MODEL
         self.update_layer_data()
@@ -2111,10 +2165,10 @@ class Gmg(wx.Frame):
         self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11000+self.obs_grav_count, 'delete observed data')
+        self.grav_submenu.Append(11000 + self.obs_grav_count, 'delete observed data')
 
         # BIND TO DEL GRAV FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+self.obs_grav_count)
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.obs_grav_count)
 
         # INCREMENT GRAV COUNTER
         self.obs_grav_count += 1
@@ -2125,12 +2179,24 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_obs_grav(self, event):
-        self.m_obs_g_submenu.DestroyItem(event.Id-11000)
-        self.obs_grav_name_list[event.Id-11000] = []
-        self.obs_grav_list[event.Id-11000].set_visible(False)
-        self.obs_grav_list[event.Id-11000] = []
-        self.obs_grav_list_save[event.Id-11000] = []
+        """DELETE AN OBSERVED GRAVITY DATASET FROM THE MODEL"""
+        self.m_obs_g_submenu.DestroyItem(event.Id - 11000)
+        self.obs_grav_name_list[event.Id - 11000] = []
+        self.obs_grav_list[event.Id - 11000].set_visible(False)
+        self.obs_grav_list[event.Id - 11000] = []
+        self.obs_grav_list_save[event.Id - 11000] = []
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.draw()
 
+    def delete_obs_grav_deriv(self, event):
+        """DELETE A GRAVITY DERIVATIVE DATASET FROM THE MODEL"""
+        print(event.Id)
+        self.m_obs_g_submenu.DestroyItem(event.Id)
+        self.obs_grav_deriv_name_list[event.Id - 11500] = []
+        self.obs_grav_deriv_list[event.Id - 11500].set_visible(False)
+        self.obs_grav_deriv_list[event.Id - 11500] = []
+        self.obs_grav_deriv_list_save[event.Id - 11500] = []
         # UPDATE MODEL
         self.update_layer_data()
         self.draw()
@@ -2195,10 +2261,10 @@ class Gmg(wx.Frame):
         self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_mag_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_mag_submenu.Append(12000+self.obs_mag_count, 'delete observed data')
+        self.obs_mag_submenu.Append(12000 + self.obs_mag_count, 'delete observed data')
 
         # BIND TO DEL MAG FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.obs_mag_count)
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000 + self.obs_mag_count)
 
         self.obs_mag_count += 1
 
@@ -2208,11 +2274,11 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_obs_mag(self, event):
-        self.obs_mag_submenu.DestroyItem(event.Id-12000)
+        self.obs_mag_submenu.DestroyItem(event.Id - 12000)
         self.obs_mag_list[event.Id].set_visible(False)
-        self.obs_mag_list[event.Id-12000] = []
-        self.obs_mag_name_list[event.Id-12000] = []
-        self.obs_mag_list_save[event.Id-12000] = []
+        self.obs_mag_list[event.Id - 12000] = []
+        self.obs_mag_name_list[event.Id - 12000] = []
+        self.obs_mag_list_save[event.Id - 12000] = []
 
         # UPDATE MODEL
         self.update_layer_data()
@@ -2604,19 +2670,19 @@ class Gmg(wx.Frame):
             outcrop_input_file = self.load_window.file_path
             self.outcrop_data_name = self.load_window.observed_name
             self.outcrop_data_color = self.load_window.color_picked
-            self.outcrop_data = np.genfromtxt(outcrop_input_file, autostrip=True, delimiter=' ', dtype=str,
+            self.outcrop_data = np.genfromtxt(outcrop_input_file, autostrip=True, dtype=str,
                                               comments='#')
             self.outcrop_data_list.append([])
         else:
             self.outcrop_data = self.outcrop_data_list_save[self.x]
-            self.outcrop_data_name =  self.outcrop_data_name_list[self.x]
+            self.outcrop_data_name = self.outcrop_data_name_list[self.x]
             self.outcrop_data_color = self.outcrop_data_color_list[self.x]
 
         # GET XY DATA NAME
         self.outcrop_data_name_list.append([])
         self.outcrop_data_name_list[self.outcrop_data_count] = str(self.outcrop_data_name)
 
-        #GET XY_COLOR
+        # GET XY_COLOR
         self.outcrop_data_color_list.append([])
         self.outcrop_data_color_list[self.outcrop_data_count] = str(self.outcrop_data_color)
 
@@ -2668,16 +2734,15 @@ class Gmg(wx.Frame):
         self.outcrop_text_list.append([])
         self.outcrop_text_list[self.outcrop_data_count] = self.text_labels
 
-
         #  APPEND NEW DATA MENU TO 'OUTCROP DATA MENU'
         self.outcrop_submenu = wx.Menu()
         self.m_outcrop_submenu.Append(self.outcrop_data_count, self.outcrop_data_name, self.outcrop_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.outcrop_submenu.Append(13000+self.outcrop_data_count, 'delete observed data')
+        self.outcrop_submenu.Append(13000 + self.outcrop_data_count, 'delete observed data')
 
         # BIND TO DEL XY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_outcrop_data, id=13000+self.outcrop_data_count)
+        self.Bind(wx.EVT_MENU, self.delete_outcrop_data, id=13000 + self.outcrop_data_count)
 
         # INCREMENT CONTACT COUNT
         self.outcrop_data_count += 1
@@ -2688,13 +2753,13 @@ class Gmg(wx.Frame):
 
     def delete_outcrop_data(self, event):
         """"DELETE OUTCROP DATA NB: ID's start at 13000"""
-        id = event.Id-13000
+        id = event.Id - 13000
         self.m_outcrop_submenu.DestroyItem(id)
 
         for i in range(0, len(self.outcrop_data_list[id])):
             self.outcrop_data_list[id][i][0].set_visible(False)
 
-        for i in range (0, len(self.outcrop_text_list[id])):
+        for i in range(0, len(self.outcrop_text_list[id])):
             self.outcrop_text_list[id][i].set_visible(False)
 
         self.outcrop_data_list[id] = []
@@ -3351,7 +3416,7 @@ class Gmg(wx.Frame):
             self.index_arg = np.argmin(d)
             self.distance = d[self.index_arg]
 
-            if self.index_arg == 0 or self.index_arg == (len(self.fault_x_coords_list[self.current_fault_index])-1):
+            if self.index_arg == 0 or self.index_arg == (len(self.fault_x_coords_list[self.current_fault_index]) - 1):
                 # PREVENT END NODES BEING DELETED
                 return 0
             if self.distance >= self.node_click_limit:
@@ -3643,7 +3708,7 @@ class Gmg(wx.Frame):
 
             #  APPEND NEW DATA MENU TO 'Topo data MENU'
             self.grav_submenu = wx.Menu()
-            self.m_obs_g_submenu.Append(self.obs_grav_count,filtered_name, self.grav_submenu)
+            self.m_obs_g_submenu.Append(self.obs_grav_count, filtered_name, self.grav_submenu)
 
             # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
             self.grav_submenu.Append(11000 + self.obs_grav_count, 'delete observed data')
@@ -3672,10 +3737,10 @@ class Gmg(wx.Frame):
         self.m_obs_mag_submenu.Append(self.obs_mag_count, filtered_name, self.obs_mag_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_mag_submenu.Append(12000+self.obs_mag_count, 'delete observed data')
+        self.obs_mag_submenu.Append(12000 + self.obs_mag_count, 'delete observed data')
 
         # BIND TO DEL MAG FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.obs_mag_count)
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000 + self.obs_mag_count)
 
         self.obs_mag_count += 1
 
@@ -3684,11 +3749,54 @@ class Gmg(wx.Frame):
         self.set_frame_limits()
         self.draw()
 
+    def take_horizontal_derivative(self, event):
+        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # OPEN
+        horizontal_derivative_box = HorizontalDerivative(self, -1, 'median filter', self.obs_grav_name_list,
+                                               self.obs_grav_list_save, self.obs_mag_name_list, self.obs_mag_list_save)
+        answer = horizontal_derivative_box.ShowModal()
+
+        # GET FILTERED OUTPUT
+        horizontal_derivative = horizontal_derivative_box.deriv
+        deriv_name = horizontal_derivative_box.output_name
+        deriv_color = horizontal_derivative_box.output_color
+
+        # LOAD FILTERED DATA
+        self.obs_grav_deriv_name_list.append(deriv_name)
+        self.obs_grav_deriv_list_save.append([])
+        self.obs_grav_deriv_list_save[self.obs_grav_deriv_count] = horizontal_derivative
+        self.obs_grav_deriv_list.append([])
+        self.obs_grav_deriv_colors[self.obs_grav_deriv_count] = deriv_color
+
+        self.obs_grav_deriv_list[self.obs_grav_deriv_count] = self.dhcanvas.scatter(horizontal_derivative[:, 0],
+                                                                       horizontal_derivative[:, 1], marker='o',
+                                                                       color=deriv_color, s=5,
+                                                                       gid=11500 + self.obs_grav_deriv_count)
+        # SET CANVAS LIMITS
+        self.dhcanvas.set_ylim(horizontal_derivative[:, 1].min(), horizontal_derivative[:, 1].max())
+
+        #  APPEND NEW DATA MENU TO 'Topo data MENU'
+        self.grav_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(11500 + self.obs_grav_deriv_count, deriv_name, self.grav_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.grav_submenu.Append(11500 + self.obs_grav_deriv_count, 'delete observed data')
+
+        # BIND TO DEL FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav_deriv, id=11500 + self.obs_grav_deriv_count)
+
+        # INCREMENT GRAV DERIV COUNTER
+        self.obs_grav_deriv_count += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.draw()
 
     def new_layer(self, event):
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer')
         answer = new_layer_dialogbox.ShowModal()
-        
+
         if new_layer_dialogbox.fixed:
             # DETERMINE THE LAST "FIXED LAYER" X AND Y VALUES; SET THIS LAYER AS "k"
             if self.layer_count > 0:
@@ -3728,7 +3836,7 @@ class Gmg(wx.Frame):
             self.boundary_lock_status.append('locked')
             self.layer_colors.append('black')
             self.tree_items.append('layer %s' % (int(self.i)))
-            self.item = 'layer %s' % (int(self.i ))
+            self.item = 'layer %s' % (int(self.i))
             self.layers_calculation_switch.append(1)
             self.add_new_tree_nodes(self.root, self.item, self.i)
 
@@ -4162,11 +4270,14 @@ class Gmg(wx.Frame):
         # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.mcanvas.get_xlim()
         if self.t_canvas:
-            self.dcanvas.set_xlim(xmin, xmax)
+            self.tcanvas.set_xlim(xmin, xmax)
+            self.thcanvas.set_xlim(xmin, xmax)
         if self.d_canvas:
             self.dcanvas.set_xlim(xmin, xmax)
+            self.dhcanvas.set_xlim(xmin, xmax)
         if self.nt_canvas:
             self.ntcanvas.set_xlim(xmin, xmax)
+            self.nthcanvas.set_xlim(xmin, xmax)
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
@@ -4296,7 +4407,6 @@ class Gmg(wx.Frame):
             polygons_to_use, densities_to_use = [], []
             for layer in range(len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
-
                     polygons_to_use.append(self.polygons[layer])
                     densities_to_use.append(self.density_contrasts[layer])
 
@@ -4386,6 +4496,22 @@ class Gmg(wx.Frame):
             ymax = (self.predgz.max()) + 2.
         if self.dcanvas is not None:
             self.dcanvas.set_ylim(ymin, ymax)
+
+        # SET GRAVITY DERIVATIVE DISPLAY BOX LIMITS
+        if self.dhcanvas is not None:
+            # FIND Y-LIMITS
+            global_min = 100000.
+            global_max = 0.
+            mini = 0.
+            maxi = 1.
+            for i in range(len(self.obs_grav_deriv_list_save)-1):
+                if self.obs_grav_deriv_list_save[i] != [] and self.obs_grav_deriv_list_save[i][:, 1].min() < global_min:
+                    mini = self.obs_grav_deriv_list_save[i][:, 1].min()
+                if self.obs_grav_deriv_list_save[i] != [] and self.obs_grav_deriv_list_save[i][:, 1].max() > global_max:
+                    maxi = self.obs_grav_deriv_list_save[i][:, 1].max()
+            # SET LIMITS
+            self.dhcanvas.set_ylim(mini, maxi)
+
 
         # SET MAGNETICS DISPLAY BOX LIMITS
         if self.mag_obs_switch is True and self.mag_residuals != []:
@@ -4488,7 +4614,7 @@ class Gmg(wx.Frame):
 
         self.doc_dir = os.path.dirname(os.path.abspath(__file__)).split('/')
         doc_url = self.doc_dir[0] + '/' + self.doc_dir[1] + '/' + self.doc_dir[2] + '/' + self.doc_dir[3] + \
-                    '/docs/html/gmg_documentation.html'
+                  '/docs/html/gmg_documentation.html'
 
         if platform == "linux" or platform == "linux2":
             # LINUX
@@ -4567,27 +4693,6 @@ class Gmg(wx.Frame):
     # FUTURE MODULES (IN PROCESS)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def horizontal_derivative(self, event):
-        pass
-        #      """CLACULATE HORIZONTAL DERIVATIVE OF PROFILE"""
-        #
-        #     '# First interpolate the data onto a even x spacing as required by the
-        #     '# finite difference derivative approximation'
-        #     N = len(in_data)
-        #     x_inc = 1.
-        #     interpolat_func = ip.interp1d(in_data[:, 0], in_data[:, 1], kind='slinear')  #create interpolation func
-        #     x_interp_values = np.arange(np.round(in_data[:, 0].min(), 0),
-        #                                    np.round(in_data[:, 0].max(), 0), x_inc)  # xvalues for interpolated array
-        #     y_interp_values = np.array(interpolat_func(x_interp_values))             # yvalues for interpolated array
-        #     data            = np.column_stack((x_interp_values, y_interp_values))
-        #
-        #     'NOW CALCULATE THE DERIVATIVE USING THE INTERPOLATED (EVENLY SPACED) INPUT DATA'
-        #     for i in range(1, N-1):
-        #         deriv = (data[i+1] - data[i-1])/(2*x_inc)
-        #
-        #     output = np.column_stack((x_interp_values, deriv))
-        #     return output
-
     def set_error(self, value):
         pass
         # self.error = value
@@ -4598,12 +4703,11 @@ class Gmg(wx.Frame):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''DIALOG BOXES GO HERE'''
+## DIALOG BOXES GO HERE
 
 
 class NewModelDialog(wx.Dialog):
     """CREATE A NEW MODEL. RETURNS MODEL PARAMETERS AND CALCULATION INCREMENT"""
-
     def __init__(self, parent, id, title, m_x1=None, m_x2=None, m_z1=None, m_z2=None):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL
                                                           | wx.BORDER_RAISED)
@@ -4760,6 +4864,7 @@ class LoadObservedDataFrame(wx.Frame):
     def cancel_button(self, event):
         """USER CHANGED THEIR MIND"""
         self.Destroy()
+
 
 class SeisDialog(wx.Dialog):
     """LOAD SEGY DATA"""
@@ -5008,7 +5113,6 @@ class DepinchDialog(wx.Dialog):
 
 class MedianFilterDialog(wx.Dialog):
     """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
-
     def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
         wx.Dialog.__init__(self, parent, id, "Apply Median Filter", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX
@@ -5034,6 +5138,7 @@ class MedianFilterDialog(wx.Dialog):
                 self.obs_combo_list.Append(i)
             except:
                 pass
+
         # DEFINE FILTER LENGTH
         self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
         self.filter_window_text = wx.TextCtrl(input_panel, -1, "9")
@@ -5089,6 +5194,107 @@ class MedianFilterDialog(wx.Dialog):
                 self.filtered_output[:, 1] = signal.medfilt(self.obs_input[:, 1], self.filter_length)
                 self.EndModal(1)
 
+
+class HorizontalDerivative(wx.Dialog):
+    """ESTIMATE THE HORIZONTAL DERIVATIVE OF THE OBSERVED DATA"""
+    def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
+        wx.Dialog.__init__(self, parent, id, "Take Horizontal Derivative", style=wx.DEFAULT_DIALOG_STYLE |
+                                                                                 wx.RESIZE_BORDER | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+
+        # GET OBSERVED DATA FROM gmg
+        self.obs_grav_name_list = obs_grav_name_list
+        self.obs_grav_list_save = obs_grav_list_save
+
+        # POPULATE OBSERVED DATA LIST
+        self.obs_combo_list_text = wx.StaticText(input_panel, -1, "Input Data:")
+        self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
+        for i in self.obs_grav_name_list:
+            try:
+                self.obs_combo_list.Append(i)
+            except:
+                pass
+
+        # DEFINE PREPROCESSING MEDIAN FILTER LENGTH
+        self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
+        self.filter_window_text = wx.TextCtrl(input_panel, -1, "9")
+
+        # DEFINE PREPROCESSING MEDIAN FILTER LENGTH
+        self.x_increment = wx.StaticText(input_panel, -1, "X increment (km):")
+        self.x_increment_text = wx.TextCtrl(input_panel, -1, "1")
+
+        # DEFINE OUTPUT NAME
+        self.output_name = wx.StaticText(input_panel, -1, "OUTPUT DATA NAME:")
+        self.output_name_text = wx.TextCtrl(input_panel, -1)
+
+        # DEFINE OUTPUT COLOR
+        self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
+        self.output_color = wx.StaticText(input_panel, -1, "OUTPUT DATA COLOR:")
+        self.output_color_text = wx.ComboBox(input_panel, -1, value='green', choices=self.colors, size=(75, -1),
+                                             style=wx.CB_DROPDOWN)
+
+        # DEFINE SET BUTTON
+        self.b_calculate = wx.Button(input_panel, -1, "Calculate")
+        self.Bind(wx.EVT_BUTTON, self.calculate_derivative, self.b_calculate)
+
+        # DEFINE SIZER
+        sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
+        sizer.AddMany([self.obs_combo_list_text, self.obs_combo_list, self.output_name, self.output_name_text,
+                       self.output_color, self.output_color_text, self.x_increment, self.x_increment_text,
+                       self.filter_window, self.filter_window_text, self.b_calculate])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def calculate_derivative(self, event):
+        """TAKE HORIZONTAL DERIVATIVE OF SELECTED DATA"""
+
+        # 0. PARSE THE USER DEFINED PARAMETERS
+        self.obs_to_filter_name = str(self.obs_combo_list.GetValue())
+
+        for i in range(len(self.obs_grav_name_list)):
+            if self.obs_grav_name_list[i] == self.obs_to_filter_name:
+                self.obs_to_filter = self.obs_grav_list_save[i]
+
+        self.filter_length = int(self.filter_window_text.GetValue())
+        self.x_inc = float(self.x_increment_text.GetValue())
+        self.output_name = str(self.output_name_text.GetValue())
+        self.output_color = str(self.output_color_text.GetValue())
+
+        # 1. INTERPOLATE THE DATA SO THE X INCREMENT IS EVENLY SPACED
+        interpolate_func = ip.interp1d(self.obs_to_filter[:, 0],
+                                       self.obs_to_filter[:, 1], kind='slinear')  # CREATE INTERPOLATION FUNCTION
+
+        x_min = np.round(self.obs_to_filter[:, 0].min(), 0) + float(self.x_inc)
+        x_max = np.round(self.obs_to_filter[:, 0].max(), 0) - float(self.x_inc)
+        x_interp_values = np.arange(int(x_min), int(x_max) + 1, float(self.x_inc))  # X VALUES FOR INTERPOLATED ARRAY
+        y_interp_values = np.array(interpolate_func(x_interp_values))  # Y VALUES FOR INTERPOLATED ARRAY
+
+        input_interpolated = np.column_stack((x_interp_values, y_interp_values))
+
+        # 2. APPLY A MEDIAN FILTER TO THE INTERPOLATED DATA
+        self.filtered_output = np.zeros(shape=(len(input_interpolated), 2))
+        self.filtered_output[:, 0] = input_interpolated[:, 0]
+        self.filtered_output[:, 1] = signal.medfilt(input_interpolated[:, 1], self.filter_length)
+
+        # 3. TAKE THE HORIZONTAL DERIVATIVE
+        N = len(input_interpolated)
+        self.deriv = np.zeros(shape=((len(input_interpolated) - 1), 2))
+
+        for i in range(1, len(input_interpolated) - 1):
+            self.deriv[i, 0] = input_interpolated[i, 0]
+
+            # CALC USING FINITE DIFFERENCE METHOD
+            self.deriv[i, 1] = abs((float(input_interpolated[i + 1, 1]) - float(input_interpolated[i - 1, 1]))) \
+                          / (2. * float(self.x_inc))
+
+        # SET FIRST AND LAST VALUES (WHICH ARE NOT CALCULATED BY FD METHOD) EQUAL TO SECOND AND SECOND-TO-LAST VALUES
+        self.deriv[0, 0] = self.deriv[1, 0]-self.x_inc
+        self.deriv[0, 1] = self.deriv[1, 1]
+        self.deriv[-1, 0] = self.deriv[-2, 0]+self.x_inc
+        self.deriv[-1, 1] = self.deriv[-2, 1]
+
+        # END
+        self.EndModal(1)
 
 class SetBackgroundDensityDialog(wx.Dialog):
     def __init__(self, parent, id, title):

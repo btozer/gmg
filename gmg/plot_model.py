@@ -43,7 +43,9 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
              draw_xy_data, xy_size, xy_color, colorbar_x, colorbar_y, colorbar_size_x, colorbar_size_y,
              layer_line_width, layer_alpha, grav_rms_value, mag_rms_value, grav_y_min, grav_y_max, xy_list_save,
              draw_wells, wells, well_fs, well_line_width, draw_faults, faults):
+
     """PLOT FIGURE TO EXTERNAL FILE USING USER SPECIFIED PLOTTING OPTIONS"""
+
     ### FUTURE:
     # 1. external_lines
 
@@ -81,7 +83,7 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
 
     # NUMBER OF ROWS IN PLOT
     if t_canvas is True and d_canvas is True and nt_canvas is True:
-        num_rows = 12  # %DETERMINES AXES SIZING
+        num_rows = 12  # DETERMINES AXES SIZING
     if t_canvas is False and d_canvas is True and nt_canvas is True:
         num_rows = 11  # DETERMINES AXES SIZING
     if t_canvas is True and d_canvas is False and nt_canvas is True:
@@ -152,7 +154,7 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
         ax2.set_xticklabels([])
 
         # PLOT GRAVITY DATA
-        if obs_grav:
+        if obs_grav is not []:
             ax2.scatter(obs_grav[:, 0], obs_grav[:, 1], marker='o', color='b', s=ms)
 
             # SET AXIS POSITIONS
@@ -181,8 +183,8 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
         plt.ylim(y_start_mag, y_end_mag)
         ax3.set_xticks([])
 
-        # PLOT MAGNETIC DATA'
-        if obs_mag:
+        # PLOT MAGNETIC DATA
+        if obs_mag is not []:
             ax3.scatter(obs_mag[:, 0], obs_mag[:, 1], marker='o', color='b', s=ms)
 
             # SET AXIS POSITIONS
@@ -376,7 +378,7 @@ def plot_fig(file_path, file_type, area, xp, obs_topo, calc_topo, obs_grav, calc
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    # WRITE OUT FIG
+    # SAVE FIGURE TO DISC
     if use_tight_layout:
         if file_type == "svg":
             plt.savefig(file_path+'.'+file_type, bbox_inches='tight', dpi=720, format='svg')
