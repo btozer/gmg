@@ -1556,34 +1556,34 @@ class Gmg(wx.Frame):
         header = ['layer_colors', 'plotx_list', 'ploty_list', 'densities', 'reference_densities',
                   'boundary_lock_list', 'layer_lock_list', 'well_list', 'well_name_list',
                   'well_list_hidden', 'well_list_switch', 'segy_name_list', 'segy_dimension_list',
-                  'obs_mag_list_save', 'obs_mag_name_list', 'earth_field', 'model_azimuth',
+                  'earth_field', 'model_azimuth',
                   'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms',
-                  'obs_grav_colors', 'obs_mag_colors', 'obs_topo_colors', 'model_aspect',
+                  'obs_topo_colors', 'model_aspect',
                   'faults', 'fault_names_list',
                   'fault_counter', 'current_fault_index', 'fault_x_coords_list',
                   'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
-                  'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list', 'outcrop_data_color_list',
-                  'outcrop_text_list',
+                  'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list',
+                  'outcrop_data_color_list', 'outcrop_text_list',
                   'xy_name_list', 'xy_list_save', 'xy_color_list',
-                  'observed_gravity_list']
+                  'observed_gravity_list', 'observed_magnetic_list']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
                         self.well_list_hidden, self.well_list_switch, self.segy_name_list, self.segy_dimension_list,
-                        self.obs_mag_list_save, self.obs_mag_name_list, self.earth_field, self.model_azimuth,
+                        self.earth_field, self.model_azimuth,
                         self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms,
-                        self.obs_grav_colors, self.obs_mag_colors, self.obs_topo_colors, self.model_aspect,
+                        self.obs_topo_colors, self.model_aspect,
                         self.faults, self.fault_names_list,
                         self.fault_counter, self.current_fault_index, self.fault_x_coords_list,
                         self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
                         self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
                         self.outcrop_data_color_list, self.outcrop_text_list,
                         self.xy_name_list, self.xy_list_save, self.xy_color_list,
-                        self.observed_gravity_list]
+                        self.observed_gravity_list, self.observed_magnetic_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -1687,8 +1687,7 @@ class Gmg(wx.Frame):
             self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
             self.plotx = self.plotx_list[self.layer_counter]
             self.ploty = self.ploty_list[self.layer_counter]
-            # self.observed_gravity_counter = len(self.obs_grav_list_save) - 1
-            self.obs_mag_list_count = len(self.obs_mag_list_save) - 1
+
             self.polygons = []
             # ----------------------------------------------------------------------------------------------------------
 
@@ -1923,14 +1922,10 @@ class Gmg(wx.Frame):
 
         # SET GRAVITY COUNTER
         self.observed_gravity_counter = len(self.observed_gravity_list)
-        print("length obs grav = ")
-        print len(self.observed_gravity_list)
-        print("observed_gravity_counter = ")
-        print self.observed_gravity_counter
 
     def replot_observed_magnetic_data(self):
         """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
-        for x in range(len(self.observed_gravity_list)):
+        for x in range(len(self.observed_magnetic_list)):
             if self.observed_magnetic_list[x] is not None:
                 # DRAW DATA IN MODEL FRAME
                 self.observed_magnetic_list[x].mpl_actor = self.ntcanvas.scatter(
@@ -1941,14 +1936,18 @@ class Gmg(wx.Frame):
                                                                           s=5, gid=self.observed_magnetic_list[x].id)
 
                 # ADD OBJECT TO MENUVAR
-                self.obs_submenu = wx.Menu()
-                self.m_obs_g_submenu.Append(12000+self.observed_magnetic_list[x].id, self.observed_magnetic_list[x].name,
-                                            self.obs_submenu)
-                self.obs_submenu.Append(12000+self.observed_magnetic_list[x].id, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_magnetic, id=12000+self.observed_gravity_list[x].id)
+                self.mag_submenu = wx.Menu()
+                self.m_obs_mag_submenu.Append(12000+self.observed_magnetic_list[x].id,
+                                              self.observed_magnetic_list[x].name,
+                                              self.mag_submenu)
+                self.mag_submenu.Append(12000+self.observed_magnetic_list[x].id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.observed_magnetic_list[x].id)
 
                 # TURN ON OBSERVED GRAVITY SWITCH
                 self.observed_magnetic_switch = True
+
+        # SET MAGNETIC COUNTER
+        self.observed_magnetic_counter = len(self.observed_magnetic_list)
 
     def load_xy(self, event):
         """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS. NB: ID's start at 5000"""
