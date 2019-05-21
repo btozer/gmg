@@ -664,7 +664,7 @@ class Gmg(wx.Frame):
         self.boundary_lock = True
         self.calc_padding = 5000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
         self.padding = 50000.  # PADDING FOR LAYERS
-        self.i = 0  # LAYER COUNTER
+        self.layer_counter = 0  # LAYER COUNTER
         self.node_layer_reference = 0
         self.index_node = None  # THE ACTIVE NODE
         self.pred_topo = None  # FUTURE - PREDICTED TOPOGRAPHY FROM MOHO (ISOSTATIC FUNC)
@@ -724,13 +724,12 @@ class Gmg(wx.Frame):
         self.obs_topo_count = 0
 
         'INITIALISE GRAVITY ATTRIBUTES'
-        self.grav_obs_switch = False
-        self.obs_grav = []
-        self.obs_grav_list = [[]]
-        self.obs_grav_list_save = [[]]
-        self.obs_grav_name_list = []
-        self.obs_grav_colors = [[]]
-        self.obs_grav_count = 0
+        self.observed_gravity_list = []
+        self.observed_gravity_counter = 0
+        self.observed_gravity_switch = False
+
+
+
         self.background_density = 0
         self.absolute_densities = True
         self.calc_grav_switch = False
@@ -739,13 +738,11 @@ class Gmg(wx.Frame):
         self.grav_residuals = []  # CALCULATED RESIDUAL
 
         'INITIALISE MAGNETIC ATTRIBUTES'
-        self.mag_obs_switch = False
-        self.obs_mag = []
-        self.obs_mag_list = [[]]
-        self.obs_mag_list_save = [[]]
-        self.obs_mag_name_list = []
-        self.obs_mag_colors = [[]]
-        self.obs_mag_count = 0
+        self.observed_magnetic_list = []
+        self.observed_magnetic_counter = 0
+        self.observed_magnetic_switch = False
+
+
         self.earth_field = 0.
         self.profile_azimuth = 0.
         self.calc_mag_switch = False
@@ -1349,15 +1346,15 @@ class Gmg(wx.Frame):
             self.fault_picking_switch = False
 
         # SET OBJECTS WITH THE CHOSEN LAYER
-        self.i = self.tree.GetPyData(event.GetItem())
-        self.nextdens = self.densities[self.i]
-        self.density_input.SetValue(0.001 * self.densities[self.i])
-        self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-        self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-        self.angle_a_input.SetValue(self.angle_a[self.i])
-        self.angle_b_input.SetValue(self.angle_b[self.i])
-        self.plotx = self.plotx_list[self.i]
-        self.ploty = self.ploty_list[self.i]
+        self.layer_counter = self.tree.GetPyData(event.GetItem())
+        self.nextdens = self.densities[self.layer_counter]
+        self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+        self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+        self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+        self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
+        self.angle_b_input.SetValue(self.angle_b[self.layer_counter])
+        self.plotx = self.plotx_list[self.layer_counter]
+        self.ploty = self.ploty_list[self.layer_counter]
         self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
         self.update_layer_data()
         self.run_algorithms()
@@ -1367,9 +1364,9 @@ class Gmg(wx.Frame):
         pass
 
     def on_end_edit_label(self, event):
-        self.i = self.tree.GetPyData(event.GetItem())
+        self.layer_counter = self.tree.GetPyData(event.GetItem())
         new_label = self.get_item_text(event.GetItem())
-        self.tree_items[self.i] = str(new_label)
+        self.tree_items[self.layer_counter] = str(new_label)
 
     def delete_all_children(self, event):
         self.tree.DeleteChildren(event)
@@ -1388,7 +1385,7 @@ class Gmg(wx.Frame):
                                      "                                                   "
                                      " || Currently Editing Layer: %s  || "
                                      " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
-                                     " || MAG RMS = %s  ||" % (self.i, self.mcanvas.get_aspect(), self.grav_rms_value,
+                                     " || MAG RMS = %s  ||" % (self.layer_counter, self.mcanvas.get_aspect(), self.grav_rms_value,
                                                                self.mag_rms_value), 2)
         self.statusbar.Update()
 
@@ -1559,7 +1556,6 @@ class Gmg(wx.Frame):
         header = ['layer_colors', 'plotx_list', 'ploty_list', 'densities', 'reference_densities',
                   'boundary_lock_list', 'layer_lock_list', 'well_list', 'well_name_list',
                   'well_list_hidden', 'well_list_switch', 'segy_name_list', 'segy_dimension_list',
-                  'obs_grav_list_save', 'obs_grav_name_list',
                   'obs_mag_list_save', 'obs_mag_name_list', 'earth_field', 'model_azimuth',
                   'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
                   'tree_items', 'segy_file_list', 'absolute_densities', 'area', 'xp', 'zp',
@@ -1570,12 +1566,12 @@ class Gmg(wx.Frame):
                   'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
                   'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list', 'outcrop_data_color_list',
                   'outcrop_text_list',
-                  'xy_name_list', 'xy_list_save', 'xy_color_list']
+                  'xy_name_list', 'xy_list_save', 'xy_color_list',
+                  'observed_gravity_list']
 
         model_params = [self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list, self.well_list, self.well_name_list,
                         self.well_list_hidden, self.well_list_switch, self.segy_name_list, self.segy_dimension_list,
-                        self.obs_grav_list_save, self.obs_grav_name_list,
                         self.obs_mag_list_save, self.obs_mag_name_list, self.earth_field, self.model_azimuth,
                         self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
                         self.tree_items, self.segy_file_list, self.absolute_densities, self.area, self.xp, self.zp,
@@ -1586,7 +1582,8 @@ class Gmg(wx.Frame):
                         self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
                         self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
                         self.outcrop_data_color_list, self.outcrop_text_list,
-                        self.xy_name_list, self.xy_list_save, self.xy_color_list]
+                        self.xy_name_list, self.xy_list_save, self.xy_color_list,
+                        self.observed_gravity_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -1636,6 +1633,7 @@ class Gmg(wx.Frame):
             self.loaded_fault_tree_items = self.fault_tree_items
 
             # DRAW CANVAS
+            print(self.area)
             self.start(self.area, self.xp, self.zp)
 
             # SET LAYERS self.boundary_lock_status
@@ -1659,13 +1657,19 @@ class Gmg(wx.Frame):
                     self.layer_lock_status.append([])
 
             # ----------------------------------------------------------------------------------------------------------
-            # PLOT OBSERVED DATA
+            # LOAD OBSERVED GRAVITY DATA
+            if len(self.observed_gravity_list) > 0:
+                self.replot_observed_gravity_data()
+
+            # LOAD OBSERVED MAGNETIC DATA
+            if len(self.observed_magnetic_list) > 0:
+                self.replot_observed_magnetic_data()
+
+            # LOAD OBSERVED XY DATA
             if self.xy_list_save != [[]]:
                 self.plot_obs_xy()
-            if self.obs_grav_list_save != [[]]:
-                self.plot_obs_grav()
-            if self.obs_mag_list_save != [[]]:
-                self.plot_obs_mag()
+
+            # LOAD OBSERVED TOPOGRAPHY DATA
             if self.obs_topo_list_save != [[]]:
                 self.plot_obs_topo()
             # ----------------------------------------------------------------------------------------------------------
@@ -1677,20 +1681,20 @@ class Gmg(wx.Frame):
 
             # ----------------------------------------------------------------------------------------------------------
             # Set VARIABLE VALUES FROM LOADED DATA
-            self.i = (len(self.densities) - 1)
+            self.layer_counter = (len(self.densities) - 1)
             self.layer_count = (len(self.densities) - 1)
-            self.density_input.SetValue(0.001 * self.densities[self.i])
-            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-            self.plotx = self.plotx_list[self.i]
-            self.ploty = self.ploty_list[self.i]
-            self.obs_grav_count = len(self.obs_grav_list_save) - 1
+            self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+            self.plotx = self.plotx_list[self.layer_counter]
+            self.ploty = self.ploty_list[self.layer_counter]
+            # self.observed_gravity_counter = len(self.obs_grav_list_save) - 1
             self.obs_mag_list_count = len(self.obs_mag_list_save) - 1
             self.polygons = []
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
             if self.layer_colors == [[]]:
-                self.layer_colors = ['black' for _ in range(self.i + 1)]
+                self.layer_colors = ['black' for _ in range(self.layer_counter + 1)]
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1722,8 +1726,8 @@ class Gmg(wx.Frame):
             
             # ----------------------------------------------------------------------------------------------------------
             # MAKE LAYER LINES AND POLYGONS
-            self.layer_lines = [[] for _ in range(self.i + 1)]
-            self.polygon_fills = [[] for _ in range(self.i + 1)]
+            self.layer_lines = [[] for _ in range(self.layer_counter + 1)]
+            self.polygon_fills = [[] for _ in range(self.layer_counter + 1)]
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1738,8 +1742,8 @@ class Gmg(wx.Frame):
                                                    color='k', linewidth=0.5, zorder=1, marker='s',
                                                    alpha=1.0)
             # CREATE NEW CURRENT FAULT GRAPHIC
-            self.faultline, = self.mcanvas.plot([-50000, 0], [-49999, 0], marker='s', color='m', linewidth=0.75,
-                                                alpha=1.0, zorder=2, picker=True)
+            self.faultline, = self.mcanvas.plot([-100000, -100000], [-100000, -100000], marker='s', color='m',
+                                                linewidth=0.75, alpha=1.0, zorder=2, picker=True)
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1896,47 +1900,55 @@ class Gmg(wx.Frame):
             else:
                 self.obs_topo_count += 1
 
-    def plot_obs_grav(self):
-        """PLOT OBSERVED GRAVITY"""
-        self.obs_grav_list = [[]]
-        for x in range(0, len(self.obs_grav_name_list)):
-            self.obs_grav_list.append([])
-            if self.obs_grav_name_list[x]:
-                self.obs_grav = self.obs_grav_list_save[x]
-                self.obs_grav_list[x] = self.dcanvas.scatter(self.obs_grav[:, 0], self.obs_grav[:, 1], marker='o',
-                                                             color=self.obs_grav_colors[x], s=5,
-                                                             gid=self.obs_grav_count)
-                self.obs_grav_list.append([])
-                self.obs_name = self.obs_grav_name_list[x]
-                self.obs_submenu = wx.Menu()
-                self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_grav_count+11000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=self.obs_grav_count+11000)
-                self.obs_grav_count += 1
-                self.grav_obs_switch = True
-            else:
-                self.obs_grav_count += 1
+    def replot_observed_gravity_data(self):
+        """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
+        for x in range(len(self.observed_gravity_list)):
+            if self.observed_gravity_list[x] is not None:
+                # DRAW DATA IN MODEL FRAME
+                self.observed_gravity_list[x].mpl_actor = self.dcanvas.scatter(self.observed_gravity_list[x].data[:, 0],
+                                                                          self.observed_gravity_list[x].data[:, 1],
+                                                                          marker='o',
+                                                                          color=self.observed_gravity_list[x].color,
+                                                                          s=5, gid=self.observed_gravity_list[x].id)
 
-    def plot_obs_mag(self):
-        """PLOT OBSERVED MAG"""
-        self.obs_mag_list = [[]]
-        for x in range(0, len(self.obs_mag_name_list)):
-            self.obs_mag_list.append([])
-            if self.obs_mag_name_list[x]:
-                self.obs_mag = self.obs_mag_list_save[x]
-                self.obs_mag_list[x] = self.ntcanvas.scatter(self.obs_mag[:, 0], self.obs_mag[:, 1], marker='o',
-                                                             color=self.obs_mag_colors[x], s=5,
-                                                             gid=self.obs_mag_count)
-                self.obs_mag_list.append([])
-                self.obs_mag_name = self.obs_mag_name_list[x]
+                # ADD OBJECT TO MENUVAR
                 self.obs_submenu = wx.Menu()
-                self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_mag_count+12000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=self.obs_mag_count+12000)
-                self.obs_mag_count += 1
-                self.mag_obs_switch = True
-            else:
-                self.obs_mag_count += 1
+                self.m_obs_g_submenu.Append(11000+self.observed_gravity_list[x].id, self.observed_gravity_list[x].name,
+                                            self.obs_submenu)
+                self.obs_submenu.Append(11000+self.observed_gravity_list[x].id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+self.observed_gravity_list[x].id)
+
+                # TURN ON OBSERVED GRAVITY SWITCH
+                self.observed_gravity_switch = True
+
+        # SET GRAVITY COUNTER
+        self.observed_gravity_counter = len(self.observed_gravity_list)
+        print("length obs grav = ")
+        print len(self.observed_gravity_list)
+        print("observed_gravity_counter = ")
+        print self.observed_gravity_counter
+
+    def replot_observed_magnetic_data(self):
+        """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
+        for x in range(len(self.observed_gravity_list)):
+            if self.observed_magnetic_list[x] is not None:
+                # DRAW DATA IN MODEL FRAME
+                self.observed_magnetic_list[x].mpl_actor = self.ntcanvas.scatter(
+                                                                          self.observed_magnetic_list[x].data[:, 0],
+                                                                          self.observed_magnetic_list[x].data[:, 1],
+                                                                          marker='o',
+                                                                          color=self.observed_magnetic_list[x].color,
+                                                                          s=5, gid=self.observed_magnetic_list[x].id)
+
+                # ADD OBJECT TO MENUVAR
+                self.obs_submenu = wx.Menu()
+                self.m_obs_g_submenu.Append(12000+self.observed_magnetic_list[x].id, self.observed_magnetic_list[x].name,
+                                            self.obs_submenu)
+                self.obs_submenu.Append(12000+self.observed_magnetic_list[x].id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_magnetic, id=12000+self.observed_gravity_list[x].id)
+
+                # TURN ON OBSERVED GRAVITY SWITCH
+                self.observed_magnetic_switch = True
 
     def load_xy(self, event):
         """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS. NB: ID's start at 5000"""
@@ -2043,7 +2055,7 @@ class Gmg(wx.Frame):
         self.obs_topo_list_save.append([])
         self.obs_topo_list[self.obs_topo_count] = self.tcanvas.scatter(self.topo[:, 0], self.topo[:, 1], marker='o',
                                                                        color=self.colors[self.colors_index],
-                                                                       s=5, gid=self.obs_grav_count)
+                                                                       s=5, gid=self.observed_gravity_counter)
         self.colors_index += 1
         self.obs_topo_list.append([])
 
@@ -2083,41 +2095,45 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_g(self):
-        """LOAD OBSERVE GRAVITY DATA: IDs start at 11000"""
-        obs_g_input = self.load_window.file_path
-        self.obs_name = self.load_window.observed_name
-        self.color = self.load_window.color_picked
+        """
+        LOAD OBSERVE GRAVITY DATA.
+        DATA ARE STORED IN gmg.observed_gravity_list as a ObservedGravityData object.
+        object IDs start at 11000.
+        """
 
-        self.obs_grav_name_list.append([])
-        self.obs_grav_name_list[self.obs_grav_count] = str(self.obs_name)
-        self.obs_grav_colors.append([])
-        self.obs_grav_colors[self.obs_grav_count] = str(self.color)
+        # PARSE USER INPUT FILE
+        input_file = self.load_window.file_path
 
-        # DRAW LOADED DATA IN GRAVITY FRAME
-        self.obs_grav = np.genfromtxt(obs_g_input, delimiter=' ', dtype=float)
-        self.obs_gz = self.obs_grav[:, 1]
-        self.obs_grav_list_save.append([])
-        self.obs_grav_name_list.append([])
-        self.obs_grav_list_save[self.obs_grav_count] = self.obs_grav
-        self.obs_grav_list[self.obs_grav_count] = self.dcanvas.scatter(self.obs_grav[:, 0], self.obs_grav[:, 1],
-                                                                       marker='o', color=self.color,
-                                                                       s=5, gid=self.obs_grav_count)
-        self.colors_index += 1
-        self.obs_grav_list.append([])
-        self.grav_obs_switch = True
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed_gravity = ObservedGravityData()
 
-        #  APPEND NEW DATA MENU TO 'GRAV data MENU'
+        # SET ATTRIBUTES
+        observed_gravity.id = int(self.observed_gravity_counter)
+        observed_gravity.name = self.load_window.observed_name
+        observed_gravity.color = self.load_window.color_picked
+        observed_gravity.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+        observed_gravity.mpl_actor = self.dcanvas.scatter(observed_gravity.data[:, 0], observed_gravity.data[:, 1],
+                                                          marker='o', color=observed_gravity.color, s=5,
+                                                          gid=observed_gravity.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_gravity_list.append(observed_gravity)
+
+        # TURN ON OBSERVED GRAVITY SWITCH
+        self.observed_gravity_switch = True
+
+        # APPEND NEW DATA MENU TO 'GRAV data MENU'
         self.grav_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(self.obs_grav_count, self.obs_name, self.grav_submenu)
+        self.m_obs_g_submenu.Append(11000+observed_gravity.id, observed_gravity.name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11000+self.obs_grav_count, 'delete observed data')
+        self.grav_submenu.Append(11000+observed_gravity.id, 'delete observed data')
 
-        # BIND TO DEL GRAV FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+self.obs_grav_count)
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+observed_gravity.id)
 
-        # INCREMENT GRAV COUNTER
-        self.obs_grav_count += 1
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_gravity_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -2125,29 +2141,31 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_obs_grav(self, event):
-        self.m_obs_g_submenu.DestroyItem(event.Id-11000)
-        self.obs_grav_name_list[event.Id-11000] = []
-        self.obs_grav_list[event.Id-11000].set_visible(False)
-        self.obs_grav_list[event.Id-11000] = []
-        self.obs_grav_list_save[event.Id-11000] = []
+        # DESTROY MENUBAR
+        self.m_obs_g_submenu.DestroyItem(event.Id)
+
+        # REMOVE OBJECT AND MPL ACTOR
+        obj_id = event.Id-11000
+        self.observed_gravity_list[obj_id].mpl_actor.set_visible(False)
+        self.observed_gravity_list[obj_id] = None
 
         # UPDATE MODEL
         self.update_layer_data()
         self.draw()
 
     def delete_all_obs_grav(self, event):
-        for x in range(0, self.obs_grav_count):
+        for x in range(0, self.observed_gravity_counter):
             try:
                 self.m_obs_g_submenu.DestroyItem(x)
                 self.obs_grav_list[x].set_visible(False)
             except IndexError:
                 continue
-        self.grav_obs_switch = False
+        self.observed_gravity_switch = False
         self.obs_grav = []
         self.obs_grav_list = [[]]
         self.obs_grav_list_save = [[]]
         self.obs_grav_name_list = []
-        self.obs_grav_count = 0
+        self.observed_gravity_counter = 0
         self.update_layer_data()
         self.draw()
 
@@ -2168,39 +2186,45 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_m(self):
-        """LOAD OBSERVE MAGNETIC DATA: IDs start at 12000"""
-        # GET VALUES FROM LOAD WINDOW
-        obs_m_input = self.load_window.file_path
-        self.obs_mag_name = self.load_window.observed_name
-        self.color = self.load_window.color_picked
+        """
+        LOAD OBSERVE GRAVITY DATA.
+        DATA ARE STORED IN gmg.observed_gravity_list as a ObservedGravityData object.
+        object IDs start at 11000.
+        """
 
-        self.obs_mag_name_list.append([])
-        self.obs_mag_name_list[self.obs_mag_count] = str(self.obs_mag_name)
-        self.obs_mag_colors.append([])
-        self.obs_mag_colors[self.obs_mag_count] = str(self.color)
+        # PARSE USER INPUT FILE
+        input_file = self.load_window.file_path
 
-        self.obs_mag = np.genfromtxt(obs_m_input, delimiter=' ', dtype=float)
-        self.obs_mz = self.obs_mag[:, 1]
-        self.obs_mag_list_save[self.obs_mag_count] = self.obs_mag
-        self.obs_mag_list_save.append([])
-        self.obs_mag_list[self.obs_mag_count] = self.ntcanvas.scatter(self.obs_mag[:, 0], self.obs_mag[:, 1],
-                                                                      marker='o', color=self.colors[self.colors_index],
-                                                                      s=5, gid=self.obs_grav_count)
-        self.colors_index += 1
-        self.obs_mag_list.append([])
-        self.mag_obs_switch = True
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed_magnetic = ObservedMagneticData()
 
-        #  APPEND NEW DATA MENU TO 'Mag data MENU'
-        self.obs_mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(self.obs_mag_count, self.obs_mag_name, self.obs_mag_submenu)
+        # SET ATTRIBUTES
+        observed_magnetic.id = int(self.observed_magnetic_counter)
+        observed_magnetic.name = self.load_window.observed_name
+        observed_magnetic.color = self.load_window.color_picked
+        observed_magnetic.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+        observed_magnetic.mpl_actor = self.ntcanvas.scatter(observed_magnetic.data[:, 0], observed_magnetic.data[:, 1],
+                                                          marker='o', color=observed_magnetic.color, s=5,
+                                                          gid=observed_magnetic.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_magnetic_list.append(observed_magnetic)
+
+        # TURN ON OBSERVED GRAVITY SWITCH
+        self.observed_magnetic_switch = True
+
+        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        self.mag_submenu = wx.Menu()
+        self.m_obs_mag_submenu.Append(12000+observed_magnetic.id, observed_magnetic.name, self.mag_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_mag_submenu.Append(12000+self.obs_mag_count, 'delete observed data')
+        self.mag_submenu.Append(12000+observed_magnetic.id, 'delete observed data')
 
-        # BIND TO DEL MAG FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.obs_mag_count)
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+observed_magnetic.id)
 
-        self.obs_mag_count += 1
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_magnetic_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -2208,18 +2232,20 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_obs_mag(self, event):
-        self.obs_mag_submenu.DestroyItem(event.Id-12000)
-        self.obs_mag_list[event.Id].set_visible(False)
-        self.obs_mag_list[event.Id-12000] = []
-        self.obs_mag_name_list[event.Id-12000] = []
-        self.obs_mag_list_save[event.Id-12000] = []
+        # DESTROY MENUBAR
+        self.m_obs_mag_submenu.DestroyItem(event.Id)
+
+        # REMOVE OBJECT AND MPL ACTOR
+        obj_id = event.Id-12000
+        self.observed_magnetic_list[obj_id].mpl_actor.set_visible(False)
+        self.observed_magnetic_list[obj_id] = None
 
         # UPDATE MODEL
         self.update_layer_data()
         self.draw()
 
     def delete_all_obs_mag(self, event):
-        for x in range(0, self.obs_mag_count):
+        for x in range(0, self.observed_magnetic_counter):
             try:
                 self.m_obs_mag_submenu.DestroyItem(x)
                 self.obs_mag_list[x].set_visible(False)
@@ -2230,7 +2256,7 @@ class Gmg(wx.Frame):
         self.obs_mag_list = [[]]
         self.obs_mag_list_save = [[]]
         self.obs_mag_name_list = []
-        self.obs_mag_count = 0
+        self.observed_magnetic_counter = 0
         self.update_layer_data()
         self.draw()
 
@@ -2716,11 +2742,11 @@ class Gmg(wx.Frame):
         new_x = float(self.x_input.GetValue())
         new_y = float(self.y_input.GetValue())
 
-        if self.i == self.node_layer_reference:
+        if self.layer_counter == self.node_layer_reference:
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
 
-            if self.boundary_lock_list[self.i] == 0 and self.index_node is not None:
+            if self.boundary_lock_list[self.layer_counter] == 0 and self.index_node is not None:
                 if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
                     xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
@@ -2739,7 +2765,7 @@ class Gmg(wx.Frame):
                 else:
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-            elif self.boundary_lock_list[self.i] == 1:
+            elif self.boundary_lock_list[self.layer_counter] == 1:
                 if new_y <= 0:
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
@@ -2782,7 +2808,7 @@ class Gmg(wx.Frame):
         GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
 
-        self.node_layer_reference = self.i
+        self.node_layer_reference = self.layer_counter
         xyt = self.polyline.get_xydata()
         xt = xyt[:, 0]
         yt = xyt[:, 1]
@@ -2798,7 +2824,7 @@ class Gmg(wx.Frame):
             self.index_arg2_list = [None] * (self.layer_count + 1)
 
             for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.i:  # SKIP CURRENT LAYER
+                if x == self.layer_counter:  # SKIP CURRENT LAYER
                     pass
                 node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
 
@@ -2853,19 +2879,19 @@ class Gmg(wx.Frame):
             if self.pinch:
                 # GET THE NODE NUMBER AND LAYER NUMBER AND PLACE THEM IN "PINCH_NODE_LIST"
                 if self.pinch_count == 0:
-                    self.plotx = self.plotx_list[self.i]
-                    self.ploty = self.ploty_list[self.i]
+                    self.plotx = self.plotx_list[self.layer_counter]
+                    self.ploty = self.ploty_list[self.layer_counter]
                     x1 = np.array(self.plotx)
                     y1 = np.array(self.ploty)
                     self.index_node = self.get_node_under_point(event)
                     self.pinch_node_list[self.pinch_count] = self.index_node[0]
-                    self.pinch_node_list[self.pinch_count + 1] = self.i
+                    self.pinch_node_list[self.pinch_count + 1] = self.layer_counter
                     self.pinch_count = + 1
                     # SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE
                 else:
                     # SET THE SECOND NODE X AND Y
-                    self.plotx2 = self.plotx_list[self.i]
-                    self.ploty2 = self.ploty_list[self.i]
+                    self.plotx2 = self.plotx_list[self.layer_counter]
+                    self.ploty2 = self.ploty_list[self.layer_counter]
                     x2 = np.array(self.plotx2)
                     y2 = np.array(self.ploty2)
                     self.index_node = self.get_node_under_point(event)
@@ -2982,7 +3008,7 @@ class Gmg(wx.Frame):
 
         # GMG IS IN LAYER MODE
         if self.fault_picking_switch is False:
-            if self.boundary_lock_list[self.i] == 0:
+            if self.boundary_lock_list[self.layer_counter] == 0:
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
 
@@ -3009,7 +3035,7 @@ class Gmg(wx.Frame):
                 else:
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
-            elif self.boundary_lock_list[self.i] == 1:
+            elif self.boundary_lock_list[self.layer_counter] == 1:
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
                 xt = np.array(self.plotx)
@@ -3135,7 +3161,7 @@ class Gmg(wx.Frame):
             self.pinch_switch = 0
             self.index_arg2_list = [None] * (self.layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
             for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.i:
+                if x == self.layer_counter:
                     pass
                 x_node_list = self.plotx_list[x]
                 y_node_list = self.ploty_list[x]
@@ -3180,36 +3206,36 @@ class Gmg(wx.Frame):
             if self.boundary_lock:
                 'unlock layer'
                 self.boundary_lock = False
-                self.boundary_lock_list[self.i] = 1
+                self.boundary_lock_list[self.layer_counter] = 1
             elif not self.boundary_lock:
                 'lock layer'
                 self.boundary_lock = True
-                self.boundary_lock_list[self.i] = 0
+                self.boundary_lock_list[self.layer_counter] = 0
 
         'l = LOCK OR UNLOCK LAYER/POLYGON MODE'
         if event.key == 'l':
             if self.layer_lock:
                 'unlock layer'
                 self.layer_lock = False
-                self.layer_lock_list[self.i] = 1
+                self.layer_lock_list[self.layer_counter] = 1
             elif not self.layer_lock:
                 'lock layer'
                 self.layer_lock = True
-                self.layer_lock_list[self.i] = 0
+                self.layer_lock_list[self.layer_counter] = 0
 
         '< = MOVE TO NEXT LAYER'
         if event.key == '.':
-            if self.i == self.layer_count:
+            if self.layer_counter == self.layer_count:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = 0
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
+                self.layer_counter = 0
+                self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+                self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
+                self.plotx = self.plotx_list[self.layer_counter]
+                self.ploty = self.ploty_list[self.layer_counter]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
@@ -3219,14 +3245,14 @@ class Gmg(wx.Frame):
                 # UPDATE LAYER DATA
                 self.update_layer_data()
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = self.i + 1
-                self.nextdens = self.densities[self.i]
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
+                self.layer_counter = self.layer_counter + 1
+                self.nextdens = self.densities[self.layer_counter]
+                self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+                self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
+                self.plotx = self.plotx_list[self.layer_counter]
+                self.ploty = self.ploty_list[self.layer_counter]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
@@ -3235,17 +3261,17 @@ class Gmg(wx.Frame):
 
         '< = MOVE TO NEXT LAYER'
         if event.key == ',':
-            if self.i == 0:
+            if self.layer_counter == 0:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = self.layer_count
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
+                self.layer_counter = self.layer_count
+                self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+                self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
+                self.plotx = self.plotx_list[self.layer_counter]
+                self.ploty = self.ploty_list[self.layer_counter]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
@@ -3255,14 +3281,14 @@ class Gmg(wx.Frame):
                 # UPDATE LAYER DATA
                 self.update_layer_data()
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.i = self.i - 1
-                self.nextdens = self.densities[self.i]
-                self.density_input.SetValue(0.001 * self.densities[self.i])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-                self.angle_a_input.SetValue(self.angle_a[self.i])
-                self.plotx = self.plotx_list[self.i]
-                self.ploty = self.ploty_list[self.i]
+                self.layer_counter = self.layer_counter - 1
+                self.nextdens = self.densities[self.layer_counter]
+                self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+                self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+                self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
+                self.plotx = self.plotx_list[self.layer_counter]
+                self.ploty = self.ploty_list[self.layer_counter]
                 self.x_input.SetValue(self.plotx[0])
                 self.y_input.SetValue(self.ploty[0])
                 self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
@@ -3593,7 +3619,7 @@ class Gmg(wx.Frame):
             self.capture_window.Show(True)
 
     def pinch_out_layer(self, event):
-        pinch_box = PinchDialog(self, -1, 'Pinch Out Layer:', self.plotx_list, self.ploty_list, self.i)
+        pinch_box = PinchDialog(self, -1, 'Pinch Out Layer:', self.plotx_list, self.ploty_list, self.layer_counter)
         answer = pinch_box.ShowModal()
         self.plotx = pinch_box.pinched_x
         self.ploty = pinch_box.pinched_y
@@ -3601,7 +3627,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def depinch_layer(self, event):
-        depinch_box = DepinchDialog(self, -1, 'Depinch layer', self.plotx_list, self.ploty_list, self.i,
+        depinch_box = DepinchDialog(self, -1, 'Depinch layer', self.plotx_list, self.ploty_list, self.layer_counter,
                                     self.layer_count)
         answer = depinch_box.ShowModal()
         self.plotx = depinch_box.depinched_x
@@ -3610,7 +3636,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def bulk_shift(self, event):
-        bulk_shift_box = BulkShiftDialog(self, -1, 'Layer bulk shift', self.plotx_list, self.ploty_list, self.i)
+        bulk_shift_box = BulkShiftDialog(self, -1, 'Layer bulk shift', self.plotx_list, self.ploty_list, self.layer_counter)
         answer = bulk_shift_box.ShowModal()
         self.plotx = bulk_shift_box.new_x
         self.ploty = bulk_shift_box.new_y
@@ -3635,24 +3661,24 @@ class Gmg(wx.Frame):
         if filter_type == "gravity":
             self.obs_grav_name_list.append(filtered_name)
             self.obs_grav_list_save.append([])
-            self.obs_grav_list_save[self.obs_grav_count] = filtered_data
+            self.obs_grav_list_save[self.observed_gravity_counter] = filtered_data
             self.obs_grav_list.append([])
-            self.obs_grav_list[self.obs_grav_count] = self.dcanvas.scatter(filtered_data[:, 0], filtered_data[:, 1],
+            self.obs_grav_list[self.observed_gravity_counter] = self.dcanvas.scatter(filtered_data[:, 0], filtered_data[:, 1],
                                                                            marker='o', color=filtered_color, s=5,
-                                                                           gid=self.obs_grav_count)
+                                                                           gid=self.observed_gravity_counter)
 
             #  APPEND NEW DATA MENU TO 'Topo data MENU'
             self.grav_submenu = wx.Menu()
-            self.m_obs_g_submenu.Append(self.obs_grav_count,filtered_name, self.grav_submenu)
+            self.m_obs_g_submenu.Append(self.observed_gravity_counter,filtered_name, self.grav_submenu)
 
             # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-            self.grav_submenu.Append(11000 + self.obs_grav_count, 'delete observed data')
+            self.grav_submenu.Append(11000 + self.observed_gravity_counter, 'delete observed data')
 
             # BIND TO DEL TOPO FUNC
-            self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.obs_grav_count)
+            self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.observed_gravity_counter)
 
             # INCREMENT GRAV COUNTER
-            self.obs_grav_count += 1
+            self.observed_gravity_counter += 1
 
             # UPDATE GMG GUI
             self.update_layer_data()
@@ -3661,23 +3687,23 @@ class Gmg(wx.Frame):
         if filter_type == "magnetics":
             self.obs_mag_name_list.append(filtered_name)
             self.obs_mag_list_save.append([])
-            self.obs_mag_list_save[self.obs_mag_count] = filtered_data
+            self.obs_mag_list_save[self.observed_magnetic_counter] = filtered_data
             self.obs_mag_list.append([])
-            self.obs_mag_list[self.obs_mag_count] = self.dcanvas.scatter(filtered_data[:, 0], filtered_data[:, 1],
+            self.obs_mag_list[self.observed_magnetic_counter] = self.dcanvas.scatter(filtered_data[:, 0], filtered_data[:, 1],
                                                                          marker='o', color=filtered_color, s=5,
-                                                                         gid=self.obs_mag_count)
+                                                                         gid=self.observed_magnetic_counter)
 
         #  APPEND NEW DATA MENU TO 'Mag data MENU'
         self.obs_mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(self.obs_mag_count, filtered_name, self.obs_mag_submenu)
+        self.m_obs_mag_submenu.Append(self.observed_magnetic_counter, filtered_name, self.obs_mag_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_mag_submenu.Append(12000+self.obs_mag_count, 'delete observed data')
+        self.obs_mag_submenu.Append(12000+self.observed_magnetic_counter, 'delete observed data')
 
         # BIND TO DEL MAG FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.obs_mag_count)
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.observed_magnetic_counter)
 
-        self.obs_mag_count += 1
+        self.observed_magnetic_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -3704,9 +3730,9 @@ class Gmg(wx.Frame):
             layer_above_x = np.array(self.plotx_list[k])
             layer_above_y = np.array(self.ploty_list[k])
 
-            # INCREMENT THE CURRENT LAYER INDEX VALUE (self.i)
-            self.i = self.layer_count
-            self.i += 1
+            # INCREMENT THE CURRENT LAYER INDEX VALUE (self.layer_counter)
+            self.layer_counter = self.layer_count
+            self.layer_counter += 1
 
             # INCREMENT THE TOTAL LAYER COUNT
             self.layer_count += 1
@@ -3727,10 +3753,10 @@ class Gmg(wx.Frame):
             self.layer_lock_status.append('locked')
             self.boundary_lock_status.append('locked')
             self.layer_colors.append('black')
-            self.tree_items.append('layer %s' % (int(self.i)))
-            self.item = 'layer %s' % (int(self.i ))
+            self.tree_items.append('layer %s' % (int(self.layer_counter)))
+            self.item = 'layer %s' % (int(self.layer_counter))
             self.layers_calculation_switch.append(1)
-            self.add_new_tree_nodes(self.root, self.item, self.i)
+            self.add_new_tree_nodes(self.root, self.item, self.layer_counter)
 
             # SET NEW LAYER NODES
             self.new_layer_thickness = new_layer_dialogbox.new_thickness
@@ -3739,21 +3765,22 @@ class Gmg(wx.Frame):
             self.nextpoly = zip(self.plotx, self.ploty)
 
             # CREATE LAYER LINE
-            self.layer_lines[self.i] = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
+            self.layer_lines[self.layer_counter] = self.mcanvas.plot(self.plotx_list[self.layer_counter],
+                                                                     self.ploty_list[self.layer_counter],
                                                          color='blue', linewidth=1.0, alpha=1.0)
             # CREATE LAYER POLYGON FILL
             self.plotx_polygon = np.array(self.plotx)
             self.ploty_polygon = np.array(self.ploty)
-            self.polygon_fills[self.i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
+            self.polygon_fills[self.layer_counter] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                            alpha=self.layer_transparency, closed=True, linewidth=None,
                                                            ec=None)
             # UPDATE LAYER DATA
             self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
-            self.nextdens = self.densities[self.i]
-            self.density_input.SetValue(0.001 * self.densities[self.i])
-            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-            self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-            self.angle_a_input.SetValue(self.angle_a[self.i])
+            self.nextdens = self.densities[self.layer_counter]
+            self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+            self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+            self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
             self.update_layer_data()
             self.draw()
 
@@ -3765,8 +3792,8 @@ class Gmg(wx.Frame):
             self.new_x4, self.new_y4 = new_layer_dialogbox.x4, new_layer_dialogbox.y4
 
             # INCREMENT THE LAYER COUNT'
-            self.i = self.layer_count
-            self.i = self.i + 1
+            self.layer_counter = self.layer_count
+            self.layer_counter = self.layer_counter + 1
 
             # INCREMENT THE TOTAL LAYER COUNT
             self.layer_count += 1
@@ -3787,31 +3814,32 @@ class Gmg(wx.Frame):
             self.boundary_lock_list.append(1)
             self.layer_lock_status.append('unlocked')
             self.boundary_lock_status.append('unlocked')
-            self.tree_items.append('layer %s' % (int(self.i)))
-            self.item = 'layer %s' % (int(self.i))
-            self.add_new_tree_nodes(self.root, self.item, self.i)
+            self.tree_items.append('layer %s' % (int(self.layer_counter)))
+            self.item = 'layer %s' % (int(self.layer_counter))
+            self.add_new_tree_nodes(self.root, self.item, self.layer_counter)
             self.layers_calculation_switch.append(1)
             self.plotx = [self.new_x1, self.new_x2, self.new_x3, self.new_x4]
             self.ploty = [self.new_y1, self.new_y2, self.new_y3, self.new_y4]
             self.nextpoly = zip(self.plotx, self.ploty)
 
             # CREATE LAYER LINE
-            self.layer_lines[self.i] = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
+            self.layer_lines[self.layer_counter] = self.mcanvas.plot(self.plotx_list[self.layer_counter],
+                                                                     self.ploty_list[self.layer_counter],
                                                          color='blue', linewidth=1.0, alpha=1.0)
             # CREATE LAYER POLYGON FILL
             self.plotx_polygon = np.array(self.plotx)
             self.ploty_polygon = np.array(self.ploty)
-            self.polygon_fills[self.i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
+            self.polygon_fills[self.layer_counter] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                            alpha=self.layer_transparency, closed=True, linewidth=None,
                                                            ec=None)
 
             # UPDATE LAYER DATA
             self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
-            self.nextdens = self.densities[self.i]
-            self.density_input.SetValue(0.001 * self.densities[self.i])
-            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-            self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-            self.angle_a_input.SetValue(self.angle_a[self.i])
+            self.nextdens = self.densities[self.layer_counter]
+            self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+            self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+            self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
@@ -3829,8 +3857,8 @@ class Gmg(wx.Frame):
         new_layer = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
 
         # INCREMENT THE LAYER COUNT
-        self.i = self.layer_count
-        self.i += 1
+        self.layer_counter = self.layer_count
+        self.layer_counter += 1
 
         # INCREMENT THE TOTAL LAYER COUNT
         self.layer_count += 1
@@ -3852,29 +3880,30 @@ class Gmg(wx.Frame):
         self.boundary_lock_list.append(1)
         self.layer_lock_status.append('unlocked')
         self.boundary_lock_status.append('unlocked')
-        self.tree_items.append('layer %s' % (int(self.i + 1)))
-        self.item = 'layer %s' % (int(self.i + 1))
-        self.add_new_tree_nodes(self.root, self.item, self.i)
+        self.tree_items.append('layer %s' % (int(self.layer_counter + 1)))
+        self.item = 'layer %s' % (int(self.layer_counter + 1))
+        self.add_new_tree_nodes(self.root, self.item, self.layer_counter)
         self.layers_calculation_switch.append(0)
         self.plotx = new_layer[:, 0]
         self.ploty = new_layer[:, 1]
         self.nextpoly = zip(self.plotx, self.ploty)
 
         'CREATE LAYER LINE'
-        self.layer_lines[self.i] = self.mcanvas.plot(self.plotx_list[self.i], self.ploty_list[self.i],
+        self.layer_lines[self.layer_counter] = self.mcanvas.plot(self.plotx_list[self.layer_counter],
+                                                                 self.ploty_list[self.layer_counter],
                                                      color='blue', linewidth=1.0, alpha=1.0)
         'CREATE LAYER POLYGON FILL'
         self.plotx_polygon = np.array(self.plotx)
         self.ploty_polygon = np.array(self.ploty)
-        self.polygon_fills[self.i] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
+        self.polygon_fills[self.layer_counter] = self.mcanvas.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                        alpha=self.layer_transparency, closed=True, linewidth=None,
                                                        ec=None)
         'Update layer data'
-        self.nextdens = self.densities[self.i]
-        self.density_input.SetValue(0.001 * self.densities[self.i])
-        self.ref_density_input.SetValue(0.001 * self.reference_densities[self.i])
-        self.susceptibility_input.SetValue(self.susceptibilities[self.i])
-        self.angle_a_input.SetValue(self.angle_a[self.i])
+        self.nextdens = self.densities[self.layer_counter]
+        self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
+        self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
+        self.susceptibility_input.SetValue(self.susceptibilities[self.layer_counter])
+        self.angle_a_input.SetValue(self.angle_a[self.layer_counter])
         self.update_layer_data()
         self.run_algorithms()
         self.draw()
@@ -3883,45 +3912,45 @@ class Gmg(wx.Frame):
         """Delete LAYER DATA"""
 
         # REMOVE POLYGON
-        self.polygon_fills[self.i][0].remove()
-        del self.polygon_fills[self.i]
+        self.polygon_fills[self.layer_counter][0].remove()
+        del self.polygon_fills[self.layer_counter]
         # REMOVE POLYGON
-        self.layer_lines[self.i][0].remove()
-        del self.layer_lines[self.i]
+        self.layer_lines[self.layer_counter][0].remove()
+        del self.layer_lines[self.layer_counter]
         # SET CURRENT AS THE NEXT LAYER'
-        if self.i == self.layer_count:
+        if self.layer_counter == self.layer_count:
             self.polyline.set_xdata(self.plotx_list[0])
             self.polyline.set_ydata(self.ploty_list[0])
             self.polyline.set_color(self.layer_colors[0])
             self.plotx = self.plotx_list[0]
             self.ploty = self.ploty_list[0]
         else:
-            self.polyline.set_xdata(self.plotx_list[self.i + 1])
-            self.polyline.set_ydata(self.ploty_list[self.i + 1])
-            self.polyline.set_color(self.layer_colors[self.i + 1])
-            self.plotx = self.plotx_list[self.i + 1]
-            self.ploty = self.ploty_list[self.i + 1]
+            self.polyline.set_xdata(self.plotx_list[self.layer_counter + 1])
+            self.polyline.set_ydata(self.ploty_list[self.layer_counter + 1])
+            self.polyline.set_color(self.layer_colors[self.layer_counter + 1])
+            self.plotx = self.plotx_list[self.layer_counter + 1]
+            self.ploty = self.ploty_list[self.layer_counter + 1]
         self.draw()
 
         # REMOVE META DATA'
-        del self.plotx_list[self.i]
-        del self.ploty_list[self.i]
-        del self.densities[self.i]
-        del self.reference_densities[self.i]
-        del self.susceptibilities[self.i]
-        del self.angle_a[self.i]
-        del self.angle_b[self.i]
-        del self.layer_lock_list[self.i]
-        del self.boundary_lock_list[self.i]
-        del self.layer_lock_status[self.i]
-        del self.boundary_lock_status[self.i]
-        del self.layer_colors[self.i]
-        del self.layers_calculation_switch[self.i]
+        del self.plotx_list[self.layer_counter]
+        del self.ploty_list[self.layer_counter]
+        del self.densities[self.layer_counter]
+        del self.reference_densities[self.layer_counter]
+        del self.susceptibilities[self.layer_counter]
+        del self.angle_a[self.layer_counter]
+        del self.angle_b[self.layer_counter]
+        del self.layer_lock_list[self.layer_counter]
+        del self.boundary_lock_list[self.layer_counter]
+        del self.layer_lock_status[self.layer_counter]
+        del self.boundary_lock_status[self.layer_counter]
+        del self.layer_colors[self.layer_counter]
+        del self.layers_calculation_switch[self.layer_counter]
 
         #  REMOVE TREE ITEMS
-        del self.tree_items[self.i]
+        del self.tree_items[self.layer_counter]
         layers = self.tree.GetRootItem().GetChildren()
-        self.tree.Delete(layers[self.i])
+        self.tree.Delete(layers[self.layer_counter])
         # RESET TREE ITEM ID'S
         layers = self.tree.GetRootItem().GetChildren()
         for i in range(len(layers)):
@@ -3951,24 +3980,24 @@ class Gmg(wx.Frame):
 
     def set_density(self, value):
         if self.density_input.GetValue() == 0:
-            self.densities[self.i] = 0
+            self.densities[self.layer_counter] = 0
         else:
-            self.densities[self.i] = float(self.density_input.GetValue() * 1000.)
+            self.densities[self.layer_counter] = float(self.density_input.GetValue() * 1000.)
 
     def set_reference_density(self, value):
         if self.ref_density_input.GetValue() == 0:
-            self.reference_densities[self.i] = 0
+            self.reference_densities[self.layer_counter] = 0
         else:
-            self.reference_densities[self.i] = float(self.ref_density_input.GetValue() * 1000.)
+            self.reference_densities[self.layer_counter] = float(self.ref_density_input.GetValue() * 1000.)
 
     def set_susceptibility(self, value):
-        self.susceptibilities[self.i] = float(self.susceptibility_input.GetValue())
+        self.susceptibilities[self.layer_counter] = float(self.susceptibility_input.GetValue())
 
     def set_angle_a(self, value):
-        self.angle_a[self.i] = float(self.angle_a_input.GetValue())
+        self.angle_a[self.layer_counter] = float(self.angle_a_input.GetValue())
 
     def set_angle_b(self, value):
-        self.angle_b[self.i] = float(self.angle_b_input.GetValue())
+        self.angle_b[self.layer_counter] = float(self.angle_b_input.GetValue())
 
     def set_text_size(self, value):
         """GET NEW TEXT SIZE"""
@@ -4068,8 +4097,8 @@ class Gmg(wx.Frame):
         self.ntcanvas.set_xlim(xmin, xmax)
 
         # SET LISTS WITH UPDATED LAYER DATA
-        self.plotx_list[self.i] = self.plotx
-        self.ploty_list[self.i] = self.ploty
+        self.plotx_list[self.layer_counter] = self.plotx
+        self.ploty_list[self.layer_counter] = self.ploty
 
         # RESET LISTS (UPDATED BY THE CALCULATE_GRAVITY FUNC)
         self.polygons = []
@@ -4139,7 +4168,7 @@ class Gmg(wx.Frame):
             self.layer_lines[i] = self.mcanvas.plot(self.plotx_list[i], self.ploty_list[i], color=self.layer_colors[i],
                                                     linewidth=1.0, alpha=0.5)
         # CURRENT LAYER LINE
-        self.polyline, = self.mcanvas.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.i],
+        self.polyline, = self.mcanvas.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.layer_counter],
                                            linewidth=1.0, alpha=0.5)
 
         # # FAULTS LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4186,8 +4215,8 @@ class Gmg(wx.Frame):
         else:
             # GMG IS IN LAYER MODE
             # UPDATE PLOT LISTS WITH LATEST EDIT
-            self.plotx_list[self.i] = self.plotx
-            self.ploty_list[self.i] = self.ploty
+            self.plotx_list[self.layer_counter] = self.plotx
+            self.ploty_list[self.layer_counter] = self.ploty
 
             # RESET LISTS (USED AS INPUT FOR THE GRAV/MAG ALGORITHMS)
             self.polygons = []
@@ -4253,7 +4282,7 @@ class Gmg(wx.Frame):
             # SET LINE FOR CURRENT LAYER BEING EDITED
             self.polyline.set_xdata(self.plotx)
             self.polyline.set_ydata(self.ploty)
-            self.polyline.set_color(self.layer_colors[self.i])
+            self.polyline.set_color(self.layer_colors[self.layer_counter])
 
         # DRAW CANVAS FEATURES
         self.mcanvas.set_aspect(self.model_aspect)
@@ -4341,7 +4370,7 @@ class Gmg(wx.Frame):
         self.model_rms(self.xp)
 
         # SET GRAV RMS VALUES
-        if self.obs_gravity_data_for_rms != [] and self.grav_obs_switch == True and self.calc_grav_switch == True \
+        if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch == True and self.calc_grav_switch == True \
                 and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         elif self.obs_gravity_data_for_rms is None:
@@ -4375,31 +4404,106 @@ class Gmg(wx.Frame):
         """SET FRAME X AND Y LIMITS"""
 
         # SET GRAVITY DISPLAY BOX LIMITS
-        if self.grav_obs_switch is True and self.grav_residuals != []:
-            ymin = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).min()) - 2.0
-            ymax = (np.hstack((self.obs_grav[:, 1], self.predgz, self.grav_residuals[:, 1])).max()) + 2.0
-        elif self.grav_obs_switch:
-            ymin = (np.append(self.obs_grav[:, 1], self.predgz).min()) - 2.
-            ymax = (np.append(self.obs_grav[:, 1], self.predgz).max()) + 2.0
+        if self.observed_gravity_switch is True and self.grav_residuals != []:
+            # CREATE EMPTY LIST
+            ymin_list = []
+            ymax_list = []
+
+            # APPEND OBSERVED MIN AND MAX
+            for i in range(len(self.observed_gravity_list)):
+                if self.observed_gravity_list[i] is not None:
+                    ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 2.0)
+                    ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 2.0)
+
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin_list.append(self.predgz.min())
+            ymax_list.append(self.predgz.max())
+
+            # APPEND RMS GRAVITY ANOMALY
+            ymin_list.append(self.grav_residuals.min() - 2.0)
+            ymax_list.append(self.grav_residuals.max() + 2.0)
+
+            # SET YMIN AND YMAX
+            ymin = min(ymin_list)
+            ymax = max(ymax_list)
+
+        elif self.observed_gravity_switch is True:
+            # CREATE EMPTY LIST
+            ymin_list = []
+            ymax_list = []
+
+            # APPEND OBSERVED MIN AND MAX
+            for i in range(len(self.observed_gravity_list)):
+                if self.observed_gravity_list[i] is not None:
+                    ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 2.0)
+                    ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 2.0)
+
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin_list.append(self.predgz.min() - 2.0)
+            ymax_list.append(self.predgz.max() + 2.0)
+
+            # SET YMIN AND YMAX
+            ymin = min(ymin_list)
+            ymax = max(ymax_list)
+
         else:
-            ymin = (self.predgz.min()) - 2.
-            ymax = (self.predgz.max()) + 2.
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin = self.predgz.min() - 2.0
+            ymax = self.predgz.max() + 2.0
+
         if self.dcanvas is not None:
             self.dcanvas.set_ylim(ymin, ymax)
 
-        # SET MAGNETICS DISPLAY BOX LIMITS
-        if self.mag_obs_switch is True and self.mag_residuals != []:
-            ymin_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).min()) - 2.
-            ymax_mag = (np.hstack((self.obs_mag[:, 1], self.prednt, self.mag_residuals[:, 1])).max()) + 2.
+        # SET MAGNETIC DISPLAY BOX LIMITS
+        if self.observed_magnetic_switch is True and self.mag_residuals != []:
+            # CREATE EMPTY LIST
+            ymin_list = []
+            ymax_list = []
 
-        elif self.mag_obs_switch:
-            ymin_mag = (np.append(self.obs_mag[:, 1], self.prednt).min()) - 2.
-            ymax_mag = (np.append(self.obs_mag[:, 1], self.prednt).max()) + 2.
+            # APPEND OBSERVED MIN AND MAX
+            for i in range(len(self.observed_magnetic_list)):
+                if self.observed_magnetic_list[i] is not None:
+                    ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 2.0)
+                    ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 2.0)
+
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin_list.append(self.prednt.min())
+            ymax_list.append(self.prednt.max())
+
+            # APPEND RMS GRAVITY ANOMALY
+            ymin_list.append(self.mag_residuals.min() - 2.0)
+            ymax_list.append(self.mag_residuals.max() + 2.0)
+
+            # SET YMIN AND YMAX
+            ymin = min(ymin_list)
+            ymax = max(ymax_list)
+
+        elif self.observed_magnetic_switch is True:
+            # CREATE EMPTY LIST
+            ymin_list = []
+            ymax_list = []
+
+            # APPEND OBSERVED MIN AND MAX
+            for i in range(len(self.observed_magnetic_list)):
+                if self.observed_magnetic_list[i] is not None:
+                    ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 2.0)
+                    ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 2.0)
+
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin_list.append(self.prednt.min() - 2.0)
+            ymax_list.append(self.prednt.max() + 2.0)
+
+            # SET YMIN AND YMAX
+            ymin = min(ymin_list)
+            ymax = max(ymax_list)
+
         else:
-            ymin_mag = (self.prednt.min()) - 2.
-            ymax_mag = (self.prednt.max()) + 2.
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin = self.prednt.min() - 2.0
+            ymax = self.prednt.max() + 2.0
+
         if self.ntcanvas is not None:
-            self.ntcanvas.set_ylim(ymin_mag, ymax_mag)
+            self.ntcanvas.set_ylim(ymin, ymax)
 
         # UPDATE GMG GRAPHICS
         self.draw()
@@ -4503,7 +4607,6 @@ class Gmg(wx.Frame):
 
     def about_gmg(self, event):
         """ SHOW SOFTWARE INFORMATION"""
-
         about = [
             "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
             "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
@@ -4523,7 +4626,6 @@ class Gmg(wx.Frame):
 
     def legal(self, event):
         """ SHOW LICENCE"""
-
         licence = ["Copyright 2015-2017 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
                    "without modification, are permitted provided that the following conditions are met: \n \n"
                    "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
@@ -4567,38 +4669,107 @@ class Gmg(wx.Frame):
     # FUTURE MODULES (IN PROCESS)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    def horizontal_derivative(self, event):
-        pass
-        #      """CLACULATE HORIZONTAL DERIVATIVE OF PROFILE"""
-        #
-        #     '# First interpolate the data onto a even x spacing as required by the
-        #     '# finite difference derivative approximation'
-        #     N = len(in_data)
-        #     x_inc = 1.
-        #     interpolat_func = ip.interp1d(in_data[:, 0], in_data[:, 1], kind='slinear')  #create interpolation func
-        #     x_interp_values = np.arange(np.round(in_data[:, 0].min(), 0),
-        #                                    np.round(in_data[:, 0].max(), 0), x_inc)  # xvalues for interpolated array
-        #     y_interp_values = np.array(interpolat_func(x_interp_values))             # yvalues for interpolated array
-        #     data            = np.column_stack((x_interp_values, y_interp_values))
-        #
-        #     'NOW CALCULATE THE DERIVATIVE USING THE INTERPOLATED (EVENLY SPACED) INPUT DATA'
-        #     for i in range(1, N-1):
-        #         deriv = (data[i+1] - data[i-1])/(2*x_inc)
-        #
-        #     output = np.column_stack((x_interp_values, deriv))
-        #     return output
-
     def set_error(self, value):
         pass
         # self.error = value
         # self.update_layer_data()
         # self.run_algorithms()
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## GMG OBJECT CLASSES GO HERE
+
+
+class Layer:
+    """
+    CREATE A MODEL LAYER OBJECT.
+    THE LAYER WILL BE STORED IN THE gmg.layers_list LIST
+    """
+    def __init__(self):
+        self.mpl_actor = None
+        self.poly_plot = None
+        self.poly_fill = None
+        self.x_nodes = []
+        self.y_nodes = []
+        self.density = 0.
+        self.reference_density = 0.
+        self.susceptibility = 0.
+        self.angle_a = 0.
+        self.angle_b = 0.
+        self.color = 0.
+        self.boundary_lock_list = [0]
+        self.boundary_lock_status = ['locked']
+        self.layer_lock_list = [0]
+        self.layer_lock_status = ['locked']
+        self.layer_transparency = 0.4
+        self.pinch_node_list = [[], []]
+        self.pinch_count = 0
+        self.layers_calculation_switch = True  # SWITCH TO DICTATE IF THE LAYER IS INCLUDED IN THE CURRENT CALC
+
+
+class ObservedGravityData:
+    def __init__(self):
+        self.id = None  # OBJECT ID VALUE FOR wx
+        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.mpl_actor = None
+
+
+class ObservedMagneticData:
+    def __init__(self):
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
+        self.include_in_calculation_switch = False  # SWITCH TO DICTATE IF THE LAYER IS INCLUDED IN THE CURRENT CALC
+
+
+class ObservedTopographyData:
+    def __init__(self):
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
+
+
+class SegyData:
+    def __init__(self):
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.gain_positive = 4.0
+        self.gain_neg = -self.gain_positive
+        self.segy_show = False
+        self.file_name = None
+        self.plot_list = None
+        self.dimensions = None
+
+
+class ObservedWellData:
+    def __init__(self):
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.name = None
+        self.name_text = None
+        self.labels_list = []
+        self.horizons_list = []
+        self.text_size = 2
+
+
+class ObservedOutcropData:
+    def __init__(self):
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
+
+class ObservedXYData:
+    def __init__(self):
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-'''DIALOG BOXES GO HERE'''
+## GMG EXTERNAL DIALOG BOXES GO HERE
 
 
 class NewModelDialog(wx.Dialog):
@@ -4855,7 +5026,7 @@ class PinchDialog(wx.Dialog):
         input_panel = wx.Panel(self, -1)
         self.plotx_list = plotx_list
         self.ploty_list = ploty_list
-        self.i = i
+        self.layer_counter = i
         self.p_start = wx.StaticText(input_panel, -1, "Pinch From (km):")
         self.p_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.p_start_Text.SetInsertionPoint(0)
@@ -4875,10 +5046,10 @@ class PinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.i]
-        current_y = self.ploty_list[self.i]
-        above_x = self.plotx_list[self.i - 1]
-        above_y = self.ploty_list[self.i - 1]
+        current_x = self.plotx_list[self.layer_counter]
+        current_y = self.ploty_list[self.layer_counter]
+        above_x = self.plotx_list[self.layer_counter - 1]
+        above_y = self.ploty_list[self.layer_counter - 1]
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -4907,10 +5078,10 @@ class PinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.i]
-        current_y = self.ploty_list[self.i]
-        below_x = self.plotx_list[self.i + 1]
-        below_y = self.ploty_list[self.i + 1]
+        current_x = self.plotx_list[self.layer_counter]
+        current_y = self.ploty_list[self.layer_counter]
+        below_x = self.plotx_list[self.layer_counter + 1]
+        below_y = self.ploty_list[self.layer_counter + 1]
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -4946,7 +5117,7 @@ class DepinchDialog(wx.Dialog):
         input_panel = wx.Panel(self, -1)
         self.plotx_list = plotx_list
         self.ploty_list = ploty_list
-        self.i = i
+        self.layer_counter = i
         self.layer_count = layer_count
         self.p_start = wx.StaticText(input_panel, -1, "Pinch From:")
         self.p_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
@@ -4964,15 +5135,15 @@ class DepinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.i]
-        current_y = self.ploty_list[self.i]
+        current_x = self.plotx_list[self.layer_counter]
+        current_y = self.ploty_list[self.layer_counter]
 
-        if self.i != 0:
-            above_x = self.plotx_list[self.i - 1]
-            above_y = self.ploty_list[self.i - 1]
-        if self.i != self.layer_count:
-            below_x = self.plotx_list[self.i + 1]
-            below_y = self.ploty_list[self.i + 1]
+        if self.layer_counter != 0:
+            above_x = self.plotx_list[self.layer_counter - 1]
+            above_y = self.ploty_list[self.layer_counter - 1]
+        if self.layer_counter != self.layer_count:
+            below_x = self.plotx_list[self.layer_counter + 1]
+            below_y = self.ploty_list[self.layer_counter + 1]
 
         # REMOVE PINCHED NODES
         self.depinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -5134,7 +5305,7 @@ class BulkShiftDialog(wx.Dialog):
         input_panel = wx.Panel(self, -1)
         self.ploty_list = ploty_list
         self.plotx_list = plotx_list
-        self.i = i
+        self.layer_counter = i
         self.bulk_panel_x = wx.StaticText(input_panel, -1, "Set x bulk shift value:")
         self.bulk_panel_x_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.bulk_panel_x_Text.SetInsertionPoint(0)
@@ -5152,8 +5323,8 @@ class BulkShiftDialog(wx.Dialog):
     def bulk_shift_button(self, event):
         self.x_shift_value = float(self.bulk_panel_x_Text.GetValue())
         self.y_shift_value = float(self.bulk_panel_y_Text.GetValue())
-        current_y = self.ploty_list[self.i]
-        current_x = self.plotx_list[self.i]
+        current_y = self.ploty_list[self.layer_counter]
+        current_x = self.plotx_list[self.layer_counter]
 
         # BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0
         self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
