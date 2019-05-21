@@ -679,13 +679,13 @@ class Gmg(wx.Frame):
         self.model_azimuth = 0.
         self.mag_observation_elv = 0.
 
-        'INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)'
+        # INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)
         self.mag_polygons = []
         self.polygons = []
         self.polyplots = []
         self.poly_fills = [[]]
 
-        'INITIALISE LAYER LISTS (USED FOR STORING LAYER DATA)'
+        # INITIALISE LAYER LISTS (USED FOR STORING LAYER DATA)
         self.plotx_list = [[]]
         self.ploty_list = [[]]
         self.layer_colors = [[]]
@@ -698,7 +698,7 @@ class Gmg(wx.Frame):
         self.pinch_node_list = [[], []]
         self.pinch_count = 0
 
-        'INITIALISE XY DATA ATTRIBUTES'
+        # INITIALISE XY DATA ATTRIBUTES
         self.xy = []
         self.xy_list = [[]]
         self.xy_list_save = [[]]
@@ -706,7 +706,7 @@ class Gmg(wx.Frame):
         self.xy_color_list =[[]]
         self.xy_count = 0
 
-        'INITIALISE GEOLOGICAL CONTACT ATTRIBUTES'
+        # INITIALISE GEOLOGICAL CONTACT ATTRIBUTES
         self.outcrop_data = [[]]
         self.outcrop_data_list = [[]]
         self.outcrop_data_list_save = [[]]
@@ -715,20 +715,15 @@ class Gmg(wx.Frame):
         self.outcrop_text_list = [[]]
         self.outcrop_data_count = 0
 
-        'INITIALISE TOPOGRAPHY ATTRIBUTES'
-        self.obs_topo = []
-        self.obs_topo_list = [[]]
-        self.obs_topo_list_save = [[]]
-        self.obs_topo_name_list = []
-        self.obs_topo_colors = [[]]
-        self.obs_topo_count = 0
+        # INITIALISE TOPOGRAPHY ATTRIBUTES
+        self.observed_topography_list = []
+        self.observed_topography_counter = 0
+        self.observed_topography_switch = False
 
-        'INITIALISE GRAVITY ATTRIBUTES'
+        # INITIALISE GRAVITY ATTRIBUTES
         self.observed_gravity_list = []
         self.observed_gravity_counter = 0
         self.observed_gravity_switch = False
-
-
 
         self.background_density = 0
         self.absolute_densities = True
@@ -737,11 +732,10 @@ class Gmg(wx.Frame):
         self.grav_rms_value = 0.  # TOTAL RMS MISFIT VALUE
         self.grav_residuals = []  # CALCULATED RESIDUAL
 
-        'INITIALISE MAGNETIC ATTRIBUTES'
+        # INITIALISE MAGNETIC ATTRIBUTES
         self.observed_magnetic_list = []
         self.observed_magnetic_counter = 0
         self.observed_magnetic_switch = False
-
 
         self.earth_field = 0.
         self.profile_azimuth = 0.
@@ -750,7 +744,7 @@ class Gmg(wx.Frame):
         self.mag_rms_value = 0.  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
         self.mag_residuals = []  # CALCULATED RESIDUAL
 
-        'INITIALISE SEISMIC ATTRIBUTES'
+        # INITIALISE SEISMIC ATTRIBUTES
         self.gain = 4.0
         self.gain_neg = -self.gain
         self.segy_on = False
@@ -760,7 +754,7 @@ class Gmg(wx.Frame):
         self.segy_dimension_list = []
         self.segy_count = 0
 
-        'INITIALISE Well ATTRIBUTES'
+        # INITIALISE Well ATTRIBUTES
         self.well_list = []
         self.well_list_hidden = []
         self.well_name_list = []
@@ -771,7 +765,7 @@ class Gmg(wx.Frame):
         self.well_list_switch = [[]]
         self.well_textsize = 2
 
-        'INITIALISE LAYER ATTRIBUTES'
+        # INITIALISE LAYER ATTRIBUTES
         self.densities = [0.]
         self.reference_densities = [2.67]
         self.susceptibilities = [0.]
@@ -779,7 +773,7 @@ class Gmg(wx.Frame):
         self.angle_b = [0.]
         self.layers_calculation_switch = [1]
 
-        'INITIALISE FAULTS'
+        # INITIALISE FAULTS
         self.fault_picking_switch = False
         self.faults = [[]]
         self.fault_names_list = []
@@ -790,38 +784,47 @@ class Gmg(wx.Frame):
         self.fault_y_coords_list = [[]]
         self.selected_node = None
 
-        'INITIALIZE COORDINATE CAPTURE'
+        # INITIALIZE COORDINATE CAPTURE
         self.capture = False
         self.linex = []
         self.liney = []
 
     def draw_main_frame(self):
         """DRAW THE PROGRAM CANVASES"""
-        columns=93
-        x_orig=9
-        'TOPO CANVAS'
+        columns = 93  # NUMBER OF COLUMNS THE MODEL FRAMES WILL TAKE UP (93/100)
+        x_orig = 9  # X ORIGIN OF MODEL FRAMES (RELATIVE TO 0 AT LEFT MARGIN)
+
+        # TOPOGRAPHY CANVAS
         self.tcanvas = plt.subplot2grid((26, 100), (0, x_orig), rowspan=2, colspan=columns)
         self.tcanvas.set_ylabel("Topo (m)")
         self.tcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.tcanvas.grid()
-        'GRAV CANVAS'
+
+        # GRAVITY CANVAS
         self.dcanvas = plt.subplot2grid((26, 100), (2, x_orig), rowspan=3, colspan=columns)
         self.dcanvas.set_ylabel("Grav (mGal)")
         self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.dcanvas.grid()
         self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        'MAG CANVAS'
+
+        self.dcanvas.set_ylabel("Grav (mGal)")
+        self.dcanvas.xaxis.set_major_formatter(plt.NullFormatter())
+        self.dcanvas.grid()
+        self.dcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+        # MAGNETIC CANVAS
         self.ntcanvas = plt.subplot2grid((26, 100), (5, x_orig), rowspan=3, colspan=columns)
         self.ntcanvas.set_ylabel("Mag (nT)")
         self.ntcanvas.xaxis.set_major_formatter(plt.NullFormatter())
         self.ntcanvas.grid()
         self.ntcanvas.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        'MODEL CANVAS'
+
+        # MODEL CANVAS
         self.mcanvas = plt.subplot2grid((26, 100), (8, x_orig), rowspan=17, colspan=columns)
         self.mcanvas.set_ylabel("Depth (km)")
         self.mcanvas.set_xlabel("x (km)")
 
-        'DENSITY COLOUR BAR CANVAS'
+        # DENSITY COLOUR BAR CANVAS
         colormap = matplotlib.cm.coolwarm
         cnorm = colors.Normalize(vmin=-0.8, vmax=0.8)
         self.colormap = cm.ScalarMappable(norm=cnorm, cmap=colormap)
@@ -831,7 +834,7 @@ class Gmg(wx.Frame):
         self.cb1.ax.tick_params(labelsize=8)
         self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=10)
 
-        'SET CANVAS LIMITS'
+        # SET CANVAS LIMITS
         self.mcanvas.set_xlim(self.x1, self.x2)
         self.mcanvas.set_ylim(self.z2, self.z1)
         self.mcanvas.grid()
@@ -841,7 +844,7 @@ class Gmg(wx.Frame):
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02,
                                  hspace=1.5)
 
-        'ADD FIRST LAYER'
+        # ADD FIRST LAYER
         if self.newmodel:
             self.plotx = [-(float(self.padding)), 0., self.x2, self.x2 + (float(self.padding))]
             self.ploty = [0.001, 0.001, 0.001, 0.001]
@@ -1878,26 +1881,29 @@ class Gmg(wx.Frame):
             else:
                 self.xy_count += 1
 
-    def plot_obs_topo(self):
-        """PLOT OBSERVED TOPOGRAPHY"""
-        self.obs_topo_list = [[]]
-        for x in range(0, len(self.obs_topo_name_list)):
-            self.obs_topo_list.append([])
-            if self.obs_topo_name_list[x]:
-                self.topo = self.obs_topo_list_save[x]
-                self.obs_topo_list[x] = self.dcanvas.scatter(self.topo[:, 0], self.topo[:, 1], marker='o',
-                                                             color=self.obs_topo_colors[x], s=5,
-                                                             gid=self.obs_topo_count)
-                self.obs_topo_list.append([])
-                self.obs_name = self.obs_topo_name_list[x]
+    def replot_observed_topography_data(self):
+        """ADD LOADED OBSERVED TOPOGRAPHY TO THE MODEL FRAME"""
+        for x in range(len(self.observed_topography_list)):
+            if self.observed_topography_list[x] is not None:
+                # DRAW DATA IN MODEL FRAME
+                self.observed_topography_list[x].mpl_actor = self.tcanvas.scatter(
+                    self.observed_topography_list[x].data[:, 0], self.observed_topography_list[x].data[:, 1],
+                    marker='o', color=self.observed_topography_list[x].color, s=5,
+                    gid=self.observed_topography_list[x].id)
+
+                # ADD OBJECT TO MENUVAR
                 self.obs_submenu = wx.Menu()
-                self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.obs_submenu)
-                self.obs_submenu.Append(self.obs_topo_count+10000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_topo, id=self.obs_topo_count+10000)
-                self.obs_topo_count += 1
-                self.obs_topo_switch = True
-            else:
-                self.obs_topo_count += 1
+                self.m_obs_t_submenu.Append(10000 + self.observed_topography_list[x].id,
+                                            self.observed_topography_list[x].name,
+                                            self.obs_submenu)
+                self.obs_submenu.Append(10000 + self.observed_topography_list[x].id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=10000 + self.observed_topography_list[x].id)
+
+                # TURN ON OBSERVED GRAVITY SWITCH
+                self.observed_topography_switch = True
+
+        # SET GRAVITY COUNTER
+        self.observed_topography_counter = len(self.observed_topography_list)
 
     def replot_observed_gravity_data(self):
         """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
@@ -2039,36 +2045,46 @@ class Gmg(wx.Frame):
         self.load_window.Show(True)
 
     def open_obs_t(self):
-        """LOAD OBSERVE TOPO DATA: IDs start at 10000"""
-        obs_t_input = self.load_window.file_path
-        self.obs_name = self.load_window.observed_name
-        self.color = self.load_window.color_picked
+        """
+        LOAD OBSERVE TOPOGRAPHY DATA.
+        DATA ARE STORED IN gmg.observed_topography_list as a ObservedTopographyData object.
+        object IDs start at 11000.
+        """
 
-        self.obs_topo_name_list.append([])
-        self.obs_topo_name_list[self.obs_topo_count] = str(self.obs_name)
-        self.obs_topo_colors.append([])
-        self.obs_topo_colors[self.obs_topo_count] = str(self.color)
+        # PARSE USER INPUT FILE
+        input_file = self.load_window.file_path
 
-        self.topo = np.genfromtxt(obs_t_input, delimiter=' ', dtype=float)
-        self.obs_topo_list_save[self.obs_topo_count] = self.topo
-        self.obs_topo_list_save.append([])
-        self.obs_topo_list[self.obs_topo_count] = self.tcanvas.scatter(self.topo[:, 0], self.topo[:, 1], marker='o',
-                                                                       color=self.colors[self.colors_index],
-                                                                       s=5, gid=self.observed_gravity_counter)
-        self.colors_index += 1
-        self.obs_topo_list.append([])
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed_topography = ObservedTopographyData()
 
-        #  APPEND NEW DATA MENU TO 'Topo data MENU'
+        # SET ATTRIBUTES
+        observed_topography.id = int(self.observed_topography_counter)
+        observed_topography.name = self.load_window.observed_name
+        observed_topography.color = self.load_window.color_picked
+        observed_topography.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+        observed_topography.mpl_actor = self.dcanvas.scatter(observed_topography.data[:, 0],
+                                                             observed_topography.data[:, 1], marker='o',
+                                                             color=observed_topography.color, s=5,
+                                                             gid=observed_topography.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_topography_list.append(observed_topography)
+
+        # TURN ON OBSERVED GRAVITY SWITCH
+        self.observed_topography_switch = True
+
+        # APPEND NEW DATA MENU TO 'TOPO data MENU'
         self.topo_submenu = wx.Menu()
-        self.m_topo_submenu.Append(self.obs_topo_count, self.obs_name, self.topo_submenu)
+        self.m_obs_g_submenu.Append(10000+observed_topography.id, observed_topography.name, self.topo_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.topo_submenu.Append(10000+self.obs_topo_count, 'delete observed data')
+        self.topo_submenu.Append(10000+observed_topography.id, 'delete observed data')
 
-        # BIND TO DEL TOPO FUNC
-        self.Bind(wx.EVT_MENU, self.delete_topo, id=10000+self.obs_topo_count)
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_topo, id=10000+observed_topography.id)
 
-        self.obs_topo_count += 1
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_topography_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -2077,14 +2093,33 @@ class Gmg(wx.Frame):
 
     def delete_topo(self, event):
         """DELETE AN OBSERVED TOPO DATA RECORD"""
-        self.m_topo_submenu.DestroyItem(event.Id-10000)
-        self.obs_topo_name_list[event.Id-10000] = []
-        self.obs_topo_list[event.Id-10000].set_visible(False)
-        self.obs_topo_list[event.Id-10000] = []
-        self.obs_topo_list_save[event.Id-10000] = []
+        # DESTROY MENUBAR
+        self.m_topo_submenu.DestroyItem(event.Id)
+
+        # REMOVE OBJECT AND MPL ACTOR
+        obj_id = event.Id-10000
+        self.observed_topography_list[obj_id].mpl_actor.set_visible(False)
+        self.observed_topography_list[obj_id] = None
 
         # UPDATE MODEL
         self.update_layer_data()
+        self.draw()
+
+    def delete_all_obs_topo(self, event):
+        for x in range(0, self.observed_topography_counter):
+            try:
+                self.m_topo_submenu.DestroyItem(x)
+                self.observed_topography_list[x].mpl_actor.set_visible(False)
+                self.observed_topography_list[x] = None
+            except IndexError:
+                continue
+
+        # RESET GRAVITY COUNTER
+        self.observed_topography_counter = 0
+
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.set_frame_limits()
         self.draw()
 
     # GRAVITY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2156,16 +2191,17 @@ class Gmg(wx.Frame):
         for x in range(0, self.observed_gravity_counter):
             try:
                 self.m_obs_g_submenu.DestroyItem(x)
-                self.obs_grav_list[x].set_visible(False)
+                self.observed_gravity_list[x].mpl_actor.set_visible(False)
+                self.observed_gravity_list[x] = None
             except IndexError:
                 continue
-        self.observed_gravity_switch = False
-        self.obs_grav = []
-        self.obs_grav_list = [[]]
-        self.obs_grav_list_save = [[]]
-        self.obs_grav_name_list = []
+
+        # RESET GRAVITY COUNTER
         self.observed_gravity_counter = 0
+
+        # UPDATE MODEL
         self.update_layer_data()
+        self.set_frame_limits()
         self.draw()
 
     def save_modelled_grav(self, event):
@@ -2188,7 +2224,7 @@ class Gmg(wx.Frame):
         """
         LOAD OBSERVE GRAVITY DATA.
         DATA ARE STORED IN gmg.observed_gravity_list as a ObservedGravityData object.
-        object IDs start at 11000.
+        object IDs start at 12000.
         """
 
         # PARSE USER INPUT FILE
@@ -2241,22 +2277,24 @@ class Gmg(wx.Frame):
 
         # UPDATE MODEL
         self.update_layer_data()
+        self.set_frame_limits()
         self.draw()
 
     def delete_all_obs_mag(self, event):
         for x in range(0, self.observed_magnetic_counter):
             try:
                 self.m_obs_mag_submenu.DestroyItem(x)
-                self.obs_mag_list[x].set_visible(False)
-            except:
+                self.observed_magnetic_list[x].mpl_actor.set_visible(False)
+                self.observed_magnetic_list[x] = None
+            except IndexError:
                 continue
-        self.mag_obs_switch = False
-        self.obs_mag = []
-        self.obs_mag_list = [[]]
-        self.obs_mag_list_save = [[]]
-        self.obs_mag_name_list = []
+
+        # RESET MAGNETIC COUNTER
         self.observed_magnetic_counter = 0
+
+        # UPDATE MODEL
         self.update_layer_data()
+        self.set_frame_limits()
         self.draw()
 
     def set_mag_variables(self, event):
