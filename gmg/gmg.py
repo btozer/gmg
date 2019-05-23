@@ -31,10 +31,9 @@ www.fatiando.org/
 ***
 
 ***
-Gravity algorithm written using NumPy by Brook Tozer (2015) (Modified from the Fatiando a Terra grav code).
+Gravity algorithm written using NumPy by Brook Tozer (2015) (Modified from the Fatiando a Terra 2D gravity code).
 
 CODE MODIFIED FROM: bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
-
 ***
 
 ***
@@ -316,8 +315,8 @@ class Gmg(wx.Frame):
         self.m_obs_g_submenu = wx.Menu()
         self.gravity_data.Append(-1, 'Gravity Data...', self.m_obs_g_submenu)
         # FILTER MENU
-        grav_m_observed_filter = self.gravity_data.Append(-1, "Filter Anomaly...", "Filter Observed Anomaly")
-        self.Bind(wx.EVT_MENU, self.observed_filter, grav_m_observed_filter)
+        grav_m_filter_observed = self.gravity_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        self.Bind(wx.EVT_MENU, self.filter_observed_gravity, grav_m_filter_observed)
         # HORIZONTAL DERIVATIVE
         grav_m_horizontal_derivative = self.gravity_data.Append(-1, "Take Horizontal Derivative...",
                                                                 "Take Horizontal Derivative")
@@ -347,8 +346,12 @@ class Gmg(wx.Frame):
         self.m_obs_mag_submenu = wx.Menu()
         self.magnetic_data.Append(-1, 'Magnetic Anomalies...', self.m_obs_mag_submenu)
         # FILTER MENU
-        mag_m_observed_filter = self.magnetic_data.Append(-1, "Filter Anomaly\tCtrl-L", "Filter Observed Anomaly")
-        self.Bind(wx.EVT_MENU, self.observed_filter, mag_m_observed_filter)
+        mag_m_filter_observed = self.magnetic_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        self.Bind(wx.EVT_MENU, self.filter_observed_magnetic, mag_m_filter_observed)
+        # HORIZONTAL DERIVATIVE
+        mag_m_horizontal_derivative = self.magnetic_data.Append(-1, "Take Horizontal Derivative...",
+                                                                "Take Horizontal Derivative")
+        self.Bind(wx.EVT_MENU, self.take_magnetic_horizontal_derivative, mag_m_horizontal_derivative)
         # SET RMS OBS ARRAYS
         mag_m_set_rms_arrays = self.magnetic_data.Append(-1, "Set RMS\tCtrl-L", "Set RMS")
         self.Bind(wx.EVT_MENU, self.set_obs_rms, mag_m_set_rms_arrays)
@@ -372,6 +375,13 @@ class Gmg(wx.Frame):
         # EDIT
         self.m_topo_submenu = wx.Menu()
         self.topography_data.Append(-1, 'Topography Data', self.m_topo_submenu)
+        # FILTER MENU
+        topo_m_filter_observed = self.topography_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        self.Bind(wx.EVT_MENU, self.filter_observed_topography, topo_m_filter_observed)
+        # HORIZONTAL DERIVATIVE
+        topo_m_horizontal_derivative = self.topography_data.Append(-1, "Take Horizontal Derivative...",
+                                                                "Take Horizontal Derivative")
+        self.Bind(wx.EVT_MENU, self.take_topography_horizontal_derivative, topo_m_horizontal_derivative)
         # DRAW MENU
         self.menubar.Append(self.topography_data, "&Topography")
         # --------------------------------------------------------------------------------------------------------------
@@ -715,17 +725,11 @@ class Gmg(wx.Frame):
         self.observed_topography_list = []
         self.observed_topography_counter = 0
         self.observed_topography_switch = False
-        # INITIALISE OBSERVED TOPOGRAPHY DERIVATIVE ATTRIBUTES
-        self.observed_topography_deriv_list = []
-        self.observed_topography_deriv_counter = 0
 
         # INITIALISE OBSERVED GRAVITY ATTRIBUTES
         self.observed_gravity_list = []
         self.observed_gravity_counter = 0
         self.observed_gravity_switch = False
-        # INITIALISE OBSERVED GRAVITY DERIVATIVE ATTRIBUTES
-        self.observed_gravity_deriv_list = []
-        self.observed_gravity_deriv_counter = 0
         # INITIALISE MODELLING GRAVITY ATTRIBUTES
         self.background_density = 0
         self.absolute_densities = True
@@ -738,9 +742,6 @@ class Gmg(wx.Frame):
         self.observed_magnetic_list = []
         self.observed_magnetic_counter = 0
         self.observed_magnetic_switch = False
-        # INITIALISE OBSERVED MAGNETIC DERIVATIVE ATTRIBUTES
-        self.observed_magnetic_deriv_list = []
-        self.observed_magnetic_deriv_counter = 0
         # INITIALISE MODELLING MAGNETIC ATTRIBUTES
         self.earth_field = 0.
         self.profile_azimuth = 0.
@@ -778,7 +779,7 @@ class Gmg(wx.Frame):
         self.angle_b = [0.]
         self.layers_calculation_switch = [1]
 
-        # INITIALISE FAULTS
+        # INITIALISE FAULT ATTRIBUTES
         self.fault_picking_switch = False
         self.faults = [[]]
         self.fault_names_list = []
@@ -795,30 +796,37 @@ class Gmg(wx.Frame):
         self.liney = []
 
     def draw_main_frame(self):
-        """DRAW THE PROGRAM CANVASES"""
+        """
+        DRAW THE PROGRAM CANVASES
+        docs: https://matplotlib.org/api/axes_api.html
+        """
         self.columns = 87  # NUMBER OF COLUMNS THE MODEL FRAMES WILL TAKE UP (89/100)
         self.x_orig = 10  # X ORIGIN OF MODEL FRAMES (RELATIVE TO 0 AT LEFT MARGIN)
 
         # TOPOGRAPHY CANVAS
         self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
         self.topo_frame.set_ylabel("Topo (km)")
+        self.topo_frame.set_navigate(False)
         self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topo_frame.grid()
         self.topo_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.topo_d_frame = self.topo_frame.twinx()
+        self.topo_d_frame.set_navigate(False)
         self.topo_d_frame.set_ylabel("dt/dx")
         self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         # GRAVITY CANVAS
         self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
+        self.gravity_frame.set_navigate(False)
         self.gravity_frame.set_ylabel("Grav (mGal)")
         self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.gravity_frame.grid()
         self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.grav_d_frame = self.gravity_frame.twinx()
+        self.grav_d_frame.set_navigate(False)
         self.grav_d_frame.set_ylabel("dg/dx")
         self.grav_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.grav_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -826,12 +834,14 @@ class Gmg(wx.Frame):
         # MAGNETIC CANVAS
         self.magnetic_frame = plt.subplot2grid((26, 100), (5, self.x_orig), rowspan=3, colspan=self.columns)
         self.magnetic_frame.set_ylabel("Mag (nT)")
+        self.magnetic_frame.set_navigate(False)
         self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_frame.grid()
         self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.mag_d_frame = self.magnetic_frame.twinx()
         self.mag_d_frame.set_ylabel("dnt/dx")
+        self.mag_d_frame.set_navigate(False)
         self.mag_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.mag_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
@@ -840,7 +850,7 @@ class Gmg(wx.Frame):
         self.model_frame.set_ylabel("Depth (km)")
         self.model_frame.set_xlabel("x (km)")
 
-        # # DENSITY COLOUR BAR CANVAS
+        # CREATE DENSITY COLOUR BAR FOR COLORING LAYERS
         colormap = matplotlib.cm.coolwarm
         cnorm = colors.Normalize(vmin=-0.8, vmax=0.8)
         self.colormap = cm.ScalarMappable(norm=cnorm, cmap=colormap)
@@ -877,11 +887,11 @@ class Gmg(wx.Frame):
             self.polygon_fills[0] = self.model_frame.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
-            self.current_node = self.model_frame.scatter(-40000., 0, s=50, color='r', zorder=10)
+            self.current_node = self.model_frame.scatter(-40000., 0, s=50, color='r', zorder=10)  # PALCE HOLDER ONLY
         else:
             self.nextpoly = []
 
-        '''ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME'''
+        # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
         'Make Attribute Label'
         self.attr_text = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
         self.attr_text2 = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
@@ -1522,14 +1532,12 @@ class Gmg(wx.Frame):
             self.zoom_on = True
             self.nodes = False
             self.nav_toolbar.zoom()
-        self.update_layer_data()
-        self.run_algorithms()
+        # REDRAW
         self.draw()
 
     def zoom_out(self, event):
         self.nav_toolbar.back()
-        self.update_layer_data()
-        self.run_algorithms()
+        # REDRAW
         self.draw()
 
     def full_extent(self, event):
@@ -1690,9 +1698,9 @@ class Gmg(wx.Frame):
                   'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list',
                   'outcrop_data_color_list', 'outcrop_text_list',
                   'xy_name_list', 'xy_list_save', 'xy_color_list',
-                  'observed_gravity_list',
-                  'observed_magnetic_list',
-                  'observed_topography_list']
+                  'observed_gravity_list', 'observed_gravity_deriv_list',
+                  'observed_magnetic_list', 'observed_magnetic_deriv_list',
+                  'observed_topography_list', 'observed_topography_deriv_list']
 
         model_params = [self.model_aspect, self.area, self.xp, self.zp, self.tree_items,
                         self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
@@ -1708,9 +1716,9 @@ class Gmg(wx.Frame):
                         self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
                         self.outcrop_data_color_list, self.outcrop_text_list,
                         self.xy_name_list, self.xy_list_save, self.xy_color_list,
-                        self.observed_gravity_list,
-                        self.observed_magnetic_list,
-                        self.observed_topography_list]
+                        self.observed_gravity_list, self.observed_gravity_deriv_list,
+                        self.observed_magnetic_list, self.observed_magnetic_deriv_list,
+                        self.observed_topography_list, self.observed_topography_deriv_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -2028,6 +2036,28 @@ class Gmg(wx.Frame):
         # SET GRAVITY COUNTER
         self.observed_topography_counter = len(self.observed_topography_list)
 
+    # def replot_observed_topography_deriv(self):
+    #     """ADD LOADED OBSERVED TOPOGRAPHY DERIVATIVE TO THE MODEL FRAME"""
+    #     for x in range(len(self.observed_topography_deriv_list)):
+    #         if self.observed_topography_deriv_list[x] is not None:
+    #             # DRAW DATA IN MODEL FRAME
+    #             self.observed_topography_deriv_list[x].mpl_actor = self.topo_frame.scatter(
+    #                 self.observed_topography_deriv_list[x].data[:, 0],
+    #                 self.observed_topography_deriv_list[x].data[:, 1], marker='o',
+    #                 color=self.observed_topography_deriv_list[x].color, s=5,
+    #                 gid=self.observed_topography_deriv_list[x].id)
+    #
+    #             # ADD OBJECT TO MENUBAR
+    #             self.obs_submenu = wx.Menu()
+    #             self.m_topo_submenu.Append(10500 + self.observed_topography_list[x].id,
+    #                                         self.observed_topography_list[x].name,
+    #                                         self.obs_submenu)
+    #             self.obs_submenu.Append(10500 + self.observed_topography_list[x].id, 'delete observed data')
+    #             self.Bind(wx.EVT_MENU, self.delete_observed_topography, id=10500 + self.observed_topography_list[x].id)
+    #
+    #     # SET GRAVITY COUNTER
+    #     self.observed_topography_deriv_counter = len(self.observed_topography_deriv_list)
+
     def replot_observed_gravity_data(self):
         """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
         for x in range(len(self.observed_gravity_list)):
@@ -2050,26 +2080,26 @@ class Gmg(wx.Frame):
         # SET GRAVITY COUNTER
         self.observed_gravity_counter = len(self.observed_gravity_list)
 
-    def replot_observed_gravity_deriv(self):
-        """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
-        for x in range(len(self.observed_gravity_deriv_list)):
-            if self.observed_gravity_deriv_list[x] is not None:
-                # DRAW DATA IN MODEL FRAME
-                self.observed_gravity_deriv_list[x].mpl_actor = self.grav_d_frame.scatter(
-                    self.observed_gravity_deriv_list[x].data[:, 0], self.observed_gravity_deriv_list[x].data[:, 1],
-                    marker='o', color=self.observed_gravity_deriv_list[x].color, s=5,
-                    gid=self.observed_gravity_deriv_list[x].id)
-
-                # ADD OBJECT TO MENUVAR
-                self.obs_submenu = wx.Menu()
-                self.m_obs_g_submenu.Append(11500+self.observed_gravity_deriv_list[x].id,
-                                            self.observed_gravity_deriv_list[x].name,
-                                            self.obs_submenu)
-                self.obs_submenu.Append(11500+self.observed_gravity_deriv_list[x].id, 'delete derivative')
-                self.Bind(wx.EVT_MENU, self.delete_obs_grav_deriv, id=11500+self.observed_gravity_deriv_list[x].id)
-
-        # SET GRAVITY COUNTER
-        self.observed_gravity_deriv_counter = len(self.observed_gravity_deriv_list)
+    # def replot_observed_gravity_deriv(self):
+    #     """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
+    #     for x in range(len(self.observed_gravity_deriv_list)):
+    #         if self.observed_gravity_deriv_list[x] is not None:
+    #             # DRAW DATA IN MODEL FRAME
+    #             self.observed_gravity_deriv_list[x].mpl_actor = self.grav_d_frame.scatter(
+    #                 self.observed_gravity_deriv_list[x].data[:, 0], self.observed_gravity_deriv_list[x].data[:, 1],
+    #                 marker='o', color=self.observed_gravity_deriv_list[x].color, s=5,
+    #                 gid=self.observed_gravity_deriv_list[x].id)
+    #
+    #             # ADD OBJECT TO MENUBAR
+    #             self.obs_submenu = wx.Menu()
+    #             self.m_obs_g_submenu.Append(11500+self.observed_gravity_deriv_list[x].id,
+    #                                         self.observed_gravity_deriv_list[x].name,
+    #                                         self.obs_submenu)
+    #             self.obs_submenu.Append(11500+self.observed_gravity_deriv_list[x].id, 'delete derivative')
+    #             self.Bind(wx.EVT_MENU, self.delete_obs_grav_deriv, id=11500+self.observed_gravity_deriv_list[x].id)
+    #
+    #     # SET GRAVITY COUNTER
+    #     self.observed_gravity_deriv_counter = len(self.observed_gravity_deriv_list)
 
     def replot_observed_magnetic_data(self):
         """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
@@ -2097,26 +2127,26 @@ class Gmg(wx.Frame):
         # SET MAGNETIC COUNTER
         self.observed_magnetic_counter = len(self.observed_magnetic_list)
 
-    def replot_observed_magnetic_deriv(self):
-        """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
-        for x in range(len(self.observed_magnetic_deriv_list)):
-            if self.observed_magnetic_deriv_list[x] is not None:
-                # DRAW DATA IN MODEL FRAME
-                self.observed_magnetic_deriv_list[x].mpl_actor = self.mag_d_frame.scatter(
-                    self.observed_magnetic_deriv_list[x].data[:, 0], self.observed_magnetic_deriv_list[x].data[:, 1],
-                    marker='o', color=self.observed_magnetic_deriv_list[x].color, s=5,
-                    gid=self.observed_magnetic_deriv_list[x].id)
-
-                # ADD OBJECT TO MENUVAR
-                self.obs_submenu = wx.Menu()
-                self.m_obs_mag_submenu.Append(12500+self.observed_magnetic_deriv_list[x].id,
-                                            self.observed_magnetic_deriv_list[x].name,
-                                            self.obs_submenu)
-                self.obs_submenu.Append(12500+self.observed_magnetic_deriv_list[x].id, 'delete derivative')
-                self.Bind(wx.EVT_MENU, self.delete_obs_mag_deriv, id=12500+self.observed_magnetic_deriv_list[x].id)
-
-        # SET GRAVITY COUNTER
-        self.observed_gravity_deriv_counter = len(self.observed_gravity_deriv_list)
+    # def replot_observed_magnetic_deriv(self):
+    #     """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
+    #     for x in range(len(self.observed_magnetic_deriv_list)):
+    #         if self.observed_magnetic_deriv_list[x] is not None:
+    #             # DRAW DATA IN MODEL FRAME
+    #             self.observed_magnetic_deriv_list[x].mpl_actor = self.mag_d_frame.scatter(
+    #                 self.observed_magnetic_deriv_list[x].data[:, 0], self.observed_magnetic_deriv_list[x].data[:, 1],
+    #                 marker='o', color=self.observed_magnetic_deriv_list[x].color, s=5,
+    #                 gid=self.observed_magnetic_deriv_list[x].id)
+    #
+    #             # ADD OBJECT TO MENUVAR
+    #             self.obs_submenu = wx.Menu()
+    #             self.m_obs_mag_submenu.Append(12500+self.observed_magnetic_deriv_list[x].id,
+    #                                         self.observed_magnetic_deriv_list[x].name,
+    #                                         self.obs_submenu)
+    #             self.obs_submenu.Append(12500+self.observed_magnetic_deriv_list[x].id, 'delete derivative')
+    #             self.Bind(wx.EVT_MENU, self.delete_obs_mag_deriv, id=12500+self.observed_magnetic_deriv_list[x].id)
+    #
+    #     # SET GRAVITY COUNTER
+    #     self.observed_gravity_deriv_counter = len(self.observed_gravity_deriv_list)
 
     def load_xy(self, event):
         """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS. NB: ID's start at 5000"""
@@ -2268,6 +2298,21 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
+    def delete_obs_topo_deriv(self, event):
+        """DELETE A GRAVITY DERIVATIVE DATASET FROM THE MODEL"""
+        # DESTROY MENUBAR
+        self.m_topo_submenu.DestroyItem(event.Id)
+
+        # REMOVE OBJECT AND MPL ACTOR
+        obj_id = event.Id - 10500
+        self.observed_topography_deriv_list[obj_id].mpl_actor.set_visible(False)
+        self.observed_topography_deriv_list[obj_id] = None
+
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
     # GRAVITY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_obs_g(self, event):
@@ -2292,9 +2337,10 @@ class Gmg(wx.Frame):
         observed_gravity.name = self.load_window.observed_name
         observed_gravity.color = self.load_window.color_picked
         observed_gravity.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
-        observed_gravity.mpl_actor = self.gravity_frame.scatter(observed_gravity.data[:, 0], observed_gravity.data[:, 1],
-                                                          marker='o', color=observed_gravity.color, s=5,
-                                                          gid=observed_gravity.id)
+        observed_gravity.mpl_actor = self.gravity_frame.scatter(observed_gravity.data[:, 0],
+                                                                observed_gravity.data[:, 1], marker='o',
+                                                                color=observed_gravity.color, s=5,
+                                                                gid=observed_gravity.id)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_gravity_list.append(observed_gravity)
@@ -3822,70 +3868,168 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
-    def observed_filter(self, event):
+    def filter_observed_topography(self, event):
+        """FILTER OBSERVED TOPOGRAPHY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # RUN FILTER
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_topography_list)
+        answer = median_filter_box.ShowModal()
+
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed = ObservedData()
+
+        # SET ATTRIBUTES
+        observed.id = int(self.observed_gravity_counter)
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.topo_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
+                                                        color=observed.color, s=5, gid=observed.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_topography_list.append(observed)
+
+        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        self.topo_submenu = wx.Menu()
+        self.m_topo_submenu.Append(10000+observed.id, observed.name, self.topo_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.topo_submenu.Append(10000+observed.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_observed_topography, id=10000+observed.id)
+
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_topography_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def filter_observed_gravity(self, event):
         """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
 
         # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.obs_grav_name_list,
-                                               self.obs_grav_list_save, self.obs_mag_name_list, self.obs_mag_list_save)
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_gravity_list)
         answer = median_filter_box.ShowModal()
 
-        # GET FILTERED OUTPUT
-        filtered_data = median_filter_box.filtered_output
-        filtered_name = median_filter_box.output_name
-        filtered_color = median_filter_box.output_color
-        filter_type = median_filter_box.filter_type
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed_gravity = ObservedData()
 
-        # LOAD FILTERED DATA
-        if filter_type == "gravity":
-            self.obs_grav_name_list.append(filtered_name)
-            self.obs_grav_list_save.append([])
-            self.obs_grav_list_save[self.observed_gravity_counter] = filtered_data
-            self.obs_grav_list.append([])
-            self.obs_grav_list[self.observed_gravity_counter] = self.gravity_frame.scatter(filtered_data[:, 0], filtered_data[:, 1],
-                                                                           marker='o', color=filtered_color, s=5,
-                                                                           gid=self.observed_gravity_counter)
+        # SET ATTRIBUTES
+        observed_gravity.id = int(self.observed_gravity_counter)
+        observed_gravity.name = median_filter_box.output_name
+        observed_gravity.color = median_filter_box.output_color
+        observed_gravity.data = median_filter_box.filtered_output
+        observed_gravity.mpl_actor = self.gravity_frame.scatter(observed_gravity.data[:, 0],
+                                                                observed_gravity.data[:, 1], marker='o',
+                                                                color=observed_gravity.color, s=5,
+                                                                gid=observed_gravity.id)
 
-            #  APPEND NEW DATA MENU TO 'Topo data MENU'
-            self.grav_submenu = wx.Menu()
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_gravity_list.append(observed_gravity)
 
-            # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-            self.grav_submenu.Append(11000 + self.observed_gravity_counter, 'delete observed data')
+        # TURN ON OBSERVED GRAVITY SWITCH
+        self.observed_gravity_switch = True
 
-            # BIND TO DEL TOPO FUNC
-            self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.observed_gravity_counter)
-
-            # INCREMENT GRAV COUNTER
-            self.observed_gravity_counter += 1
-
-            # UPDATE GMG GUI
-            self.update_layer_data()
-            self.draw()
-
-        if filter_type == "magnetics":
-            self.obs_mag_name_list.append(filtered_name)
-            self.obs_mag_list_save.append([])
-            self.obs_mag_list_save[self.observed_magnetic_counter] = filtered_data
-            self.obs_mag_list.append([])
-            self.obs_mag_list[self.observed_magnetic_counter] = self.gravity_frame.scatter(filtered_data[:, 0], filtered_data[:, 1],
-                                                                         marker='o', color=filtered_color, s=5,
-                                                                         gid=self.observed_magnetic_counter)
-
-        #  APPEND NEW DATA MENU TO 'Mag data MENU'
-        self.obs_mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(self.observed_magnetic_counter, filtered_name, self.obs_mag_submenu)
+        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        self.grav_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(11000+observed_gravity.id, observed_gravity.name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_mag_submenu.Append(12000+self.observed_magnetic_counter, 'delete observed data')
+        self.grav_submenu.Append(11000+observed_gravity.id, 'delete observed data')
 
-        # BIND TO DEL MAG FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+self.observed_magnetic_counter)
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+observed_gravity.id)
 
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_gravity_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def filter_observed_magnetic(self, event):
+        """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # RUN FILTER
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_magnetic_list)
+        answer = median_filter_box.ShowModal()
+
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed = ObservedData()
+
+        # SET ATTRIBUTES
+        observed.id = int(self.observed_gravity_counter)
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.magnetic_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
+                                                        color=observed.color, s=5, gid=observed.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_magnetic_list.append(observed)
+
+        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        self.mag_submenu = wx.Menu()
+        self.m_obs_mag_submenu.Append(12000+observed.id, observed.name, self.mag_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.mag_submenu.Append(12000+observed.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+observed.id)
+
+        # INCREMENT OBSERVED GRAVITY COUNTER
         self.observed_magnetic_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
         self.set_frame_limits()
+        self.draw()
+
+    def take_topography_horizontal_derivative(self, event):
+        """
+        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
+        CALLS class HorizontalDerivative
+        """
+
+        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
+        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative',
+                                                         self.observed_topography_list)
+        answer = horizontal_derivative_box.ShowModal()
+
+        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        new_derivative = ObservedData()
+        new_derivative.data = horizontal_derivative_box.deriv
+        new_derivative.name = horizontal_derivative_box.output_name
+        new_derivative.color = horizontal_derivative_box.output_color
+        new_derivative.id = 10000 + self.observed_topography_counter
+        new_derivative.mpl_actor = self.topo_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                         marker='o', color=new_derivative.color, s=5,
+                                                         gid=10000 + self.observed_topography_counter)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_topography_list.append(new_derivative)
+
+        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
+        self.topo_submenu = wx.Menu()
+        self.m_topo_submenu.Append(10000 + self.observed_topography_counter, new_derivative.name,
+                                    self.topo_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.topo_submenu.Append(10000 + self.observed_topography_counter, 'delete observed data')
+
+        # BIND TO DEL FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_topo, id=10000 + self.observed_topography_counter)
+
+        # INCREMENT GRAV DERIV COUNTER
+        self.observed_topography_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
         self.draw()
 
     def take_gravity_horizontal_derivative(self, event):
@@ -3903,26 +4047,26 @@ class Gmg(wx.Frame):
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 11500 + self.observed_gravity_deriv_counter
+        new_derivative.id = 11000 + self.observed_gravity_counter
         new_derivative.mpl_actor = self.grav_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                          marker='o', color=new_derivative.color, s=5,
-                                                         gid=11500 + self.observed_gravity_deriv_counter)
+                                                         gid=11000 + self.observed_gravity_counter)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_gravity_deriv_list.append(new_derivative)
+        self.observed_gravity_list.append(new_derivative)
 
         #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
         self.grav_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(11500 + self.observed_gravity_deriv_counter, new_derivative.name, self.grav_submenu)
+        self.m_obs_g_submenu.Append(11000 + self.observed_gravity_counter, new_derivative.name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11500 + self.observed_gravity_deriv_counter, 'delete observed data')
+        self.grav_submenu.Append(11000 + self.observed_gravity_counter, 'delete observed data')
 
         # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav_deriv, id=11500 + self.observed_gravity_deriv_counter)
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.observed_gravity_counter)
 
         # INCREMENT GRAV DERIV COUNTER
-        self.observed_gravity_deriv_counter += 1
+        self.observed_gravity_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -3943,27 +4087,27 @@ class Gmg(wx.Frame):
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 12500 + self.observed_magnetic_deriv_counter
+        new_derivative.id = 12000 + self.observed_magnetic_counter
         new_derivative.mpl_actor = self.mag_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                              marker='o', color=new_derivative.color, s=5,
-                                                             gid=12500 + self.observed_magnetic_deriv_counter)
+                                                             gid=12000 + self.observed_magnetic_counter)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_magnetic_deriv_list.append(new_derivative)
+        self.observed_magnetic_list.append(new_derivative)
 
         #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
         self.mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(12500 + self.observed_magnetic_deriv_counter, new_derivative.name,
+        self.m_obs_mag_submenu.Append(12500 + self.observed_magnetic_counter, new_derivative.name,
                                       self.mag_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.mag_submenu.Append(12500 + self.observed_magnetic_deriv_counter, 'delete observed data')
+        self.mag_submenu.Append(12500 + self.observed_magnetic_counter, 'delete observed data')
 
         # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag_deriv, id=12500 + self.observed_magnetic_deriv_counter)
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12500 + self.observed_magnetic_counter)
 
         # INCREMENT GRAV DERIV COUNTER
-        self.observed_magnetic_deriv_counter += 1
+        self.observed_magnetic_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -4029,9 +4173,9 @@ class Gmg(wx.Frame):
             # CREATE LAYER POLYGON FILL
             self.plotx_polygon = np.array(self.plotx)
             self.ploty_polygon = np.array(self.ploty)
-            self.polygon_fills[self.layer_counter] = self.model_frame.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
-                                                           alpha=self.layer_transparency, closed=True, linewidth=None,
-                                                           ec=None)
+            self.polygon_fills[self.layer_counter] = self.model_frame.fill(self.plotx_polygon, self.ploty_polygon,
+                                                                           color='blue', alpha=self.layer_transparency,
+                                                                           closed=True, linewidth=None, ec=None)
             # UPDATE LAYER DATA
             self.current_node.set_offsets([self.plotx[0], self.ploty[0]])
             self.nextdens = self.densities[self.layer_counter]
@@ -4351,6 +4495,7 @@ class Gmg(wx.Frame):
 
         # UPDATE MODEL CANVAS (mcanvas) LIMITS
         xmin, xmax = self.model_frame.get_xlim()
+        self.topo_frame.set_xlim(xmin, xmax)
         self.gravity_frame.set_xlim(xmin, xmax)
         self.magnetic_frame.set_xlim(xmin, xmax)
 
@@ -4423,11 +4568,11 @@ class Gmg(wx.Frame):
         # MODEL LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # CREATE LAYER LINES
         for i in range(0, self.layer_count + 1):
-            self.layer_lines[i] = self.model_frame.plot(self.plotx_list[i], self.ploty_list[i], color=self.layer_colors[i],
-                                                    linewidth=1.0, alpha=0.5)
+            self.layer_lines[i] = self.model_frame.plot(self.plotx_list[i], self.ploty_list[i],
+                                                        color=self.layer_colors[i], linewidth=1.0, alpha=0.5)
         # CURRENT LAYER LINE
-        self.polyline, = self.model_frame.plot(self.plotx, self.ploty, marker='o', color=self.layer_colors[self.layer_counter],
-                                           linewidth=1.0, alpha=0.5)
+        self.polyline, = self.model_frame.plot(self.plotx, self.ploty, marker='o',
+                                               color=self.layer_colors[self.layer_counter], linewidth=1.0, alpha=0.5)
 
         # # FAULTS LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # # CREATE FAULT LINES
@@ -4436,7 +4581,8 @@ class Gmg(wx.Frame):
         #                                             color=self.fault_colors[i], linewidth=1.0, alpha=1.0)
         # # CURRENT FAULT LINE
         # self.fault_polyline, = self.model_frame.plot(self.fault_plotx, self.fault_ploty, marker='o',
-        #                                          color=self.fault_colors[self.current_fault_index], linewidth=1.0, alpha=0.5)
+        #                                          color=self.fault_colors[self.current_fault_index],
+        #                                          linewidth=1.0, alpha=0.5)
 
         # UPDATE GMG
         self.model_frame.set_aspect(self.model_aspect)
@@ -4625,13 +4771,12 @@ class Gmg(wx.Frame):
 
         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # UPDATE RMS VALUES
-
         #  RUN RMS CALC CODE
         self.model_rms(self.xp)
 
         # SET GRAV RMS VALUES
-        if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch == True and self.calc_grav_switch == True \
-                and self.predgz != []:
+        if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch == True and \
+                self.calc_grav_switch == True and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         elif self.obs_gravity_data_for_rms is None:
             self.grav_rms_plot.set_data(self.obs_gravity_data_for_rms[:, 0],
@@ -4967,21 +5112,17 @@ class Layer:
 
 class ObservedData:
     def __init__(self):
+        """GENERIC CLASS FOR AN OBSERVATIONAL DATA OBJECT"""
         self.id = None  # OBJECT ID VALUE FOR wx
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
         self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
+        self.type = None  # THE KIND OF DATA (str: 'observed', 'filtered', 'derivative')
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
         self.mpl_actor = None  # THE PML ACTOR ELEMENT (PLOTTING OBJECT)
 
 
 class ObservedOutcropData:
-    def __init__(self):
-        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
-        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
-        self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
-
-
-class ObservedXYData:
+    """GENERIC CLASS FOR AN OBSERVATIONAL OUTCROP DATA OBJECT"""
     def __init__(self):
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
@@ -5423,31 +5564,20 @@ class DepinchDialog(wx.Dialog):
 
 class MedianFilterDialog(wx.Dialog):
     """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
-    def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
+    def __init__(self, parent, id, title, observed_list):
         wx.Dialog.__init__(self, parent, id, "Apply Median Filter", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
-                                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX
-                           )
+                                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
-        # GET OBSERVED DATA FROM gmg
-        self.obs_grav_name_list = obs_grav_name_list
-        self.obs_grav_list_save = obs_grav_list_save
-        self.obs_mag_name_list = obs_mag_name_list
-        self.obs_mag_list_save = obs_mag_list_save
-
-        # CHOOSE INPUT OBSERVED DATA
+        # CREATE DATA LIST MENU
+        self.observed_list = observed_list
         self.obs_combo_list_text = wx.StaticText(input_panel, -1, "Input Data:")
         self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
-        for i in self.obs_grav_name_list:
-            try:
-                self.obs_combo_list.Append(i)
-            except:
-                pass
-        for i in self.obs_mag_name_list:
-            try:
-                self.obs_combo_list.Append(i)
-            except:
-                pass
+
+        # POPULATE OBSERVED DATA LIST
+        for i in range(len(observed_list)):
+            if observed_list[i] is not None:
+                self.obs_combo_list.Append(observed_list[i].name)
 
         # DEFINE FILTER LENGTH
         self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
@@ -5477,31 +5607,18 @@ class MedianFilterDialog(wx.Dialog):
 
     def median_pass(self, event):
         """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
-        self.obs_to_filter = str(self.obs_combo_list.GetValue())
+        self.obs_to_filter_name = str(self.obs_combo_list.GetValue())
         self.filter_length = int(self.filter_window_text.GetValue())
         self.output_name = str(self.output_name_text.GetValue())
         self.output_color = str(self.output_color_text.GetValue())
 
-        for i in range(len(self.obs_grav_name_list)):
-            # CHECK GRAV
-            if self.obs_grav_name_list[i] == self.obs_to_filter:
-                self.filter_type = str('gravity')
-                self.obs_input = self.obs_grav_list_save[i]
-                self.obs_input_name = str(self.obs_grav_name_list[i])
-                self.filtered_output = np.zeros(shape=(len(self.obs_input), 2))
-                self.filtered_output[:, 0] = self.obs_input[:, 0]
-                self.filtered_output[:, 1] = signal.medfilt(self.obs_input[:, 1], self.filter_length)
-                self.EndModal(1)
+        for i in range(len(self.observed_list)):
+            if self.observed_list[i].name == self.obs_to_filter_name:
+                self.filter_input = self.observed_list[i].data
 
-        for i in range(len(self.obs_mag_name_list)):
-            # CHECK MAG
-            if self.obs_mag_name_list[i] == self.obs_to_filter:
-                self.filter_type = str('magnetics')
-                self.obs_input = self.obs_mag_list_save[i]
-                self.obs_input_name = str(self.obs_mag_name_list[i])
-                self.filtered_output = np.zeros(shape=(len(self.obs_input), 2))
-                self.filtered_output[:, 0] = self.obs_input[:, 0]
-                self.filtered_output[:, 1] = signal.medfilt(self.obs_input[:, 1], self.filter_length)
+                self.filtered_output = np.zeros(shape=(len(self.filter_input), 2))
+                self.filtered_output[:, 0] = self.filter_input[:, 0]
+                self.filtered_output[:, 1] = signal.medfilt(self.filter_input[:, 1], self.filter_length)
                 self.EndModal(1)
 
 
@@ -5512,9 +5629,9 @@ class HorizontalDerivative(wx.Dialog):
                                                                                  wx.RESIZE_BORDER | wx.MAXIMIZE_BOX
                                                                                  | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.observed_list = observed_list
 
         # CREATE DATA LIST MENU
+        self.observed_list = observed_list
         self.obs_combo_list_text = wx.StaticText(input_panel, -1, "Input Data:")
         self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
 
