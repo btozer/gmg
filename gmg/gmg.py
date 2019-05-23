@@ -393,9 +393,6 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_xy, m_load_xy)
         self.m_xy_submenu = wx.Menu()
         self.xy_data.Append(-1, 'XY Data...', self.m_xy_submenu)
-        # REMOVE
-        self.m_xy_submenu.Append(102, 'Remove all XY Data')
-        self.Bind(wx.EVT_MENU, self.delete_all_xy, id=102)
         # DRAW MENU
         self.menubar.Append(self.xy_data, "&XY Data")
         # --------------------------------------------------------------------------------------------------------------
@@ -705,12 +702,8 @@ class Gmg(wx.Frame):
         self.pinch_count = 0
 
         # INITIALISE XY DATA ATTRIBUTES
-        self.xy = []
-        self.xy_list = [[]]
-        self.xy_list_save = [[]]
-        self.xy_name_list = []
-        self.xy_color_list = [[]]
-        self.xy_count = 0
+        self.observed_xy_data_list = []
+        self.xy_data_counter = 0
 
         # INITIALISE GEOLOGICAL CONTACT ATTRIBUTES
         self.outcrop_data = [[]]
@@ -722,7 +715,7 @@ class Gmg(wx.Frame):
         self.outcrop_data_count = 0
 
         # INITIALISE OBSERVED TOPOGRAPHY ATTRIBUTES
-        self.observed_topography_list = []
+        self.observed_xy_data_list = []
         self.observed_topography_counter = 0
         self.observed_topography_switch = False
 
@@ -767,7 +760,7 @@ class Gmg(wx.Frame):
         self.well_name_text = [[]]
         self.well_labels_list = [[]]
         self.well_horizons_list = [[]]
-        self.well_count = 0
+        self.well_counter = 0
         self.well_list_switch = [[]]
         self.well_textsize = 2
 
@@ -1697,10 +1690,10 @@ class Gmg(wx.Frame):
                   'fault_x_coords_list', 'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
                   'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list',
                   'outcrop_data_color_list', 'outcrop_text_list',
-                  'xy_name_list', 'xy_list_save', 'xy_color_list',
-                  'observed_gravity_list', 'observed_gravity_deriv_list',
-                  'observed_magnetic_list', 'observed_magnetic_deriv_list',
-                  'observed_topography_list', 'observed_topography_deriv_list']
+                  'observed_xy_data_list',
+                  'observed_gravity_list',
+                  'observed_magnetic_list',
+                  'observed_topography_list']
 
         model_params = [self.model_aspect, self.area, self.xp, self.zp, self.tree_items,
                         self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
@@ -1715,10 +1708,10 @@ class Gmg(wx.Frame):
                         self.fault_x_coords_list, self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
                         self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
                         self.outcrop_data_color_list, self.outcrop_text_list,
-                        self.xy_name_list, self.xy_list_save, self.xy_color_list,
-                        self.observed_gravity_list, self.observed_gravity_deriv_list,
-                        self.observed_magnetic_list, self.observed_magnetic_deriv_list,
-                        self.observed_topography_list, self.observed_topography_deriv_list]
+                        self.observed_xy_data_list,
+                        self.observed_gravity_list,
+                        self.observed_magnetic_list,
+                        self.observed_topography_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -1804,8 +1797,8 @@ class Gmg(wx.Frame):
                 self.replot_observed_magnetic_data()
 
             # LOAD OBSERVED XY DATA
-            # if len(self.observed_xy_data_list) > 0:
-            #     self.replot_observed_xy_data_data()
+            if len(self.observed_xy_data_list) > 0:
+                self.replot_observed_xy_data()
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1907,7 +1900,7 @@ class Gmg(wx.Frame):
                     self.Bind(wx.EVT_MENU, self.show_hide_well, id=self.count + 2000)
                     self.Bind(wx.EVT_MENU, self.delete_well, id=self.count + 3000)
                     self.count += 1
-            self.well_count = len(self.well_name_list)
+            self.well_counter = len(self.well_name_list)
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1990,27 +1983,28 @@ class Gmg(wx.Frame):
                 else:
                     continue
 
-    def plot_obs_xy(self):
-        """PLOT OBSERVED XY"""
-        self.xy_list = [[]]
-        for i in range(0, len(self.xy_list_save) - 1):
-            print("xy count =")
-            print self.xy_count
-            self.xy_list.append([])
-            if self.xy_list_save[i] != []:
-                self.xy = self.xy_list_save[i]
-                self.xy_list[i] = self.model_frame.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
-                                                       color=self.xy_color_list[i], s=5, gid=self.xy_count)
-                self.xy_list.append([])
-                self.colors_index += 1
-                self.xy_name = self.xy_name_list[i]
-                self.xy_submenu = wx.Menu()
-                self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.xy_submenu)
-                self.xy_submenu.Append(self.xy_count + 4000, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_xy, id=self.xy_count + 4000)
-                self.xy_count += 1
-            else:
-                self.xy_count += 1
+    def replot_observed_xy_data(self):
+        """ADD LOADED OBSERVED XY DATA TO THE MODEL FRAME"""
+        for x in range(len(self.observed_xy_data_list)):
+            if self.observed_xy_data_list[x] is not None:
+                # DRAW DATA IN MODEL FRAME
+                self.self.observed_xy_data_list[x].mpl_actor = self.topo_frame.scatter(
+                    self.self.observed_xy_data_list[x].data[:, 0], self.observed_xy_data_list[x].data[:, 1],
+                    marker='o', color=self.observed_xy_data_list[x].color, s=5,
+                    gid=self.observed_xy_data_list[x].id)
+
+                # APPEND NEW DATA MENU TO 'XY data MENU'
+                self.obs_submenu = wx.Menu()
+                self.m_xy_submenu.Append(4000 + self.observed_xy_data_list[x].id, self.observed_xy_data_list[x].name,
+                                                                                 self.obs_submenu)
+                # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+                self.obs_submenu.Append(4000 + self.observed_xy_data_list[x].id, 'delete observed data')
+
+                # BIND TO DEL XY FUNC
+                self.Bind(wx.EVT_MENU, self.delete_xy, id=4000 + self.observed_xy_data_list[x].id)
+
+        # SET GRAVITY COUNTER
+        self.observed_xy_data_counter = len(self.observed_xy_data_list)
 
     def replot_observed_topography_data(self):
         """ADD LOADED OBSERVED TOPOGRAPHY TO THE MODEL FRAME"""
@@ -2036,28 +2030,6 @@ class Gmg(wx.Frame):
         # SET GRAVITY COUNTER
         self.observed_topography_counter = len(self.observed_topography_list)
 
-    # def replot_observed_topography_deriv(self):
-    #     """ADD LOADED OBSERVED TOPOGRAPHY DERIVATIVE TO THE MODEL FRAME"""
-    #     for x in range(len(self.observed_topography_deriv_list)):
-    #         if self.observed_topography_deriv_list[x] is not None:
-    #             # DRAW DATA IN MODEL FRAME
-    #             self.observed_topography_deriv_list[x].mpl_actor = self.topo_frame.scatter(
-    #                 self.observed_topography_deriv_list[x].data[:, 0],
-    #                 self.observed_topography_deriv_list[x].data[:, 1], marker='o',
-    #                 color=self.observed_topography_deriv_list[x].color, s=5,
-    #                 gid=self.observed_topography_deriv_list[x].id)
-    #
-    #             # ADD OBJECT TO MENUBAR
-    #             self.obs_submenu = wx.Menu()
-    #             self.m_topo_submenu.Append(10500 + self.observed_topography_list[x].id,
-    #                                         self.observed_topography_list[x].name,
-    #                                         self.obs_submenu)
-    #             self.obs_submenu.Append(10500 + self.observed_topography_list[x].id, 'delete observed data')
-    #             self.Bind(wx.EVT_MENU, self.delete_observed_topography, id=10500 + self.observed_topography_list[x].id)
-    #
-    #     # SET GRAVITY COUNTER
-    #     self.observed_topography_deriv_counter = len(self.observed_topography_deriv_list)
-
     def replot_observed_gravity_data(self):
         """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
         for x in range(len(self.observed_gravity_list)):
@@ -2079,27 +2051,6 @@ class Gmg(wx.Frame):
 
         # SET GRAVITY COUNTER
         self.observed_gravity_counter = len(self.observed_gravity_list)
-
-    # def replot_observed_gravity_deriv(self):
-    #     """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
-    #     for x in range(len(self.observed_gravity_deriv_list)):
-    #         if self.observed_gravity_deriv_list[x] is not None:
-    #             # DRAW DATA IN MODEL FRAME
-    #             self.observed_gravity_deriv_list[x].mpl_actor = self.grav_d_frame.scatter(
-    #                 self.observed_gravity_deriv_list[x].data[:, 0], self.observed_gravity_deriv_list[x].data[:, 1],
-    #                 marker='o', color=self.observed_gravity_deriv_list[x].color, s=5,
-    #                 gid=self.observed_gravity_deriv_list[x].id)
-    #
-    #             # ADD OBJECT TO MENUBAR
-    #             self.obs_submenu = wx.Menu()
-    #             self.m_obs_g_submenu.Append(11500+self.observed_gravity_deriv_list[x].id,
-    #                                         self.observed_gravity_deriv_list[x].name,
-    #                                         self.obs_submenu)
-    #             self.obs_submenu.Append(11500+self.observed_gravity_deriv_list[x].id, 'delete derivative')
-    #             self.Bind(wx.EVT_MENU, self.delete_obs_grav_deriv, id=11500+self.observed_gravity_deriv_list[x].id)
-    #
-    #     # SET GRAVITY COUNTER
-    #     self.observed_gravity_deriv_counter = len(self.observed_gravity_deriv_list)
 
     def replot_observed_magnetic_data(self):
         """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
@@ -2126,110 +2077,6 @@ class Gmg(wx.Frame):
 
         # SET MAGNETIC COUNTER
         self.observed_magnetic_counter = len(self.observed_magnetic_list)
-
-    # def replot_observed_magnetic_deriv(self):
-    #     """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
-    #     for x in range(len(self.observed_magnetic_deriv_list)):
-    #         if self.observed_magnetic_deriv_list[x] is not None:
-    #             # DRAW DATA IN MODEL FRAME
-    #             self.observed_magnetic_deriv_list[x].mpl_actor = self.mag_d_frame.scatter(
-    #                 self.observed_magnetic_deriv_list[x].data[:, 0], self.observed_magnetic_deriv_list[x].data[:, 1],
-    #                 marker='o', color=self.observed_magnetic_deriv_list[x].color, s=5,
-    #                 gid=self.observed_magnetic_deriv_list[x].id)
-    #
-    #             # ADD OBJECT TO MENUVAR
-    #             self.obs_submenu = wx.Menu()
-    #             self.m_obs_mag_submenu.Append(12500+self.observed_magnetic_deriv_list[x].id,
-    #                                         self.observed_magnetic_deriv_list[x].name,
-    #                                         self.obs_submenu)
-    #             self.obs_submenu.Append(12500+self.observed_magnetic_deriv_list[x].id, 'delete derivative')
-    #             self.Bind(wx.EVT_MENU, self.delete_obs_mag_deriv, id=12500+self.observed_magnetic_deriv_list[x].id)
-    #
-    #     # SET GRAVITY COUNTER
-    #     self.observed_gravity_deriv_counter = len(self.observed_gravity_deriv_list)
-
-    def load_xy(self, event):
-        """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS. NB: ID's start at 5000"""
-        self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'XY')
-        self.load_window.Show(True)
-
-    def open_xy_data(self):
-        """
-        OPEN THE XY DATA SELECTED BY THE USER USING THE load_xy FUNC
-        NB: IDs START AT 5000
-        """
-        xy_input_file = self.load_window.file_path
-        self.xy_name = self.load_window.observed_name
-        self.xy_color = self.load_window.color_picked
-
-        # GET XY DATA NAME
-        self.xy_name_list.append([])
-        self.xy_name_list[self.xy_count] = str(self.xy_name)
-
-        # GET XY_COLOR
-        self.xy_color_list.append([])
-        self.xy_color_list[self.xy_count] = str(self.xy_color)
-
-        # LOAD DATA
-        self.xy = np.genfromtxt(xy_input_file, dtype=float, autostrip=True)
-        self.xy_list_save.append([])
-        self.xy_list_save[self.xy_count] = self.xy
-        self.xy_list.append([])
-
-        # PLOT DATA IN MODEL
-        self.xy_list[self.xy_count] = self.model_frame.scatter(self.xy[:, 0], self.xy[:, 1], marker='o',
-                                                           color=self.xy_color_list[self.xy_count], s=3,
-                                                           gid=self.xy_count)
-
-        #  APPEND NEW DATA MENU TO 'XY data MENU'
-        self.obs_submenu = wx.Menu()
-        self.m_xy_submenu.Append(self.xy_count, self.xy_name, self.obs_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_submenu.Append(4000 + self.xy_count, 'delete observed data')
-
-        # BIND TO DEL XY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_xy, id=4000 + self.xy_count)
-
-        # INCREMENT XY COUNTER
-        self.xy_count += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.draw()
-
-    def delete_xy(self, event):
-        """"DELETE OBSERVED XY DATA NB: ID's start at 4000"""
-        id = event.Id - 4000
-        self.m_xy_submenu.DestroyItem(id)
-        self.xy_list[id].set_visible(False)
-        self.xy_list[id] = []
-        self.xy_name_list[id] = []
-        self.xy_color_list[id] = []
-        self.xy_list_save[id] = []
-
-        # UPDATE GMG
-        self.update_layer_data()
-        self.draw()
-
-    def delete_all_xy(self, event):
-        for i in range(0, self.xy_count):
-            try:
-                self.m_xy_submenu.DestroyId(i)
-                self.xy_list[i].set_visible(False)
-            except:
-                continue
-        # RESET DATA LISTS
-        self.xy = []
-        self.xy_list = [[]]
-        self.xy_list_save = [[]]
-        self.xy_name_list = []
-        self.xy_color_list = []
-        self.xy_count = 0
-
-        # UPDATE GMG
-        self.update_layer_data()
-        self.draw()
 
     # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2618,9 +2465,78 @@ class Gmg(wx.Frame):
         else:
             return 0
 
+    # XY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def load_xy(self, event):
+        """ LOAD & PLOT XY DATA E.G. EQ HYPOCENTERS. NB: ID's start at 5000"""
+        self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'XY')
+        self.load_window.Show(True)
+
+    def open_xy_data(self):
+        """
+        OPEN THE XY DATA SELECTED BY THE USER USING THE load_xy FUNC
+        NB: IDs START AT 5000
+        """
+        xy_input_file = self.load_window.file_path
+        self.xy_name = self.load_window.observed_name
+        self.xy_color = self.load_window.color_picked
+
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        new_xy = ObservedData()
+
+        # SET ATTRIBUTES
+        new_xy.data = np.genfromtxt(xy_input_file, dtype=float, autostrip=True)
+        new_xy.name = self.load_window.observed_name
+        new_xy.color = self.load_window.color_picked
+        new_xy.type = str('observed')
+        new_xy.mpl_actor = self.model_frame.scatter(new_xy.data[:, 0], new_xy.data[:, 1], marker='o',
+                                                    color=new_xy.color, s=3, gid=4000 + self.xy_data_counter)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_xy_data_list.append(new_xy)
+
+        # APPEND NEW DATA MENU TO 'XY data MENU'
+        self.obs_submenu = wx.Menu()
+        self.m_xy_submenu.Append(4000 + self.xy_data_counter, new_xy.name, self.obs_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.obs_submenu.Append(4000 + self.xy_data_counter, 'delete observed data')
+
+        # BIND TO DEL XY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_xy, id=4000 + self.xy_data_counter)
+
+        # INCREMENT XY COUNTER
+        self.xy_data_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.draw()
+
+    def delete_xy(self, event):
+        """"DELETE OBSERVED XY DATA NB: ID's start at 4000"""
+        # DESTROY MENUBAR
+        self.m_xy_submenu.DestroyItem(event.Id)
+
+        # REMOVE OBJECT AND MPL ACTOR
+        obj_id = event.Id-4000
+        self.observed_xy_data_list[obj_id].mpl_actor.set_visible(False)
+        self.observed_xy_data_list[obj_id] = None
+
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
     # WELL DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_well(self, event):
+        """
+        LOAD A WELL RECORD INTO THE MODEL FRAME.
+        IDs BEGIN AT 3000.
+        HIDE/SHOW TOGGLE IDs BEGIN AT 2000.    
+        """
+
+        # CREATE INSTANCE OF LOADING DIALOG BOX
         open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -2630,92 +2546,83 @@ class Gmg(wx.Frame):
             well_name_box = wx.TextEntryDialog(None, 'Please provide a name for the new well record:')
             answer = well_name_box.ShowModal()
 
-        self.well_name = well_name_box.GetValue()
-        self.well_name_list.append(str(self.well_name))
+        # CREATE A NEW WELL DATA OBJECT
+        well = ObservedWellData()
 
+        # SET WELL ATTRIBUTES
+
+        # SET NAME
+        well.name = well_name_box.GetValue()
+
+        # SET DATA
         with open(well_in, 'r') as f:
-            input_well_data = [line.strip().split(' ') for line in f]
-        self.well_list.append(input_well_data)
+            input_record = [line.strip().split(' ') for line in f]
+        well.raw_record = input_record
+
+        well.data = np.array(well.raw_record[1:])  # CREATE NP ARRAY WITHOUT HEADER INFO
 
         # CREATE FILE MENU DATA
         self.well_name_submenu = wx.Menu()
-        self.m_wells_submenu.Append(int(self.well_count) + 3000, self.well_name, self.well_name_submenu)
-        self.well_name_submenu.Append(int(self.well_count) + 2000, 'Hide/Show')
-        self.well_name_submenu.Append(int(self.well_count) + 3000, 'Delete well')
-        self.Bind(wx.EVT_MENU, self.show_hide_well, id=int(self.well_count) + 2000)
-        self.Bind(wx.EVT_MENU, self.delete_well, id=int(self.well_count) + 3000)
-        self.well_count += 1
+        self.m_wells_submenu.Append(self.well_counter + 3000, well.name, self.well_name_submenu)
+        self.well_name_submenu.Append(self.well_counter + 2000, 'Hide/Show')
+        self.well_name_submenu.Append(self.well_counter + 3000, 'Delete well')
+        self.Bind(wx.EVT_MENU, self.show_hide_well, id=self.well_counter + 2000)
+        self.Bind(wx.EVT_MENU, self.delete_well, id=self.well_counter + 3000)
+
 
         # DRAW WELL
-        well_data = np.array(self.well_list[self.well_count - 1][1:])  # CREATE NP ARRAY WITHOUT HEADER INFO
-        y1 = well_data[0][1].astype(float)
-        y2 = well_data[-1][-1].astype(float)
-        well_x_location = well_data[1][1].astype(float)
+        y1 = well.data[0][1].astype(float)
+        y2 = well.data[-1][-1].astype(float)
+        well_x_location = well.data[1][1].astype(float)
         wellx = (well_x_location, well_x_location)
         welly = (y1, y2)
-        self.wells.append([])
-        self.wells[self.well_count - 1] = self.model_frame.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
-
-        self.well_name_text.append([])
+        well.mpl_actor = self.model_frame.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
 
         # PLOT WELL NAME
-        self.well_name_text[self.well_count - 1] = self.model_frame.annotate(self.well_name, xy=(well_x_location, -0.5),
+        well.mpl_actor_name = self.model_frame.annotate(well.name, xy=(well_x_location, -0.5),
                                                                          xytext=(well_x_location, -0.5),
                                                                          fontsize=self.well_textsize, weight='bold',
                                                                          horizontalalignment='center', color='black',
                                                                          bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
                                                                          clip_on=True)
-        self.well_name_text.append([])
 
         # PLOT WELL HORIZONS
         # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
-        self.well_labels.append([])
-        self.horizons.append([])
-        self.well_labels[self.well_count - 1] = [None] * len(well_data)
-        self.horizons[self.well_count - 1] = [None] * len(well_data)
-        for i in range(2, len(well_data)):
-            y = [well_data[i][1].astype(float), well_data[i][1].astype(float)]
-            x = [well_data[1][1].astype(float) - 1, well_data[1][1].astype(float) + 1]
+        well.labels_list = [None] * len(well.data)
+        well.horizons_list = [None] * len(well.data)
+        for i in range(2, len(well.data)):
+            y = [well.data[i][1].astype(float), well.data[i][1].astype(float)]
+            x = [well.data[1][1].astype(float) - 1, well.data[1][1].astype(float) + 1]
 
             # PLOT HORIZON LINE
-            self.horizons[self.well_count - 1][i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
-            horizon_y_pos = well_data[i][1].astype(float)
-            horizon = well_data[i][0].astype(str)
+            well.horizons_list[i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
+            horizon_y_pos = well.data[i][1].astype(float)
+            horizon = well.data[i][0].astype(str)
 
             # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
             if i % 2 == 0:
-                horizon_x_pos = well_data[1][1].astype(float) - 1.05
-                self.well_labels[self.well_count - 1][i] = self.model_frame.annotate(horizon,
-                                                                                 xy=(horizon_x_pos, horizon_y_pos),
-                                                                                 xytext=(horizon_x_pos, horizon_y_pos),
-                                                                                 fontsize=self.well_textsize,
-                                                                                 weight='bold',
-                                                                                 horizontalalignment='left',
-                                                                                 verticalalignment='top',
-                                                                                 color='black',
-                                                                                 bbox=dict(boxstyle="round,pad=.4",
-                                                                                           fc="0.8", ec='None'),
-                                                                                 clip_on=True)
+                horizon_x_pos = well.data[1][1].astype(float) - 1.05
+                well.labels_list[i] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
+                                                                 xytext=(horizon_x_pos, horizon_y_pos),
+                                                                 fontsize=well.text_size, weight='bold',
+                                                                 horizontalalignment='left', verticalalignment='top',
+                                                                 color='black', bbox=dict(boxstyle="round,pad=.4",
+                                                                 fc="0.8", ec='None'), clip_on=True)
             else:
-                horizon_x_pos = well_data[1][1].astype(float) + 1.05
-                self.well_labels[self.well_count - 1][i] = self.model_frame.annotate(horizon,
-                                                                                 xy=(horizon_x_pos, horizon_y_pos),
-                                                                                 xytext=(horizon_x_pos, horizon_y_pos),
-                                                                                 fontsize=self.well_textsize,
-                                                                                 weight='bold',
-                                                                                 horizontalalignment='right',
-                                                                                 verticalalignment='bottom',
-                                                                                 color='black',
-                                                                                 bbox=dict(boxstyle="round,pad=.4",
-                                                                                           fc="0.8", ec='None'),
-                                                                                 clip_on=True)
-        self.well_labels_list[self.well_count - 1] = self.well_labels
-        self.well_horizons_list[self.well_count - 1] = self.horizons
-        self.well_horizons_list.append([])
-        self.well_labels_list.append([])
+                horizon_x_pos = well.data[1][1].astype(float) + 1.05
+                well.labels_list[i] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
+                                                                xytext=(horizon_x_pos, horizon_y_pos),
+                                                                fontsize=well.text_size, weight='bold',
+                                                                 horizontalalignment='right', verticalalignment='top',
+                                                                 color='black', bbox=dict(boxstyle="round,pad=.4",
+                                                                 fc="0.8", ec='None'), clip_on=True)
+
+        # INCREAMENT WELL COUNTER
+        self.well_counter += 1
 
         # UPDATE GMG
         self.update_layer_data()
+        self.draw()
 
     def draw_well(self):
         """DRAW WELLS ON MODEL CANVAS"""
@@ -4408,10 +4315,13 @@ class Gmg(wx.Frame):
 
         # WELL DATA
         # LOOP THROUGH ALL WELL NAMES
-        if len(self.well_name_text) > 0:
-            for i in range(len(self.well_name_text)):
-                if self.well_name_text[i] != "None" and self.well_name_text[i] != []:
-                    self.well_name_text[i].set_size(self.textsize)
+        for i in range(len(self.well_data_list)):
+            self.well_data_list[i].text_size = self.textsize
+            self.well_data_list[i].name_mpl_actor.set_size(self.textsize)
+
+            for l in range(self.well_data_list[i].name_mpl_actor)
+
+
         # LOOP THROUGH ALL WELL HORIZON LABELS
         if len(self.well_labels) > 0:
             for i in range(len(self.well_labels)):
@@ -4972,7 +4882,7 @@ class Gmg(wx.Frame):
                                        self.xy_size, self.xy_color, self.colorbar_x, self.colorbar_y,
                                        self.colorbar_size_x, self.colorbar_size_y, self.layer_line_width,
                                        self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min,
-                                       self.grav_y_max, self.xy_list_save, self.draw_wells, self.wells, self.well_fs,
+                                       self.grav_y_max, self.xy_data_list_save, self.draw_wells, self.wells, self.well_fs,
                                        self.well_line_width, self.draw_faults, self.faults)
         del fig_plot
 
@@ -5143,9 +5053,11 @@ class SegyData:
 
 class ObservedWellData:
     def __init__(self):
+        self.name = None  # NAME OF WELL RECORD
+        self.raw_record = None  # RAW TEXT RECORD
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
-        self.name = None
-        self.name_text = None
+        self.mpl_actor = None  # MPL ACTOR USED TO STORE MPL LINE
+        self.mpl_actor_name = None  # MPL ACTOR USED TO STORE WELL NAME LABEL
         self.labels_list = []
         self.horizons_list = []
         self.text_size = 2
