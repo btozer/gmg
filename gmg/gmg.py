@@ -2057,7 +2057,7 @@ class Gmg(wx.Frame):
         """ADD LOADED WELL DATA TO THE MODEL FRAME"""
         for x in range(len(self.well_data_list)):
             if self.well_data_list[x] is not None:
-
+                pass
 
         # SET WELL COUNTER
         self.well_counter = len(self.well_data_list)
