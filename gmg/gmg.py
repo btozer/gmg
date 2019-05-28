@@ -624,22 +624,22 @@ class Gmg(wx.Frame):
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
         self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
-        'SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
+        # SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
         self.draw = self.fig.canvas.draw
 
-        'GET THE MODEL DIMENSIONS AND SAMPLE LOCATIONS'
+        # GET THE MODEL DIMENSIONS AND SAMPLE LOCATIONS'
         self.area = area
         self.x1, self.x2, self.z1, self.z2 = 0.001 * np.array(area)
         self.xp = np.array(xp, dtype='f')
         self.zp = np.array(zp, dtype='f')
 
-        'DRAW MAIN PROGRAM WINDOW'
+        # DRAW MAIN PROGRAM WINDOW
         self.draw_main_frame()
 
-        'CONNECT MPL FUNCTIONS'
+        # CONNECT MPL FUNCTIONS
         self.connect()
 
-        'UPDATE DISPLAY'
+        # UPDATE DISPLAY
         self.display_info()
         self.size_handler()
 
@@ -648,9 +648,13 @@ class Gmg(wx.Frame):
         else:
             pass
 
-        'REFRESH SIZER POSITIONS'
+        # REFRESH SIZER POSITIONS
         self.Hide()
         self.Show()
+
+        # FINIALISE INIT PROCESS
+        self.run_algorithms()
+        self.draw()
 
     def initalise_model(self):
         """INITIALISE OBSERVED DATA AND LAYERS"""
@@ -715,7 +719,7 @@ class Gmg(wx.Frame):
         self.outcrop_data_count = 0
 
         # INITIALISE OBSERVED TOPOGRAPHY ATTRIBUTES
-        self.observed_xy_data_list = []
+        self.observed_topography_list = []
         self.observed_topography_counter = 0
         self.observed_topography_switch = False
 
@@ -5182,10 +5186,10 @@ class LoadObservedDataFrame(wx.Frame):
                                               wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         if self.open_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # the user changed idea...
-        'SET FILE PATH IN CLASS PANEL'
+
+        #SET FILE PATH IN CLASS PANEL
         self.chosen_path = self.open_file_dialog.GetPath()
         self.file_path_text.SetValue(str(self.chosen_path))
-        self.open_file_dialog.Destroy()
 
     def load_button(self, event):
         """WHEN THE LOAD BUTTON IS PRESSED -> SET VALUES TO PASS TO MOULDER, THEN CLOSE WINDOW"""
