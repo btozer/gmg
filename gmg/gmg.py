@@ -1245,17 +1245,6 @@ class Gmg(wx.Frame):
                         color=self.observed_gravity_list[x].color,
                         s=5, gid=11000+self.observed_gravity_list[x].id)
 
-            # PLOT HORIZONTAL DERIVATIVES
-            for x in range(len(self.observed_gravity_deriv_list)):
-                if self.observed_gravity_deriv_list[x] is not None:
-                    # DRAW DATA IN MODEL FRAME
-                    self.observed_gravity_deriv_list[x].mpl_actor = self.gravity_frame.scatter(
-                        self.observed_gravity_deriv_list[x].data[:, 0],
-                        self.observed_gravity_deriv_list[x].data[:, 1],
-                        marker='o',
-                        color=self.observed_gravity_deriv_list[x].color,
-                        s=5, gid=11500+self.observed_gravity_deriv_list[x].id)
-
         # PLOT OBSERVED MAGNETIC DATA
         if self.magnetic_frame is not None:
             # REPLOT OBSERVED MAGNETIC DATA
@@ -2133,21 +2122,6 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
-    def delete_obs_topo_deriv(self, event):
-        """DELETE A GRAVITY DERIVATIVE DATASET FROM THE MODEL"""
-        # DESTROY MENUBAR
-        self.m_topo_submenu.DestroyItem(event.Id)
-
-        # REMOVE OBJECT AND MPL ACTOR
-        obj_id = event.Id - 10500
-        self.observed_topography_deriv_list[obj_id].mpl_actor.set_visible(False)
-        self.observed_topography_deriv_list[obj_id] = None
-
-        # UPDATE MODEL
-        self.update_layer_data()
-        self.set_frame_limits()
-        self.draw()
-
     # GRAVITY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_obs_g(self, event):
@@ -2214,16 +2188,6 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.set_frame_limits()
         self.draw()
-
-    def delete_obs_grav_deriv(self, event):
-        """DELETE A GRAVITY DERIVATIVE DATASET FROM THE MODEL"""
-        # DESTROY MENUBAR
-        self.m_obs_g_submenu.DestroyItem(event.Id)
-
-        # REMOVE OBJECT AND MPL ACTOR
-        obj_id = event.Id - 11500
-        self.observed_gravity_deriv_list[obj_id].mpl_actor.set_visible(False)
-        self.observed_gravity_deriv_list[obj_id] = None
 
         # UPDATE MODEL
         self.update_layer_data()
@@ -2300,21 +2264,6 @@ class Gmg(wx.Frame):
         obj_id = event.Id-12000
         self.observed_magnetic_list[obj_id].mpl_actor.set_visible(False)
         self.observed_magnetic_list[obj_id] = None
-
-        # UPDATE MODEL
-        self.update_layer_data()
-        self.set_frame_limits()
-        self.draw()
-
-    def delete_obs_mag_deriv(self, event):
-        """DELETE A MAGNETIC DERIVATIVE DATASET FROM THE MODEL"""
-        # DESTROY MENUBAR
-        self.m_obs_mag_submenu.DestroyItem(event.Id)
-
-        # REMOVE OBJECT AND MPL ACTOR
-        obj_id = event.Id - 12500
-        self.observed_magnetic_deriv_list[obj_id].mpl_actor.set_visible(False)
-        self.observed_magnetic_deriv_list[obj_id] = None
 
         # UPDATE MODEL
         self.update_layer_data()
@@ -3907,6 +3856,7 @@ class Gmg(wx.Frame):
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 10000 + self.observed_topography_counter
+        new_derivative.type = str('derivative')
         new_derivative.mpl_actor = self.topo_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                          marker='o', color=new_derivative.color, s=5,
                                                          gid=10000 + self.observed_topography_counter)
@@ -3948,6 +3898,7 @@ class Gmg(wx.Frame):
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 11000 + self.observed_gravity_counter
+        new_derivative.type = str('derivative')
         new_derivative.mpl_actor = self.grav_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                          marker='o', color=new_derivative.color, s=5,
                                                          gid=11000 + self.observed_gravity_counter)
@@ -3988,6 +3939,7 @@ class Gmg(wx.Frame):
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 12000 + self.observed_magnetic_counter
+        new_derivative.type = str('derivative')
         new_derivative.mpl_actor = self.mag_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                              marker='o', color=new_derivative.color, s=5,
                                                              gid=12000 + self.observed_magnetic_counter)
