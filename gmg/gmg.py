@@ -709,15 +709,6 @@ class Gmg(wx.Frame):
         self.observed_xy_data_list = []
         self.xy_data_counter = 0
 
-        # INITIALISE GEOLOGICAL CONTACT ATTRIBUTES
-        self.outcrop_data = [[]]
-        self.outcrop_data_list = [[]]
-        self.outcrop_data_list_save = [[]]
-        self.outcrop_data_name_list = []
-        self.outcrop_data_color_list = [[]]
-        self.outcrop_text_list = [[]]
-        self.outcrop_data_count = 0
-
         # INITIALISE OBSERVED TOPOGRAPHY ATTRIBUTES
         self.observed_topography_list = []
         self.observed_topography_counter = 0
@@ -747,6 +738,14 @@ class Gmg(wx.Frame):
         self.mag_rms_value = 0.  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
         self.mag_residuals = []  # CALCULATED RESIDUAL
 
+        # INITIALISE GEOLOGICAL CONTACT ATTRIBUTES
+        self.outcrop_data_list = []
+        self.outcrop_data_count = 0
+
+        # INITIALISE Well ATTRIBUTES
+        self.well_data_list = []
+        self.well_counter = 0
+
         # INITIALISE SEISMIC ATTRIBUTES
         self.gain = 4.0
         self.gain_neg = -self.gain
@@ -756,10 +755,6 @@ class Gmg(wx.Frame):
         self.segy_plot_list = []
         self.segy_dimension_list = []
         self.segy_count = 0
-
-        # INITIALISE Well ATTRIBUTES
-        self.well_data_list = []
-        self.well_counter = 0
 
         # INITIALISE LAYER ATTRIBUTES
         self.densities = [0.]
@@ -1673,13 +1668,12 @@ class Gmg(wx.Frame):
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms',
                   'faults', 'fault_names_list', 'fault_counter', 'current_fault_index',
                   'fault_x_coords_list', 'fault_y_coords_list', 'fault_tree_items', 'fault_counter',
-                  'outcrop_data_list', 'outcrop_data_list_save', 'outcrop_data_name_list',
-                  'outcrop_data_color_list', 'outcrop_text_list',
                   'observed_xy_data_list',
                   'observed_gravity_list',
                   'observed_magnetic_list',
                   'observed_topography_list',
-                  'well_data_list']
+                  'well_data_list',
+                  'outcrop_data_list']
 
         model_params = [self.model_aspect, self.area, self.xp, self.zp, self.tree_items,
                         self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
@@ -1691,13 +1685,12 @@ class Gmg(wx.Frame):
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms,
                         self.faults, self.fault_names_list, self.fault_counter, self.current_fault_index,
                         self.fault_x_coords_list, self.fault_y_coords_list, self.fault_tree_items, self.fault_counter,
-                        self.outcrop_data_list, self.outcrop_data_list_save, self.outcrop_data_name_list,
-                        self.outcrop_data_color_list, self.outcrop_text_list,
                         self.observed_xy_data_list,
                         self.observed_gravity_list,
                         self.observed_magnetic_list,
                         self.observed_topography_list,
-                        self.well_data_list]
+                        self.well_data_list,
+                        self.outcrop_data_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -1782,9 +1775,6 @@ class Gmg(wx.Frame):
             if len(self.observed_magnetic_list) > 0:
                 self.replot_observed_magnetic_data()
 
-            # LOAD OBSERVED XY DATA
-            if len(self.observed_xy_data_list) > 0:
-                self.replot_observed_xy_data()
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1859,16 +1849,20 @@ class Gmg(wx.Frame):
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
+            # LOAD OBSERVED WELL DATA
+            if len(self.well_data_list) > 0:
+                print("LOADING WELL DATA")
+                self.replot_well_data()
+
+            # LOAD OBSERVED XY DATA
+            if len(self.observed_xy_data_list) > 0:
+                self.replot_observed_xy_data()
+
+
             # DRAW OUTCROP DATA
-            self.outcrop_data_count = 0
-            for self.x in range(len(self.outcrop_data_name_list)):
-                print self.outcrop_data_count
-                if self.outcrop_data_name_list[self.x] == "None" or self.outcrop_data_name_list[self.x] == []:
-                    self.outcrop_data_count += 1
-                else:
-                    # LOAD DATA INTO MODEL
-                    print self.outcrop_data_count
-                    self.open_outcrop_data('open')
+            if len(self.outcrop_data_list) > 0:
+                self.replot_outcrop_data()
+
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1877,7 +1871,7 @@ class Gmg(wx.Frame):
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
-            # Set Fault PICKIGN SWTICH OFF (DEFAULT TO LAYER MODE)
+            # Set Fault PICKING SWITCH OFF (DEFAULT TO LAYER MODE)
             self.fault_picking_swtich = False
             # ----------------------------------------------------------------------------------------------------------
 
@@ -1893,7 +1887,6 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
-            self.draw_well()  # DRAW WELLS
             self.Restore()  # FIX'S DISPLAY ISSUE
             # ----------------------------------------------------------------------------------------------------------
 
@@ -2050,10 +2043,132 @@ class Gmg(wx.Frame):
         """ADD LOADED WELL DATA TO THE MODEL FRAME"""
         for x in range(len(self.well_data_list)):
             if self.well_data_list[x] is not None:
-                pass
+
+                # SET CURRENT WELL
+                self.loaded_well = self.well_data_list[x]
+                well = self.well_data_list[x]
+
+                # CREATE FILE MENU DATA
+                self.well_name_submenu = wx.Menu()
+                self.m_wells_submenu.Append(well.id + 3000, well.name, self.well_name_submenu)
+                self.well_name_submenu.Append(well.id + 2000, 'Hide/Show')
+                self.well_name_submenu.Append(well.id + 3000, 'Delete well')
+                self.Bind(wx.EVT_MENU, self.show_hide_well, id=well.id + 2000)
+                self.Bind(wx.EVT_MENU, self.delete_well, id=well.id + 3000)
+
+                # DRAW WELL IN MODEL FRAME
+                y1 = well.data[0][1].astype(float)
+                y2 = well.data[-1][-1].astype(float)
+                well_x_location = well.data[1][1].astype(float)
+                wellx = (well_x_location, well_x_location)
+                welly = (y1, y2)
+                well.mpl_actor = self.model_frame.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
+
+                # PLOT WELL NAME
+                well.mpl_actor_name = self.model_frame.annotate(well.name, xy=(well_x_location, -0.5),
+                                                                xytext=(well_x_location, -0.5),
+                                                                fontsize=well.textsize, weight='bold',
+                                                                horizontalalignment='center', color='black',
+                                                                bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
+                                                                clip_on=True)
+
+                # PLOT WELL HORIZONS
+                # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
+                well.labels_list = [None] * (len(well.data) - 2)
+                well.horizons_list = [None] * (len(well.data) - 2)
+                for i in range(2, len(well.data)):
+                    y = [well.data[i][1].astype(float), well.data[i][1].astype(float)]
+                    x = [well.data[1][1].astype(float) - 1, well.data[1][1].astype(float) + 1]
+
+                    # PLOT HORIZON LINE
+                    well.horizons_list[i-2] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
+                    horizon_y_pos = well.data[i][1].astype(float)
+                    horizon = well.data[i][0].astype(str)
+
+                    # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
+                    if i % 2 == 0:
+                        horizon_x_pos = well.data[1][1].astype(float) - 1.05
+                        well.labels_list[i-2] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
+                                                                        xytext=(horizon_x_pos, horizon_y_pos),
+                                                                        fontsize=well.text_size, weight='bold',
+                                                                        horizontalalignment='left',
+                                                                        verticalalignment='top',
+                                                                        color='black',
+                                                                        bbox=dict(boxstyle="round,pad=.4",
+                                                                                  fc="0.8", ec='None'), clip_on=True)
+                    else:
+                        horizon_x_pos = well.data[1][1].astype(float) + 1.05
+                        well.labels_list[i-2] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
+                                                                        xytext=(horizon_x_pos, horizon_y_pos),
+                                                                        fontsize=well.text_size, weight='bold',
+                                                                        horizontalalignment='right',
+                                                                        verticalalignment='top',
+                                                                        color='black',
+                                                                        bbox=dict(boxstyle="round,pad=.4",
+                                                                                  fc="0.8", ec='None'), clip_on=True)
 
         # SET WELL COUNTER
         self.well_counter = len(self.well_data_list)
+
+    def replot_outcrop_data(self):
+        """ADD LOADED OUTCROP DATA TO THE MODEL FRAME"""
+        for x in range(len(self.outcrop_data_list)):
+            if self.outcrop_data_list[x] is not None:
+
+                # SET CURRENT OUTCROP DATA RECORD
+                outcrop = self.outcrop_data_list[x]
+
+                # PLOT MARKERS IN MODEL
+                outcrop.lines = [None] * len(outcrop.data)
+                for i in range(len(outcrop.data)):
+                    x1 = outcrop.data[i, 0].astype(float)
+                    y1 = outcrop.data[i, 1].astype(float)
+                    y2 = outcrop.data[i, 2].astype(float)
+                    x = (x1, x1)
+                    y = (y1, y2)
+                    outcrop.lines[i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color=outcrop.color)
+
+                # DRAW TEXT LABELS
+                outcrop.labels = [None] * len(outcrop.data)
+
+                # CREATE TEXT XYT
+                text = zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
+                           outcrop.data[:, 3].astype(str))
+
+                for i in range(len(outcrop.data)):
+
+                    # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
+                    if i % 2 == 0:
+                        outcrop.labels[i] = self.model_frame.annotate(text[i][2], xy=(text[i][0], text[i][1]),
+                                                                      xytext=(text[i][0], text[i][1]),
+                                                                      fontsize=outcrop.textsize,
+                                                                      weight='regular', horizontalalignment='right',
+                                                                      verticalalignment='bottom',
+                                                                      color='black',
+                                                                      bbox=dict(boxstyle="round,pad=.4", fc="0.8",
+                                                                                ec='None'), clip_on=True)
+                    else:
+                        outcrop.labels[i] = self.model_frame.annotate(text[i][2], xy=(text[i][0], text[i][1]),
+                                                                      xytext=(text[i][0], text[i][1]),
+                                                                      fontsize=outcrop.textsize,
+                                                                      weight='regular', horizontalalignment='left',
+                                                                      verticalalignment='top',
+                                                                      color='black',
+                                                                      bbox=dict(boxstyle="round,pad=.4", fc="0.8",
+                                                                                ec='None'), clip_on=True)
+
+                #  APPEND NEW DATA MENU TO 'OUTCROP DATA MENU'
+                self.outcrop_submenu = wx.Menu()
+                self.m_outcrop_submenu.Append(self.outcrop_data_count, outcrop.name, self.outcrop_submenu)
+
+                # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+                self.outcrop_submenu.Append(13000 + self.outcrop_data_count, 'delete observed data')
+
+                # BIND TO DEL XY FUNC
+                self.Bind(wx.EVT_MENU, self.delete_outcrop_data, id=13000 + self.outcrop_data_count)
+
+                # ISET OUTCROP COUNTER
+                self.outcrop_data_count = len(self.outcrop_data_list)
 
     # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2487,6 +2602,7 @@ class Gmg(wx.Frame):
         well = ObservedWellData()
 
         # SET WELL ATTRIBUTES
+        well.id = self.well_counter
 
         # SET NAME
         well.name = well_name_box.GetValue()
@@ -2503,8 +2619,8 @@ class Gmg(wx.Frame):
         self.m_wells_submenu.Append(self.well_counter + 3000, well.name, self.well_name_submenu)
         self.well_name_submenu.Append(self.well_counter + 2000, 'Hide/Show')
         self.well_name_submenu.Append(self.well_counter + 3000, 'Delete well')
-        self.Bind(wx.EVT_MENU, self.show_hide_well, id=self.well_counter + 2000)
-        self.Bind(wx.EVT_MENU, self.delete_well, id=self.well_counter + 3000)
+        self.Bind(wx.EVT_MENU, self.show_hide_well, id=well.id + 2000)
+        self.Bind(wx.EVT_MENU, self.delete_well, id=well.id + 3000)
 
 
         # DRAW WELL IN MODEL FRAME
@@ -2525,21 +2641,21 @@ class Gmg(wx.Frame):
 
         # PLOT WELL HORIZONS
         # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
-        well.labels_list = [None] * len(well.data)
-        well.horizons_list = [None] * len(well.data)
+        well.labels_list = [None] * (len(well.data) - 2)
+        well.horizons_list = [None] * (len(well.data) - 2)
         for i in range(2, len(well.data)):
             y = [well.data[i][1].astype(float), well.data[i][1].astype(float)]
             x = [well.data[1][1].astype(float) - 1, well.data[1][1].astype(float) + 1]
 
             # PLOT HORIZON LINE
-            well.horizons_list[i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
+            well.horizons_list[i-2] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
             horizon_y_pos = well.data[i][1].astype(float)
             horizon = well.data[i][0].astype(str)
 
             # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
             if i % 2 == 0:
                 horizon_x_pos = well.data[1][1].astype(float) - 1.05
-                well.labels_list[i] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
+                well.labels_list[i-2] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
                                                                  xytext=(horizon_x_pos, horizon_y_pos),
                                                                  fontsize=well.text_size, weight='bold',
                                                                  horizontalalignment='left', verticalalignment='top',
@@ -2547,7 +2663,7 @@ class Gmg(wx.Frame):
                                                                  fc="0.8", ec='None'), clip_on=True)
             else:
                 horizon_x_pos = well.data[1][1].astype(float) + 1.05
-                well.labels_list[i] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
+                well.labels_list[i-2] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
                                                                 xytext=(horizon_x_pos, horizon_y_pos),
                                                                 fontsize=well.text_size, weight='bold',
                                                                  horizontalalignment='right', verticalalignment='top',
@@ -2564,83 +2680,9 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
-    def draw_well(self):
-        """DRAW WELLS ON MODEL CANVAS"""
-
-        # CREATE EMPTY ARRAYS TO FILL WITH WELL DATA
-        self.wells = [[]] * len(self.well_list)
-        # self.well_name_text = [[]] * len(self.well_list)
-        # self.well_labels = [[]] * len(self.well_list)
-        # self.horizons = [[]] * len(self.well_list)
-        #
-        # for w in range(0, len(self.well_list)):
-        #     if self.well_list[w] == "None" or self.well_list[w] == []:
-        #         self.well_horizons_list.append([])
-        #         self.well_labels_list.append([])
-        #         continue
-        #     else:
-        #
-        #         self.wd = np.array(self.well_list[w][1:])  # CREATE NP ARRAY WITHOUT HEADER INFO
-        #         y1 = float(self.wd[0][1])
-        #         y2 = float(self.wd[-1][-1])
-        #         well_x_location = float(self.wd[1][1])
-        #         wellx = (well_x_location, well_x_location)
-        #         welly = (y1, y2)
-        #
-        #         self.wells[w] = self.model_frame.plot(wellx, welly, linestyle='-', linewidth='2', color='black')
-        #
-        #         # PLOT WELL NAME
-        #         well_name = self.well_name_list[w]
-        #         self.well_name_text[w] = self.model_frame.annotate(well_name, xy=(well_x_location, -0.5),
-        #                                                        xytext=(well_x_location, -0.5),
-        #                                                        fontsize=self.well_textsize, weight='bold',
-        #                                                        horizontalalignment='center', color='black',
-        #                                                        bbox=dict(boxstyle="round,pad=.2", fc="0.8"),
-        #                                                        clip_on=True)
-        #
-        #         # PLOT WELL HORIZONS
-        #         # SET EMPTY ARRAYS TO FILL WITH LABELS AND HORIZONS
-        #         self.well_labels[w] = [None] * len(self.wd)
-        #         self.horizons[w] = [None] * len(self.wd)
-        #         for i in range(2, len(self.wd)):
-        #             y = [self.wd[i][1].astype(float), self.wd[i][1].astype(float)]
-        #             x = [self.wd[1][1].astype(float) - 1, self.wd[1][1].astype(float) + 1]
-        #
-        #             # PLOT HORIZON LINE
-        #             self.horizons[w][i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
-        #             horizon_y_pos = self.wd[i, 1].astype(float)
-        #             horizon = self.wd[i, 0].astype(str)
-        #
-        #             # ALTERNATE POSITION OF ODDs/EVENs TO TRY AND AVOID OVERLAP
-        #             if i % 2 == 0:
-        #                 horizon_x_pos = self.wd[1, 1].astype(float) - 1.05
-        #                 self.well_labels[w][i] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
-        #                                                                xytext=(horizon_x_pos, horizon_y_pos),
-        #                                                                fontsize=self.well_textsize,
-        #                                                                weight='bold', horizontalalignment='left',
-        #                                                                verticalalignment='top',
-        #                                                                color='black',
-        #                                                                bbox=dict(boxstyle="round,pad=.4", fc="0.8",
-        #                                                                          ec='None'),
-        #                                                                clip_on=True)
-        #             else:
-        #                 horizon_x_pos = self.wd[1][1].astype(float) + 1.05
-        #                 self.well_labels[w][i] = self.model_frame.annotate(horizon, xy=(horizon_x_pos, horizon_y_pos),
-        #                                                                xytext=(horizon_x_pos, horizon_y_pos),
-        #                                                                fontsize=self.well_textsize,
-        #                                                                weight='bold', horizontalalignment='right',
-        #                                                                verticalalignment='bottom',
-        #                                                                color='black',
-        #                                                                bbox=dict(boxstyle="round,pad=.4", fc="0.8",
-        #                                                                          ec='None'),
-        #                                                                clip_on=True)
-        #         self.well_labels_list[w] = self.well_labels
-        #         self.well_horizons_list[w] = self.horizons
-        #         self.well_horizons_list.append([])
-        #         self.well_labels_list.append([])
-        # self.draw()
-
     def show_hide_well(self, event):
+        print("Hide/Show well")
+        print(event.Id)
         id = event.Id - 2000
         if self.well_data_list[id].mpl_actor[0].get_visible():
             # HIDE WELL
@@ -2670,27 +2712,32 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_well(self, event):
-        """REMOVE PLOT GRAPHICS"""
-        self.wells[event.Id - 3000][0].set_visible(False)
-        self.well_name_text[event.Id - 3000].set_visible(False)
-        horizons = self.horizons[event.Id - 3000]
-        for i in range(2, len(horizons)):
-            horizons[i][0].set_visible(False)
-            horizons[i] = "None"
-        labels = self.well_labels[event.Id - 3000]
-        for i in range(2, len(labels)):
-            labels[i].set_visible(False)
-            labels[i] = "None"
+        """"DELETE WELL DATA NB: ID's start at 2500"""
 
-        # SET DATA TO NONE
-        self.well_list[event.Id - 3000] = "None"
-        self.well_name_list[event.Id - 3000] = "None"
-        self.wells[event.Id - 3000][0] = "None"
-        self.well_name_text[event.Id - 3000] = "None"
+        # SET ID
+        obj_id = event.Id - 3000
 
-        # REMOVE SUBMENU
+        # REMOVE OBJECT AND MPL ACTOR
+        self.well_data_list[obj_id].mpl_actor[0].set_visible(False)
+
+        # REMOVE HORIZON MPL ACTORS
+        for h in range(len(self.well_data_list[obj_id].horizons_list)):
+            if self.well_data_list[obj_id].horizons_list[h] is not None:
+                self.well_data_list[obj_id].horizons_list[h][0].set_visible(False)
+
+        # REMOVE LABEL MPL ACTORS
+        for l in range(len(self.well_data_list[obj_id].labels_list)):
+            if self.well_data_list[obj_id].labels_list[l] is not None:
+                self.well_data_list[obj_id].labels_list[l].set_visible(False)
+
+        # SET OBJECT AS NONE
+        self.well_data_list[obj_id] = None
+
+        # DELETE MENUBAR ENTRY
         self.m_wells_submenu.DestroyItem(event.Id)
-        self.update_layer_data()
+
+        # UPDATE MODEL
+        self.draw()
 
     # GEOLOGY OUTCROP DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2699,79 +2746,62 @@ class Gmg(wx.Frame):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'outcrop')
         self.load_window.Show(True)
 
-    def open_outcrop_data(self, type):
+    def open_outcrop_data(self):
         """OPEN THE OUTCROP DATA SELECTED BY THE USER USING THE load_outcrop_data FUNC"""
-        if type == 'load':
-            outcrop_input_file = self.load_window.file_path
-            self.outcrop_data_name = self.load_window.observed_name
-            self.outcrop_data_color = self.load_window.color_picked
-            self.outcrop_data = np.genfromtxt(outcrop_input_file, autostrip=True, dtype=str,
-                                              comments='#')
-            self.outcrop_data_list.append([])
-        else:
-            self.outcrop_data = self.outcrop_data_list_save[self.x]
-            self.outcrop_data_name = self.outcrop_data_name_list[self.x]
-            self.outcrop_data_color = self.outcrop_data_color_list[self.x]
 
-        # GET XY DATA NAME
-        self.outcrop_data_name_list.append([])
-        self.outcrop_data_name_list[self.outcrop_data_count] = str(self.outcrop_data_name)
+        # CREATE A NEW OUTCROP DATA OBJECT
+        outcrop = ObservedOutcropData()
 
-        # GET XY_COLOR
-        self.outcrop_data_color_list.append([])
-        self.outcrop_data_color_list[self.outcrop_data_count] = str(self.outcrop_data_color)
+        # LOAD DATA FILE
+        outcrop_input_file = self.load_window.file_path
+        outcrop.id = self.outcrop_data_count
+        outcrop.name = self.load_window.observed_name
+        outcrop.color = self.load_window.color_picked
+        outcrop.data = np.genfromtxt(outcrop_input_file, autostrip=True, dtype=str, comments='#')
 
-        # LOAD DATA
-        self.outcrop_data_list_save.append([])
-        self.outcrop_data_list_save[self.outcrop_data_count] = self.outcrop_data
 
         # PLOT MARKERS IN MODEL
-        self.contact_labels = [None] * len(self.outcrop_data)
-        self.contacts = [None] * len(self.outcrop_data)
-        lines = [None] * len(self.outcrop_data)
-        for i in range(len(self.outcrop_data)):
-            x1 = self.outcrop_data[i, 0].astype(float)
-            y1 = self.outcrop_data[i, 1].astype(float)
-            y2 = self.outcrop_data[i, 2].astype(float)
+        outcrop.lines = [None] * len(outcrop.data)
+        for i in range(len(outcrop.data)):
+            x1 = outcrop.data[i, 0].astype(float)
+            y1 = outcrop.data[i, 1].astype(float)
+            y2 = outcrop.data[i, 2].astype(float)
             x = (x1, x1)
             y = (y1, y2)
-            lines[i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color='black')
+            outcrop.lines[i] = self.model_frame.plot(x, y, linestyle='-', linewidth='2', color=outcrop.color)
 
-        self.outcrop_data_list.append([])
-        self.outcrop_data_list[self.outcrop_data_count] = lines
+        # DRAW TEXT LABELS
+        outcrop.labels = [None] * len(outcrop.data)
 
-        # DRAW TEXT
-        self.text_labels = [None] * len(self.outcrop_data)
-        text = zip(self.outcrop_data[:, 0].astype(float), self.outcrop_data[:, 1].astype(float),
-                   self.outcrop_data[:, 3].astype(str))
-        for i in range(len(self.outcrop_data)):
+        # CREATE TEXT XYT
+        text = zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
+                   outcrop.data[:, 3].astype(str))
+
+        for i in range(len(outcrop.data)):
 
             # ALTERNATE POSITION OF ODDs/EVENs To TRY AND AVOID OVERLAP
             if i % 2 == 0:
-                self.text_labels[i] = self.model_frame.annotate(text[i][2], xy=(text[i][0], text[i][1]),
+                outcrop.labels[i] = self.model_frame.annotate(text[i][2], xy=(text[i][0], text[i][1]),
                                                             xytext=(text[i][0], text[i][1]),
-                                                            fontsize=self.well_textsize,
+                                                            fontsize=outcrop.textsize,
                                                             weight='regular', horizontalalignment='right',
                                                             verticalalignment='bottom',
                                                             color='black',
                                                             bbox=dict(boxstyle="round,pad=.4", fc="0.8", ec='None'),
                                                             clip_on=True)
             else:
-                self.text_labels[i] = self.model_frame.annotate(text[i][2], xy=(text[i][0], text[i][1]),
+                outcrop.labels[i] = self.model_frame.annotate(text[i][2], xy=(text[i][0], text[i][1]),
                                                             xytext=(text[i][0], text[i][1]),
-                                                            fontsize=self.well_textsize,
+                                                            fontsize=outcrop.textsize,
                                                             weight='regular', horizontalalignment='left',
                                                             verticalalignment='top',
                                                             color='black',
                                                             bbox=dict(boxstyle="round,pad=.4", fc="0.8", ec='None'),
                                                             clip_on=True)
 
-        self.outcrop_text_list.append([])
-        self.outcrop_text_list[self.outcrop_data_count] = self.text_labels
-
         #  APPEND NEW DATA MENU TO 'OUTCROP DATA MENU'
         self.outcrop_submenu = wx.Menu()
-        self.m_outcrop_submenu.Append(self.outcrop_data_count, self.outcrop_data_name, self.outcrop_submenu)
+        self.m_outcrop_submenu.Append(13000 + self.outcrop_data_count, outcrop.name, self.outcrop_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
         self.outcrop_submenu.Append(13000 + self.outcrop_data_count, 'delete observed data')
@@ -2782,28 +2812,34 @@ class Gmg(wx.Frame):
         # INCREMENT CONTACT COUNT
         self.outcrop_data_count += 1
 
+        # APPEND NEW OUTCROP DATA OBJECT TO THE OUTCROP DATA LIST
+        self.outcrop_data_list.append(outcrop)
+
         # UPDATE GMG GUI
         self.update_layer_data()
         self.draw()
 
     def delete_outcrop_data(self, event):
         """"DELETE OUTCROP DATA NB: ID's start at 13000"""
-        id = event.Id - 13000
-        self.m_outcrop_submenu.DestroyItem(id)
 
-        for i in range(0, len(self.outcrop_data_list[id])):
-            self.outcrop_data_list[id][i][0].set_visible(False)
+        # SET ID
+        obj_id = event.Id - 13000
 
-        for i in range(0, len(self.outcrop_text_list[id])):
-            self.outcrop_text_list[id][i].set_visible(False)
+        # REMOVE LINE MPL ACTORS
+        for i in range(len(self.outcrop_data_list[obj_id].lines)):
+            self.outcrop_data_list[obj_id].lines[i][0].set_visible(False)
 
-        self.outcrop_data_list[id] = []
-        self.outcrop_data_name_list[id] = []
-        self.outcrop_data_color_list[id] = []
-        self.outcrop_data_list_save[id] = []
-        self.outcrop_text_list[id] = []
+        # REMOVE LABEL MPL ACTORS
+        for i in range(len(self.outcrop_data_list[obj_id].labels)):
+            self.outcrop_data_list[obj_id].labels[i].set_visible(False)
 
-        self.update_layer_data()
+        # SET OBJECT AS NONE
+        self.outcrop_data_list[obj_id] = None
+
+        # DELETE MENUBAR ENTRY
+        self.m_outcrop_submenu.DestroyItem(event.Id)
+
+        # UPDATE MODEL
         self.draw()
 
     # LAYER & NODE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4270,14 +4306,11 @@ class Gmg(wx.Frame):
                     self.well_data_list[i].labels_list[l].set_size(self.textsize)
 
         # # LOOP THROUGH OUTCROP DATA LABELS
-        # if self.outcrop_data_count > 0:
-        #     for i in range(self.outcrop_data_count):
-        #         outcrop_text = self.outcrop_text_list[i]
-        #         for k in range(len(outcrop_text)):
-        #             if outcrop_text[k] is not None:
-        #                 outcrop_text[k].set_size(self.textsize)
-        #             else:
-        #                 pass
+        if self.outcrop_data_count > 0:
+            for i in range(self.outcrop_data_count):
+                if self.outcrop_data_list[i] is not None:
+                    for t in range(len(self.outcrop_data_list[i].labels)):
+                        self.outcrop_data_list[i].labels[t].set_fontsize(self.textsize)
 
         # REDRAW ANNOTATIONS WITH NEW TEXT SIZE
         self.draw()
@@ -4973,10 +5006,11 @@ class ObservedData:
 class ObservedOutcropData:
     """GENERIC CLASS FOR AN OBSERVATIONAL OUTCROP DATA OBJECT"""
     def __init__(self):
+        self.id = None
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
         self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
-
+        self.textsize = 2  # THE SIZE OF TEXT LABELS
 
 class SegyData:
     def __init__(self):
@@ -5158,7 +5192,7 @@ class LoadObservedDataFrame(wx.Frame):
         elif self.type == 'XY':
             self.parent.open_xy_data()
         elif self.type == 'outcrop':
-            self.parent.open_outcrop_data('load')
+            self.parent.open_outcrop_data()
         else:
             pass
         self.Destroy()
