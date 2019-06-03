@@ -402,9 +402,6 @@ class Gmg(wx.Frame):
         # SEGY LOAD
         self.m_load_segy = self.seismic_data.Append(-1, "&Load Segy...\tCtrl-y", "Load Segy Data")
         self.Bind(wx.EVT_MENU, self.segy_input, self.m_load_segy)
-        # SEGY REMOVE_ALL
-        self.m_remove_all_segy = self.seismic_data.Append(-1, "&Remove All Segy...\tCtrl-y", "Remove All Segy Data")
-        self.Bind(wx.EVT_MENU, self.remove_all_segy, self.m_remove_all_segy)
         # SEGY NAME LIST
         self.m_segy_submenu = wx.Menu()
         self.seismic_data.Append(-1, 'SEGY Data...', self.m_segy_submenu)
@@ -747,14 +744,11 @@ class Gmg(wx.Frame):
         self.well_counter = 0
 
         # INITIALISE SEISMIC ATTRIBUTES
-        self.gain = 4.0
-        self.gain_neg = -self.gain
-        self.segy_on = False
-        self.segy_name_list = []
-        self.segy_file_list = []
-        self.segy_plot_list = []
-        self.segy_dimension_list = []
-        self.segy_count = 0
+        self.segy_data_list = []
+        self.segy_counter = 0
+        self.segy_color_map = cm.gray
+        self.segy_gain_neg = -4.0
+        self.segy_gain_pos = 4.0
 
         # INITIALISE LAYER ATTRIBUTES
         self.densities = [0.]
@@ -810,11 +804,11 @@ class Gmg(wx.Frame):
         self.gravity_frame.grid()
         self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-        self.grav_d_frame = self.gravity_frame.twinx()
-        self.grav_d_frame.set_navigate(False)
-        self.grav_d_frame.set_ylabel("dg/dx")
-        self.grav_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.grav_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.gravity_d_frame = self.gravity_frame.twinx()
+        self.gravity_d_frame.set_navigate(False)
+        self.gravity_d_frame.set_ylabel("dg/dx")
+        self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         # MAGNETIC CANVAS
         self.magnetic_frame = plt.subplot2grid((26, 100), (5, self.x_orig), rowspan=3, colspan=self.columns)
@@ -824,11 +818,11 @@ class Gmg(wx.Frame):
         self.magnetic_frame.grid()
         self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-        self.mag_d_frame = self.magnetic_frame.twinx()
-        self.mag_d_frame.set_ylabel("dnt/dx")
-        self.mag_d_frame.set_navigate(False)
-        self.mag_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.mag_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.magnetic_d_frame = self.magnetic_frame.twinx()
+        self.magnetic_d_frame.set_ylabel("dnt/dx")
+        self.magnetic_d_frame.set_navigate(False)
+        self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         # MODEL CANVAS
         self.model_frame = plt.subplot2grid((26, 100), (8, self.x_orig), rowspan=17, colspan=self.columns)
@@ -977,24 +971,30 @@ class Gmg(wx.Frame):
         if event.Id == 601:
             if self.topo_frame_switch is True:
                 self.topo_frame.set_visible(False)
+                self.topo_d_frame.set_visible(False)
                 self.topo_frame_switch = False
             else:
                 self.topo_frame_switch = True
                 self.topo_frame.set_visible(True)
+                self.topo_d_frame.set_visible(True)
         if event.Id == 602:
             if self.gravity_frame_switch is True:
                 self.gravity_frame.set_visible(False)
+                self.gravity_d_frame.set_visible(False)
                 self.gravity_frame_switch = False
             else:
                 self.gravity_frame_switch = True
                 self.gravity_frame.set_visible(True)
+                self.gravity_d_frame.set_visible(True)
         if event.Id == 603:
             if self.magnetic_frame_switch is True:
                 self.magnetic_frame.set_visible(False)
+                self.magnetic_d_frame.set_visible(False)
                 self.magnetic_frame_switch = False
             else:
                 self.magnetic_frame_switch = True
                 self.magnetic_frame.set_visible(True)
+                self.magnetic_d_frame.set_visible(True)
 
         # ADJUST FRAME SIZING AND SET PROGRAM WINDOW
         if self.topo_frame_switch is True and self.gravity_frame_switch is True and self.magnetic_frame_switch is True:
@@ -1018,10 +1018,10 @@ class Gmg(wx.Frame):
             self.gravity_frame.grid()
             self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.grav_d_frame = self.gravity_frame.twinx()
-            self.grav_d_frame.set_ylabel("dg/dx")
-            self.grav_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.grav_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.gravity_d_frame = self.gravity_frame.twinx()
+            self.gravity_d_frame.set_ylabel("dg/dx")
+            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
             'MAG CANVAS'
             self.magnetic_frame = plt.subplot2grid((26, 100), (5, self.x_orig), rowspan=3, colspan=self.columns)
@@ -1030,10 +1030,10 @@ class Gmg(wx.Frame):
             self.magnetic_frame.grid()
             self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.mag_d_frame = self.magnetic_frame.twinx()
-            self.mag_d_frame.set_ylabel("dnt/dx")
-            self.mag_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.mag_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.magnetic_d_frame = self.magnetic_frame.twinx()
+            self.magnetic_d_frame.set_ylabel("dnt/dx")
+            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         elif self.topo_frame_switch is False and self.gravity_frame_switch is True and \
                 self.magnetic_frame_switch is True:
@@ -1042,15 +1042,14 @@ class Gmg(wx.Frame):
             # HIDDEN
             'GRAV CANVAS'
             self.gravity_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=4, colspan=self.columns)
-            self.grav_d_frame = self.gravity_frame.twinx()
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.grid()
             self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.grav_d_frame = self.gravity_frame.twinx()
-            self.grav_d_frame.set_ylabel("dg/dx")
-            self.grav_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.grav_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.gravity_d_frame = self.gravity_frame.twinx()
+            self.gravity_d_frame.set_ylabel("dg/dx")
+            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
             'MAG CANVAS'
             self.magnetic_frame = plt.subplot2grid((26, 100), (4, self.x_orig), rowspan=4, colspan=self.columns)
@@ -1059,10 +1058,10 @@ class Gmg(wx.Frame):
             self.magnetic_frame.grid()
             self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.mag_d_frame = self.magnetic_frame.twinx()
-            self.mag_d_frame.set_ylabel("dnt/dx")
-            self.mag_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.mag_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.magnetic_d_frame = self.magnetic_frame.twinx()
+            self.magnetic_d_frame.set_ylabel("dnt/dx")
+            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         elif self.topo_frame_switch is True and self.gravity_frame_switch is False and \
                 self.magnetic_frame_switch is True:
@@ -1087,10 +1086,10 @@ class Gmg(wx.Frame):
             self.magnetic_frame.grid()
             self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.mag_d_frame = self.magnetic_frame.twinx()
-            self.mag_d_frame.set_ylabel("dnt/dx")
-            self.mag_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.mag_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.magnetic_d_frame = self.magnetic_frame.twinx()
+            self.magnetic_d_frame.set_ylabel("dnt/dx")
+            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         elif self.topo_frame_switch is True and self.gravity_frame_switch is True and \
                 self.magnetic_frame_switch is False:
@@ -1108,15 +1107,14 @@ class Gmg(wx.Frame):
 
             'GRAV CANVAS'
             self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=6, colspan=self.columns)
-            self.grav_d_frame = self.gravity_frame.twinx()
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.grid()
             self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.grav_d_frame = self.gravity_frame.twinx()
-            self.grav_d_frame.set_ylabel("dg/dx")
-            self.grav_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.grav_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.gravity_d_frame = self.gravity_frame.twinx()
+            self.gravity_d_frame.set_ylabel("dg/dx")
+            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
             'MAG CANVAS'
             # HIDDEN
@@ -1135,10 +1133,10 @@ class Gmg(wx.Frame):
             self.magnetic_frame.grid()
             self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.mag_d_frame = self.magnetic_frame.twinx()
-            self.mag_d_frame.set_ylabel("dnt/dx")
-            self.mag_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.mag_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.magnetic_d_frame = self.magnetic_frame.twinx()
+            self.magnetic_d_frame.set_ylabel("dnt/dx")
+            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         elif self.topo_frame_switch is False and self.gravity_frame_switch is True and \
                 self.magnetic_frame_switch is False:
@@ -1147,15 +1145,14 @@ class Gmg(wx.Frame):
             # HIDDEN
             'GRAV CANVAS'
             self.gravity_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=8, colspan=self.columns)
-            self.grav_d_frame = self.gravity_frame.twinx()
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.grid()
             self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            self.grav_d_frame = self.gravity_frame.twinx()
-            self.grav_d_frame.set_ylabel("dg/dx")
-            self.grav_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.grav_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.gravity_d_frame = self.gravity_frame.twinx()
+            self.gravity_d_frame.set_ylabel("dg/dx")
+            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
             'MAG CANVAS'
             # HIDDEN
@@ -1201,10 +1198,10 @@ class Gmg(wx.Frame):
             self.topo_d_frame.set_xlim(self.model_frame.get_xlim())
         if self.gravity_frame is not None:
             self.gravity_frame.set_xlim(self.model_frame.get_xlim())
-            self.grav_d_frame.set_xlim(self.model_frame.get_xlim())
+            self.gravity_d_frame.set_xlim(self.model_frame.get_xlim())
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
-            self.mag_d_frame.set_xlim(self.model_frame.get_xlim())
+            self.magnetic_d_frame.set_xlim(self.model_frame.get_xlim())
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
 
         # INITALISE CALCULATED P.F. LINES
@@ -1661,7 +1658,6 @@ class Gmg(wx.Frame):
         header = ['model_aspect',  'area', 'xp', 'zp', 'tree_items',
                   'layer_colors', 'plotx_list', 'ploty_list', 'densities', 'reference_densities',
                   'boundary_lock_list', 'layer_lock_list',
-                  'segy_name_list', 'segy_dimension_list', 'segy_file_list',
                   'earth_field', 'model_azimuth',
                   'mag_observation_elv', 'susceptibilities', 'angle_a', 'angle_b',
                   'absolute_densities',
@@ -1673,12 +1669,12 @@ class Gmg(wx.Frame):
                   'observed_magnetic_list',
                   'observed_topography_list',
                   'well_data_list',
-                  'outcrop_data_list']
+                  'outcrop_data_list',
+                  'segy_data_list']
 
         model_params = [self.model_aspect, self.area, self.xp, self.zp, self.tree_items,
                         self.layer_colors, self.plotx_list, self.ploty_list, self.densities, self.reference_densities,
                         self.boundary_lock_list, self.layer_lock_list,
-                        self.segy_name_list, self.segy_dimension_list, self.segy_file_list,
                         self.earth_field, self.model_azimuth,
                         self.mag_observation_elv, self.susceptibilities, self.angle_a, self.angle_b,
                         self.absolute_densities,
@@ -1690,7 +1686,8 @@ class Gmg(wx.Frame):
                         self.observed_magnetic_list,
                         self.observed_topography_list,
                         self.well_data_list,
-                        self.outcrop_data_list]
+                        self.outcrop_data_list,
+                        self.segy_data_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -1774,12 +1771,6 @@ class Gmg(wx.Frame):
             # LOAD OBSERVED MAGNETIC DATA
             if len(self.observed_magnetic_list) > 0:
                 self.replot_observed_magnetic_data()
-
-            # ----------------------------------------------------------------------------------------------------------
-
-            # ----------------------------------------------------------------------------------------------------------
-            # LOAD & PLOT SEGY
-            self.plot_segy()
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1835,6 +1826,9 @@ class Gmg(wx.Frame):
             # ----------------------------------------------------------------------------------------------------------
             # LOAD LAYERS
             self.load_layer_data()
+
+            # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
+            self.current_node = self.model_frame.scatter(-40000., 0., marker='o', color='r', zorder=10)
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -1846,12 +1840,14 @@ class Gmg(wx.Frame):
             # CREATE NEW CURRENT FAULT GRAPHIC
             self.faultline, = self.model_frame.plot([-100000, -100000], [-100000, -100000], marker='s', color='m',
                                                 linewidth=0.75, alpha=1.0, zorder=2, picker=True)
+
+            # Set Fault PICKING SWITCH OFF (DEFAULT TO LAYER MODE)
+            self.fault_picking_swtich = False
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
             # LOAD OBSERVED WELL DATA
             if len(self.well_data_list) > 0:
-                print("LOADING WELL DATA")
                 self.replot_well_data()
 
             # LOAD OBSERVED XY DATA
@@ -1859,29 +1855,19 @@ class Gmg(wx.Frame):
                 self.replot_observed_xy_data()
 
 
-            # DRAW OUTCROP DATA
+            # LOAD OUTCROP DATA
             if len(self.outcrop_data_list) > 0:
                 self.replot_outcrop_data()
 
-            # ----------------------------------------------------------------------------------------------------------
-
-            # ----------------------------------------------------------------------------------------------------------
-            # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
-            self.current_node = self.model_frame.scatter(-40000., 0., marker='o', color='r', zorder=10)
-            # ----------------------------------------------------------------------------------------------------------
-
-            # ----------------------------------------------------------------------------------------------------------
-            # Set Fault PICKING SWITCH OFF (DEFAULT TO LAYER MODE)
-            self.fault_picking_swtich = False
+            # LOAD SEGY DATA
+            if len(self.segy_data_list) > 0:
+                self.replot_segy_data()
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
             # REFRESH SIZER POSITIONS
             self.Hide()
             self.Show()
-            # ----------------------------------------------------------------------------------------------------------
-
-            # ----------------------------------------------------------------------------------------------------------
             # UPDATE LAYER DATA AND PLOT
             self.draw()
             self.update_layer_data()
@@ -1903,46 +1889,7 @@ class Gmg(wx.Frame):
         # MAXIMIZE FRAME
         self.Maximize(True)
 
-    # PLOTTING FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    def plot_segy(self):
-        """ PLOT SEGY DATA"""
-        self.segy_count = len(self.segy_file_list)
-
-        if self.segy_count >= 1:
-            for s in range(0, self.segy_count):
-                if self.segy_name_list[s] != "NaN":
-                    file_in = self.segy_file_list[s]
-                    self.sx1, self.sx2, self.sz1, self.sz2 = self.segy_dimension_list[s]
-                    section = read(file_in, unpack_trace_headers=False)
-                    nsamples = len(section.traces[0].data)
-                    ntraces = len(section.traces)
-                    self.seis_data = plt.zeros((nsamples, ntraces))
-                    for i, tr in enumerate(section.traces):
-                        self.seis_data[:, i] = tr.data
-                    del section
-                    gc.collect()
-                    del gc.garbage[:]
-
-                    self.seis_axis = [self.sx1, self.sx2, self.sz2, self.sz1]
-                    self.segy_plot_list.append(self.model_frame.imshow(self.seis_data, vmin=self.gain_neg,
-                                                                   vmax=self.gain, aspect='auto',
-                                                                   extent=self.seis_axis, cmap=cm.gray,
-                                                                   alpha=0.75))
-                    del self.seis_data
-                    gc.collect()
-                    del gc.garbage[:]
-
-                    self.segy_on = True
-                    '''ADD SEGY_NAME TO SEGY MENU'''
-                    # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
-                    self.segy_name_submenu = wx.Menu()
-                    self.m_segy_submenu.Append(s + 1000, self.segy_name_list[s], self.segy_name_submenu)
-                    self.segy_name_submenu.Append(s + 1000, 'delete segy')
-                    self.Bind(wx.EVT_MENU, self.remove_segy, id=s + 1000)  # ID+1000 TO AVOID GRAV SUBMENU ID CONFLICT
-
-                else:
-                    continue
+    # MODEL LOADING PLOTTING FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def replot_observed_xy_data(self):
         """ADD LOADED OBSERVED XY DATA TO THE MODEL FRAME"""
@@ -2170,7 +2117,55 @@ class Gmg(wx.Frame):
                 # ISET OUTCROP COUNTER
                 self.outcrop_data_count = len(self.outcrop_data_list)
 
-    # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def replot_segy_data(self):
+        """ PLOT SEGY DATA"""
+        for x in range(len(self.segy_data_list)):
+            if self.segy_data_list[x] is not None:
+
+                # SET CURRENT SEGY OBJECT
+                segy = self.segy_data_list[x]
+
+                # LOAD SEGY DATA
+                try:
+                    section = read(segy.file, unpack_trace_headers=False)
+                except IOError:
+                    load_error = MessageDialog(self, -1, "SEGY LOAD ERROR: FILE NOT FOOUND", "Segy load error")
+                    return
+
+                nsamples = len(section.traces[0].data)
+                ntraces = len(section.traces)
+                seis_data = plt.zeros((nsamples, ntraces))
+                for i, tr in enumerate(section.traces):
+                    seis_data[:, i] = tr.data
+                del section
+
+                # SET AXIS
+                segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
+
+                # PLOT SEGY DATA ON MODEL
+                segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
+                                                         aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
+                                                         alpha=0.75)
+                # REMOVE SEGY DATA
+                del seis_data
+
+                # SET SEGY ON SWTICH
+                self.segy_on = True
+
+                # APPEND NEW SEGY TO THE SEGY DATA LIST
+                self.segy_data_list.append(segy)
+
+                # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
+                self.segy_name_submenu = wx.Menu()
+                self.m_segy_submenu.Append(segy.id + 1000, segy.name, self.segy_name_submenu)
+                self.segy_name_submenu.Append(segy.id + 1000, 'delete segy')
+                self.Bind(wx.EVT_MENU, self.remove_segy, id=segy.id + 1000)
+
+            # INCREMENT COUNTER
+            self.segy_counter = len(self.segy_data_list)
+
+
+            # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_topo(self, event):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'topography')
@@ -2191,6 +2186,7 @@ class Gmg(wx.Frame):
 
         # SET ATTRIBUTES
         observed_topography.id = int(self.observed_topography_counter)
+        observed_topography.type = str('observed')
         observed_topography.name = self.load_window.observed_name
         observed_topography.color = self.load_window.color_picked
         observed_topography.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
@@ -2258,6 +2254,7 @@ class Gmg(wx.Frame):
 
         # SET ATTRIBUTES
         observed_gravity.id = int(self.observed_gravity_counter)
+        observed_gravity.type = str('observed')
         observed_gravity.name = self.load_window.observed_name
         observed_gravity.color = self.load_window.color_picked
         observed_gravity.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
@@ -2304,11 +2301,6 @@ class Gmg(wx.Frame):
         self.set_frame_limits()
         self.draw()
 
-        # UPDATE MODEL
-        self.update_layer_data()
-        self.set_frame_limits()
-        self.draw()
-
     def save_modelled_grav(self, event):
         """SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
         save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
@@ -2340,12 +2332,14 @@ class Gmg(wx.Frame):
 
         # SET ATTRIBUTES
         observed_magnetic.id = int(self.observed_magnetic_counter)
+        observed_magnetic.type = str('observed')
         observed_magnetic.name = self.load_window.observed_name
         observed_magnetic.color = self.load_window.color_picked
         observed_magnetic.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
-        observed_magnetic.mpl_actor = self.magnetic_frame.scatter(observed_magnetic.data[:, 0], observed_magnetic.data[:, 1],
-                                                          marker='o', color=observed_magnetic.color, s=5,
-                                                          gid=observed_magnetic.id)
+        observed_magnetic.mpl_actor = self.magnetic_frame.scatter(observed_magnetic.data[:, 0],
+                                                                  observed_magnetic.data[:, 1], marker='o',
+                                                                  color=observed_magnetic.color, s=5,
+                                                                  gid=observed_magnetic.id)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_magnetic_list.append(observed_magnetic)
@@ -2418,104 +2412,125 @@ class Gmg(wx.Frame):
             open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
                                              wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
             if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-                return  # the user changed idea...
+                return  # THE USER CHANGED THEIR MIND
+
+            # PARSE INPUT FILE
             file_in = open_file_dialog.GetPath()
-            self.segy_dimension_list.append(self.d)
-            self.segy_file_list.append(file_in)
-            self.segy_name_list.append(self.segy_name)
+
+            # CREATE NEW SEGY OBJECT
+            segy = SegyData()
+
+            # ASSIGN ATTRIBUTES
+            segy.id = self.segy_counter
+            segy.file = file_in
+            segy.name = self.segy_name
+            segy.dimensions = self.d
+
+            # LOAD SEGY DATA
             section = read(file_in, unpack_trace_headers=False)
             nsamples = len(section.traces[0].data)
             ntraces = len(section.traces)
-            self.seis_data = plt.zeros((nsamples, ntraces))
+            seis_data = plt.zeros((nsamples, ntraces))
             for i, tr in enumerate(section.traces):
-                self.seis_data[:, i] = tr.data
+                seis_data[:, i] = tr.data
             del section
-            self.seis_axis = [self.sx1, self.sx2, self.sz2, self.sz1]
-            self.segy_plot_list.append(self.model_frame.imshow(self.seis_data, vmin=self.gain_neg, vmax=self.gain,
-                                                           aspect='auto', extent=self.seis_axis, cmap=cm.gray,
-                                                           alpha=0.75))
-            del self.seis_data
+
+            # SET AXIS
+            segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
+
+            # PLOT SEGY DATA ON MODEL
+            segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
+                                                           aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
+                                                           alpha=0.75)
+            # REMOVE SEGY DATA
+            del seis_data
+
+            # SET SEGY ON SWTICH
             self.segy_on = True
-            self.update_layer_data()
 
-            # ADD SEGY_NAME TO SEGY MENU
-            # 1000 IS ADDED TO EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
+            # APPEND NEW SEGY TO THE SEGY DATA LIST
+            self.segy_data_list.append(segy)
+
+            # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
             self.segy_name_submenu = wx.Menu()
-            self.m_segy_submenu.Append(self.segy_count + 1000, self.segy_name_list[self.segy_count],
-                                       self.segy_name_submenu)
-            self.segy_name_submenu.Append(self.segy_count + 1000, 'delete segy')
-            self.Bind(wx.EVT_MENU, self.remove_segy,
-                      id=self.segy_count + 1000)  # ID IS SET TO +1000 TO AVOID CONFLICT WITH GRAV SUB MENU IDS
+            self.m_segy_submenu.Append(self.segy_counter + 1000, segy.name, self.segy_name_submenu)
+            self.segy_name_submenu.Append(self.segy_counter + 1000, 'delete segy')
+            self.Bind(wx.EVT_MENU, self.remove_segy, id=self.segy_counter + 1000)
 
-            self.segy_count = self.segy_count + 1
+            # INCREMENT COUNTER
+            self.segy_counter += 1
+
         except AttributeEditor:
             load_error = MessageDialog(self, -1, "SEGY LOAD ERROR", "segy load error")
 
-    def remove_all_segy(self, event):
-        self.segy_plot_list = []
-        self.segy_name_list = []
-        self.segy_dimension_list = []
-        self.segy_dimension_list = []
-        self.segy_file_list = []
-        self.segy_count = 0
+        # REPLOT MODEL
+        self.update_layer_data()
         self.draw()
 
     def remove_segy(self, event):
-        # 1000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS
+        """DELETE SEGY DATA. NB 1000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS"""
         if self.segy_on:
-            img = self.segy_plot_list[event.Id - 1000]
-            img.remove()
-            self.segy_name_list[event.Id - 1000] = "NaN"
-            self.segy_plot_list[event.Id - 1000] = 0
-            self.m_segy_submenu.DestroyId(event.Id)
+
+            # DELETE SEGY OBJECT
+            obj_id = event.Id - 1000
+            self.segy_data_list[obj_id].mpl_actor.set_visible(False)
+            self.segy_data_list[obj_id].mpl_actor.remove()
+            self.segy_data_list[obj_id] = None
+
+            # REMOVE MENUBAR
+            self.m_segy_submenu.DestroyItem(event.Id)
+
+            # UPDATE MODEL
+            self.update_layer_data()
+            self.set_frame_limits()
             self.draw()
 
     def segy_color_adjustment(self, event):
         if event.Id == 901:
-            if self.segy_on is False:
-                return 0
-            else:
-                for s in range(0, len(self.segy_plot_list)):
-                    if self.segy_plot_list[s]:
-                        self.segy_plot_list[s].set_cmap(cm.gray)
-                self.draw()
+            for s in range(0, len(self.segy_data_list)):
+                if self.segy_data_list[s] is not None:
+                    self.segy_data_list[s].mpl_actor.set_cmap(cm.gray)
         else:
             if event.Id == 902:
-                if self.segy_on is False:
-                    return 0
-                else:
-                    for s in range(0, len(self.segy_plot_list)):
-                        if self.segy_plot_list[s]:
-                            self.segy_plot_list[s].set_cmap(cm.seismic)
-                    self.draw()
+                for s in range(0, len(self.segy_data_list)):
+                    if self.segy_data_list[s] is not None:
+                        self.segy_data_list[s].mpl_actor.set_cmap(cm.seismic)
+        # REDRAW MODEL
+        self.draw()
 
     def gain_increase(self, event):
-        if self.segy_on is False:
-            return 0
-        elif self.gain >= 0.5:
-            self.gain = self.gain - 0.5
-            self.gain_neg = -self.gain
-            for s in range(0, len(self.segy_plot_list)):
-                if self.segy_plot_list[s]:
-                    self.segy_plot_list[s].set_clim(vmax=self.gain)
-                    self.segy_plot_list[s].set_clim(vmin=self.gain_neg)
-            self.draw()
+        # CHANGE THE GAIN VALUE
+        gain_pos = self.segy_gain_pos - 1.0
+        if gain_pos < 1.0:
+            return
         else:
-            return 0
+            self.segy_gain_pos = gain_pos
+            self.segy_gain_neg = -gain_pos
+            # REDRAW THE SEGY PML ACTOR
+            for s in range(0, len(self.segy_data_list)):
+                if self.segy_data_list[s] is not None:
+                    self.segy_data_list[s].mpl_actor.set_clim(vmax=self.segy_gain_pos)
+                    self.segy_data_list[s].mpl_actor.set_clim(vmin=self.segy_gain_neg)
+
+        # REDRAW MODEL
+        self.draw()
 
     def gain_decrease(self, event):
-        if self.segy_on is False:
-            return 0
-        elif self.gain >= 0.5:
-            self.gain = self.gain + 0.5
-            self.gain_neg = -self.gain
-            for s in range(0, len(self.segy_plot_list)):
-                if self.segy_plot_list[s]:
-                    self.segy_plot_list[s].set_clim(vmax=self.gain)
-                    self.segy_plot_list[s].set_clim(vmin=self.gain_neg)
-            self.draw()
+        # CHANGE THE GAIN VALUE
+        gain_pos = self.segy_gain_pos + 1.0
+        if gain_pos < 1.0:
+            return
         else:
-            return 0
+            self.segy_gain_pos = gain_pos
+            self.segy_gain_neg = -gain_pos
+            # REDRAW THE SEGY PML ACTOR
+            for s in range(0, len(self.segy_data_list)):
+                if self.segy_data_list[s] is not None:
+                    self.segy_data_list[s].mpl_actor.set_clim(vmax=self.segy_gain_pos)
+                    self.segy_data_list[s].mpl_actor.set_clim(vmin=self.segy_gain_neg)
+
+        # REDRAW MODEL
+        self.draw()
 
     # XY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2570,7 +2585,7 @@ class Gmg(wx.Frame):
         self.m_xy_submenu.DestroyItem(event.Id)
 
         # REMOVE OBJECT AND MPL ACTOR
-        obj_id = event.Id-4000
+        obj_id = event.Id - 4000
         self.observed_xy_data_list[obj_id].mpl_actor.set_visible(False)
         self.observed_xy_data_list[obj_id] = None
 
@@ -3935,7 +3950,7 @@ class Gmg(wx.Frame):
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 11000 + self.observed_gravity_counter
         new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.grav_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+        new_derivative.mpl_actor = self.gravity_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                          marker='o', color=new_derivative.color, s=5,
                                                          gid=11000 + self.observed_gravity_counter)
 
@@ -3976,7 +3991,7 @@ class Gmg(wx.Frame):
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 12000 + self.observed_magnetic_counter
         new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.mag_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+        new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                              marker='o', color=new_derivative.color, s=5,
                                                              gid=12000 + self.observed_magnetic_counter)
 
@@ -4481,10 +4496,10 @@ class Gmg(wx.Frame):
             self.topo_d_frame.set_xlim(xmin, xmax)
         if self.gravity_frame:
             self.gravity_frame.set_xlim(xmin, xmax)
-            self.grav_d_frame.set_xlim(xmin, xmax)
+            self.gravity_d_frame.set_xlim(xmin, xmax)
         if self.magnetic_frame:
             self.magnetic_frame.set_xlim(xmin, xmax)
-            self.mag_d_frame.set_xlim(xmin, xmax)
+            self.magnetic_d_frame.set_xlim(xmin, xmax)
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
@@ -4689,6 +4704,7 @@ class Gmg(wx.Frame):
 
     def set_frame_limits(self):
         """SET FRAME X AND Y LIMITS"""
+
         # --------------------------------------------------------------------------------------------------------------
         # SET GRAVITY DISPLAY BOX LIMITS
         if self.observed_gravity_switch is True and self.grav_residuals != []:
@@ -4741,7 +4757,20 @@ class Gmg(wx.Frame):
         if self.gravity_frame is not None:
             self.gravity_frame.set_ylim(ymin, ymax)
         # --------------------------------------------------------------------------------------------------------------
+        # SET DERIVATIVE Y-AXIS LIMITS
 
+        # CREATE EMPTY LIST
+        ymin_list = []
+        ymax_list = []
+        for i in range(len(self.observed_gravity_list)):
+            if self.observed_gravity_list[i].type == 'derivative':
+                ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 0.1)
+                ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 0.1)
+        self.gravity_d_frame.set_ylim(ymin, ymax)
+        # --------------------------------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
         # SET MAGNETIC DISPLAY BOX LIMITS
         if self.observed_magnetic_switch is True and self.mag_residuals != []:
@@ -4793,6 +4822,18 @@ class Gmg(wx.Frame):
 
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_ylim(ymin, ymax)
+
+        # SET DERIVATIVE Y-AXIS LIMITS
+        # --------------------------------------------------------------------------------------------------------------
+        # CREATE EMPTY LIST
+        ymin_list = []
+        ymax_list = []
+        for i in range(len(self.observed_magnetic_list)):
+            if self.observed_magnetic_list[i].type == 'derivative':
+                ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 0.1)
+                ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 0.1)
+        self.magnetic_d_frame.set_ylim(ymin, ymax)
+        # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
         # UPDATE GMG GRAPHICS
@@ -5014,14 +5055,19 @@ class ObservedOutcropData:
 
 class SegyData:
     def __init__(self):
-        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.file = None
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
+        self.dimensions = None
+        self.mpl_actor = None
+        self.axis = None
+        self.color_map = cm.gray
+        
+        
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
         self.gain_positive = 4.0
         self.gain_neg = -self.gain_positive
         self.segy_show = False
-        self.file_name = None
         self.plot_list = None
-        self.dimensions = None
 
 
 class ObservedWellData:
