@@ -111,6 +111,7 @@ import model_stats
 import struct
 import gc
 import webbrowser
+import time
 # FUTURE
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
@@ -130,9 +131,13 @@ class Gmg(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
         # DIR CONTAINING PROGRAM ICONS
-        self.dir = os.path.dirname(os.path.abspath(__file__)).split("/")
-        self.gui_icons_dir = "/" + self.dir[1] + "/" + self.dir[2] + "/" + self.dir[3] + "/docs/icons/"
+        # self.dir = os.path.dirname(os.path.abspath(__file__)).split("/")
+        # print(self.dir)
+        # self.gui_icons_dir = "/" + self.dir[1] + "/" + self.dir[2] + "/" + self.dir[3] + "/docs/icons/"
+        # print(self.gui_icons_dir)
+        self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__))+"/icons/"
 
+        print(self.gui_icons_dir)
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
 
@@ -501,10 +506,10 @@ class Gmg(wx.Frame):
         m_legal = help_file.Append(-1, "&Legal...", "Legal...")
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
         self.menubar.Append(help_file, "&Help")
-        # --------------------------------------------------------------------------------------------------------------
 
         'SET MENUBAR'
         self.SetMenuBar(self.menubar)
+        # --------------------------------------------------------------------------------------------------------------
 
         'TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)'
         self.toolbar = self.CreateToolBar()
@@ -521,19 +526,27 @@ class Gmg(wx.Frame):
         #   wx.Bitmap(self.gui_icons_dir + 'T_24.png'), shortHelp="Calculate topography")
         # self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
-        t_calc_model_bott = self.toolbar.AddTool(wx.ID_ANY, "Calculate gravity",
-                                                 wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
-                                                 shortHelp="Calculate gravity")
-        self.Bind(wx.EVT_TOOL, self.calc_grav_switch, t_calc_model_bott)
+        self.t_calc_grav = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Fault pick",
+                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
+                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
+                                                     shortHelp="Calculate gravity anomaly",
+                                                     longHelp="", clientData=None)
+        self.Bind(wx.EVT_TOOL, self.calc_grav_switch, self.t_calc_grav)
 
-        t_calc_mag = self.toolbar.AddTool(wx.ID_ANY, "Calculate magnetic",
-                                          wx.Bitmap(self.gui_icons_dir + 'M_24.png'), shortHelp="Calculate magnetic")
-        self.Bind(wx.EVT_TOOL, self.calc_mag_switch, t_calc_mag)
+        self.t_calc_mag = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Fault pick",
+                                                    bitmap1=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
+                                                    bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
+                                                    shortHelp="Calculate magnetic anomaly",
+                                                    longHelp="", clientData=None)
+        self.Bind(wx.EVT_TOOL, self.calc_mag_switch, self.t_calc_mag)
 
-        t_capture_coordinates = self.toolbar.AddTool(wx.ID_ANY, "Capture coordinates",
-                                                     wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
-                                                     shortHelp="Capture coordinates")
-        self.Bind(wx.EVT_TOOL, self.capture_coordinates, t_capture_coordinates)
+
+        self.t_capture_coordinates = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Capture coordinates",
+                                                    bitmap1=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
+                                                    bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
+                                                    shortHelp="Capture coordinates",
+                                                    longHelp="", clientData=None)
+        self.Bind(wx.EVT_TOOL, self.capture_coordinates, self.t_capture_coordinates)
 
         t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
                                                  wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'),
@@ -555,9 +568,12 @@ class Gmg(wx.Frame):
                                                   shortHelp="Aspect decrease x2")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
 
-        t_zoom = self.toolbar.AddTool(wx.ID_ANY, "Zoom in",
-                                      wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'), shortHelp="Zoom in")
-        self.Bind(wx.EVT_TOOL, self.zoom, t_zoom)
+        self.t_zoom = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Zoom in",
+                                                    bitmap1=wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'),
+                                                    bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'),
+                                                    shortHelp="Zoom in",
+                                                    longHelp="", clientData=None)
+        self.Bind(wx.EVT_TOOL, self.zoom, self.t_zoom)
 
         t_zoom_out = self.toolbar.AddTool(wx.ID_ANY, "Zoom out",
                                           wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'), shortHelp="Zoom out")
@@ -568,9 +584,12 @@ class Gmg(wx.Frame):
                                              shortHelp="Full extent")
         self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
 
-        t_pan = self.toolbar.AddTool(wx.ID_ANY, "Pan",
-                                     wx.Bitmap(self.gui_icons_dir + 'pan_24.png'), shortHelp="Pan")
-        self.Bind(wx.EVT_TOOL, self.pan, t_pan)
+        self.t_pan = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Pan",
+                                                    bitmap1=wx.Bitmap(self.gui_icons_dir + 'pan_24.png'),
+                                                    bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'pan_24.png'),
+                                                    shortHelp="Pan",
+                                                    longHelp="", clientData=None)
+        self.Bind(wx.EVT_TOOL, self.pan, self.t_pan)
 
         t_gain_down = self.toolbar.AddTool(wx.ID_ANY, "Gain down",
                                            wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'), shortHelp="Gain down")
@@ -585,7 +604,7 @@ class Gmg(wx.Frame):
                                                    shortHelp="Transparency down")
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
 
-        # INCREASE TRANSPERANCY ICON
+        # INCREASE TRANSPARENCY ICON
         t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
                                                  wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'),
                                                  shortHelp="Transparency up")
@@ -598,16 +617,18 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
 
         # TOOGLE FAULT PICKING MODE
-        t_toogle_fault_mode = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                                   wx.Bitmap(self.gui_icons_dir + 'F_24.png'),
-                                                   shortHelp="Toogle fault picking")
-        self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, t_toogle_fault_mode)
+        self.t_toogle_fault_mode = self.toolbar.AddCheckTool(toolId=10000, label="Fault pick",
+                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'F_24.png'),
+                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'off_F_24.png'),
+                                                     shortHelp="Toogle fault picking")
+        self.t_toogle_fault_mode.SetDisabledBitmap(wx.Bitmap(self.gui_icons_dir + 'off_F_24.png'))
+        self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, self.t_toogle_fault_mode)
 
         # FAULT PICKER ICON
-        t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                            wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'),
-                                            shortHelp="Fault picker")
-        self.Bind(wx.EVT_TOOL, self.pick_new_fault, t_fault_pick)
+        self.t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
+                                                 bitmap=wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'),
+                                                 shortHelp="Fault picker")
+        self.Bind(wx.EVT_TOOL, self.pick_new_fault, self.t_fault_pick)
 
         # CREATE TOOLBAR
         self.toolbar.Realize()
@@ -669,6 +690,7 @@ class Gmg(wx.Frame):
         self.padding = 50000.  # PADDING FOR LAYERS
         self.layer_counter = 0  # LAYER COUNTER
         self.node_layer_reference = 0
+        self.select_new_layer_nodes = False  # SWITCH TO TURN ON WHEN MOUSE CLICK IS TO BE CAPTURED FOR A NEW LAYER
         self.index_node = None  # THE ACTIVE NODE
         self.pred_topo = None  # FUTURE - PREDICTED TOPOGRAPHY FROM MOHO (ISOSTATIC FUNC)
         self.predgz = None  # THE CALCULATED GRAVITY RESPONSE
@@ -681,7 +703,7 @@ class Gmg(wx.Frame):
         self.colors_index = 0
         self.model_azimuth = 0.
         self.mag_observation_elv = 0.
-        self.pinch = False
+        self.pinch_switch = False
 
         # INITIALISE POLYGON LISTS (USED AS MODEL LAYERS)
         self.mag_polygons = []
@@ -1854,7 +1876,6 @@ class Gmg(wx.Frame):
             if len(self.observed_xy_data_list) > 0:
                 self.replot_observed_xy_data()
 
-
             # LOAD OUTCROP DATA
             if len(self.outcrop_data_list) > 0:
                 self.replot_outcrop_data()
@@ -2899,7 +2920,7 @@ class Gmg(wx.Frame):
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
 
             # DEAL WITH PINCHED NODE
-            if self.pinch_switch != 0:
+            if self.pinch_switch is True:
                 for k in range(0, len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
                         next_x_list = self.plotx_list[k]
@@ -2932,7 +2953,6 @@ class Gmg(wx.Frame):
         """
         GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
-
         self.node_layer_reference = self.layer_counter
         xyt = self.polyline.get_xydata()
         xt = xyt[:, 0]
@@ -2943,23 +2963,31 @@ class Gmg(wx.Frame):
             return None, None
         else:
             # CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER
-            self.pinch_switch = 0
+
+            # RESET PINCH SWITCH
+            self.pinch_switch = False
 
             # CREATE LIST OF NONES SAME LENGTH AS NUMBER OF LAYERS IN MODEL
             self.index_arg2_list = [None] * (self.layer_count + 1)
 
             for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
                 if x == self.layer_counter:  # SKIP CURRENT LAYER
-                    pass
-                node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
+                    continue
+                else:
+                    # CHECK FOR PINCHED NODES
+                    node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
+                    for i in range(0, len(node_list_x)):
+                        if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
+                            # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER
+                            # THEN RETURN THE INDEX
+                            self.index_arg2_list[x] = i
+                            print("self.index_arg2_list =")
+                            print self.index_arg2_list
+                            self.pinch_switch = True
+                        else:
+                            continue
 
-                for i in range(0, len(node_list_x)):
-                    if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
-                        # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER, THEN RETURN THE INDEX
-                        self.index_arg2_list[x] = i
-                        self.pinch_switch = 1
-
-            'return node index'
+            # RETURN NODE INDEX LISTS
             return self.index_arg, self.index_arg2_list
 
     def get_fault_node_under_point(self, event):
@@ -2987,7 +3015,7 @@ class Gmg(wx.Frame):
         if event.button != 1:
             return
 
-        if self.fault_picking_switch is False and self.capture is False:
+        if self.fault_picking_switch is False and self.capture is False and self.select_new_layer_nodes is False:
             # THEN GMG IS IN LAYER MODE
 
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
@@ -3001,7 +3029,8 @@ class Gmg(wx.Frame):
             self.y_input.SetValue(yt[self.index_node])
 
             # IF PINCH == TRUE, THEN PINCH THE NODE TO NEXT NODE
-            if self.pinch:
+            if self.pinch_switch is True:
+                print("nodes pinched")
                 # GET THE NODE NUMBER AND LAYER NUMBER AND PLACE THEM IN "PINCH_NODE_LIST"
                 if self.pinch_count == 0:
                     self.plotx = self.plotx_list[self.layer_counter]
@@ -3039,7 +3068,7 @@ class Gmg(wx.Frame):
             # COLOR CURRENTLY SELECTED NODE RED
             self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
-        elif self.fault_picking_switch is True:
+        elif self.fault_picking_switch is True and self.select_new_layer_nodes is False:
             # GMG IS IN FAULT MODE
 
             # GET CURRENT NODE
@@ -3055,14 +3084,15 @@ class Gmg(wx.Frame):
             # COLOR CURRENTLY SELECTED NODE RED
             self.current_node.set_offsets([self.xt[self.selected_node], self.yt[self.selected_node]])
 
-        elif self.capture is True:
-            # COORDINATE CAPTURE MODE
-            pass
+        elif self.capture is True or self.select_new_layer_nodes is True:
+            # COORDINATE CAPTURE MODE OR NEW LAYER CREATION IS ON
+            return
 
     def toogle_fault_mode(self, event):
         """SWITCH FAULT PICKING MODE ON AND OFF"""
         if self.fault_picking_switch is True:
             self.fault_picking_switch = False
+
         elif self.fault_picking_switch is False:
             self.fault_picking_switch = True
 
@@ -3077,7 +3107,7 @@ class Gmg(wx.Frame):
             return
         if event.button != 1:
             return
-        if self.pinch is True:
+        if self.pinch_switch is True:
             # PINCH MODE IS ON
             return
         if self.pan_on is True:
@@ -3086,7 +3116,9 @@ class Gmg(wx.Frame):
         if self.zoom_on is True:
             # ZOOM MODE IS ON
             return
-
+        if self.select_new_layer_nodes is True:
+            # CURRENTLY CREATING A NEW LAYER
+            return
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
 
@@ -3173,7 +3205,7 @@ class Gmg(wx.Frame):
                     yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
 
             # DEAL WITH PINCHED MODE
-            if self.pinch_switch != 0:
+            if self.pinch_switch is True:
                 for k in range(0, len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
                         # GET THE NODE LIST OF THE NEXT LAYER
@@ -3209,13 +3241,46 @@ class Gmg(wx.Frame):
         if event.button != 1:
             return
 
-        # UPDATE LAYER ATTRIBUTES TABLE WITH CURRENT COORDINATES
-        # self.x_input.SetValue(event.xdata)
-        # self.y_input.SetValue(event.ydata)
-
         if self.capture is True:
             # GMG IS IN COORDINATE CAPTURE MODE SO ADD THE CURRENT COORDINATES TO THE TABLE
             self.capture_window.table.Append((event.xdata, event.ydata))
+
+        # NEW FLOATING LAYER CREATION SEQUENCE
+        if self.select_new_layer_nodes is True:
+            # APPEND NEW COORDINATES
+            self.new_plotx.append(event.xdata)
+            self.new_ploty.append(event.ydata)
+
+            if self.click_count == 0:
+                # PLOT NEW NODES
+                self.new_layer_nodes = self.model_frame.plot(self.new_plotx, self.new_ploty, color='blue',marker='o')
+                # FILL LAYER
+                self.new_layer_fill = self.model_frame.fill(self.new_plotx, self.new_ploty, color='blue',
+                                                        alpha=self.layer_transparency, closed=True, linewidth=None,
+                                                        ec=None)
+                self.draw()
+                # INCREMENT CLICK COUNTER
+                self.click_count += 1
+
+            elif self.click_count < 3:
+                self.new_layer_nodes[0].set_xdata(self.new_plotx)
+                self.new_layer_nodes[0].set_ydata(self.new_ploty)
+                self.new_layer_fill[0].set_xy(zip(self.new_plotx, self.new_ploty))
+                self.draw()
+                # INCREMENT CLICK COUNTER
+                self.click_count += 1
+
+            else:
+                # REMOVE THE TEMP LAYER MPL ACTOR
+                self.select_new_layer_nodes = False
+                self.new_layer_nodes[0].set_visible(False)
+                self.new_layer_fill[0].set_visible(False)
+                self.new_layer_nodes[0].remove()
+                self.new_layer_fill[0].remove()
+                self.new_layer_nodes = None
+                self.new_layer_fill = None
+                # RUN FINAL PART OF LAYER LOADING
+                self.create_new_floating_layer()
 
         # UPDATE LAYERS
         self.update_layer_data()
@@ -3283,7 +3348,7 @@ class Gmg(wx.Frame):
 
             # NOW CHECK FOR PINCHED NODES
             index_arg2 = None
-            self.pinch_switch = 0
+            self.pinch_switch = False
             self.index_arg2_list = [None] * (self.layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
             for x in range(0, self.layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
                 if x == self.layer_counter:
@@ -3295,10 +3360,10 @@ class Gmg(wx.Frame):
                     if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
                         # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
                         self.index_arg2_list[x] = i
-                        self.pinch_switch = 1
+                        self.pinch_switch = True
 
             # REMOVE PINCHED NODES
-            if self.pinch_switch != 0:
+            if self.pinch_switch is True:
                 for k in range(len(self.index_arg2_list)):
                     if self.index_arg2_list[k] is not None:
                         next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[
@@ -3439,10 +3504,10 @@ class Gmg(wx.Frame):
 
         'p = TURN ON PINCH NODE MODE'
         if event.key == 'p':
-            if not self.pinch:
-                self.pinch = True
+            if self.pinch_switch is False:
+                self.pinch_switch = True
             else:
-                self.pinch = False
+                self.pinch_switch = False
                 self.pinch_node_list = [[], []]
                 self.pinch_count = 0
 
@@ -4090,12 +4155,28 @@ class Gmg(wx.Frame):
             self.draw()
 
         elif not new_layer_dialogbox.fixed:
-            # GET NEW NODE VALUES
-            self.new_x1, self.new_y1 = new_layer_dialogbox.x1, new_layer_dialogbox.y1
-            self.new_x2, self.new_y2 = new_layer_dialogbox.x2, new_layer_dialogbox.y2
-            self.new_x3, self.new_y3 = new_layer_dialogbox.x3, new_layer_dialogbox.y3
-            self.new_x4, self.new_y4 = new_layer_dialogbox.x4, new_layer_dialogbox.y4
+            # CREATEING A NEW FLOATING LAYER
+            self.new_plotx = []
+            self.new_ploty = []
+            self.click_count = 0
+            self.new_layer_nodes = None
+            self.new_layer_fill = None
+            # SWITCH ON MOUSE CLICK CAPTURE MODE (SEE button_release func for continuation of code)
+            self.select_new_layer_nodes = True
 
+        else:
+            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED'
+            pass
+
+    def create_new_floating_layer(self):
+
+            # GET NEW NODE VALUES
+            # self.new_x1, self.new_y1 = new_layer_dialogbox.x1, new_layer_dialogbox.y1
+            # self.new_x2, self.new_y2 = new_layer_dialogbox.x2, new_layer_dialogbox.y2
+            # self.new_x3, self.new_y3 = new_layer_dialogbox.x3, new_layer_dialogbox.y3
+            # self.new_x4, self.new_y4 = new_layer_dialogbox.x4, new_layer_dialogbox.y4
+            self.plotx = self.new_plotx
+            self.ploty = self.new_ploty
             # INCREMENT THE LAYER COUNT'
             self.layer_counter = self.layer_count
             self.layer_counter = self.layer_counter + 1
@@ -4123,8 +4204,8 @@ class Gmg(wx.Frame):
             self.item = 'layer %s' % (int(self.layer_counter))
             self.add_new_tree_nodes(self.root, self.item, self.layer_counter)
             self.layers_calculation_switch.append(1)
-            self.plotx = [self.new_x1, self.new_x2, self.new_x3, self.new_x4]
-            self.ploty = [self.new_y1, self.new_y2, self.new_y3, self.new_y4]
+            # self.plotx = [self.new_x1, self.new_x2, self.new_x3, self.new_x4]
+            # self.ploty = [self.new_y1, self.new_y2, self.new_y3, self.new_y4]
             self.nextpoly = zip(self.plotx, self.ploty)
 
             # CREATE LAYER LINE
@@ -4148,9 +4229,7 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
-        else:
-            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED'
-            pass
+
 
     def load_layer(self, event):
         open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
@@ -4193,17 +4272,17 @@ class Gmg(wx.Frame):
         self.ploty = new_layer[:, 1]
         self.nextpoly = zip(self.plotx, self.ploty)
 
-        'CREATE LAYER LINE'
+        # CREATE LAYER LINE
         self.layer_lines[self.layer_counter] = self.model_frame.plot(self.plotx_list[self.layer_counter],
-                                                                 self.ploty_list[self.layer_counter],
-                                                     color='blue', linewidth=1.0, alpha=1.0)
-        'CREATE LAYER POLYGON FILL'
+                                                                     self.ploty_list[self.layer_counter],
+                                                                     color='blue', linewidth=1.0, alpha=1.0)
+        # CREATE LAYER POLYGON FILL
         self.plotx_polygon = np.array(self.plotx)
         self.ploty_polygon = np.array(self.ploty)
-        self.polygon_fills[self.layer_counter] = self.model_frame.fill(self.plotx_polygon, self.ploty_polygon, color='blue',
-                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
-                                                       ec=None)
-        'Update layer data'
+        self.polygon_fills[self.layer_counter] = self.model_frame.fill(self.plotx_polygon, self.ploty_polygon,
+                                                                       color='blue', alpha=self.layer_transparency,
+                                                                       closed=True, linewidth=None, ec=None)
+        # UPDATE LAYER DATA
         self.nextdens = self.densities[self.layer_counter]
         self.density_input.SetValue(0.001 * self.densities[self.layer_counter])
         self.ref_density_input.SetValue(0.001 * self.reference_densities[self.layer_counter])
@@ -4751,8 +4830,9 @@ class Gmg(wx.Frame):
             ymax = max(ymax_list)
 
         else:
-            ymin = -1.
-            ymax = 1.
+            ymin = self.predgz.min() - 2.0
+            ymax = self.predgz.max() + 2.0
+
 
         if self.gravity_frame is not None:
             self.gravity_frame.set_ylim(ymin, ymax)
@@ -5821,13 +5901,15 @@ class NewLayerDialog(wx.Dialog):
     def set_floating(self, event):
         """ APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
         self.fixed = False
-        floating_dialogbox = self.SetFloatingLayer(self, -1, "Set new layer nodes")
-        answer = floating_dialogbox.ShowModal()
-        self.x1, self.y1 = floating_dialogbox.x1, floating_dialogbox.y1
-        self.x2, self.y2 = floating_dialogbox.x2, floating_dialogbox.y2
-        self.x3, self.y3 = floating_dialogbox.x3, floating_dialogbox.y3
-        self.x4, self.y4 = floating_dialogbox.x4, floating_dialogbox.y4
         self.EndModal(1)
+
+        # floating_dialogbox = self.SetFloatingLayer(self, -1, "Set new layer nodes")
+        # answer = floating_dialogbox.ShowModal()
+        # self.x1, self.y1 = floating_dialogbox.x1, floating_dialogbox.y1
+        # self.x2, self.y2 = floating_dialogbox.x2, floating_dialogbox.y2
+        # self.x3, self.y3 = floating_dialogbox.x3, floating_dialogbox.y3
+        # self.x4, self.y4 = floating_dialogbox.x4, floating_dialogbox.y4
+
 
     class SetNewThickness(wx.Dialog):
         """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""
@@ -5950,12 +6032,11 @@ class MessageDialog(wx.MessageDialog):
 
 class CaptureCoordinates(wx.Frame):
     """CAPTURE MOUSE CLICK COORDINATES AND WRITE TO DISK FILE. RETURNS ASCII TEXT FILE"""
-
     def __init__(coordinate_list, parent, id, title):
         wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
         coordinate_list.input_panel = wx.Panel(coordinate_list)
 
-        # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
+        # SET INSTANCE OF GMG CLASS TO RECEIVE NEW ATTRIBUTES
         coordinate_list.parent = parent
 
         # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
