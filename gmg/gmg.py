@@ -327,8 +327,8 @@ class Gmg(wx.Frame):
                                                                 "Take Horizontal Derivative")
         self.Bind(wx.EVT_MENU, self.take_gravity_horizontal_derivative, grav_m_horizontal_derivative)
         # SET RMS OBS ARRAYS
-        grav_m_set_rms_arrays = self.gravity_data.Append(-1, "Set RMS input...", "Set RMS")
-        self.Bind(wx.EVT_MENU, self.set_obs_rms, grav_m_set_rms_arrays)
+        grav_m_set_rms = self.gravity_data.Append(-1, "Set RMS input...", "Set RMS input...")
+        self.Bind(wx.EVT_MENU, self.set_obs_grav_rms, grav_m_set_rms)
         # SET BACKGROUND DENSITY
         m_set_background_density = self.gravity_data.Append(-1, "&Set Background Density...",
                                                             "Set Background Density...")
@@ -358,8 +358,8 @@ class Gmg(wx.Frame):
                                                                 "Take Horizontal Derivative")
         self.Bind(wx.EVT_MENU, self.take_magnetic_horizontal_derivative, mag_m_horizontal_derivative)
         # SET RMS OBS ARRAYS
-        mag_m_set_rms_arrays = self.magnetic_data.Append(-1, "Set RMS\tCtrl-L", "Set RMS")
-        self.Bind(wx.EVT_MENU, self.set_obs_rms, mag_m_set_rms_arrays)
+        mag_m_set_rms = self.magnetic_data.Append(-1, "Set RMS input..\tCtrl-L", "Set RMS input..")
+        self.Bind(wx.EVT_MENU, self.set_obs_mag_rms, mag_m_set_rms)
         # SET MAG
         m_set_mag_variables = self.magnetic_data.Append(-1, "&Set Magnetic Field...\tCtrl-shift-up",
                                                         "Set Magnetic Feild...")
@@ -683,7 +683,7 @@ class Gmg(wx.Frame):
         self.nodes = True
         self.zoom_on = False
         self.pan_on = False
-        self.node_click_limit = 0.1  # CONTROLS HOW CLOSE A MOUSE CLICK MUST BE TO ACTIVATE A NODE
+        self.node_click_limit = 0.2  # CONTROLS HOW CLOSE A MOUSE CLICK MUST BE TO ACTIVATE A NODE
         self.layer_lock = True
         self.boundary_lock = True
         self.calc_padding = 5000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
@@ -1209,8 +1209,6 @@ class Gmg(wx.Frame):
             'MAG CANVAS'
             # HIDDEN
 
-        self.draw()
-
         # SET CANVAS LIMITS
         self.model_frame.set_xlim(self.current_xlim)
         self.model_frame.set_ylim(self.current_ylim)
@@ -1240,24 +1238,40 @@ class Gmg(wx.Frame):
             for x in range(len(self.observed_topography_list)):
                 if self.observed_topography_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
-                    self.observed_topography_list[x].mpl_actor = self.topo_frame.scatter(
-                        self.observed_topography_list[x].data[:, 0],
-                        self.observed_topography_list[x].data[:, 1],
-                        marker='o', color=self.observed_topography_list[x].color, s=5,
-                        gid=self.observed_topography_list[x].id)
-
+                    if self.observed_topography_list[x].type is not "derivative":
+                        self.observed_topography_list[x].mpl_actor = self.topo_frame.scatter(
+                                                                           self.observed_topography_list[x].data[:, 0],
+                                                                           self.observed_topography_list[x].data[:, 1],
+                                                                           marker='o', s=5,
+                                                                           color=self.observed_topography_list[x].color,
+                                                                           gid=self.observed_topography_list[x].id)
+                    else:
+                        self.observed_topography_list[x].mpl_actor = self.topo_d_frame.scatter(
+                                                                           self.observed_topography_list[x].data[:, 0],
+                                                                           self.observed_topography_list[x].data[:, 1],
+                                                                           marker='o', s=5,
+                                                                           color=self.observed_topography_list[x].color,
+                                                                           gid=self.observed_topography_list[x].id)
         # PLOT OBSERVED GRAVITY DATA
         if self.gravity_frame is not None:
             # REPLOT OBSERVED GRAVITY DATA
             for x in range(len(self.observed_gravity_list)):
                 if self.observed_gravity_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
-                    self.observed_gravity_list[x].mpl_actor = self.gravity_frame.scatter(
-                        self.observed_gravity_list[x].data[:, 0],
-                        self.observed_gravity_list[x].data[:, 1],
-                        marker='o',
-                        color=self.observed_gravity_list[x].color,
-                        s=5, gid=11000+self.observed_gravity_list[x].id)
+                    if self.observed_gravity_list[x].type is not "derivative":
+                        self.observed_gravity_list[x].mpl_actor = self.gravity_frame.scatter(
+                                                                            self.observed_gravity_list[x].data[:, 0],
+                                                                            self.observed_gravity_list[x].data[:, 1],
+                                                                            marker='o', s=5,
+                                                                            color=self.observed_gravity_list[x].color,
+                                                                            gid=11000+self.observed_gravity_list[x].id)
+                    else:
+                        self.observed_gravity_list[x].mpl_actor = self.gravity_d_frame.scatter(
+                                                                            self.observed_gravity_list[x].data[:, 0],
+                                                                            self.observed_gravity_list[x].data[:, 1],
+                                                                            marker='o', s=5,
+                                                                            color=self.observed_gravity_list[x].color,
+                                                                            gid=11000+self.observed_gravity_list[x].id)
 
         # PLOT OBSERVED MAGNETIC DATA
         if self.magnetic_frame is not None:
@@ -1265,17 +1279,26 @@ class Gmg(wx.Frame):
             for x in range(len(self.observed_magnetic_list)):
                 if self.observed_magnetic_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
-                    self.observed_magnetic_list[x].mpl_actor = self.magnetic_frame.scatter(
-                        self.observed_magnetic_list[x].data[:, 0], self.observed_magnetic_list[x].data[:, 1],
-                        marker='o', color=self.observed_magnetic_list[x].color, s=5,
-                        gid=self.observed_magnetic_list[x].id)
+                    if self.observed_magnetic_list[x].type is not "derivative":
+                        self.observed_magnetic_list[x].mpl_actor = self.magnetic_frame.scatter(
+                                                                            self.observed_magnetic_list[x].data[:, 0],
+                                                                            self.observed_magnetic_list[x].data[:, 1],
+                                                                            marker='o', s=5,
+                                                                            color=self.observed_magnetic_list[x].color,
+                                                                            gid=self.observed_magnetic_list[x].id)
+                    else:
+                        self.observed_magnetic_list[x].mpl_actor = self.magnetic_d_frame.scatter(
+                                                                            self.observed_magnetic_list[x].data[:, 0],
+                                                                            self.observed_magnetic_list[x].data[:, 1],
+                                                                            marker='o', s=5,
+                                                                            color=self.observed_magnetic_list[x].color,
+                                                                            gid=self.observed_magnetic_list[x].id)
 
         # UPDATE FRAMES
-        self.update_layer_data()
-        self.run_algorithms()
-        self.set_frame_limits()
         self.model_frame.grid(True)
+        self.run_algorithms()
         self.draw()
+        self.set_frame_limits()
 
     def size_handler(self):
         """ CREATE CANVAS BOX"""
@@ -2795,7 +2818,6 @@ class Gmg(wx.Frame):
         outcrop.color = self.load_window.color_picked
         outcrop.data = np.genfromtxt(outcrop_input_file, autostrip=True, dtype=str, comments='#')
 
-
         # PLOT MARKERS IN MODEL
         outcrop.lines = [None] * len(outcrop.data)
         for i in range(len(outcrop.data)):
@@ -2951,7 +2973,7 @@ class Gmg(wx.Frame):
 
     def get_node_under_point(self, event):
         """
-        GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
+        GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
         self.node_layer_reference = self.layer_counter
         xyt = self.polyline.get_xydata()
@@ -2991,7 +3013,7 @@ class Gmg(wx.Frame):
             return self.index_arg, self.index_arg2_list
 
     def get_fault_node_under_point(self, event):
-        """GET THE INDEX VALUE OF THE NODE UNDER POINT IF IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
+        """GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
         # GET FAULT NODE XY DATA
         xy_data = self.faultline.get_xydata()
         x = xy_data[:, 0]
@@ -3008,10 +3030,10 @@ class Gmg(wx.Frame):
             return self.index_arg
 
     def button_press(self, event):
-        """ WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
+        """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
 
         if event.inaxes is None:
-            return  # CLICK IS OUTSIDE MODEL FRAME
+            return  # CLICK IS OUTSIDE MODEL FRAME SO RETURN
         if event.button != 1:
             return
 
@@ -3069,7 +3091,7 @@ class Gmg(wx.Frame):
             self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
         elif self.fault_picking_switch is True and self.select_new_layer_nodes is False:
-            # GMG IS IN FAULT MODE
+            # THEN GMG IS IN FAULT MODE
 
             # GET CURRENT NODE
             self.selected_node = self.get_fault_node_under_point(event)
@@ -3088,16 +3110,8 @@ class Gmg(wx.Frame):
             # COORDINATE CAPTURE MODE OR NEW LAYER CREATION IS ON
             return
 
-    def toogle_fault_mode(self, event):
-        """SWITCH FAULT PICKING MODE ON AND OFF"""
-        if self.fault_picking_switch is True:
-            self.fault_picking_switch = False
-
-        elif self.fault_picking_switch is False:
-            self.fault_picking_switch = True
-
     def move(self, event):
-        """WHEN THE MOUSE IS MOVED"""
+        """WHAT HAPPEN WHEN THE LEFT MOUSE BUTTON IS HELD AND THE MOUSE IS MOVED"""
 
         if self.index_node is None and self.selected_node is None:
             # NO NODE WAS FOUND NEAR THE CLICK
@@ -3233,7 +3247,7 @@ class Gmg(wx.Frame):
         self.update_layer_data()
 
     def button_release(self, event):
-        """WHEN MOUSE BUTTON IS RELEASED"""
+        """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS RELEASED"""
 
         if event.inaxes is None:
             # CLICK WAS OUTSIDE THE MODEL FRAME
@@ -3258,7 +3272,6 @@ class Gmg(wx.Frame):
                 self.new_layer_fill = self.model_frame.fill(self.new_plotx, self.new_ploty, color='blue',
                                                         alpha=self.layer_transparency, closed=True, linewidth=None,
                                                         ec=None)
-                self.draw()
                 # INCREMENT CLICK COUNTER
                 self.click_count += 1
 
@@ -3266,7 +3279,7 @@ class Gmg(wx.Frame):
                 self.new_layer_nodes[0].set_xdata(self.new_plotx)
                 self.new_layer_nodes[0].set_ydata(self.new_ploty)
                 self.new_layer_fill[0].set_xy(zip(self.new_plotx, self.new_ploty))
-                self.draw()
+
                 # INCREMENT CLICK COUNTER
                 self.click_count += 1
 
@@ -3282,12 +3295,12 @@ class Gmg(wx.Frame):
                 # RUN FINAL PART OF LAYER LOADING
                 self.create_new_floating_layer()
 
-        # UPDATE LAYERS
-        self.update_layer_data()
-
         # RUN MODELLING ALGORITHMS
         if self.fault_picking_switch is False:
             self.run_algorithms()
+        else:
+            # UPDATE GMG GRAPHICS
+            self.draw()
 
     def key_press(self, event):
         """DEFINE KEY PRESS LINKS"""
@@ -3297,7 +3310,7 @@ class Gmg(wx.Frame):
             self.fault_mode_key_press(event)
             return
 
-        'f = ACTIVATE FAULT PICKING MODE'
+        # f = ACTIVATE FAULT PICKING MODE
         if event.key == 'f':
             # TURN ON/OFF FAULT PICKING MODE
             if self.fault_picking_switch is True:
@@ -3305,7 +3318,7 @@ class Gmg(wx.Frame):
             else:
                 self.fault_picking_switch = True
 
-        'i = INSERT NEW NODE AT MOUSE POSITION'
+        # i = INSERT NEW NODE AT MOUSE POSITION
         if event.key == 'i':
             if event.inaxes is None:
                 return
@@ -3326,7 +3339,7 @@ class Gmg(wx.Frame):
             self.run_algorithms()
             self.draw()
 
-        'd = DELETE NODE AT MOUSE POSITION'
+        # d = DELETE NODE AT MOUSE POSITION
         if event.key == 'd':
             xt = np.array(self.plotx)
             yt = np.array(self.ploty)
@@ -3383,15 +3396,15 @@ class Gmg(wx.Frame):
             self.run_algorithms()
             self.draw()
 
-        'q = BEAT THE ZOOM BUG'
+        # q = BEAT THE ZOOM BUG
         if event.key == 'q':
             self.nodes = True
 
-        'n = CREATE NEW LAYER AT MOUSE POINT'
+        # n = CREATE NEW LAYER AT MOUSE POINT
         if event.key == 'n':
             self.new_layer(event)
 
-        'b = LOCK OR UNLOCK LAYER BOUNDARY LOCKED MODE'
+        # b = LOCK OR UNLOCK LAYER BOUNDARY LOCKED MODE
         if event.key == 'b':
             if self.boundary_lock:
                 'unlock layer'
@@ -3402,7 +3415,7 @@ class Gmg(wx.Frame):
                 self.boundary_lock = True
                 self.boundary_lock_list[self.layer_counter] = 0
 
-        'l = LOCK OR UNLOCK LAYER/POLYGON MODE'
+        # l = LOCK OR UNLOCK LAYER/POLYGON MODE
         if event.key == 'l':
             if self.layer_lock:
                 'unlock layer'
@@ -3413,7 +3426,7 @@ class Gmg(wx.Frame):
                 self.layer_lock = True
                 self.layer_lock_list[self.layer_counter] = 0
 
-        '< = MOVE TO NEXT LAYER'
+        # < = MOVE TO NEXT LAYER
         if event.key == '.':
             if self.layer_counter == self.layer_count:
                 # UPDATE LAYER DATA
@@ -3449,7 +3462,7 @@ class Gmg(wx.Frame):
                 self.update_layer_data()
                 self.run_algorithms()
 
-        '< = MOVE TO NEXT LAYER'
+        # < = MOVE TO NEXT LAYER
         if event.key == ',':
             if self.layer_counter == 0:
                 # UPDATE LAYER DATA
@@ -3486,23 +3499,23 @@ class Gmg(wx.Frame):
                 self.run_algorithms()
             self.draw()
 
-        'z = ZOOM IN MODE'
+        # z = ZOOM IN MODE
         if event.key == 'z':
             self.zoom(event)
 
-        'ctrl+z = ZOOM OUT'
+        # ctrl+z = ZOOM OUT
         if event.key == 'ctrl+z':
             self.zoom_out(event)
 
-        'shift = PAN MODE'
+        # shift = PAN MODE
         if event.key == 'ctrl+p':
             self.pan(event)
 
-        'a = FULL EXTENT VIEW'
+        # a = FULL EXTENT VIEW'
         if event.key == 'a':
             self.full_extent(event)
 
-        'p = TURN ON PINCH NODE MODE'
+        # p = TURN ON PINCH NODE MODE
         if event.key == 'p':
             if self.pinch_switch is False:
                 self.pinch_switch = True
@@ -3511,29 +3524,37 @@ class Gmg(wx.Frame):
                 self.pinch_node_list = [[], []]
                 self.pinch_count = 0
 
-        'ctrl+i = INCREASE LAYER TRANSPARENCY'
+        # ctrl+i = INCREASE LAYER TRANSPARENCY
         if event.key == 'ctrl+i':
             self.transparency_increase(event)
 
-        'ctrl+d = INCREASE ASPECT TRANSPARENCY'
+        # ctrl+d = INCREASE ASPECT TRANSPARENCY
         if event.key == 'ctrl+d':
             self.transparency_decrease(event)
 
-        'up arrow = INCREASE ASPECT RATIO'
+        # up arrow = INCREASE ASPECT RATIO
         if event.key == 'up':
             self.aspect_increase(event)
 
-        'ctrl+up = INCREASE ASPECT RATIO X2'
+        # ctrl+up = INCREASE ASPECT RATIO X2
         if event.key == 'ctrl+up':
             self.aspect_increase2(event)
 
-        'down arrow = DECREASE ASPECT RATIO'
+        # down arrow = DECREASE ASPECT RATIO
         if event.key == 'down':
             self.aspect_decrease(event)
 
-        'ctrl+down = DECREASE ASPECT RATIO'
+        # ctrl+down = DECREASE ASPECT RATIO
         if event.key == 'ctrl+down':
             self.aspect_decrease2(event)
+
+    def toogle_fault_mode(self, event):
+        """SWITCH FAULT PICKING MODE ON AND OFF"""
+        if self.fault_picking_switch is True:
+            self.fault_picking_switch = False
+
+        elif self.fault_picking_switch is False:
+            self.fault_picking_switch = True
 
     def fault_mode_key_press(self, event):
         """KEY PRESS CALLBACKS WHEN FAULT MODE IS ACTIVATED"""
@@ -3753,15 +3774,20 @@ class Gmg(wx.Frame):
 
         # NOW WRITE OUT THE DATA
         with open(all_layers_output_file, 'wb') as f:
-            for i in range(0, self.layer_count + 1):
-                out = csv.writer(f, delimiter=' ')
-                f.write('>\n')
-                data = [self.plotx_list[i], self.ploty_list[i]]
-                out.writerows(zip(*data))
-                layer_write = zip(self.plotx_list[i], self.ploty_list[i])
-                # WRITE INDIVIDUAL LAYER
-                np.savetxt(output_dir + '/' + self.loaded_tree_items[i] + '.xy', layer_write, delimiter=' ',
-                           fmt='%f %f')
+            try:
+                for i in range(1, self.layer_count + 1):
+                    out = csv.writer(f, delimiter=' ')
+                    f.write('>\n')
+                    data = [self.plotx_list[i], self.ploty_list[i]]
+                    out.writerows(zip(*data))
+                    layer_write = zip(self.plotx_list[i], self.ploty_list[i])
+                    # WRITE INDIVIDUAL LAYER
+                    np.savetxt(output_dir + '/' + self.loaded_tree_items[i] + '.xy', layer_write, delimiter=' ',
+                               fmt='%f %f')
+                    f.close()
+            except IndexError:
+                f.close()
+                pass
 
     def write_c_xy(self, event):
         # CREATE OUTPUT FILE
@@ -3844,12 +3870,13 @@ class Gmg(wx.Frame):
         observed = ObservedData()
 
         # SET ATTRIBUTES
-        observed.id = int(self.observed_gravity_counter)
+        observed.id = int(self.observed_topography_counter)
+        observed.type = str('filtered')
         observed.name = median_filter_box.output_name
         observed.color = median_filter_box.output_color
         observed.data = median_filter_box.filtered_output
         observed.mpl_actor = self.topo_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
-                                                        color=observed.color, s=5, gid=observed.id)
+                                                     color=observed.color, s=5, gid=observed.id)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_topography_list.append(observed)
@@ -3880,33 +3907,34 @@ class Gmg(wx.Frame):
         answer = median_filter_box.ShowModal()
 
         # CREATE NEW OBSERVED GRAVITY OBJECT
-        observed_gravity = ObservedData()
+        observed = ObservedData()
 
         # SET ATTRIBUTES
-        observed_gravity.id = int(self.observed_gravity_counter)
-        observed_gravity.name = median_filter_box.output_name
-        observed_gravity.color = median_filter_box.output_color
-        observed_gravity.data = median_filter_box.filtered_output
-        observed_gravity.mpl_actor = self.gravity_frame.scatter(observed_gravity.data[:, 0],
-                                                                observed_gravity.data[:, 1], marker='o',
-                                                                color=observed_gravity.color, s=5,
-                                                                gid=observed_gravity.id)
+        observed.id = int(self.observed_gravity_counter)
+        observed.type = str('filtered')
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.gravity_frame.scatter(observed.data[:, 0],
+                                                                observed.data[:, 1], marker='o',
+                                                                color=observed.color, s=5,
+                                                                gid=observed.id)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_gravity_list.append(observed_gravity)
+        self.observed_gravity_list.append(observed)
 
         # TURN ON OBSERVED GRAVITY SWITCH
         self.observed_gravity_switch = True
 
         # APPEND NEW DATA MENU TO 'GRAV data MENU'
         self.grav_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(11000+observed_gravity.id, observed_gravity.name, self.grav_submenu)
+        self.m_obs_g_submenu.Append(11000+observed.id, observed.name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11000+observed_gravity.id, 'delete observed data')
+        self.grav_submenu.Append(11000+observed.id, 'delete observed data')
 
         # BIND TO DELETE OBSERVED GRAVITY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+observed_gravity.id)
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+observed.id)
 
         # INCREMENT OBSERVED GRAVITY COUNTER
         self.observed_gravity_counter += 1
@@ -3927,7 +3955,8 @@ class Gmg(wx.Frame):
         observed = ObservedData()
 
         # SET ATTRIBUTES
-        observed.id = int(self.observed_gravity_counter)
+        observed.id = int(self.observed_magnetic_counter)
+        observed.type = str('filtered')
         observed.name = median_filter_box.output_name
         observed.color = median_filter_box.output_color
         observed.data = median_filter_box.filtered_output
@@ -4169,14 +4198,11 @@ class Gmg(wx.Frame):
             pass
 
     def create_new_floating_layer(self):
-
-            # GET NEW NODE VALUES
-            # self.new_x1, self.new_y1 = new_layer_dialogbox.x1, new_layer_dialogbox.y1
-            # self.new_x2, self.new_y2 = new_layer_dialogbox.x2, new_layer_dialogbox.y2
-            # self.new_x3, self.new_y3 = new_layer_dialogbox.x3, new_layer_dialogbox.y3
-            # self.new_x4, self.new_y4 = new_layer_dialogbox.x4, new_layer_dialogbox.y4
+            """CREATE A NEW FLOATING LAYER USING FOUR USER INPUT MOUSE CLICKS"""
+            # SOURCE NEW NODES FROM USER CLICKS
             self.plotx = self.new_plotx
             self.ploty = self.new_ploty
+
             # INCREMENT THE LAYER COUNT'
             self.layer_counter = self.layer_count
             self.layer_counter = self.layer_counter + 1
@@ -4204,8 +4230,6 @@ class Gmg(wx.Frame):
             self.item = 'layer %s' % (int(self.layer_counter))
             self.add_new_tree_nodes(self.root, self.item, self.layer_counter)
             self.layers_calculation_switch.append(1)
-            # self.plotx = [self.new_x1, self.new_x2, self.new_x3, self.new_x4]
-            # self.ploty = [self.new_y1, self.new_y2, self.new_y3, self.new_y4]
             self.nextpoly = zip(self.plotx, self.ploty)
 
             # CREATE LAYER LINE
@@ -4229,7 +4253,6 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
-
 
     def load_layer(self, event):
         open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
@@ -4295,6 +4318,9 @@ class Gmg(wx.Frame):
     def delete_layer(self, event):
         """Delete LAYER DATA"""
 
+        # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
+        self.current_node = self.model_frame.scatter(-40000., 0., marker='o', color='r', zorder=10)
+
         # REMOVE POLYGON
         self.polygon_fills[self.layer_counter][0].remove()
         del self.polygon_fills[self.layer_counter]
@@ -4316,7 +4342,7 @@ class Gmg(wx.Frame):
             self.ploty = self.ploty_list[self.layer_counter + 1]
         self.draw()
 
-        # REMOVE META DATA'
+        # REMOVE META DATA
         del self.plotx_list[self.layer_counter]
         del self.ploty_list[self.layer_counter]
         del self.densities[self.layer_counter]
@@ -4332,9 +4358,9 @@ class Gmg(wx.Frame):
         del self.layers_calculation_switch[self.layer_counter]
 
         #  REMOVE TREE ITEMS
-        del self.tree_items[self.layer_counter]
+        del self.tree_items[self.layer_counter-1]
         layers = self.tree.GetRootItem().GetChildren()
-        self.tree.Delete(layers[self.layer_counter])
+        self.tree.Delete(layers[self.layer_counter-1])
         # RESET TREE ITEM ID'S
         layers = self.tree.GetRootItem().GetChildren()
         for i in range(len(layers)):
@@ -4342,6 +4368,9 @@ class Gmg(wx.Frame):
 
         # UPDATE COUNTERS
         self.layer_count -= 1
+
+        # SET CURRENT LAYER AS PREVIOUS LAYER TO THAT JUST DELETED
+        self.layer_counter -= 1
 
         # UPDATE
         self.update_layer_data()
@@ -4409,12 +4438,21 @@ class Gmg(wx.Frame):
         # REDRAW ANNOTATIONS WITH NEW TEXT SIZE
         self.draw()
 
-    def set_obs_rms(self, value):
-        set_values = SetObsRmsDialog(self, -1, 'Set RMS Input', self.obs_grav_name_list, self.obs_grav_list_save,
-                                     self.obs_mag_name_list, self.obs_mag_list_save)
-        answer = set_values.ShowModal()
-        self.obs_gravity_data_for_rms = set_values.obs_gravity_data_for_rms
-        self.obs_mag_data_for_rms = set_values.obs_mag_data_for_rms
+    def set_obs_grav_rms(self, value):
+        """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
+        selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_gravity_list)
+        answer = selection.ShowModal()
+        for i in range(0, len(self.observed_gravity_list)):
+                if self.observed_gravity_list[i].name == selection.obs_name:
+                    self.obs_gravity_data_for_rms = self.observed_gravity_list[i].data
+
+    def set_obs_mag_rms(self, value):
+        """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
+        selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_magnetic_list)
+        answer = selection.ShowModal()
+        for i in range(0, len(self.observed_magnetic_list)):
+                if self.observed_magnetic_list[i].name == selection.obs_name:
+                    self.obs_mag_data_for_rms = self.observed_magnetic_list[i].data
 
     def model_rms(self, xp):
         """CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
@@ -4462,6 +4500,7 @@ class Gmg(wx.Frame):
 
         # UPDATE GMG STATE
         self.update_layer_data()
+        self.run_algorithms()
         self.draw()
 
     # LIVE GRAPHICS UPDATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4563,6 +4602,7 @@ class Gmg(wx.Frame):
         # UPDATE GMG
         self.model_frame.set_aspect(self.model_aspect)
         self.display_info()
+        self.run_algorithms()
         self.draw()
 
     def update_layer_data(self):
@@ -4681,23 +4721,24 @@ class Gmg(wx.Frame):
         self.draw()
 
     def run_algorithms(self):
-        """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
+        """
+        RUN POTENTIAL FIELD CALCULATION ALGORITHMS
+        """
         # REVERSE ORDER OF POLYGONS SO NODES ARE INPUT TO ALGORITHMS IN CLOCKWISE DIRECTION
         # (AS LAYER NODES ARE STORED IN LEFT TO RIGHT ORDER IN THE NUMPY ARRAYS
-        if self.calc_grav_switch is True or self.calc_mag_switch is True:
-            if len(self.polygons) > 1:
-                for i in range(0, len(self.polygons)):
-                    self.polygons[i] = self.polygons[i][::-1]
-            else:
-                self.polygons[0] = self.polygons[0][::-1]
+        # if len(self.polygons) > 1:
+        #     print("running algorithms")
+        #     for i in range(0, len(self.polygons)):
+        #         self.polygons_to_pass[i] = self.polygons[i][::-1]
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
         # TOPOGRAPHY - :FUTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
         self.pred_topo = np.zeros_like(self.xp)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
         # GRAVITY
-        # ARRAY OF DENSITY CONTRASTS TO BE PASSED TO BOTT ALGORITHM
+        # CREATE ARRAYAY OF DENSITY CONTRASTS TO BE PASSED TO THE BOTT ALGORITHM
         self.density_contrasts = np.zeros(len(self.densities))
         for i in range(len(self.densities)):
             self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
@@ -4705,11 +4746,13 @@ class Gmg(wx.Frame):
         # ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT
         if self.polygons and self.calc_grav_switch is True:
             # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
-            polygons_to_use, densities_to_use = [], []
+            polygons_to_use = []
+            densities_to_use = []
             for layer in range(len(self.densities)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
-                    densities_to_use.append(self.density_contrasts[layer])
+                    # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
+                    densities_to_use.append(self.density_contrasts[layer] * -1)
 
             # PASS TO BOTT ALGORITHM
             polys = []
@@ -4719,9 +4762,9 @@ class Gmg(wx.Frame):
         else:
             self.predgz = np.zeros_like(self.xp)
         self.predplot.set_data(self.xp * 0.001, self.predgz)
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
         # MAGNETICS
         # ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM
         if self.polygons and self.earth_field != 0.0 and self.calc_mag_switch is True:
@@ -4730,9 +4773,10 @@ class Gmg(wx.Frame):
             for layer in range(0, len(self.polygons)):
                 if self.layers_calculation_switch[layer] == 1:
                     polygons_to_use.append(self.polygons[layer])
-                    susceptibilities_to_use.append(self.susceptibilities[layer])
+                    # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
+                    susceptibilities_to_use.append(self.susceptibilities[layer] * -1)
 
-            # PASS TO TALWANI AND HEIRTZLER ALGORITHM
+            # PASS TO TALWANI&HEIRTZLER ALGORITHM
             self.polys = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
                 self.polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
@@ -4743,34 +4787,28 @@ class Gmg(wx.Frame):
 
         # PLOT MAGNETIC PROFILE
         self.prednt_plot.set_data(self.xp * 0.001, self.prednt)
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
 
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
         # UPDATE RMS VALUES
-        #  RUN RMS CALC CODE
+
+        # RUN THE RMS CALC CODE
         self.model_rms(self.xp)
 
-        # SET GRAV RMS VALUES
-        if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch == True and \
-                self.calc_grav_switch == True and self.predgz != []:
+        # 2SET GRAVITY RMS
+        if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch is True and \
+                self.calc_grav_switch is True and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
-        elif self.obs_gravity_data_for_rms is None:
-            self.grav_rms_plot.set_data(self.obs_gravity_data_for_rms[:, 0],
-                                        np.zeros_like(self.obs_gravity_data_for_rms[:, 0]))
         else:
             pass
 
-        # SET MAG RMS VALUES
-        if self.obs_mag_data_for_rms != [] and self.mag_obs_switch == True and self.calc_mag_switch == True \
+        # SET MAGNETIC RMS
+        if self.obs_mag_data_for_rms != [] and self.mag_obs_switch is True and self.calc_mag_switch is True \
                 and self.prednt != []:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
-        elif self.obs_mag_data_for_rms is None:
-            self.mag_rms_plot.set_data(self.obs_mag_data_for_rms[:, 0],
-                                       np.zeros_like(self.obs_mag_data_for_rms[:, 0]))
         else:
             pass
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        # --------------------------------------------------------------------------------------------------------------
 
         # SET FRAME X AND Y LIMITS
         self.set_frame_limits()
@@ -4781,9 +4819,9 @@ class Gmg(wx.Frame):
         # UPDATE GMG GRAPHICS
         self.draw()
 
+
     def set_frame_limits(self):
         """SET FRAME X AND Y LIMITS"""
-
         # --------------------------------------------------------------------------------------------------------------
         # SET GRAVITY DISPLAY BOX LIMITS
         if self.observed_gravity_switch is True and self.grav_residuals != []:
@@ -4840,13 +4878,15 @@ class Gmg(wx.Frame):
         # SET DERIVATIVE Y-AXIS LIMITS
 
         # CREATE EMPTY LIST
-        ymin_list = []
-        ymax_list = []
+        ymin_list = [-1]
+        ymax_list = [1]
         for i in range(len(self.observed_gravity_list)):
-            if self.observed_gravity_list[i].type == 'derivative':
+            if self.observed_gravity_list[i].type == str('derivative'):
                 ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 0.1)
                 ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 0.1)
-        self.gravity_d_frame.set_ylim(ymin, ymax)
+        if self.gravity_frame is not None:
+            self.gravity_d_frame.set_ylim(min(ymin_list), max(ymax_list))
+
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
@@ -5811,29 +5851,18 @@ class BulkShiftDialog(wx.Dialog):
 class SetObsRmsDialog(wx.Dialog):
     """SET THE DATASET TO USE FOR CALCULATING THE RMS MISFIT"""
 
-    def __init__(self, parent, id, title, obs_grav_name_list, obs_grav_list_save, obs_mag_name_list, obs_mag_list_save):
+    def __init__(self, parent, id, title, observed_data_list):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
-        self.obs_grav_name_list = obs_grav_name_list
-        self.obs_grav_list_save = obs_grav_list_save
-        self.obs_mag_name_list = obs_mag_name_list
-        self.obs_mag_list_save = obs_mag_list_save
-
         '# CHOOSE INPUT OBSERVED DATA'
-        self.obs_combo_list_grav_text = wx.StaticText(input_panel, -1, "Gravity Input:")
-        self.obs_combo_list_grav = wx.ComboBox(input_panel, id=-1, value="", choices=[])
-        self.obs_combo_list_mag_text = wx.StaticText(input_panel, -1, "Magnetic Input:")
-        self.obs_combo_list_mag = wx.ComboBox(input_panel, id=-1, value="", choices=[])
-        for i in self.obs_grav_name_list:
+        self.obs_combo_list_text = wx.StaticText(input_panel, -1, "Observed data file:")
+        self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
+
+        for i in range(0, len(observed_data_list)):
             try:
-                self.obs_combo_list_grav.Append(i)
-            except:
-                pass
-        for i in self.obs_mag_name_list:
-            try:
-                self.obs_combo_list_mag.Append(i)
+                self.obs_combo_list.Append(str(observed_data_list[i].name))
             except:
                 pass
 
@@ -5843,30 +5872,13 @@ class SetObsRmsDialog(wx.Dialog):
 
         '# DEFINE SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
-        sizer.AddMany([self.obs_combo_list_grav_text, self.obs_combo_list_grav,
-                       self.obs_combo_list_mag_text, self.obs_combo_list_mag, self.b_set])
+        sizer.AddMany([self.obs_combo_list_text, self.obs_combo_list,
+                       self.b_set])
         input_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
     def set_obs(self, event):
-        obs_grav = str(self.obs_combo_list_grav.GetValue())
-        obs_mag = str(self.obs_combo_list_mag.GetValue())
-
-        if obs_grav is not None:
-            for i in range(len(self.obs_grav_name_list)):
-                '# CHECK GRAV AND SET VALUES'
-                if self.obs_grav_name_list[i] == obs_grav:
-                    self.obs_gravity_data_for_rms = self.obs_grav_list_save[i]
-        else:
-            self.obs_gravity_data_for_rms = None
-
-        if obs_mag is not None:
-            '# CHECK MAG AND SET VALUES'
-            for i in range(len(self.obs_mag_name_list)):
-                if self.obs_mag_name_list[i] == obs_mag:
-                    self.obs_mag_data_for_rms = self.obs_mag_list_save[i]
-        else:
-            self.obs_mag_data_for_rms = None
+        self.obs_name = str(self.obs_combo_list.GetValue())
         self.EndModal(1)
 
 
