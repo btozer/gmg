@@ -14,7 +14,7 @@ def rms(obs_x, obs_y, calc_x, calc_y):
     f = interpolate.interp1d(calc_x, calc_y)  # CREATE INTERPOLATION FUNC FOR CALCULATED DATA
     intp_calc_y = f(obs_x)  # INTERPOLATE CALC DATA ONTO OBS X POINTS
 
-    # %CALCULATE THE RESIDUALS
+    # CALCULATE THE RESIDUALS
     res = (obs_y - intp_calc_y)
     residuals = np.column_stack((obs_x, res))
 
