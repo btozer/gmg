@@ -1501,17 +1501,24 @@ class Gmg(wx.Frame):
         if self.fault_picking_switch is True:
             self.fault_picking_switch = False
 
-        # SET OBJECTS WITH THE CHOSEN LAYER
+        # GET HTE TREE ID AND USE IT TO SET THE CURRENT LAYER
         self.currently_active_layer_id = self.tree.GetPyData(event.GetItem())
-        self.nextdens = self.densities[self.currently_active_layer_id]
-        self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
-        self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
-        self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
-        self.angle_a_input.SetValue(self.angle_a[self.currently_active_layer_id])
-        self.angle_b_input.SetValue(self.angle_b[self.currently_active_layer_id])
-        self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-        self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
+
+        # SET OBJECTS WITH THE CHOSEN LAYER
+        self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
+        self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
+        self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
+        self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
+        self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
+
+        # GET THE XY NODES FROM THE ACTIVE LAYER AND SET THE CUURENTLY ACTIVE NODES (I.E. MAKE THEM INTERACTIVE)
+        self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+        self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
+
+        # SET CURRENTLY ACTIVE (RED) NODE
         self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
+
+        # UPDATE MODEL
         self.update_layer_data()
         self.run_algorithms()
 
@@ -1528,13 +1535,12 @@ class Gmg(wx.Frame):
         self.tree.DeleteChildren(event)
 
     def item_checked(self, event):
-        """TOGGLE WHETHER OR NOT A LAYER IS INCLUDED IN THE CALCULATIONS"""
-
+        """TOGGLE WHETHER OR NOT THE SELECTED LAYER IS INCLUDED IN THE MODELLED ANOMALY CALCULATIONS"""
         layer = self.tree.GetPyData(event.GetItem())
-        if self.layers_calculation_switch[layer] == 1:
-            self.layers_calculation_switch[layer] = 0
+        if self.layer_list[layer].include_in_calculations_switch is True:
+            self.layer_list[layer].include_in_calculations_switch is False
         else:
-            self.layers_calculation_switch[layer] = 1
+            self.layer_list[layer].include_in_calculations_switch is True
 
     def display_info(self):
         self.statusbar.SetStatusText("                                                                                 "
@@ -1853,8 +1859,6 @@ class Gmg(wx.Frame):
                 tree_item = self.tree.AppendItem(self.root, "%s" % self.loaded_tree_items[i], ct_type=1)
                 tree_item.Check(checked=True)
                 self.tree.SetItemPyData(tree_item, i)
-
-            self.layers_calculation_switch = [1] * len(self.loaded_tree_items)
 
             self.tree_items = self.loaded_tree_items
             # ----------------------------------------------------------------------------------------------------------
@@ -2922,7 +2926,7 @@ class Gmg(wx.Frame):
             xt = np.array(self.current_x_nodes)
             yt = np.array(self.current_y_nodes)
 
-            if self.boundary_lock_list[self.currently_active_layer_id] == 0 and self.index_node is not None:
+            if self.layer_list[self.currently_active_layer_id].layer_type == 'fixed' and self.index_node is not None:
                 if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
                     xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
@@ -2941,7 +2945,7 @@ class Gmg(wx.Frame):
                 else:
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-            elif self.boundary_lock_list[self.currently_active_layer_id] == 1:
+            elif self.layer_list[self.currently_active_layer_id].layer_type == 'floating':
                 if new_y <= 0:
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
@@ -2949,18 +2953,18 @@ class Gmg(wx.Frame):
                     xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
 
-            # DEAL WITH PINCHED NODE
-            if self.pinch_switch is True:
-                for k in range(0, len(self.index_arg2_list)):
-                    if self.index_arg2_list[k] is not None:
-                        next_x_list = self.plotx_list[k]
-                        next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
-                        next_x_list[self.index_arg2_list[k]] = new_x
-                        next_y_list[self.index_arg2_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
-                        self.plotx_list[k] = next_x_list
-                        self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+            # # DEAL WITH PINCHED NODE
+            # if self.pinch_switch is True:
+            #     for k in range(0, len(self.index_arg2_list)):
+            #         if self.index_arg2_list[k] is not None:
+            #             next_x_list = self.plotx_list[k]
+            #             next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
+            #             next_x_list[self.index_arg2_list[k]] = new_x
+            #             next_y_list[self.index_arg2_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
+            #             self.plotx_list[k] = next_x_list
+            #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
 
-            self.current_x_nodes= xt
+            self.current_x_nodes = xt
             self.current_y_nodes = yt
             self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
 
@@ -3005,7 +3009,8 @@ class Gmg(wx.Frame):
                     continue
                 else:
                     # CHECK FOR PINCHED NODES
-                    node_list_x, node_list_y = self.plotx_list[x], self.ploty_list[x]
+                    node_list_x = self.layer_list[x].x_nodes
+                    node_list_y = self.layer_list[x].y_nodes
                     for i in range(0, len(node_list_x)):
                         if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
                             # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER
@@ -3187,14 +3192,18 @@ class Gmg(wx.Frame):
 
         # GMG IS IN LAYER MODE
         if self.fault_picking_switch is False:
-            if self.boundary_lock_list[self.currently_active_layer_id] == 0:
+            if self.layer_list[self.currently_active_layer_id].type == str('fixed'):
+                print("layer is fixed")
+                # GET X AND Y VALUES
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
 
                 # GET CURRENT X AND Y ARRAYS
-                xt = np.array(self.current_x_nodes)
-                yt = np.array(self.current_y_nodes)
-
+                xt = self.layer_list[self.currently_active_layer_id].x_nodes
+                yt = self.layer_list[self.currently_active_layer_id].y_nodes
+                print("xt and yt =")
+                print(xt)
+                print(yt)
                 # UPDATE NODE
                 if xt[self.index_node] == self.x1 and yt[self.index_node] != 0.001:
                     xt[self.index_node] = self.x1  # REPLACE OLD X WITH NEW X
@@ -3214,11 +3223,18 @@ class Gmg(wx.Frame):
                 else:
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
-            elif self.boundary_lock_list[self.currently_active_layer_id] == 1:
+            elif self.layer_list[self.currently_active_layer_id].type == str('floating'):
+                print("layer is floating")
+                # GET THE X AND Y VALUES
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
-                xt = np.array(self.current_x_nodes)
-                yt = np.array(self.current_y_nodes)
+                xt = self.layer_list[self.currently_active_layer_id].x_nodes
+                yt = self.layer_list[self.currently_active_layer_id].y_nodes
+
+                print("xt and yt =")
+                print(xt)
+                print(yt)
+
                 if y <= 0:
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
@@ -3226,20 +3242,31 @@ class Gmg(wx.Frame):
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
 
-            # DEAL WITH PINCHED MODE
-            if self.pinch_switch is True:
-                for k in range(0, len(self.index_arg2_list)):
-                    if self.index_arg2_list[k] is not None:
-                        # GET THE NODE LIST OF THE NEXT LAYER
-                        next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
+            # # DEAL WITH PINCHED MODE
+            # if self.pinch_switch is True:
+            #     for k in range(0, len(self.index_arg2_list)):
+            #         if self.index_arg2_list[k] is not None:
+            #             # GET THE NODE LIST OF THE NEXT LAYER
+            #             next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
+            #
+            #             # REPLACE THE PINCHED NODE WITH THE NEW NODE
+            #             next_x_list[self.index_arg2_list[k]] = x
+            #             next_y_list[self.index_arg2_list[k]] = y
+            #             self.plotx_list[k] = next_x_list
+            #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+            else:
+                print("DID NOT GET A layer.type value")
+                print(str(self.layer_list[self.currently_active_layer_id].type))
+                return 0
 
-                        # REPLACE THE PINCHED NODE WITH THE NEW NODE
-                        next_x_list[self.index_arg2_list[k]] = x
-                        next_y_list[self.index_arg2_list[k]] = y
-                        self.plotx_list[k] = next_x_list
-                        self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+            print("xt and yt =")
+            print(xt)
+            print(yt)
+            # NOW RESET THE LAYER WITH THE NEW NODE POSITION
+            self.layer_list[self.currently_active_layer_id].x_nodes = xt
+            self.layer_list[self.currently_active_layer_id].y_nodes = yt
 
-            self.current_x_nodes= xt
+            self.current_x_nodes = xt
             self.current_y_nodes = yt
             self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
 
@@ -3336,9 +3363,10 @@ class Gmg(wx.Frame):
             yt = np.array(self.current_y_nodes)
 
             # INSERT NEW NODES INTO LAYER X AND Y LISTS
-            self.current_x_nodes= np.insert(xt, [self.index_arg + 1], event.xdata)
+            self.current_x_nodes = np.insert(xt, [self.index_arg + 1], event.xdata)
             self.current_y_nodes = np.insert(yt, [self.index_arg + 1], event.ydata)
 
+            # SET THE CURRENT LAYER WITH THE UPDATED NODE LIST
             self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
 
             # UPDATE LAYER DATA AND PLOT
@@ -3362,43 +3390,47 @@ class Gmg(wx.Frame):
                 return 0
             else:
                 # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
-                self.current_x_nodes= [tup for i, tup in enumerate(self.plotx) if i != self.index_arg]  # DELETE X
-                self.current_y_nodes = [tup for i, tup in enumerate(self.ploty) if i != self.index_arg]  # DELETE Y
-                self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
+                self.current_x_nodes = [tup for i, tup in enumerate(xt) if i != self.index_arg]  # DELETE X
+                self.current_y_nodes = [tup for i, tup in enumerate(yt) if i != self.index_arg]  # DELETE Y
 
-            # NOW CHECK FOR PINCHED NODES
-            index_arg2 = None
-            self.pinch_switch = False
-            self.index_arg2_list = [None] * (self.total_layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
-            for x in range(0, self.total_layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.currently_active_layer_id:
-                    pass
-                x_node_list = self.plotx_list[x]
-                y_node_list = self.ploty_list[x]
-                for i in range(0, len(x_node_list)):
-                    # NOW CHECK X AND Y VALUES ARE EQUAL
-                    if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
-                        # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
-                        self.index_arg2_list[x] = i
-                        self.pinch_switch = True
+            # SET THE CURRENT LAYER WITH THE UPDATED NODE LIST
+            self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
 
-            # REMOVE PINCHED NODES
-            if self.pinch_switch is True:
-                for k in range(len(self.index_arg2_list)):
-                    if self.index_arg2_list[k] is not None:
-                        next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[
-                            k]  # GET THE NODE LIST OF THE NEXT LAYER
-                        next_x_list = [tup for i, tup in enumerate(next_x_list) if
-                                       i != self.index_arg2_list[k]]  # DELETE X
-                        next_y_list = [tup for i, tup in enumerate(next_y_list) if
-                                       i != self.index_arg2_list[k]]  # DELETE Y
-                        self.plotx_list[k], self.ploty_list[
-                            k] = next_x_list, next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+            # # NOW CHECK FOR PINCHED NODES
+            # index_arg2 = None
+            # self.pinch_switch = False
+            # self.index_arg2_list = [None] * (self.total_layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
+            # for x in range(0, self.total_layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
+            #     if x == self.currently_active_layer_id:
+            #         pass
+            #     x_node_list = self.layer_list[x].x_nodes
+            #     y_node_list = self.layer_list[x].y_nodes
+            #
+            #     for i in range(0, len(x_node_list)):
+            #         # NOW CHECK X AND Y VALUES ARE EQUAL
+            #         if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
+            #             # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
+            #             self.index_arg2_list[x] = i
+            #             self.pinch_switch = True
+            #
+            # # REMOVE PINCHED NODES
+            # if self.pinch_switch is True:
+            #     for k in range(len(self.index_arg2_list)):
+            #         if self.index_arg2_list[k] is not None:
+            #             next_x_list = self.plotx_list[k]
+            #             next_y_list = self.ploty_list[k]
+            #             # GET THE NODE LIST OF THE NEXT LAYER
+            #             next_x_list = [tup for i, tup in enumerate(next_x_list) if
+            #                            i != self.index_arg2_list[k]]  # DELETE X
+            #             next_y_list = [tup for i, tup in enumerate(next_y_list) if
+            #                            i != self.index_arg2_list[k]]  # DELETE Y
+            #             # OVERWRITE THE NODE LIST WITH UPDATED LIST
+            #             self.plotx_list[k], self.ploty_list[k] = next_x_list, next_y_list
 
             # SHIFT CURRENT NODE COLORING TO PREVIOUS NODE
             self.current_node.set_offsets([xt[self.index_arg - 1], yt[self.index_arg - 1]])
 
-            # UPDATE GMG
+            # UPDATE LAYER DATA AND PLOT
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
@@ -3411,61 +3443,54 @@ class Gmg(wx.Frame):
         if event.key == 'n':
             self.new_layer(event)
 
-        # b = LOCK OR UNLOCK LAYER BOUNDARY LOCKED MODE
-        if event.key == 'b':
-            if self.boundary_lock:
-                'unlock layer'
-                self.boundary_lock = False
-                self.boundary_lock_list[self.currently_active_layer_id] = 1
-            elif not self.boundary_lock:
-                'lock layer'
-                self.boundary_lock = True
-                self.boundary_lock_list[self.currently_active_layer_id] = 0
-
-        # l = LOCK OR UNLOCK LAYER/POLYGON MODE
-        if event.key == 'l':
-            if self.layer_lock:
-                'unlock layer'
-                self.layer_lock = False
-                self.layer_lock_list[self.currently_active_layer_id] = 1
-            elif not self.layer_lock:
-                'lock layer'
-                self.layer_lock = True
-                self.layer_lock_list[self.currently_active_layer_id] = 0
-
         # < = MOVE TO NEXT LAYER
         if event.key == '.':
             if self.currently_active_layer_id == self.total_layer_count:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
+
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
                 self.currently_active_layer_id = 0
-                self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
-                self.angle_a_input.SetValue(self.angle_a[self.currently_active_layer_id])
-                self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-                self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
-                self.x_input.SetValue(self.current_x_nodes[0])
-                self.y_input.SetValue(self.current_y_nodes[0])
+
+                # SET CURRENT INPUT VALUES IN MENU
+                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
+                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
+                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
+
+                # SET CURRENT NODE VALUES
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
+                self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
+                self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
+
+                # UPDATE MODEL
                 self.update_layer_data()
                 self.run_algorithms()
             else:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
+
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.currently_active_layer_id = self.currently_active_layer_id + 1
-                self.nextdens = self.densities[self.currently_active_layer_id]
-                self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
-                self.angle_a_input.SetValue(self.angle_a[self.currently_active_layer_id])
-                self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-                self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
-                self.x_input.SetValue(self.current_x_nodes[0])
-                self.y_input.SetValue(self.current_y_nodes[0])
+                self.currently_active_layer_id += 1
+
+                # SET CURRENT INPUT VALUES IN MENU
+                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
+                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
+                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
+
+                # SET CURRENT NODE VALUES
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
+                self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
+                self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
+
+                # UPDATE MODEL
                 self.update_layer_data()
                 self.run_algorithms()
 
@@ -3474,36 +3499,48 @@ class Gmg(wx.Frame):
             if self.currently_active_layer_id == 0:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
+
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
                 self.currently_active_layer_id = self.total_layer_count
-                self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
-                self.angle_a_input.SetValue(self.angle_a[self.currently_active_layer_id])
-                self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-                self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
-                self.x_input.SetValue(self.current_x_nodes[0])
-                self.y_input.SetValue(self.current_y_nodes[0])
+
+                # SET CURRENT INPUT VALUES IN MENU
+                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
+                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
+                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
+
+                # SET CURRENT NODE VALUES
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
+                self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
+                self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
-                self.update_layer_data()
-                self.run_algorithms()
             else:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
                 # MOVE TO LAYER ABOVE INPUT LAYER & ASSIGN CURRENT LAYER XY DATA
-                self.currently_active_layer_id = self.currently_active_layer_id - 1
-                self.nextdens = self.densities[self.currently_active_layer_id]
-                self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
-                self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
-                self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
-                self.angle_a_input.SetValue(self.angle_a[self.currently_active_layer_id])
-                self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-                self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
-                self.x_input.SetValue(self.current_x_nodes[0])
-                self.y_input.SetValue(self.current_y_nodes[0])
-                self.current_node.set_offsets([self.current_y_nodes[0], self.current_y_nodes[0]])
+                self.currently_active_layer_id -= 1
+
+                # SET CURRENT INPUT VALUES IN MENU
+                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
+                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
+                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
+
+                # SET CURRENT NODE VALUES
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
+                self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
+                self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
+                self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
+
+                # UPDATE MODEL
                 self.update_layer_data()
                 self.run_algorithms()
+
+            # UPDATE MODEL FRAME
             self.draw()
 
         # z = ZOOM IN MODE
@@ -4131,6 +4168,7 @@ class Gmg(wx.Frame):
             self.currently_active_layer_id = self.total_layer_count
             print("self.currently_active_layer_id = %s") % self.currently_active_layer_id
             print("self.total_layer_count = %s") % self.total_layer_count
+
             # CREATE A NEW LAYER OBJECT
             new_layer = Layer()
 
@@ -4138,6 +4176,7 @@ class Gmg(wx.Frame):
             new_layer.id = self.currently_active_layer_id
             new_layer.name = str('layer %s') % self.currently_active_layer_id
             new_layer.type = str('fixed')
+            new_layer.include_in_calculations_switch = True
 
             # ADD NEW LAYER TO THE LAYER TREE DISPLAY
             self.tree_items.append('layer %s' % (int(self.currently_active_layer_id)))
@@ -4179,10 +4218,8 @@ class Gmg(wx.Frame):
             self.current_x_nodes = new_layer.x_nodes
             self.current_y_nodes = new_layer.y_nodes
 
-            # SET THE CURRENT NODE
+            # SET THE CURRENTLY SELECTED (RED) ACTIVE NODE
             self.current_node.set_offsets([new_layer.x_nodes[0], new_layer.y_nodes[0]])
-
-            self.nextdens = new_layer.density
 
             # SET CURRENT ATTRIBUTE INPUTS IN LEFT PANEL
             self.density_input.SetValue(new_layer.density)
@@ -4207,65 +4244,66 @@ class Gmg(wx.Frame):
             self.click_count = 0
             self.new_layer_nodes = None
             self.new_layer_fill = None
-            # SWITCH ON MOUSE CLICK CAPTURE MODE (SEE button_release func for continuation of code)
+
+            # SWITCH ON MOUSE CLICK CAPTURE MODE TO CREATE NEW LAYER (SEE button_release FUNC FOR CONTINUATION OF CODE)
             self.select_new_layer_nodes = True
 
         else:
-            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED'
+            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED = EXIT FUNC
             pass
 
     def create_new_floating_layer(self):
             """CREATE A NEW FLOATING LAYER USING FOUR USER INPUT MOUSE CLICKS"""
-            # SOURCE NEW NODES FROM USER CLICKS
-            self.current_x_nodes= self.new_plotx
-            self.current_y_nodes = self.new_ploty
-
-            # INCREMENT THE LAYER COUNT'
-            self.currently_active_layer_id = self.total_layer_count
-            self.currently_active_layer_id = self.currently_active_layer_id + 1
-
             # INCREMENT THE TOTAL LAYER COUNT
             self.total_layer_count += 1
 
-            # ADD A NEW BLANK LAYER TO THE PLOT LISTS
-            self.polygon_fills.append([])
-            self.layer_lines.append([])
-            self.plotx_list.append([])
-            self.ploty_list.append([])
-            self.poly_fills.append([])
-            self.layer_colors.append('black')
-            self.densities.append(0.)
-            self.reference_densities.append(0.)
-            self.susceptibilities.append(0.)
-            self.angle_a.append(0.)
-            self.angle_b.append(0.)
-            self.layer_lock_list.append(1)
-            self.boundary_lock_list.append(1)
-            self.layer_lock_status.append('unlocked')
-            self.boundary_lock_status.append('unlocked')
+            # SET CURRENENTLY ACTIVE LAYER AS THE NEWLY CREATED LAYER
+            self.currently_active_layer_id = self.total_layer_count
+
+            # CREATE NEW LAYER OBJECT
+            new_layer = Layer()
+
+            # SOURCE NEW NODES FROM USER CLICKS
+            new_layer.x_nodes = self.new_plotx
+            new_layer.y_nodes = self.new_ploty
+
+            # SET CURRENTLY ACTIVE LAYER NODE OBJECTS
+            self.current_x_nodes = new_layer.x_nodes
+            self.current_y_nodes = new_layer.y_nodes
+
+            # SET SOME OF THE NEW LAYERS ATTRIBUTES
+            new_layer.id = self.currently_active_layer_id
+            new_layer.name = str('layer %s') % self.currently_active_layer_id
+            new_layer.type = str('floating')
+            new_layer.include_in_calculations_switch = True
+
+            # ADD NEW LAYER TO THE LAYER TREE DISPLAY
             self.tree_items.append('layer %s' % (int(self.currently_active_layer_id)))
             self.item = 'layer %s' % (int(self.currently_active_layer_id))
             self.add_new_tree_nodes(self.root, self.item, self.currently_active_layer_id)
-            self.layers_calculation_switch.append(1)
 
             # CREATE LAYER LINE
-            self.layer_lines[self.currently_active_layer_id] = self.model_frame.plot(self.plotx_list[self.currently_active_layer_id],
-                                                                     self.ploty_list[self.currently_active_layer_id],
-                                                         color='blue', linewidth=1.0, alpha=1.0)
+            new_layer.node_mpl_actor = self.model_frame.plot(new_layer.x_nodes, new_layer.y_nodes, color='blue',
+                                                                   linewidth=1.0, alpha=1.0)
             # CREATE LAYER POLYGON FILL
-            self.plotx_polygon = np.array(self.current_x_nodes)
-            self.ploty_polygon = np.array(self.current_y_nodes)
-            self.polygon_fills[self.currently_active_layer_id] = self.model_frame.fill(self.plotx_polygon, self.ploty_polygon,
-                                                                       color='blue', alpha=self.layer_transparency,
-                                                                       closed=True, linewidth=None, ec=None)
+            new_layer.polygon_mpl_actor = self.model_frame.fill(new_layer.x_nodes, new_layer.y_nodes, color='blue',
+                                                                         alpha=self.layer_transparency, closed=True,
+                                                                         linewidth=None, ec=None)
 
-            # UPDATE LAYER DATA
-            self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
-            self.nextdens = self.densities[self.currently_active_layer_id]
-            self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
-            self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
-            self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
-            self.angle_a_input.SetValue(self.angle_a[self.currently_active_layer_id])
+            # SET THE CURRENTLY SELECTED (RED) ACTIVE NODE
+            self.current_node.set_offsets([new_layer.x_nodes[0], new_layer.y_nodes[0]])
+
+            # SET CURRENT ATTRIBUTE INPUTS IN LEFT PANEL
+            self.density_input.SetValue(new_layer.density)
+            self.ref_density_input.SetValue(new_layer.reference_density)
+            self.susceptibility_input.SetValue(new_layer.susceptibility)
+            self.angle_a_input.SetValue(new_layer.angle_a)
+            self.angle_b_input.SetValue(new_layer.angle_b)
+
+            # APPEND NEW LAYER TO THE LAYER LIST
+            self.layer_list.append(new_layer)
+
+            # UPDATE MODEL
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
@@ -4321,7 +4359,6 @@ class Gmg(wx.Frame):
                                                                        color='blue', alpha=self.layer_transparency,
                                                                        closed=True, linewidth=None, ec=None)
         # UPDATE LAYER DATA
-        self.nextdens = self.densities[self.currently_active_layer_id]
         self.density_input.SetValue(0.001 * self.densities[self.currently_active_layer_id])
         self.ref_density_input.SetValue(0.001 * self.reference_densities[self.currently_active_layer_id])
         self.susceptibility_input.SetValue(self.susceptibilities[self.currently_active_layer_id])
@@ -4400,32 +4437,27 @@ class Gmg(wx.Frame):
         self.background_density_upper = float(grav_box.background_density_upper)
 
         for i in range(0, self.total_layer_count):
-            self.reference_densities[i] = float(self.background_density_upper) * 1000.
+            self.layer_list[i].reference_density = float(self.background_density_upper) * 1000.
         # self.background_density_upper = float((grav_box.background_density_lower))
         # self.background_density_upper = float((grav_box.background_density_lid))
         self.absolute_densities = True
         self.draw()
 
     def set_density(self, value):
-        if self.density_input.GetValue() == 0:
-            self.densities[self.currently_active_layer_id] = 0
-        else:
-            self.densities[self.currently_active_layer_id] = float(self.density_input.GetValue() * 1000.)
+        self.layer_list[self.currently_active_layer_id].density = float(self.density_input.GetValue() * 1000.)
 
     def set_reference_density(self, value):
-        if self.ref_density_input.GetValue() == 0:
-            self.reference_densities[self.currently_active_layer_id] = 0
-        else:
-            self.reference_densities[self.currently_active_layer_id] = float(self.ref_density_input.GetValue() * 1000.)
+        self.layer_list[self.currently_active_layer_id].reference_density = \
+            float(self.ref_density_input.GetValue() * 1000.)
 
     def set_susceptibility(self, value):
-        self.susceptibilities[self.currently_active_layer_id] = float(self.susceptibility_input.GetValue())
+        self.layer_list[self.currently_active_layer_id].susceptibility = float(self.susceptibility_input.GetValue())
 
     def set_angle_a(self, value):
-        self.angle_a[self.currently_active_layer_id] = float(self.angle_a_input.GetValue())
+        self.layer_list[self.currently_active_layer_id].angle_a = float(self.angle_a_input.GetValue())
 
     def set_angle_b(self, value):
-        self.angle_b[self.currently_active_layer_id] = float(self.angle_b_input.GetValue())
+        self.layer_list[self.currently_active_layer_id].angle_b = float(self.angle_a_input.GetValue())
 
     def set_text_size(self, value):
         """GET NEW TEXT SIZE"""
@@ -4498,7 +4530,7 @@ class Gmg(wx.Frame):
     def attribute_set(self, new_tree_items, densities, reference_densities, susceptibilities, angle_a, angle_b,
                       layer_colors):
         """UPDATE GMG ATTRIBUTES WITH NEW ATTRIBUTES FROM THE ATTRIBUTE TABLE"""
-
+        print("TREE ITEM CLICKED")
         # UPDATE MAIN FRAME TREE LIST
         current_tree_items = self.tree.GetRootItem().GetChildren()
         for i in range(0, len(self.tree_items) - 1):
@@ -4656,31 +4688,27 @@ class Gmg(wx.Frame):
             # UPDATE PLOT LISTS WITH LATEST EDIT
             self.layer_list[self.currently_active_layer_id].x_nodes = self.current_x_nodes
             self.layer_list[self.currently_active_layer_id].y_nodes = self.current_y_nodes
-            print("total layer count = %s") % self.total_layer_count
-            print("")
-
-            # RESET LISTS (USED AS INPUT FOR THE GRAV/MAG ALGORITHMS)
-            self.gravity_polygons = []
-            self.mag_polygons = []
+            # print("total layer count = %s") % self.total_layer_count
+            # print("")
 
             # CREATE UPDATED POLYGON XYs -------------------------------------------------------------------------------
             # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - (THIS DONE FIRST SO THE WHOLE
             # POLYGON ISN'T PASSED TO SELF.POLYPLOTS)
             for i in range(0, self.total_layer_count + 1):
-                print("i = %s") % i
+                # print("i = %s") % i
 
                 # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE GRAV/MAG ALGORITHMS
                 # FIRST SET UP XY DATA; IF LAYER IS BELOW LAYER 0 THEN ATTACH THE ABOVE LAYER TO COMPLETE THE POLYGON;
                 # ELSE USE TOP LAYER CHECK FOR 'FIXED' LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
-                print self.layer_list[i].name
-                print self.layer_list[i].id
-                print self.layer_list[i].type
-                print self.layer_list[i].color
-                print self.layer_list[i].x_nodes
-                print self.layer_list[i].y_nodes
-                print self.layer_list[i].node_mpl_actor
-                print self.layer_list[i].polygon_mpl_actor
-                print("")
+                # print self.layer_list[i].name
+                # print self.layer_list[i].id
+                # print self.layer_list[i].type
+                # print self.layer_list[i].color
+                # print self.layer_list[i].x_nodes
+                # print self.layer_list[i].y_nodes
+                # print self.layer_list[i].node_mpl_actor
+                # print self.layer_list[i].polygon_mpl_actor
+                # print("")
                 if i >= 1 and self.layer_list[i].type == 'fixed':
                     for layers in range(i, 0, -1):
                         if self.layer_list[i-1].type == 'fixed':
@@ -4700,16 +4728,20 @@ class Gmg(wx.Frame):
                             layer_above_y = np.array(self.layer_list[i-1].y_nodes)[::-1]
 
                             # CREATE POLYGON
-                            self.plotx_polygon = np.append(np.array(plotx), np.array(layer_above_x))
-                            self.ploty_polygon = np.append(np.array(ploty), np.array(layer_above_y))
+                            polygon_x = np.append(np.array(plotx), np.array(layer_above_x))
+                            polygon_y = np.append(np.array(ploty), np.array(layer_above_y))
+
+                            # UPDATE LAYER POLYGON ATTRIBUTE
+                            self.layer_list[i].polygon = zip(polygon_x, polygon_y)
                             break
                 else:
                     # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
-                    self.plotx_polygon = np.array(self.layer_list[i].x_nodes)
-                    self.ploty_polygon = np.array(self.layer_list[i].y_nodes)
+                    polygon_x = np.array(self.layer_list[i].x_nodes)
+                    polygon_y = np.array(self.layer_list[i].y_nodes)
 
-                # APPEND LAYER TO THE LIST OF LAYERS SUPPLIED TO THE GRAVITY ALGORITHM
-                self.gravity_polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
+                    # UPDATE LAYER POLYGON ATTRIBUTE
+                    self.layer_list[i].polygon = zip(polygon_x, polygon_y)
+
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -4729,12 +4761,13 @@ class Gmg(wx.Frame):
                     next_color = self.colormap.to_rgba(0.)
 
                 # # UPDATE POLYGON XY AND COLOR FILL
-                self.layer_list[i].polygon_mpl_actor[0].set_xy(self.gravity_polygons[i])
+                self.layer_list[i].polygon_mpl_actor[0].set_xy(self.layer_list[i].polygon)
                 self.layer_list[i].polygon_mpl_actor[0].set_color(next_color)
                 #
                 # # UPDATE LAYER LINES
                 self.layer_list[i].node_mpl_actor[0].set_xdata(self.layer_list[i].x_nodes)
                 self.layer_list[i].node_mpl_actor[0].set_ydata(self.layer_list[i].y_nodes)
+
             # ----------------------------------------------------------------------------------------------------------
 
             # UPDATE CURRENTLY ACTIVE LAYER LINE AND NODES
@@ -4756,9 +4789,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def run_algorithms(self):
-        """
-        RUN POTENTIAL FIELD CALCULATION ALGORITHMS
-        """
+        """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # --------------------------------------------------------------------------------------------------------------
         # CALCULATE TOPOGRAPHY - :FUTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
         self.pred_topo = np.zeros_like(self.xp)
@@ -4766,54 +4797,62 @@ class Gmg(wx.Frame):
 
         # --------------------------------------------------------------------------------------------------------------
         # CALCULATE GRAVITY
-        # CREATE ARRAY OF DENSITY CONTRASTS TO BE PASSED TO THE BOTT ALGORITHM
-        self.density_contrasts = np.zeros(len(self.densities))
-        for i in range(len(self.densities)):
-            self.density_contrasts[i] = (self.densities[i] - self.reference_densities[i])
-
-        # ZIP POLYGONS WITH DENSITY CONTRASTS AND PASS TO BOTT
-        if self.gravity_polygons and self.calc_grav_switch is True:
+        polygons_to_use = []
+        densities_to_use = []
+        if self.calc_grav_switch is True:
             # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
-            polygons_to_use = []
-            densities_to_use = []
-            for layer in range(len(self.densities)):
-                if self.layers_calculation_switch[layer] == 1:
-                    polygons_to_use.append(self.gravity_polygons[layer])
+            for layer in range(0, self.total_layer_count + 1):
+                if self.layer_list[layer].include_in_calculations_switch is True:
+                    polygons_to_use.append(self.layer_list[layer].polygon)
                     # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
-                    densities_to_use.append(self.density_contrasts[layer] * -1)
+                    densities_to_use.append((self.layer_list[layer].density -
+                                             self.layer_list[layer].reference_density) * -1)
 
-            # PASS TO BOTT ALGORITHM
-            polys = []
+            # PASS POLYGONS TO BOTT ALGORITHM AND RETURN THE PREDICTED VALUES
+            bott_input = []
             for p, d in zip(polygons_to_use, densities_to_use):
-                polys.append(Polygon(1000 * np.array(p), {'density': d}))
-            self.predgz = bott.Gz(self.xp, self.zp, polys)
+                bott_input.append(Polygon(1000 * np.array(p), {'density': d}))
+
+            # SET THE PREDICTED VALUES AS THE BOTT OUTPUT
+            self.predgz = bott.Gz(self.xp, self.zp, bott_input)
         else:
+            # SET THE PREDICTED VALUES AS ZEROS
             self.predgz = np.zeros_like(self.xp)
+
+        # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
         self.predplot.set_data(self.xp * 0.001, self.predgz)
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
         # CALCULATE MAGNETICS
         # ZIP POLYGONS WITH SUSCEPT/STRIKES AND PASS TO TALWANI AND HEIRTZLER ALGORITHM
-        if self.gravity_polygons and self.earth_field != 0.0 and self.calc_mag_switch is True:
+        if self.earth_field != 0.0 and self.calc_mag_switch is True:
             # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
-            polygons_to_use, susceptibilities_to_use = [], []
-            for layer in range(0, len(self.gravity_polygons)):
-                if self.layers_calculation_switch[layer] == 1:
-                    polygons_to_use.append(self.gravity_polygons[layer])
+            polygons_to_use = []
+            susceptibilities_to_use = []
+            angle_a_to_use = []
+            angle_b_to_use = []
+            for layer in range(0, self.total_layer_count + 1):
+                if self.layer_list[layer].include_in_calculations_switch is True:
+                    polygons_to_use.append(self.layer_list[layer].polygon)
                     # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
-                    susceptibilities_to_use.append(self.susceptibilities[layer] * -1)
+                    susceptibilities_to_use.append(self.layer_list[layer].susceptibility * -1)
+                    angle_a_to_use.append(self.layer_list[layer].angle_a)
+                    angle_b_to_use.append(self.layer_list[layer].angle_b)
 
             # PASS TO TALWANI&HEIRTZLER ALGORITHM
-            self.polys = []
+            mag_input = []
             for p, s, in zip(polygons_to_use, susceptibilities_to_use):
-                self.polys.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
-            self.prednt = talwani_and_heirtzler.ntz(self.xp, self.zp, self.polys, self.model_azimuth, self.earth_field,
-                                                    self.angle_a, self.angle_b, self.mag_observation_elv)
+                mag_input.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
+
+            # SET THE PREDICTED VALUES AS THE TALWANI&HEIRTZLER OUTPUT
+            self.prednt = talwani_and_heirtzler.ntz(self.xp, self.zp, mag_input, self.model_azimuth, self.earth_field,
+                                                    angle_a_to_use, angle_b_to_use, self.mag_observation_elv)
         else:
+            # SET THE PREDICTED VALUES AS ZEROS
             self.prednt = np.zeros_like(self.xp)
 
-        # PLOT MAGNETIC PROFILE
+        # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
         self.prednt_plot.set_data(self.xp * 0.001, self.prednt)
         # --------------------------------------------------------------------------------------------------------------
 
@@ -4823,7 +4862,7 @@ class Gmg(wx.Frame):
         # RUN THE RMS CALC CODE
         self.model_rms(self.xp)
 
-        # 2SET GRAVITY RMS
+        # SET GRAVITY RMS
         if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch is True and \
                 self.calc_grav_switch is True and self.predgz != []:
             self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
@@ -5154,10 +5193,7 @@ class Gmg(wx.Frame):
 
 
 class Layer:
-    """
-    CREATE A MODEL LAYER OBJECT.
-    THE LAYER WILL BE STORED IN THE gmg.layers_list LIST
-    """
+    """CREATE A MODEL LAYER OBJECT. THE LAYER WILL BE STORED IN THE gmg.layers_list LIST"""
     def __init__(self):
         self.id = None  # THE LAYER NUMBER
         self.name = None  # THE LAYER NAME
@@ -5167,6 +5203,7 @@ class Layer:
         self.poly_plot = None
         self.x_nodes = []
         self.y_nodes = []
+        self.polygon = None  # x_nodes AND y_nodes ZIPPED. TO BE PASSED TO THE POTENTIAL FIELD ALGORITHMS
         self.density = 0.
         self.reference_density = 0.
         self.susceptibility = 0.
@@ -5176,7 +5213,7 @@ class Layer:
         self.layer_transparency = 0.4
         self.pinch_node_list = [[], []]
         self.pinch_count = 0
-        self.layers_calculation_switch = True  # SWITCH TO DICTATE IF THE LAYER IS INCLUDED IN THE CURRENT CALC
+        self.include_in_calculations_switch = True  # SWITCH THAT DICTATES IF THE LAYER IS INCLUDED IN THE CURRENT CALC
 
 
 class ObservedData:
