@@ -3476,10 +3476,10 @@ class Gmg(wx.Frame):
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
 
                 # SET CURRENT NODE VALUES
-                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
-                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
                 self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
 
                 # UPDATE MODEL
@@ -3500,10 +3500,10 @@ class Gmg(wx.Frame):
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
 
                 # SET CURRENT NODE VALUES
-                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
-                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
                 self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
 
                 # UPDATE MODEL
@@ -3527,11 +3527,15 @@ class Gmg(wx.Frame):
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
 
                 # SET CURRENT NODE VALUES
-                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
-                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
                 self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
+
+                # UPDATE MODEL
+                self.update_layer_data()
+                self.run_algorithms()
             else:
                 # UPDATE LAYER DATA
                 self.update_layer_data()
@@ -3546,10 +3550,10 @@ class Gmg(wx.Frame):
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
 
                 # SET CURRENT NODE VALUES
-                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
-                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
                 self.y_input.SetValue(self.layer_list[self.currently_active_layer_id].y_nodes[0])
+                self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+                self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
                 self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
 
                 # UPDATE MODEL
@@ -4391,12 +4395,8 @@ class Gmg(wx.Frame):
         """Delete LAYER DATA"""
         # CANNOT DELETE THE FIRST LAYER
         if self.total_layer_count > 1:
-            # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
-            self.current_node = self.model_frame.scatter(-40000., 0., marker='o', color='r', zorder=10)
 
             # HIDE THE LAYER MPL ACTORS
-            print(self.currently_active_layer_id)
-            print(self.total_layer_count)
             self.layer_list[self.currently_active_layer_id].node_mpl_actor[0].set_visible(False)
             self.layer_list[self.currently_active_layer_id].polygon_mpl_actor[0].set_visible(False)
 
@@ -4421,8 +4421,10 @@ class Gmg(wx.Frame):
             # INCREMET THE CURRENT LAYER ID
             if self.currently_active_layer_id == self.total_layer_count:
                 self.currently_active_layer_id -= 1
+                print("self.currently_active_layer_id = %s") % self.currently_active_layer_id
             else:
                 self.currently_active_layer_id += 1
+                print("self.currently_active_layer_id = %s") % self.currently_active_layer_id
 
             # INCREMENT THE TOTAL LAYER COUNT
             self.total_layer_count -= 1
@@ -4441,12 +4443,13 @@ class Gmg(wx.Frame):
             self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
             self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
 
-            # SET CURRENTLY ACTIVE (RED) NODE
-            self.current_node.set_offsets([self.current_x_nodes[0], self.current_y_nodes[0]])
-
             # UPDATE MODEL
+            self.draw()
             self.update_layer_data()
-            # self.run_algorithms()
+
+            # SET THE CURRENTLY SELECTED (RED) ACTIVE NODE
+            self.current_node.set_offsets([self.layer_list[self.currently_active_layer_id].x_nodes[0],
+                                           self.layer_list[self.currently_active_layer_id].y_nodes[0]])
             self.draw()
 
     # LAYER AND MODEL ATTRIBUTE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
