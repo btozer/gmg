@@ -78,7 +78,6 @@ NB. before launching gmg you must run:
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
-
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -897,8 +896,8 @@ class Gmg(wx.Frame):
             self.current_node = self.model_frame.scatter(-40000., 0, s=50, color='r', zorder=10)  # PALCE HOLDER ONLY
 
             self.layer_list.append(layer0)
-            print self.layer_list
-            print len(self.layer_list)
+            print(self.layer_list)
+            print(len(self.layer_list))
 
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
         'Make Attribute Label'
@@ -955,14 +954,13 @@ class Gmg(wx.Frame):
         self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
         'MAKE LAYER TREE'
-        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
-                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
+        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(600, 280),
+                                      agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_ROW_LINES | wx.TR_HIDE_ROOT)
         self.tree.SetIndent(0.0)
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_activated, self.tree)
-        self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
-        self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
+        self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.on_tree_right_click_down, self.tree)
 
-        'TREE ATTRIBUTES'
+        # TREE ATTRIBUTES
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
         self.tree_items = ["Layer 0"]
@@ -978,7 +976,7 @@ class Gmg(wx.Frame):
 
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.fault_activated, self.fault_tree)
         ### self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.fault_tree)
-        ### self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.fault_tree)
+        ## self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.fault_tree)
 
         'TREE ATTRIBUTES'
         self.fault_tree_root = self.fault_tree.AddRoot("Faults:")
@@ -1497,6 +1495,7 @@ class Gmg(wx.Frame):
             return
 
     def on_activated(self, event):
+        """WHEN A LAYER IS SELETECTED IN THE TREE"""
         # FIRST CHECK IS FAULT PICKING MODE IS ON, IF IT IS, THEN TURN IT OFF
         if self.fault_picking_switch is True:
             self.fault_picking_switch = False
@@ -1522,14 +1521,46 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.run_algorithms()
 
-    def on_begin_edit_label(self, event):
-        # self.DoGetBestSize()
+    def on_tree_right_click_down(self, event):
+        print("RIGHT CLICKED")
+        print(event)
+
+        self.currently_active_layer_id = self.tree.GetPyData(event.GetItem())
+
+        # if event = wx.EVT_TREE_ITEM_RIGHT_CLICK:
+        # self.Bind(wx.EVT_RIGHT_UP, self.on_tree_right_click_up)
+
+        menu = wx.Menu()
+
+        item1 = menu.Append(wx.ID_ANY, "Change layer colour")
+        item2 = menu.Append(wx.ID_ANY, "Rename layer")
+
+        self.Bind(wx.EVT_MENU, self.change_layer_color, item1)
+        self.Bind(wx.EVT_MENU, self.rename_layer, item2)
+
+        self.PopupMenu(menu)
+        menu.Destroy()
+
+    def change_layer_color(self, event):
         pass
 
-    def on_end_edit_label(self, event):
-        self.currently_active_layer_id = self.tree.GetPyData(event.GetItem())
-        new_label = self.get_item_text(event.GetItem())
-        self.tree_items[self.currently_active_layer_id] = str(new_label)
+    def rename_layer(self, event):
+        """USE A POPUP MENU TO RENAME THE LAYER"""
+
+        # CREATE POP OUT MENU AND SHOW
+        layer_name_box = LayerNameDialog(self, -1, 'Rename layer', self.tree_items[self.currently_active_layer_id])
+        new = layer_name_box.ShowModal()
+
+        # WAIT FOR USER TO CLOSE POP OUT
+
+        # GET THE NEW LAYER NAME FROM POP OUT
+        new_name = layer_name_box.name
+
+        # SET THE TREE AND LAYER OBJECT WITH THE NEW NAME
+        current_tree_items = self.tree.GetRootItem().GetChildren()
+        self.tree.SetItemText(current_tree_items[self.currently_active_layer_id-1], str(new_name))
+        self.tree_items[self.currently_active_layer_id] = str(new_name)
+        self.layer_list[self.currently_active_layer_id].name = str(new_name)
 
     def delete_all_children(self, event):
         self.tree.DeleteChildren(event)
@@ -1547,7 +1578,8 @@ class Gmg(wx.Frame):
                                      "                                                   "
                                      " || Currently Editing Layer: %s  || "
                                      " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
-                                     " || MAG RMS = %s  ||" % (self.currently_active_layer_id, self.model_frame.get_aspect(), self.grav_rms_value,
+                                     " || MAG RMS = %s  ||" % (self.currently_active_layer_id,
+                                                               self.model_frame.get_aspect(), self.grav_rms_value,
                                                                self.mag_rms_value), 2)
         self.statusbar.Update()
 
@@ -2452,7 +2484,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def set_mag_variables(self, event):
-        mag_box = MagDialog(self, -1, 'Segy Dimensions', self.area)
+        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.area)
         answer = mag_box.ShowModal()
         self.mag_observation_elv = mag_box.mag_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
         self.model_azimuth = mag_box.model_azimuth
@@ -2939,8 +2971,13 @@ class Gmg(wx.Frame):
         new_y = float(self.y_input.GetValue())
 
         if self.currently_active_layer_id == self.node_layer_reference:
+            # GET CURRENT NODES
             xt = np.array(self.current_x_nodes)
             yt = np.array(self.current_y_nodes)
+
+            # GET THE XY LOCATION OF NODE CURRENTLY BEING EDITED (PRIOR TO MOVE)
+            current_x = xt[self.index_node]
+            current_y = yt[self.index_node]
 
             if self.layer_list[self.currently_active_layer_id].layer_type == 'fixed' and self.index_node is not None:
                 if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
@@ -2971,14 +3008,35 @@ class Gmg(wx.Frame):
 
             # # DEAL WITH PINCHED NODE
             # if self.pinch_switch is True:
-            #     for k in range(0, len(self.index_arg2_list)):
-            #         if self.index_arg2_list[k] is not None:
+            #     for k in range(0, len(self.pinched_index_arg_list)):
+            #         if self.pinched_index_arg_list[k] is not None:
             #             next_x_list = self.plotx_list[k]
             #             next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
-            #             next_x_list[self.index_arg2_list[k]] = new_x
-            #             next_y_list[self.index_arg2_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
+            #             next_x_list[self.pinched_index_arg_list[k]] = new_x
+            #             next_y_list[self.pinched_index_arg_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
             #             self.plotx_list[k] = next_x_list
             #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+
+            # # DEAL WITH PINCHED NODE
+            if self.layer_list[currently_active_layer_id].pinched is True:
+                for l in self.layer_list[currently_active_layer_id].pinched_list:
+
+                    # CREATE LIST OF DISTANCE TO NODE
+                    d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+
+                    self.index_arg = np.argmin(d)
+
+                    self.layer_list[l].x_nodes
+                    self.layer_list[l].x_nodes
+
+            #         if self.pinched_index_arg_list[l] is not None:
+            #             next_x_list = self.plotx_list[k]
+            #             next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
+            #             next_x_list[self.pinched_index_arg_list[k]] = new_x
+            #             next_y_list[self.pinched_index_arg_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
+            #             self.plotx_list[k] = next_x_list
+            #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+
 
             self.current_x_nodes = xt
             self.current_y_nodes = yt
@@ -3003,43 +3061,47 @@ class Gmg(wx.Frame):
         """
         GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
-        self.node_layer_reference = self.currently_active_layer_id
+        
+        # GET THE CURRENT LAYERS NODE VALUES
         xyt = self.currently_active_layer.get_xydata()
         xt = xyt[:, 0]
         yt = xyt[:, 1]
+        
+        # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
         d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+        
+        # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK
         self.index_arg = np.argmin(d)
+
+        # CHECK IF THE NODE IS WITHIN THE "MEANT TO CLICK" DISTANCE 
         if d[self.index_arg] >= self.node_click_limit:
             return None, None
         else:
             # CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER
+            if self.layer_list[self.currently_active_layer_id].pinched is True:
+                
+                # CREATE EMPTY LIST THE FILL WIH THE NODE INDEX VALUES
+                self.pinched_index_arg_list = []
+    
+                for l in self.layer_list[self.currently_active_layer_id].pinched_list:
+                    print("WORKING ON LAYER %s") % l
+                    # GET LAYER NODES
+                    xt = self.layer_list[l].x_nodes
+                    yt = self.layer_list[l].y_nodes
 
-            # RESET PINCH SWITCH
-            self.pinch_switch = False
+                    # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
+                    d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
 
-            # CREATE LIST OF NONES SAME LENGTH AS NUMBER OF LAYERS IN MODEL
-            self.index_arg2_list = [None] * (self.total_layer_count + 1)
-
-            for x in range(0, self.total_layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
-                if x == self.currently_active_layer_id:  # SKIP CURRENT LAYER
-                    continue
-                else:
-                    # CHECK FOR PINCHED NODES
-                    node_list_x = self.layer_list[x].x_nodes
-                    node_list_y = self.layer_list[x].y_nodes
-                    for i in range(0, len(node_list_x)):
-                        if node_list_x[i] == xt[self.index_arg] and node_list_y[i] == yt[self.index_arg]:
-                            # IF ONE OF THE NODES FROM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER
-                            # THEN RETURN THE INDEX
-                            self.index_arg2_list[x] = i
-                            print("self.index_arg2_list =")
-                            print self.index_arg2_list
-                            self.pinch_switch = True
-                        else:
-                            continue
-
-            # RETURN NODE INDEX LISTS
-            return self.index_arg, self.index_arg2_list
+                    # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK AND APPEND IT
+                    # TO THE PINCHED INDEX LIST
+                    self.pinched_index_arg_list.append(np.argmin(d))
+            else:
+                self.pinched_index_arg_list = None
+                
+            # NOW RETURN: 
+            # 1) THE INDEX VALUE OF THE NODE CLICKED. 
+            # 2) A LIST OF INDEX VALUES FOR NODES PINCHED TO INDEX_ARG (NONE IF THE NODE ISN'T PINCHED).
+            return self.index_arg, self.pinched_index_arg_list
 
     def get_fault_node_under_point(self, event):
         """GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
@@ -3070,7 +3132,7 @@ class Gmg(wx.Frame):
             # THEN GMG IS IN LAYER MODE
 
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
-            self.index_node, self.index_arg2_list = self.get_node_under_point(event)
+            self.index_node, self.pinched_index_arg_list = self.get_node_under_point(event)
             if self.index_node is None:
                 return
 
@@ -3079,42 +3141,42 @@ class Gmg(wx.Frame):
             self.x_input.SetValue(xt[self.index_node])
             self.y_input.SetValue(yt[self.index_node])
 
-            # IF PINCH == TRUE, THEN PINCH THE NODE TO NEXT NODE
-            if self.pinch_switch is True:
-                print("nodes pinched")
-                # GET THE NODE NUMBER AND LAYER NUMBER AND PLACE THEM IN "PINCH_NODE_LIST"
-                if self.pinch_count == 0:
-                    self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-                    self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
-                    x1 = np.array(self.current_x_nodes)
-                    y1 = np.array(self.current_y_nodes)
-                    self.index_node = self.get_node_under_point(event)
-                    self.pinch_node_list[self.pinch_count] = self.index_node[0]
-                    self.pinch_node_list[self.pinch_count + 1] = self.currently_active_layer_id
-                    self.pinch_count = + 1
-                    # SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE
-                else:
-                    # SET THE SECOND NODE X AND Y
-                    self.plotx2 = self.plotx_list[self.currently_active_layer_id]
-                    self.ploty2 = self.ploty_list[self.currently_active_layer_id]
-                    x2 = np.array(self.plotx2)
-                    y2 = np.array(self.ploty2)
-                    self.index_node = self.get_node_under_point(event)
-                    new_x = x2[int(self.index_node[0])]
-                    new_y = y2[int(self.index_node[0])]
-
-                    # SET THE FIRST NODE X AND Y
-                    self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
-                    self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
-                    x1 = np.array(self.plotx1)
-                    y1 = np.array(self.ploty1)
-
-                    # REPLACE THE ORIGINAL NODE WITH THE NEW NODE
-                    x1[int(self.pinch_node_list[0])] = new_x  # REPLACE OLD X WITH NEW X
-                    y1[int(self.pinch_node_list[0])] = new_y  # REPLACE OLD Y WITH NEW Y
-                    self.plotx_list[int(self.pinch_node_list[1])] = x1
-                    self.ploty_list[int(self.pinch_node_list[1])] = y1
-                    self.pinch_count = 0
+            # # IF PINCH == TRUE, THEN PINCH THE NODE TO NEXT NODE
+            # if self.pinch_switch is True:
+            #     print("nodes pinched")
+            #     # GET THE NODE NUMBER AND LAYER NUMBER AND PLACE THEM IN "PINCH_NODE_LIST"
+            #     if self.pinch_count == 0:
+            #         self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
+            #         self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
+            #         x1 = np.array(self.current_x_nodes)
+            #         y1 = np.array(self.current_y_nodes)
+            #         self.index_node = self.get_node_under_point(event)
+            #         self.pinch_node_list[self.pinch_count] = self.index_node[0]
+            #         self.pinch_node_list[self.pinch_count + 1] = self.currently_active_layer_id
+            #         self.pinch_count = + 1
+            #         # SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE
+            #     else:
+            #         # SET THE SECOND NODE X AND Y
+            #         self.plotx2 = self.plotx_list[self.currently_active_layer_id]
+            #         self.ploty2 = self.ploty_list[self.currently_active_layer_id]
+            #         x2 = np.array(self.plotx2)
+            #         y2 = np.array(self.ploty2)
+            #         self.index_node = self.get_node_under_point(event)
+            #         new_x = x2[int(self.index_node[0])]
+            #         new_y = y2[int(self.index_node[0])]
+            #
+            #         # SET THE FIRST NODE X AND Y
+            #         self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
+            #         self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
+            #         x1 = np.array(self.plotx1)
+            #         y1 = np.array(self.ploty1)
+            #
+            #         # REPLACE THE ORIGINAL NODE WITH THE NEW NODE
+            #         x1[int(self.pinch_node_list[0])] = new_x  # REPLACE OLD X WITH NEW X
+            #         y1[int(self.pinch_node_list[0])] = new_y  # REPLACE OLD Y WITH NEW Y
+            #         self.plotx_list[int(self.pinch_node_list[1])] = x1
+            #         self.ploty_list[int(self.pinch_node_list[1])] = y1
+            #         self.pinch_count = 0
 
             # COLOR CURRENTLY SELECTED NODE RED
             self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
@@ -3260,14 +3322,14 @@ class Gmg(wx.Frame):
 
             # # DEAL WITH PINCHED MODE
             # if self.pinch_switch is True:
-            #     for k in range(0, len(self.index_arg2_list)):
-            #         if self.index_arg2_list[k] is not None:
+            #     for k in range(0, len(self.pinched_index_arg_list)):
+            #         if self.pinched_index_arg_list[k] is not None:
             #             # GET THE NODE LIST OF THE NEXT LAYER
             #             next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
             #
             #             # REPLACE THE PINCHED NODE WITH THE NEW NODE
-            #             next_x_list[self.index_arg2_list[k]] = x
-            #             next_y_list[self.index_arg2_list[k]] = y
+            #             next_x_list[self.pinched_index_arg_list[k]] = x
+            #             next_y_list[self.pinched_index_arg_list[k]] = y
             #             self.plotx_list[k] = next_x_list
             #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
             else:
@@ -3415,7 +3477,7 @@ class Gmg(wx.Frame):
             # # NOW CHECK FOR PINCHED NODES
             # index_arg2 = None
             # self.pinch_switch = False
-            # self.index_arg2_list = [None] * (self.total_layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
+            # self.pinched_index_arg_list = [None] * (self.total_layer_count + 1)  # CREATE LIST OF NONES = LENGTH AS NUMB OF LAYERS
             # for x in range(0, self.total_layer_count + 1):  # LOOP THROUGH ALL LAYERS TO CHECK FOR PINCHED NODES
             #     if x == self.currently_active_layer_id:
             #         pass
@@ -3426,20 +3488,20 @@ class Gmg(wx.Frame):
             #         # NOW CHECK X AND Y VALUES ARE EQUAL
             #         if x_node_list[i] == xt[self.index_arg] and y_node_list[i] == yt[self.index_arg]:
             #             # IF ONE OF THE NODES FORM LIST IS EQUAL TO A NODE FROM THE OTHER LAYER THEN RETURN THE INDEX
-            #             self.index_arg2_list[x] = i
+            #             self.pinched_index_arg_list[x] = i
             #             self.pinch_switch = True
             #
             # # REMOVE PINCHED NODES
             # if self.pinch_switch is True:
-            #     for k in range(len(self.index_arg2_list)):
-            #         if self.index_arg2_list[k] is not None:
+            #     for k in range(len(self.pinched_index_arg_list)):
+            #         if self.pinched_index_arg_list[k] is not None:
             #             next_x_list = self.plotx_list[k]
             #             next_y_list = self.ploty_list[k]
             #             # GET THE NODE LIST OF THE NEXT LAYER
             #             next_x_list = [tup for i, tup in enumerate(next_x_list) if
-            #                            i != self.index_arg2_list[k]]  # DELETE X
+            #                            i != self.pinched_index_arg_list[k]]  # DELETE X
             #             next_y_list = [tup for i, tup in enumerate(next_y_list) if
-            #                            i != self.index_arg2_list[k]]  # DELETE Y
+            #                            i != self.pinched_index_arg_list[k]]  # DELETE Y
             #             # OVERWRITE THE NODE LIST WITH UPDATED LIST
             #             self.plotx_list[k], self.ploty_list[k] = next_x_list, next_y_list
 
@@ -3611,6 +3673,9 @@ class Gmg(wx.Frame):
         # ctrl+down = DECREASE ASPECT RATIO
         if event.key == 'ctrl+down':
             self.aspect_decrease2(event)
+
+        if event.key == 'return':
+            print("return")
 
     def toogle_fault_mode(self, event):
         """SWITCH FAULT PICKING MODE ON AND OFF"""
@@ -5138,8 +5203,8 @@ class Layer:
         self.angle_b = 0.
         self.color = 'k'
         self.layer_transparency = 0.4
-        self.pinch_node_list = [[], []]
-        self.pinch_count = 0
+        self.pinched = False  # SWITCH DICTATING IF THE LAYER HSA ANY NODES PINCHED TO ANOTHER
+        self.pinched_list = []  # LIST OF LAYER ID's FOR LAYERS THAT HAVE NODES PINCHED TO THE CURRENT LAYER
         self.include_in_calculations_switch = True  # SWITCH THAT DICTATES IF THE LAYER IS INCLUDED IN THE CURRENT CALC
 
 
@@ -5151,7 +5216,7 @@ class ObservedData:
         self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
         self.type = None  # THE KIND OF DATA (str: 'observed', 'filtered', 'derivative')
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
-        self.mpl_actor = None  # THE PML ACTOR ELEMENT (PLOTTING OBJECT)
+        self.mpl_actor = None  # THE MPL ACTOR ELEMENT (PLOTTING OBJECT)
 
 
 class ObservedOutcropData:
@@ -5165,12 +5230,12 @@ class ObservedOutcropData:
 
 class SegyData:
     def __init__(self):
-        self.file = None
+        self.file = None  # THE FULL FILE PATH TO THE SEGY DATA
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
         self.dimensions = None
-        self.mpl_actor = None
-        self.axis = None
-        self.color_map = cm.gray
+        self.mpl_actor = None  # THE MPL ACTOR ELEMENT (PLOTTING OBJECT)
+        self.axis = None  # THE X AND Z AXIS LIMITS = X1, X2, Z1, Z2
+        self.color_map = cm.gray  # THE COLOR SCALE USED TO PLOT THE DATA
         
         
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
@@ -5400,6 +5465,34 @@ class SeisDialog(wx.Dialog):
         self.dimensions = [self.sx1, self.sx2, self.sz1, self.sz2]
         self.segy_name_input = str(self.segy_name_Text.GetValue())
         self.EndModal(1)
+
+
+class LayerNameDialog(wx.Dialog):
+    """SET MAGNETIC FIELD PARAMETERS"""
+
+    def __init__(self, parent, id, title, current_name):
+        wx.Dialog.__init__(self, parent, id, 'Rename layer', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                                         | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+
+        # OBSERVATION ELEVATION
+        self.set_name = wx.StaticText(input_panel, -1, "New layer name:")
+        self.set_name_text = wx.TextCtrl(input_panel, -1, current_name, size=(75, -1))
+        self.set_name_text.SetInsertionPoint(0)
+
+        # SET BUTTON
+        self.b_set_button = wx.Button(input_panel, -1, "Set")
+        self.Bind(wx.EVT_BUTTON, self.set_button, self.b_set_button)
+
+        sizer = wx.FlexGridSizer(cols=2, hgap=7, vgap=7)
+        sizer.AddMany([self.set_name, self.set_name_text, self.b_set_button])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def set_button(self, event):
+        self.name = str(self.set_name_text.GetValue())
+        self.EndModal(1)
+
 
 
 class MagDialog(wx.Dialog):
