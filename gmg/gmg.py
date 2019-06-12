@@ -717,7 +717,6 @@ class Gmg(wx.Frame):
         self.layer_lock_list = [0]
         self.layer_lock_status = ['locked']
         self.layer_transparency = 0.4
-        self.pinch_node_list = [[], []]
         self.pinch_count = 0
 
         # INITIALISE XY DATA ATTRIBUTES
@@ -3018,16 +3017,16 @@ class Gmg(wx.Frame):
             #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
 
             # # DEAL WITH PINCHED NODE
-            if self.layer_list[currently_active_layer_id].pinched is True:
-                for l in self.layer_list[currently_active_layer_id].pinched_list:
-
-                    # CREATE LIST OF DISTANCE TO NODE
-                    d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-
-                    self.index_arg = np.argmin(d)
-
-                    self.layer_list[l].x_nodes
-                    self.layer_list[l].x_nodes
+            # if self.layer_list[currently_active_layer_id].pinched is True:
+            #     for l in self.layer_list[currently_active_layer_id].pinched_list:
+            #
+            #         # CREATE LIST OF DISTANCE TO NODE
+            #         d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+            #
+            #         self.index_arg = np.argmin(d)
+            #
+            #         self.layer_list[l].x_nodes
+            #         self.layer_list[l].x_nodes
 
             #         if self.pinched_index_arg_list[l] is not None:
             #             next_x_list = self.plotx_list[k]
@@ -3061,47 +3060,68 @@ class Gmg(wx.Frame):
         """
         GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
-        
-        # GET THE CURRENT LAYERS NODE VALUES
-        xyt = self.currently_active_layer.get_xydata()
-        xt = xyt[:, 0]
-        yt = xyt[:, 1]
-        
-        # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
-        d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-        
-        # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK
-        self.index_arg = np.argmin(d)
+        if self.pinch_switch is False:
+            # PINCH MODE ISN'T ON, SO DO THE NORMAL ROUTINE
 
-        # CHECK IF THE NODE IS WITHIN THE "MEANT TO CLICK" DISTANCE 
-        if d[self.index_arg] >= self.node_click_limit:
-            return None, None
-        else:
-            # CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER
-            if self.layer_list[self.currently_active_layer_id].pinched is True:
-                
-                # CREATE EMPTY LIST THE FILL WIH THE NODE INDEX VALUES
-                self.pinched_index_arg_list = []
-    
-                for l in self.layer_list[self.currently_active_layer_id].pinched_list:
-                    print("WORKING ON LAYER %s") % l
-                    # GET LAYER NODES
-                    xt = self.layer_list[l].x_nodes
-                    yt = self.layer_list[l].y_nodes
+            # GET THE CURRENT LAYERS NODE VALUES
+            xyt = self.currently_active_layer.get_xydata()
+            xt = xyt[:, 0]
+            yt = xyt[:, 1]
 
-                    # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
-                    d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+            # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
+            d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
 
-                    # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK AND APPEND IT
-                    # TO THE PINCHED INDEX LIST
-                    self.pinched_index_arg_list.append(np.argmin(d))
+            # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK
+            self.index_arg = np.argmin(d)
+
+            # CHECK IF THE NODE IS WITHIN THE "MEANT TO CLICK" DISTANCE
+            if d[self.index_arg] >= self.node_click_limit:
+                return None, None
             else:
-                self.pinched_index_arg_list = None
-                
-            # NOW RETURN: 
-            # 1) THE INDEX VALUE OF THE NODE CLICKED. 
-            # 2) A LIST OF INDEX VALUES FOR NODES PINCHED TO INDEX_ARG (NONE IF THE NODE ISN'T PINCHED).
-            return self.index_arg, self.pinched_index_arg_list
+                # CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER
+                if self.layer_list[self.currently_active_layer_id].pinched is True:
+
+                    # CREATE EMPTY LIST THE FILL WIH THE NODE INDEX VALUES
+                    self.pinched_index_arg_list = []
+
+                    for l in self.layer_list[self.currently_active_layer_id].pinched_list:
+                        print("WORKING ON LAYER %s") % l
+                        # GET LAYER NODES
+                        xt = self.layer_list[l].x_nodes
+                        yt = self.layer_list[l].y_nodes
+
+                        # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
+                        d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+
+                        # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK AND APPEND IT
+                        # TO THE PINCHED INDEX LIST
+                        self.pinched_index_arg_list.append(np.argmin(d))
+                else:
+                    self.pinched_index_arg_list = None
+
+                # NOW RETURN:
+                # 1) THE INDEX VALUE OF THE NODE CLICKED.
+                # 2) A LIST OF INDEX VALUES FOR NODES PINCHED TO INDEX_ARG (NONE IF THE NODE ISN'T PINCHED).
+                return self.index_arg, self.pinched_index_arg_list
+        else:
+            # GMG IS IN PINCH MODE - SO JUST RETURN THE INDEX OF THE NODE
+
+            # GET THE CURRENT LAYERS NODE VALUES
+            xyt = self.currently_active_layer.get_xydata()
+            xt = xyt[:, 0]
+            yt = xyt[:, 1]
+
+            # CALCULATE DISTANCES FROM THE MOUSE CLICK TO THE LAYER NODES
+            d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
+
+            # FIND THE NODE INDEX VALUE FOR THE NODE CLOSEST TO THE CLICK
+            self.index_arg = np.argmin(d)
+
+            # CHECK IF THE NODE IS WITHIN THE "MEANT TO CLICK" DISTANCE
+            if d[self.index_arg] >= self.node_click_limit:
+                return None, None
+            else:
+                return self.index_arg, None
 
     def get_fault_node_under_point(self, event):
         """GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
@@ -3136,50 +3156,77 @@ class Gmg(wx.Frame):
             if self.index_node is None:
                 return
 
-            xyt = self.currently_active_layer.get_xydata()
-            xt, yt = xyt[:, 0], xyt[:, 1]
-            self.x_input.SetValue(xt[self.index_node])
-            self.y_input.SetValue(yt[self.index_node])
+            # CHECK if the 'p' KEY IS ON (I.E. IN PINCH MODE)
+            if self.pinch_switch is True:
+                print("PINCH SWITCH IS TRUE")
+                # SET THE FIRST NODE CLICKED AS NODE 1
+                if self.pinch_count == 0:
+                    self.layer_getting_pinched = self.currently_active_layer_id
+                    self.node_to_pinch_index = self.index_node
+                    self.pinch_count += 1
 
-            # # IF PINCH == TRUE, THEN PINCH THE NODE TO NEXT NODE
-            # if self.pinch_switch is True:
-            #     print("nodes pinched")
-            #     # GET THE NODE NUMBER AND LAYER NUMBER AND PLACE THEM IN "PINCH_NODE_LIST"
-            #     if self.pinch_count == 0:
-            #         self.current_x_nodes= self.plotx_list[self.currently_active_layer_id]
-            #         self.current_y_nodes = self.ploty_list[self.currently_active_layer_id]
-            #         x1 = np.array(self.current_x_nodes)
-            #         y1 = np.array(self.current_y_nodes)
-            #         self.index_node = self.get_node_under_point(event)
-            #         self.pinch_node_list[self.pinch_count] = self.index_node[0]
-            #         self.pinch_node_list[self.pinch_count + 1] = self.currently_active_layer_id
-            #         self.pinch_count = + 1
-            #         # SET THE X AND Y OF THE FIRST NODE AS THAT OF THE SECOND NODE
-            #     else:
-            #         # SET THE SECOND NODE X AND Y
-            #         self.plotx2 = self.plotx_list[self.currently_active_layer_id]
-            #         self.ploty2 = self.ploty_list[self.currently_active_layer_id]
-            #         x2 = np.array(self.plotx2)
-            #         y2 = np.array(self.ploty2)
-            #         self.index_node = self.get_node_under_point(event)
-            #         new_x = x2[int(self.index_node[0])]
-            #         new_y = y2[int(self.index_node[0])]
-            #
-            #         # SET THE FIRST NODE X AND Y
-            #         self.plotx1 = self.plotx_list[int(self.pinch_node_list[1])]
-            #         self.ploty1 = self.ploty_list[int(self.pinch_node_list[1])]
-            #         x1 = np.array(self.plotx1)
-            #         y1 = np.array(self.ploty1)
-            #
-            #         # REPLACE THE ORIGINAL NODE WITH THE NEW NODE
-            #         x1[int(self.pinch_node_list[0])] = new_x  # REPLACE OLD X WITH NEW X
-            #         y1[int(self.pinch_node_list[0])] = new_y  # REPLACE OLD Y WITH NEW Y
-            #         self.plotx_list[int(self.pinch_node_list[1])] = x1
-            #         self.ploty_list[int(self.pinch_node_list[1])] = y1
-            #         self.pinch_count = 0
+                elif self.pinch_count == 1 and self.currently_active_layer_id == self.layer_getting_pinched:
+                    # USER HASN'T CHANGED TO A DIFFERENT LAYER YET
+                    return
 
-            # COLOR CURRENTLY SELECTED NODE RED
-            self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
+                else:
+                    # USER IS UP TO SECOND MOUSE CLICK. SET THE NODE TO BE PINCHED AS THE SECOND NODE CLICKED
+
+                    # GET CURRENT LAYER NODES
+                    xyt = self.currently_active_layer.get_xydata()
+                    xt, yt = xyt[:, 0], xyt[:, 1]
+
+                    # SET THE PINCHED NODE
+                    self.layer_list[self.layer_getting_pinched].x_nodes[self.node_to_pinch_index] = xt[self.index_node]
+                    self.layer_list[self.layer_getting_pinched].y_nodes[self.node_to_pinch_index] = yt[self.index_node]
+
+                    # UPDATE LAYER LINE
+                    self.layer_list[self.layer_getting_pinched].node_mpl_actor[0].set_visible(False)
+                    self.layer_list[self.layer_getting_pinched].node_mpl_actor[0].remove()
+                    self.layer_list[self.layer_getting_pinched].node_mpl_actor = self.model_frame.plot(
+                        self.layer_list[self.layer_getting_pinched].x_nodes,
+                        self.layer_list[self.layer_getting_pinched].y_nodes,
+                        color='blue', linewidth=1.0, alpha=1.0)
+
+                    # UPDATE LAYER POLYGON FILL
+                    current_color = self.layer_list[self.layer_getting_pinched].polygon_mpl_actor[0].get_fc()
+                    self.layer_list[self.layer_getting_pinched].polygon_mpl_actor[0].set_visible(False)
+                    self.layer_list[self.layer_getting_pinched].polygon_mpl_actor[0].remove()
+
+                    self.layer_list[self.layer_getting_pinched].polygon_mpl_actor = self.model_frame.fill(
+                        self.layer_list[self.layer_getting_pinched].x_nodes,
+                        self.layer_list[self.layer_getting_pinched].y_nodes, color=current_color, alpha=0.4,
+                        closed=True, linewidth=None, ec=None)
+
+                    # RESET PINCH COUNT
+                    self.pinch_count = 0
+
+                    # SET THE PINCH ATTRIBUTES IN THE LAYER OBJECTS
+                    self.layer_list[self.layer_getting_pinched].pinched = True
+                    if self.currently_active_layer_id in self.layer_list[self.layer_getting_pinched].pinched_list:
+                        pass
+                    else:
+                        self.layer_list[self.layer_getting_pinched].pinched_list.append(self.currently_active_layer_id)
+
+                    # SET THE PINCH ATTRIBUTES IN THE LAYER OBJECTS
+                    self.layer_list[self.currently_active_layer_id].pinched = True
+                    if self.layer_getting_pinched in self.layer_list[self.currently_active_layer_id].pinched_list:
+                        pass
+                    else:
+                        self.layer_list[self.currently_active_layer_id].pinched_list.append(self.layer_getting_pinched)
+
+                    # REDRAW MODEL
+                    self.draw()
+            else:
+                print("PINCH SWITCH IS FALSE")
+                # GMG IS IN LAYER MODE - SO JUST SET THE NEW NODE LOCATION
+                xyt = self.currently_active_layer.get_xydata()
+                xt, yt = xyt[:, 0], xyt[:, 1]
+                self.x_input.SetValue(xt[self.index_node])
+                self.y_input.SetValue(yt[self.index_node])
+
+                # COLOR CURRENTLY SELECTED NODE RED
+                self.current_node.set_offsets([xt[self.index_node], yt[self.index_node]])
 
         elif self.fault_picking_switch is True and self.select_new_layer_nodes is False:
             # THEN GMG IS IN FAULT MODE
@@ -3271,7 +3318,6 @@ class Gmg(wx.Frame):
         # GMG IS IN LAYER MODE
         if self.fault_picking_switch is False:
             if self.layer_list[self.currently_active_layer_id].type == str('fixed'):
-                print("layer is fixed")
                 # GET X AND Y VALUES
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
@@ -3279,9 +3325,9 @@ class Gmg(wx.Frame):
                 # GET CURRENT X AND Y ARRAYS
                 xt = self.layer_list[self.currently_active_layer_id].x_nodes
                 yt = self.layer_list[self.currently_active_layer_id].y_nodes
-                print("xt and yt =")
-                print(xt)
-                print(yt)
+                current_x_value = xt[self.index_node]
+                current_y_value = yt[self.index_node]
+
                 # UPDATE NODE
                 if xt[self.index_node] == self.x1 and yt[self.index_node] != 0.001:
                     xt[self.index_node] = self.x1  # REPLACE OLD X WITH NEW X
@@ -3302,16 +3348,13 @@ class Gmg(wx.Frame):
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
             elif self.layer_list[self.currently_active_layer_id].type == str('floating'):
-                print("layer is floating")
                 # GET THE X AND Y VALUES
                 x = event.xdata  # GET X OF NEW POINT
                 y = event.ydata  # GET Y OF NEW POINT
                 xt = self.layer_list[self.currently_active_layer_id].x_nodes
                 yt = self.layer_list[self.currently_active_layer_id].y_nodes
-
-                print("xt and yt =")
-                print(xt)
-                print(yt)
+                current_x_value = xt[self.index_node]
+                current_y_value = yt[self.index_node]
 
                 if y <= 0:
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
@@ -3320,30 +3363,23 @@ class Gmg(wx.Frame):
                     xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
                     yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
 
-            # # DEAL WITH PINCHED MODE
-            # if self.pinch_switch is True:
-            #     for k in range(0, len(self.pinched_index_arg_list)):
-            #         if self.pinched_index_arg_list[k] is not None:
-            #             # GET THE NODE LIST OF THE NEXT LAYER
-            #             next_x_list, next_y_list = self.plotx_list[k], self.ploty_list[k]
-            #
-            #             # REPLACE THE PINCHED NODE WITH THE NEW NODE
-            #             next_x_list[self.pinched_index_arg_list[k]] = x
-            #             next_y_list[self.pinched_index_arg_list[k]] = y
-            #             self.plotx_list[k] = next_x_list
-            #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
-            else:
-                print("DID NOT GET A layer.type value")
-                print(str(self.layer_list[self.currently_active_layer_id].type))
-                return 0
-
-            print("xt and yt =")
-            print(xt)
-            print(yt)
-            # NOW RESET THE LAYER WITH THE NEW NODE POSITION
+            # RESET THE LAYER WITH THE NEW NODE POSITION
             self.layer_list[self.currently_active_layer_id].x_nodes = xt
             self.layer_list[self.currently_active_layer_id].y_nodes = yt
 
+            # DEAL WITH PINCHED MODE
+            if self.layer_list[self.currently_active_layer_id].pinched is True:
+                self.layer_list[self.currently_active_layer_id].x_nodes
+                i = 0
+                for l in self.layer_list[self.currently_active_layer_id].pinched_list:
+                    if self.layer_list[l].x_nodes[self.pinched_index_arg_list[i]] == current_x_value and self.layer_list[l].y_nodes[self.pinched_index_arg_list[i]] == current_y_value:
+                        # SET PINCHED NODE AS NEW VALUE
+                        self.layer_list[l].x_nodes[self.pinched_index_arg_list[i]] = xt[self.index_node]
+                        self.layer_list[l].y_nodes[self.pinched_index_arg_list[i]] = yt[self.index_node]
+
+                    i += 1
+
+            # SET THE CURRENTLY ACTIVE LAYER WITH THE NEW NODE
             self.current_x_nodes = xt
             self.current_y_nodes = yt
             self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
@@ -3647,7 +3683,6 @@ class Gmg(wx.Frame):
                 self.pinch_switch = True
             else:
                 self.pinch_switch = False
-                self.pinch_node_list = [[], []]
                 self.pinch_count = 0
 
         # ctrl+i = INCREASE LAYER TRANSPARENCY
@@ -4748,11 +4783,11 @@ class Gmg(wx.Frame):
                     # NO DENSITY HAS BEEN SET SO LEAVE BLANK
                     next_color = self.colormap.to_rgba(0.)
 
-                # # UPDATE POLYGON XY AND COLOR FILL
+                # UPDATE POLYGON XY AND COLOR FILL
                 self.layer_list[i].polygon_mpl_actor[0].set_xy(self.layer_list[i].polygon)
                 self.layer_list[i].polygon_mpl_actor[0].set_color(next_color)
-                #
-                # # UPDATE LAYER LINES
+
+                # UPDATE LAYER LINES
                 self.layer_list[i].node_mpl_actor[0].set_xdata(self.layer_list[i].x_nodes)
                 self.layer_list[i].node_mpl_actor[0].set_ydata(self.layer_list[i].y_nodes)
 
