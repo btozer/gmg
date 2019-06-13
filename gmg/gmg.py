@@ -3216,7 +3216,8 @@ class Gmg(wx.Frame):
                         self.layer_list[self.currently_active_layer_id].pinched_list.append(self.layer_getting_pinched)
 
                     # REDRAW MODEL
-                    self.draw()
+                    self.update_layer_data()
+                    # self.draw()
             else:
                 print("PINCH SWITCH IS FALSE")
                 # GMG IS IN LAYER MODE - SO JUST SET THE NEW NODE LOCATION
@@ -3999,27 +4000,72 @@ class Gmg(wx.Frame):
             self.capture_window.Show(True)
 
     def pinch_out_layer(self, event):
-        pinch_box = PinchDialog(self, -1, 'Pinch Out Layer:', self.plotx_list, self.ploty_list, self.currently_active_layer_id)
-        answer = pinch_box.ShowModal()
-        self.current_x_nodes= pinch_box.pinched_x
-        self.current_y_nodes = pinch_box.pinched_y
-        self.update_layer_data()
-        self.draw()
+        """PINCH OUT A FIXED LAYER OVER A GIVEN X RANGE"""
+        if self.layer_list[self.currently_active_layer_id].type == 'floating':
+            error_message = "Only fixed layers can use the bulk pinch function! \n" \
+                            "Use the p key to pinch individual floating layer nodes"
+            MessageDialog(self, -1, error_message, "Error")
+            return
+        else:
+            # CREATE AND SHOW POP OUT BOX
+            pinch_box = PinchDialog(self, -1, 'Pinch Out Layer:', self.layer_list, self.currently_active_layer_id)
+            answer = pinch_box.ShowModal()
+
+            # SET NEW NODE VALUES
+            self.current_x_nodes = pinch_box.pinched_x
+            self.current_y_nodes = pinch_box.pinched_y
+            self.layer_list[self.currently_active_layer_id].x_nodes = pinch_box.pinched_x
+            self.layer_list[self.currently_active_layer_id].y_nodes = pinch_box.pinched_y
+
+            # SET THE CURRENTLY SELECTED (RED) ACTIVE NODE
+            self.current_node.set_offsets([self.layer_list[self.currently_active_layer_id].x_nodes[0],
+                                           self.layer_list[self.currently_active_layer_id].y_nodes[0]])
+
+            # REDRAW MODEL
+            self.update_layer_data()
+            self.draw()
 
     def depinch_layer(self, event):
-        depinch_box = DepinchDialog(self, -1, 'Depinch layer', self.plotx_list, self.ploty_list, self.currently_active_layer_id,
+        """PINCH OUT A FIXED LAYER OVER A GIVEN X RANGE"""
+        # CREATE AND SHOW POP OUT BOX
+        depinch_box = DepinchDialog(self, -1, 'Depinch layer', self.layer_list, self.currently_active_layer_id,
                                     self.total_layer_count)
         answer = depinch_box.ShowModal()
-        self.current_x_nodes= depinch_box.depinched_x
+
+        # SET NEW NODE VALUES
+        self.current_x_nodes = depinch_box.depinched_x
         self.current_y_nodes = depinch_box.depinched_y
+
+        self.layer_list[self.currently_active_layer_id].x_nodes = depinch_box.depinched_x
+        self.layer_list[self.currently_active_layer_id].y_nodes = depinch_box.depinched_y
+
+        # SET THE CURRENTLY SELECTED (RED) ACTIVE NODE
+        self.current_node.set_offsets([self.layer_list[self.currently_active_layer_id].x_nodes[0],
+                                       self.layer_list[self.currently_active_layer_id].y_nodes[0]])
+
+        # REDRAW MODEL
         self.update_layer_data()
         self.draw()
 
     def bulk_shift(self, event):
-        bulk_shift_box = BulkShiftDialog(self, -1, 'Layer bulk shift', self.plotx_list, self.ploty_list, self.currently_active_layer_id)
+        """APPLY A BULK X AND/OR Y SHIFT TO A GIVEN LAYERS NODES"""
+
+        # CREATE AND SHOW POP OUT BOX
+        bulk_shift_box = BulkShiftDialog(self, -1, 'Layer bulk shift', self.layer_list, self.currently_active_layer_id)
         answer = bulk_shift_box.ShowModal()
-        self.current_x_nodes= bulk_shift_box.new_x
+
+        # SET NEW NODE VALUES
+        self.current_x_nodes = bulk_shift_box.new_x
         self.current_y_nodes = bulk_shift_box.new_y
+
+        self.layer_list[self.currently_active_layer_id].x_nodes = bulk_shift_box.new_x
+        self.layer_list[self.currently_active_layer_id].y_nodes = bulk_shift_box.new_y
+
+        # SET THE CURRENTLY SELECTED (RED) ACTIVE NODE
+        self.current_node.set_offsets([self.layer_list[self.currently_active_layer_id].x_nodes[0],
+                                       self.layer_list[self.currently_active_layer_id].y_nodes[0]])
+
+        # REDRAW MODEL
         self.update_layer_data()
         self.draw()
 
@@ -4045,7 +4091,7 @@ class Gmg(wx.Frame):
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_topography_list.append(observed)
 
-        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        # APPEND NEW DATA MENU TO 'TOPO data MENU'
         self.topo_submenu = wx.Menu()
         self.m_topo_submenu.Append(10000+observed.id, observed.name, self.topo_submenu)
 
@@ -4130,7 +4176,7 @@ class Gmg(wx.Frame):
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_magnetic_list.append(observed)
 
-        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        # APPEND NEW DATA MENU TO 'MAG data MENU'
         self.mag_submenu = wx.Menu()
         self.m_obs_mag_submenu.Append(12000+observed.id, observed.name, self.mag_submenu)
 
@@ -4184,7 +4230,7 @@ class Gmg(wx.Frame):
         # BIND TO DEL FUNC
         self.Bind(wx.EVT_MENU, self.delete_obs_topo, id=10000 + self.observed_topography_counter)
 
-        # INCREMENT GRAV DERIV COUNTER
+        # INCREMENT TOPO DERIV COUNTER
         self.observed_topography_counter += 1
 
         # UPDATE GMG GUI
@@ -4267,7 +4313,7 @@ class Gmg(wx.Frame):
         # BIND TO DEL FUNC
         self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12500 + self.observed_magnetic_counter)
 
-        # INCREMENT GRAV DERIV COUNTER
+        # INCREMENT MAG DERIV COUNTER
         self.observed_magnetic_counter += 1
 
         # UPDATE GMG GUI
@@ -4518,7 +4564,7 @@ class Gmg(wx.Frame):
                 self.layer_list[i].id -= 1
 
 
-            # INCREMET THE CURRENT LAYER ID
+            # INCREMENT THE CURRENT LAYER ID
             if self.currently_active_layer_id == self.total_layer_count:
                 self.currently_active_layer_id -= 1
                 print("self.currently_active_layer_id = %s") % self.currently_active_layer_id
@@ -4716,26 +4762,18 @@ class Gmg(wx.Frame):
             # CREATE UPDATED POLYGON XYs -------------------------------------------------------------------------------
             # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - (THIS DONE FIRST SO THE WHOLE
             # POLYGON ISN'T PASSED TO SELF.POLYPLOTS)
-            for i in range(0, self.total_layer_count + 1):
-                # print("i = %s") % i
 
+            for i in range(0, self.total_layer_count + 1):
                 # CREATE THE LAYER POLYGONS TO PASS TO SELF.POLYGONS AND ONTO THE GRAV/MAG ALGORITHMS
                 # FIRST SET UP XY DATA; IF LAYER IS BELOW LAYER 0 THEN ATTACH THE ABOVE LAYER TO COMPLETE THE POLYGON;
                 # ELSE USE TOP LAYER CHECK FOR 'FIXED' LAYER MODE AND FIND LAST LAYER TO MAKE POLYGON
-                # print self.layer_list[i].name
-                # print self.layer_list[i].id
-                # print self.layer_list[i].type
-                # print self.layer_list[i].color
-                # print self.layer_list[i].x_nodes
-                # print self.layer_list[i].y_nodes
-                # print self.layer_list[i].node_mpl_actor
-                # print self.layer_list[i].polygon_mpl_actor
-                # print("")
+
                 if i >= 1 and self.layer_list[i].type == 'fixed':
-                    print i
-                    for layers in range(i, 0, -1):
-                        if self.layer_list[i-1].type == 'fixed':
-                            self.last_layer = layers - 1
+                    # CHECK FOR LAST PREVIOUS FIXED LAYER (USE ITS BASE TO COMPLETE THE POLYGON)
+                    for layer in range(i, 0, -1):
+                        if self.layer_list[layer-1].type == 'fixed':
+                            # ASSIGN THE LAST FIXED LAYER INDEX
+                            last_layer_index = layer - 1
 
                             # NOW APPEND NODES FOR BOUNDARY CONDITIONS (CONTINUOUS SLAB)
                             plotx = np.array(self.layer_list[i].x_nodes)
@@ -4747,8 +4785,8 @@ class Gmg(wx.Frame):
                             self.layer_list[i].y_nodes = ploty
 
                             # ADD NODES FROM ABOVE LAYER TO COMPETE POLYGON
-                            layer_above_x = np.array(self.layer_list[i-1].x_nodes)[::-1]
-                            layer_above_y = np.array(self.layer_list[i-1].y_nodes)[::-1]
+                            layer_above_x = np.array(self.layer_list[last_layer_index].x_nodes)[::-1]
+                            layer_above_y = np.array(self.layer_list[last_layer_index].y_nodes)[::-1]
 
                             # CREATE POLYGON
                             polygon_x = np.append(np.array(plotx), np.array(layer_above_x))
@@ -4757,14 +4795,16 @@ class Gmg(wx.Frame):
                             # UPDATE LAYER POLYGON ATTRIBUTE
                             self.layer_list[i].polygon = zip(polygon_x, polygon_y)
                             break
+                        else:
+                            continue
                 else:
                     # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
+                    print("layer is floating")
                     polygon_x = np.array(self.layer_list[i].x_nodes)
                     polygon_y = np.array(self.layer_list[i].y_nodes)
 
                     # UPDATE LAYER POLYGON ATTRIBUTE
                     self.layer_list[i].polygon = zip(polygon_x, polygon_y)
-
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -4790,7 +4830,6 @@ class Gmg(wx.Frame):
                 # UPDATE LAYER LINES
                 self.layer_list[i].node_mpl_actor[0].set_xdata(self.layer_list[i].x_nodes)
                 self.layer_list[i].node_mpl_actor[0].set_ydata(self.layer_list[i].y_nodes)
-
             # ----------------------------------------------------------------------------------------------------------
 
             # UPDATE CURRENTLY ACTIVE LAYER LINE AND NODES
@@ -5574,17 +5613,16 @@ class MagDialog(wx.Dialog):
 class PinchDialog(wx.Dialog):
     """PINCH A LAYER TO ANOTHER LAYER"""
 
-    def __init__(self, parent, id, title, plotx_list, ploty_list, i):
+    def __init__(self, parent, id, title, layer_list, currently_active_layer_id):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.plotx_list = plotx_list
-        self.ploty_list = ploty_list
-        self.currently_active_layer_id = i
-        self.p_start = wx.StaticText(input_panel, -1, "Pinch From (km):")
+        self.layer_list = layer_list
+        self.currently_active_layer_id = currently_active_layer_id
+        self.p_start = wx.StaticText(input_panel, -1, "Pinch from (km):")
         self.p_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.p_start_Text.SetInsertionPoint(0)
-        self.p_end = wx.StaticText(input_panel, -1, "Pinch To (km):")
+        self.p_end = wx.StaticText(input_panel, -1, "Pinch to (km):")
         self.p_end_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         self.b_up_set_button = wx.Button(input_panel, -1, "Pinch up")
@@ -5600,10 +5638,10 @@ class PinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.currently_active_layer_id]
-        current_y = self.ploty_list[self.currently_active_layer_id]
-        above_x = self.plotx_list[self.currently_active_layer_id - 1]
-        above_y = self.ploty_list[self.currently_active_layer_id - 1]
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
+        above_x = self.layer_list[self.currently_active_layer_id-1].x_nodes
+        above_y = self.layer_list[self.currently_active_layer_id-1].y_nodes
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -5626,16 +5664,17 @@ class PinchDialog(wx.Dialog):
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
+        # CLOSE POPOUT BOX
         self.EndModal(1)
 
     def down_set_button(self, event):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.currently_active_layer_id]
-        current_y = self.ploty_list[self.currently_active_layer_id]
-        below_x = self.plotx_list[self.currently_active_layer_id + 1]
-        below_y = self.ploty_list[self.currently_active_layer_id + 1]
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
+        below_x = self.layer_list[self.currently_active_layer_id+1].x_nodes
+        below_y = self.layer_list[self.currently_active_layer_id+1].y_nodes
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -5659,24 +5698,23 @@ class PinchDialog(wx.Dialog):
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
+        # CLOSE POPOUT BOX
         self.EndModal(1)
 
 
 class DepinchDialog(wx.Dialog):
     """DEPINCH A LAYER"""
-
-    def __init__(self, parent, id, title, plotx_list, ploty_list, i, layer_count):
+    def __init__(self, parent, id, title, layer_list, currently_active_layer_id, total_layer_count):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.plotx_list = plotx_list
-        self.ploty_list = ploty_list
-        self.currently_active_layer_id = i
-        self.total_layer_count = layer_count
-        self.p_start = wx.StaticText(input_panel, -1, "Pinch From:")
+        self.layer_list = layer_list
+        self.currently_active_layer_id = currently_active_layer_id
+        self.total_layer_count = total_layer_count
+        self.p_start = wx.StaticText(input_panel, -1, "Depinch from (km):")
         self.p_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.p_start_Text.SetInsertionPoint(0)
-        self.p_end = wx.StaticText(input_panel, -1, "Pinch Too")
+        self.p_end = wx.StaticText(input_panel, -1, "Depinch to (km):")
         self.p_end_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         self.b_depinch_button = wx.Button(input_panel, -1, "depinch")
@@ -5689,21 +5727,21 @@ class DepinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.currently_active_layer_id]
-        current_y = self.ploty_list[self.currently_active_layer_id]
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
 
         if self.currently_active_layer_id != 0:
-            above_x = self.plotx_list[self.currently_active_layer_id - 1]
-            above_y = self.ploty_list[self.currently_active_layer_id - 1]
+            above_x = self.layer_list[self.currently_active_layer_id - 1].x_nodes
+            above_y = self.layer_list[self.currently_active_layer_id - 1].y_nodes
         if self.currently_active_layer_id != self.total_layer_count:
-            below_x = self.plotx_list[self.currently_active_layer_id + 1]
-            below_y = self.ploty_list[self.currently_active_layer_id + 1]
+            below_x = self.layer_list[self.currently_active_layer_id + 1].x_nodes
+            below_y = self.layer_list[self.currently_active_layer_id + 1].y_nodes
 
         # REMOVE PINCHED NODES
         self.depinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH range
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.depinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH range
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
         # FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST
         # PASS X VALUES IF THEY ARE INSIDE THE PINCH range
@@ -5728,6 +5766,7 @@ class DepinchDialog(wx.Dialog):
         self.depinched_x[insert_point:1] = new_xs
         self.depinched_y[insert_point:1] = new_ys_list
 
+        # CLOSE POPOUT
         self.EndModal(1)
 
 
@@ -5931,17 +5970,16 @@ class SetBackgroundDensityDialog(wx.Dialog):
 class BulkShiftDialog(wx.Dialog):
     """APPLY A BULK SHIFT OF A LAYER IN THE Z DIRECTION"""
 
-    def __init__(self, parent, id, title, plotx_list, ploty_list, i):
+    def __init__(self, parent, id, title, layer_list, currently_active_layer_id):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.ploty_list = ploty_list
-        self.plotx_list = plotx_list
-        self.currently_active_layer_id = i
-        self.bulk_panel_x = wx.StaticText(input_panel, -1, "Set x bulk shift value:")
+        self.layer_list = layer_list
+        self.currently_active_layer_id = currently_active_layer_id
+        self.bulk_panel_x = wx.StaticText(input_panel, -1, "X shift (km):")
         self.bulk_panel_x_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.bulk_panel_x_Text.SetInsertionPoint(0)
-        self.bulk_panel_y = wx.StaticText(input_panel, -1, "Set y bulk shift value:")
+        self.bulk_panel_y = wx.StaticText(input_panel, -1, "Y shift (km):")
         self.bulk_panel_y_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.bulk_panel_y_Text.SetInsertionPoint(0)
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
@@ -5953,14 +5991,18 @@ class BulkShiftDialog(wx.Dialog):
         sizer.Fit(self)
 
     def bulk_shift_button(self, event):
+        """WHEN BUTTON IS PRESSED TO EXECUTE A BULK SHIFT"""
+        # GET THE USER INPUT
         self.x_shift_value = float(self.bulk_panel_x_Text.GetValue())
         self.y_shift_value = float(self.bulk_panel_y_Text.GetValue())
-        current_y = self.ploty_list[self.currently_active_layer_id]
-        current_x = self.plotx_list[self.currently_active_layer_id]
 
-        # BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0
-        self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
-        self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0. else 0.01 for y in current_y]
+        # GET THE CURRENT VALUES
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
+
+        # BULK SHIFT NODES, SET TO ZERO (a.k.k 0.01) IF NEW VALUE IS < 0.01
+        self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0.01 else 0.01 for x in current_x]
+        self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0.01 else 0.01 for y in current_y]
 
         # CLOSE
         self.EndModal(1)
