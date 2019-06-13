@@ -4691,15 +4691,14 @@ class Gmg(wx.Frame):
     # LAYER ATTRIBUTE TABLE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_attribute_table(self, event):
-        attribute_table = AttributeEditor(self, -1, 'attribute editor', self.tree_items, self.densities,
-                                          self.reference_densities, self.susceptibilities, self.angle_a,
-                                          self.angle_b, self.layer_colors)
+        attribute_table = AttributeEditor(self, -1, 'Attribute editor', self.tree_items, self.layer_list)
         attribute_table.Show(True)
 
-    def attribute_set(self, new_tree_items, densities, reference_densities, susceptibilities, angle_a, angle_b,
-                      layer_colors):
+    def attribute_set(self, new_tree_items, new_layer_list):
         """UPDATE GMG ATTRIBUTES WITH NEW ATTRIBUTES FROM THE ATTRIBUTE TABLE"""
+
         print("TREE ITEM CLICKED")
+
         # UPDATE MAIN FRAME TREE LIST
         current_tree_items = self.tree.GetRootItem().GetChildren()
         for i in range(0, len(self.tree_items) - 1):
@@ -4707,12 +4706,13 @@ class Gmg(wx.Frame):
             self.tree.SetItemText(current_tree_items[i], new_tree_items[i + 1])
 
         # UPDATE MAIN FRAME ATTRIBUTES
-        self.densities = densities
-        self.reference_densities = reference_densities
-        self.susceptibilities = susceptibilities
-        self.angle_a = angle_a
-        self.angle_b = angle_b
-        self.layer_colors = layer_colors
+        for l in range(0, len(self.layer_list)):
+            self.layer_list[l].density = new_layer_list[l].density
+            self.layer_list[l].reference_density = new_layer_list[l].reference_density
+            self.layer_list[l].susceptibility = new_layer_list[l].susceptibility
+            self.layer_list[l].angle_a = new_layer_list[l].angle_a
+            self.layer_list[l].angle_b = new_layer_list[l].angle_b
+            self.layer_list[l].color = new_layer_list[l].color
 
         # UPDATE GMG STATE
         self.update_layer_data()
@@ -6525,88 +6525,82 @@ class PlotSettingsDialog(wx.Frame):
 class AttributeEditor(wx.Frame):
     """OPENS A TABLE FOR VIEWING AND EDITING LABEL ATTRIBUTES"""
 
-    def __init__(attribute_edit, parent, id, title, tree_items, densities, reference_densities, susceptibilities,
-                 angle_a, angle_b, layer_colors):
-        wx.Frame.__init__(attribute_edit, None, wx.ID_ANY, 'Attribute editor', size=(650, 1000))
-        attribute_edit.input_panel = wx.Panel(attribute_edit)
+    def __init__(self, parent, id, title, tree_items, layer_list):
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'Attribute editor', size=(650, 1000))
+        self.input_panel = wx.Panel(self)
 
         # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
-        attribute_edit.parent = parent
+        self.parent = parent
 
         # SET VARIABLES
-        attribute_edit.tree_items = tree_items
-        attribute_edit.densities = densities
-        attribute_edit.reference_densities = reference_densities
-        attribute_edit.susceptibilities = susceptibilities
-        attribute_edit.angle_a = angle_a
-        attribute_edit.angle_b = angle_b
-        attribute_edit.layer_colors = layer_colors
+        self.tree_items = tree_items
+        self.layer_list = layer_list
 
         # DEFINE ATTRIBUTE GRID
-        attribute_edit.attr_grid = gridlib.Grid(attribute_edit.input_panel, -1, size=(650, 980))
-        attribute_edit.attr_grid.CreateGrid(len(attribute_edit.tree_items) - 1, 7)
-        attribute_edit.attr_grid.SetColLabelValue(0, 'Layer Name')
-        attribute_edit.attr_grid.SetColLabelValue(1, 'Density')
-        attribute_edit.attr_grid.SetColLabelValue(2, 'Density Reference')
-        attribute_edit.attr_grid.SetColLabelValue(3, 'Susceptibility')
-        attribute_edit.attr_grid.SetColLabelValue(4, 'Angle A')
-        attribute_edit.attr_grid.SetColLabelValue(5, 'Angle B')
-        attribute_edit.attr_grid.SetColLabelValue(6, 'Layer color')
+        self.attr_grid = gridlib.Grid(self.input_panel, -1, size=(650, 980))
+        self.attr_grid.CreateGrid(len(self.tree_items) - 1, 7)
+        self.attr_grid.SetColLabelValue(0, 'Layer Name')
+        self.attr_grid.SetColLabelValue(1, 'Density')
+        self.attr_grid.SetColLabelValue(2, 'Reference density')
+        self.attr_grid.SetColLabelValue(3, 'Susceptibility')
+        self.attr_grid.SetColLabelValue(4, 'Angle A')
+        self.attr_grid.SetColLabelValue(5, 'Angle B')
+        self.attr_grid.SetColLabelValue(6, 'Layer color')
 
         # SET COLUMN FORMATS
-        attribute_edit.attr_grid.SetColFormatFloat(1, 3, 2)
-        attribute_edit.attr_grid.SetColFormatFloat(2, 3, 2)
-        attribute_edit.attr_grid.SetColFormatFloat(3, 9, 7)
-        attribute_edit.attr_grid.SetColFormatFloat(4, 3, 2)
-        attribute_edit.attr_grid.SetColFormatFloat(5, 3, 2)
+        self.attr_grid.SetColFormatFloat(1, 3, 2)
+        self.attr_grid.SetColFormatFloat(2, 3, 2)
+        self.attr_grid.SetColFormatFloat(3, 9, 7)
+        self.attr_grid.SetColFormatFloat(4, 3, 2)
+        self.attr_grid.SetColFormatFloat(5, 3, 2)
 
         # CREATE SET BUTTON
-        attribute_edit.b_set_attr_button = wx.Button(attribute_edit.input_panel, -1, "Set")
-        attribute_edit.Bind(wx.EVT_BUTTON, attribute_edit.set_attr_button, attribute_edit.b_set_attr_button)
+        self.b_set_attr_button = wx.Button(self.input_panel, -1, "Set")
+        self.Bind(wx.EVT_BUTTON, self.set_attr_button, self.b_set_attr_button)
 
         # POPULATE ATTRIBUTE TABLE
-        attribute_edit.length = len(attribute_edit.tree_items)
+        self.length = len(self.tree_items)
 
-        for i in range(attribute_edit.length - 1):
-            attribute_edit.attr_grid.SetCellValue(i, 0, attribute_edit.tree_items[i + 1])
-            attribute_edit.attr_grid.SetCellValue(i, 1, str(float(attribute_edit.densities[i + 1]) / 1000.))
-            attribute_edit.attr_grid.SetCellValue(i, 2, str(float(attribute_edit.reference_densities[i + 1]) / 1000.))
-            attribute_edit.attr_grid.SetCellValue(i, 3, str(attribute_edit.susceptibilities[i]))
-            attribute_edit.attr_grid.SetCellValue(i, 4, str(attribute_edit.angle_a[i + 1]))
-            attribute_edit.attr_grid.SetCellValue(i, 5, str(attribute_edit.angle_b[i + 1]))
-            attribute_edit.attr_grid.SetCellValue(i, 6, str(attribute_edit.layer_colors[i + 1]))
+        for i in range(self.length - 1):
+            self.attr_grid.SetCellValue(i, 0, self.tree_items[i + 1])
+            self.attr_grid.SetCellValue(i, 1, str(float(self.layer_list[i + 1].density) / 1000.))
+            self.attr_grid.SetCellValue(i, 2, str(float(self.layer_list[i + 1].reference_density) / 1000.))
+            self.attr_grid.SetCellValue(i, 3, str(self.layer_list[i + 1].susceptibility))
+            self.attr_grid.SetCellValue(i, 4, str(self.layer_list[i + 1].angle_a))
+            self.attr_grid.SetCellValue(i, 5, str(self.layer_list[i + 1].angle_b))
+            self.attr_grid.SetCellValue(i, 6, str(self.layer_list[i + 1].color))
 
         # SET SIZER
         for col in range(6):
-            attribute_edit.attr_grid.SetColSize(col, 12)
+            self.attr_grid.SetColSize(col, 12)
 
-        attribute_edit.attr_grid.AutoSize()
+        self.attr_grid.AutoSize()
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(attribute_edit.b_set_attr_button)
-        sizer.Add(attribute_edit.attr_grid)
-        attribute_edit.input_panel.SetSizer(sizer)
-        sizer.Fit(attribute_edit)
+        sizer.Add(self.b_set_attr_button)
+        sizer.Add(self.attr_grid)
+        self.input_panel.SetSizer(sizer)
+        sizer.Fit(self)
 
         # ACTION BINDINGS
-        attribute_edit.Bind(wx.EVT_CHAR_HOOK, attribute_edit.on_key)
-        attribute_edit.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, attribute_edit.open_colour_box)
-        attribute_edit.attr_grid.Bind(wx.EVT_SIZE, attribute_edit.on_size)
+        self.Bind(wx.EVT_CHAR_HOOK, self.on_key)
+        self.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.open_colour_box)
+        self.attr_grid.Bind(wx.EVT_SIZE, self.on_size)
 
-    def on_size(attribute_edit, event):
-        width, height = attribute_edit.GetClientSize()
+    def on_size(self, event):
+        width, height = self.GetClientSize()
         for col in range(6):
-            attribute_edit.attr_grid.SetColSize(col, width / (10 + 1))
+            self.attr_grid.SetColSize(col, width / (10 + 1))
 
-    def open_colour_box(attribute_edit, event):
+    def open_colour_box(self, event):
         if event.GetCol() == 5:
             row = event.GetRow()
-            attribute_edit.on_color_dlg(event, row)
+            self.on_color_dlg(event, row)
         else:
             pass
 
-    def on_color_dlg(attribute_edit, event, row):
+    def on_color_dlg(self, event, row):
         """SET COLOUR FOR LAYER"""
-        dlg = wx.ColourDialog(attribute_edit)
+        dlg = wx.ColourDialog(self)
 
         # ENSURE THE FULL COLOUR DIALOG IS DISPLAYED, NOT THE ABBREVIATED VERSION
         dlg.GetColourData().SetChooseFull(True)
@@ -6614,48 +6608,48 @@ class AttributeEditor(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             rgb = dlg.GetColourData().GetColour().Get()
             html = struct.pack('BBB', *rgb).encode('hex')
-            attribute_edit.attr_grid.SetCellValue(row, 5, '#' + str(html))
+            self.attr_grid.SetCellValue(row, 5, '#' + str(html))
         dlg.Destroy()
 
-    def on_key(attribute_edit, event):
+    def on_key(self, event):
         if event.ControlDown() and event.GetKeyCode() == 67:
-            attribute_edit.selection()
-            attribute_edit.copy()  # CALL COPY METHOD
+            self.selection()
+            self.copy()  # CALL COPY METHOD
         # SKIP OTHER KEY EVENTS
         if event.GetKeyCode():
             event.Skip()
             return
 
-    def selection(attribute_edit):
+    def selection(self):
         # SHOW CELL SELECTION
         # IF SELECTION IS CELL
-        if attribute_edit.attr_grid.GetSelectedCells():
-            print("Selected cells " + str(attribute_edit.GetSelectedCells()))
+        if self.attr_grid.GetSelectedCells():
+            print("Selected cells " + str(self.GetSelectedCells()))
         # IF SELECTION IS BLOCK
-        if attribute_edit.attr_grid.GetSelectionBlockTopLeft():
-            print("Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft()))
-        if attribute_edit.attr_grid.GetSelectionBlockbottomRight():
-            print("Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight()))
+        if self.attr_grid.GetSelectionBlockTopLeft():
+            print("Selection block top left " + str(self.attr_grid.GetSelectionBlockTopLeft()))
+        if self.attr_grid.GetSelectionBlockbottomRight():
+            print("Selection block bottom right " + str(self.attr_grid.GetSelectionBlockbottomRight()))
         # IF SELECTION IS COL
-        if attribute_edit.attr_grid.GetSelectedCols():
-            print("Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols()))
+        if self.attr_grid.GetSelectedCols():
+            print("Selected cols " + str(self.attr_grid.GetSelectedCols()))
         # IF SELECTION IS ROW
-        if attribute_edit.attr_grid.GetSelectedRows():
-            print("Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows()))
+        if self.attr_grid.GetSelectedRows():
+            print("Selected rows " + str(self.attr_grid.GetSelectedRows()))
 
-    def currentcell(attribute_edit):
+    def currentcell(self):
         # SHOW CURSOR POSITION
-        row = attribute_edit.attr_grid.GetGridCursorRow()
-        col = attribute_edit.attr_grid.GetGridCursorCol()
+        row = self.attr_grid.GetGridCursorRow()
+        col = self.attr_grid.GetGridCursorCol()
         cell = (row, col)
         print("Current cell " + str(cell))
 
-    def copy(attribute_edit):
+    def copy(self):
         # NUMBER OF ROWS AND COLS
-        rows = attribute_edit.attr_grid.GetSelectionBlockbottomRight()[0][0] - \
-               attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][0] + 1
-        cols = attribute_edit.attr_grid.GetSelectionBlockbottomRight()[0][1] - \
-               attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][1] + 1
+        rows = self.attr_grid.GetSelectionBlockbottomRight()[0][0] - \
+               self.attr_grid.GetSelectionBlockTopLeft()[0][0] + 1
+        cols = self.attr_grid.GetSelectionBlockbottomRight()[0][1] - \
+               self.attr_grid.GetSelectionBlockTopLeft()[0][1] + 1
 
         # DATA VARIABLE CONTAIN TEXT THAT MUST BE SET IN THE CLIPBOARD
         data = ''
@@ -6665,8 +6659,8 @@ class AttributeEditor(wx.Frame):
         for r in range(rows):
             for c in range(cols):
                 data = data + str(
-                    attribute_edit.attr_grid.GetCellValue(attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][0] + r,
-                                                          attribute_edit.attr_grid.GetSelectionBlockTopLeft()[0][
+                    self.attr_grid.GetCellValue(self.attr_grid.GetSelectionBlockTopLeft()[0][0] + r,
+                                                          self.attr_grid.GetSelectionBlockTopLeft()[0][
                                                               1] + c))
                 if c < cols - 1:
                     data = data + '\t'
@@ -6685,34 +6679,26 @@ class AttributeEditor(wx.Frame):
         else:
             wx.MessageBox("Can't open the clipboard", "Error")
 
-    def set_attr_button(attribute_edit, event):
+    def set_attr_button(self, event):
         # RECREATE ARRAYS (INCLUDE VALUES FOR "LAYER 0)"
-        attribute_edit.tree_items = ['Layer 1']
-        attribute_edit.densities = [0.0]
-        attribute_edit.reference_densities = [0.0]
-        attribute_edit.susceptibilities = [0.0]
-        attribute_edit.angle_a = [0.0]
-        attribute_edit.angle_b = [0.0]
-        attribute_edit.layer_colors = ['b']
+        self.tree_items = ['Layer 1']
 
-        # SET NEW DATA FOR LAYERS 1 to i
-        for i in range(attribute_edit.length - 1):
-            attribute_edit.tree_items.append(str(attribute_edit.attr_grid.GetCellValue(i, 0)))
-            attribute_edit.densities.append(float(attribute_edit.attr_grid.GetCellValue(i, 1)) * 1000.)
-            attribute_edit.reference_densities.append(float(attribute_edit.attr_grid.GetCellValue(i, 2)) * 1000.)
-            attribute_edit.susceptibilities.append(float(attribute_edit.attr_grid.GetCellValue(i, 3)))
-            attribute_edit.angle_a.append(float(attribute_edit.attr_grid.GetCellValue(i, 4)))
-            attribute_edit.angle_b.append(float(attribute_edit.attr_grid.GetCellValue(i, 5)))
-            attribute_edit.layer_colors.append(str(attribute_edit.attr_grid.GetCellValue(i, 6)))
+        # SET NEW TREE NAMES AND LAYER ATTRIBUTES FOR LAYERS 1 to i
+        for i in range(self.length - 1):
+            self.tree_items.append(str(self.attr_grid.GetCellValue(i, 0)))
+            self.layer_list[i + 1].density = float(self.attr_grid.GetCellValue(i, 1)) * 1000.
+            self.layer_list[i + 1].reference_density = float(self.attr_grid.GetCellValue(i, 2)) * 1000.
+            self.layer_list[i + 1].susceptibility = float(self.attr_grid.GetCellValue(i, 3))
+            self.layer_list[i + 1].angle_a = float(self.attr_grid.GetCellValue(i, 4))
+            self.layer_list[i + 1].angle_b = float(self.attr_grid.GetCellValue(i, 5))
+            self.layer_list[i + 1].color = str(self.attr_grid.GetCellValue(i, 6))
 
         # UPDATE MAIN FRAME
-        attribute_edit.parent.attribute_set(attribute_edit.tree_items, attribute_edit.densities,
-                                            attribute_edit.reference_densities, attribute_edit.susceptibilities,
-                                            attribute_edit.angle_a, attribute_edit.angle_b, attribute_edit.layer_colors)
+        self.parent.attribute_set(self.tree_items, self.layer_list)
 
-        attribute_edit.parent.update_layer_data()
-        attribute_edit.parent.run_algorithms()
-        attribute_edit.parent.draw()
+        self.parent.update_layer_data()
+        self.parent.run_algorithms()
+        self.parent.draw()
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
