@@ -110,7 +110,7 @@ import model_stats
 import struct
 import gc
 import webbrowser
-import time
+
 # FUTURE
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
@@ -146,16 +146,16 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1100), style=wx.SP_NOBORDER | wx.EXPAND)
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1080), style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 530),
                                              style=wx.SP_NOBORDER | wx.EXPAND)
         self.leftPanel.SetMinimumPaneSize(1)
         self.leftPanel_b.SetMinimumPaneSize(1)
 
         # FIRST PANE; LEFT PANEL (=ATTRIBUTES)
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 595),
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 380),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 595),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 380),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
                                                                        foldIcons=images)
@@ -688,6 +688,7 @@ class Gmg(wx.Frame):
         self.mag_observation_elv = 0.  # OBSERVATION LEVEL FOR MAGNETIC DATA
         self.gravity_observation_elv = 0.  # OBSERVATION LEVEL FOR GRAVITY DATA
         self.pinch_switch = False
+        self.didnt_get_node = False
 
         # INITIALISE LAYER LIST
         self.layer_list = []  # LIST HOLDING ALL OF THE LAYER OBJECTS
@@ -2897,85 +2898,50 @@ class Gmg(wx.Frame):
         CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT, THEN SKIP THIS PART AND ONLY UPDATE ATTRIBUTES
         """
 
+        # GET NEW XY POINT
         new_x = float(self.x_input.GetValue())
         new_y = float(self.y_input.GetValue())
 
-        if self.currently_active_layer_id == self.node_layer_reference:
-            # GET CURRENT NODES
-            xt = np.array(self.current_x_nodes)
-            yt = np.array(self.current_y_nodes)
+        # GET CURRENT NODES
+        xt = self.layer_list[self.currently_active_layer_id].x_nodes
+        yt = self.layer_list[self.currently_active_layer_id].y_nodes
 
-            # GET THE XY LOCATION OF NODE CURRENTLY BEING EDITED (PRIOR TO MOVE)
-            current_x = xt[self.index_node]
-            current_y = yt[self.index_node]
+        if self.layer_list[self.currently_active_layer_id].layer_type == 'fixed' and self.index_node is not None:
+            if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
+                xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+            elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
+                xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+            elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
+                xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
+                xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            elif new_y <= 0:
+                xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            else:
+                xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+        elif self.layer_list[self.currently_active_layer_id].layer_type == 'floating':
+            if new_y <= 0:
+                xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
+            else:
+                xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
 
-            if self.layer_list[self.currently_active_layer_id].layer_type == 'fixed' and self.index_node is not None:
-                if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
-                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-                elif xt[self.index_node] == self.x2 and yt[self.index_node] != 0.001:
-                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-                elif xt[self.index_node] == 0 and yt[self.index_node] == 0.001:
-                    xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                elif xt[self.index_node] == self.x2 and yt[self.index_node] == 0.001:
-                    xt[self.index_node] = self.x2  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                elif new_y <= 0:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                else:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-            elif self.layer_list[self.currently_active_layer_id].layer_type == 'floating':
-                if new_y <= 0:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                else:
-                    xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+        self.current_x_nodes = xt
+        self.current_y_nodes = yt
+        self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
 
-            # # DEAL WITH PINCHED NODE
-            # if self.pinch_switch is True:
-            #     for k in range(0, len(self.pinched_index_arg_list)):
-            #         if self.pinched_index_arg_list[k] is not None:
-            #             next_x_list = self.plotx_list[k]
-            #             next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
-            #             next_x_list[self.pinched_index_arg_list[k]] = new_x
-            #             next_y_list[self.pinched_index_arg_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
-            #             self.plotx_list[k] = next_x_list
-            #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
+        self.layer_list[self.currently_active_layer_id].x_nodes = xt
+        self.layer_list[self.currently_active_layer_id].y_nodes = yt
 
-            # # DEAL WITH PINCHED NODE
-            # if self.layer_list[currently_active_layer_id].pinched is True:
-            #     for l in self.layer_list[currently_active_layer_id].pinched_list:
-            #
-            #         # CREATE LIST OF DISTANCE TO NODE
-            #         d = np.sqrt((xt - event.xdata) ** 2 + (yt - event.ydata) ** 2)
-            #
-            #         self.index_arg = np.argmin(d)
-            #
-            #         self.layer_list[l].x_nodes
-            #         self.layer_list[l].x_nodes
-
-            #         if self.pinched_index_arg_list[l] is not None:
-            #             next_x_list = self.plotx_list[k]
-            #             next_y_list = self.ploty_list[k]  # GET THE NODE LIST OF THE NEXT LAYER
-            #             next_x_list[self.pinched_index_arg_list[k]] = new_x
-            #             next_y_list[self.pinched_index_arg_list[k]] = new_y  # REPLACE THE PINCHED NODE WITH THE NEW NODE
-            #             self.plotx_list[k] = next_x_list
-            #             self.ploty_list[k] = next_y_list  # OVERWRITE THE NODE LIST WITH UPDATED LIST
-
-
-            self.current_x_nodes = xt
-            self.current_y_nodes = yt
-            self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
-
-            # COLOR CURRENTLY SELECTED NODE RED
-            self.current_node.set_offsets([new_x, new_y])
-        else:
-            pass
+        # COLOR CURRENTLY SELECTED NODE RED
+        self.current_node.set_offsets([new_x, new_y])
 
         # UPDATE LAYER DATA
         self.set_density(self)
@@ -2984,6 +2950,7 @@ class Gmg(wx.Frame):
         self.set_angle_b(self)
 
         # UPDATE GMG
+        self.draw()
         self.update_layer_data()
         self.run_algorithms()
 
@@ -2991,6 +2958,9 @@ class Gmg(wx.Frame):
         """
         GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
+        # RESET NODE SWITCH
+        self.didnt_get_node = False
+
         if self.pinch_switch is False:
             # PINCH MODE ISN'T ON, SO DO THE NORMAL ROUTINE
 
@@ -3007,6 +2977,7 @@ class Gmg(wx.Frame):
 
             # CHECK IF THE NODE IS WITHIN THE "MEANT TO CLICK" DISTANCE
             if d[self.index_arg] >= self.node_click_limit:
+                self.didnt_get_node = True
                 return None, None
             else:
                 # CHECK IF NODE IS A PINCHED POINT, IF YES FIND NODE OF ABOVE OR BELOW LAYER
@@ -3056,18 +3027,13 @@ class Gmg(wx.Frame):
 
     def get_fault_node_under_point(self, event):
         """GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
-        print("")
-        print("doing get_fault_node_under_point")
+        # RESET NODE SWITCH
+        self.didnt_get_node = False
+
         # GET FAULT NODE XY DATA
         xy_data = self.currently_active_fault.get_xydata()
-        print("xy_data =")
         x = xy_data[:, 0]
         y = xy_data[:, 1]
-        print("x =")
-        print(x)
-        print("y =")
-        print(y)
-        print("")
 
         # FIND NODE CLOSEST TO EVENT CLICK POINT
         d = np.sqrt((x - event.xdata) ** 2 + (y - event.ydata) ** 2)
@@ -3075,6 +3041,7 @@ class Gmg(wx.Frame):
 
         # RETURN RESULTING NODE OR NONE
         if d[self.index_arg] >= self.node_click_limit:
+            self.didnt_get_node = True
             return None
         else:
             return self.index_arg
@@ -3210,6 +3177,9 @@ class Gmg(wx.Frame):
         if self.select_new_layer_nodes is True:
             # CURRENTLY CREATING A NEW LAYER
             return
+        if self.didnt_get_node is True:
+            # NO NODE WAS SELECTED WHEN CLICKING
+            return
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE
 
@@ -3218,15 +3188,6 @@ class Gmg(wx.Frame):
             self.new_y = event.ydata  # GET Y OF NEW POINT
 
             # UPDATE NODE ARRAY
-            print("self.selected_node")
-            print(self.selected_node)
-            print(self.xt)
-            print(self.yt)
-            print("")
-            print(self.xt[self.selected_node])
-            print(self.yt[self.selected_node])
-            print(self.x1)
-            print(self.x2)
             if self.xt[self.selected_node] == self.x1 and self.yt[self.selected_node] != 0.001:
                 self.xt[self.selected_node] = self.x1  # REPLACE OLD X WITH NEW X
                 self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
@@ -4727,8 +4688,8 @@ class Gmg(wx.Frame):
     # LAYER ATTRIBUTE TABLE~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_attribute_table(self, event):
-        attribute_table = AttributeEditor(self, -1, 'Attribute editor', self.tree_items, self.layer_list)
-        attribute_table.Show(True)
+        self.attribute_table = AttributeEditor(self, -1, 'Attribute editor', self.tree_items, self.layer_list)
+        self.attribute_table.Show(True)
 
     def attribute_set(self, new_tree_items, new_layer_list):
         """UPDATE GMG ATTRIBUTES WITH NEW ATTRIBUTES FROM THE ATTRIBUTE TABLE"""
@@ -6250,35 +6211,37 @@ class MessageDialog(wx.MessageDialog):
 
 class CaptureCoordinates(wx.Frame):
     """CAPTURE MOUSE CLICK COORDINATES AND WRITE TO DISK FILE. RETURNS ASCII TEXT FILE"""
-    def __init__(coordinate_list, parent, id, title):
-        wx.Frame.__init__(coordinate_list, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
-        coordinate_list.input_panel = wx.Panel(coordinate_list)
+    def __init__(self, parent, id, title):
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'Capture coordinates', size=(350, 500))
+        self.input_panel = wx.Panel(self)
 
         # SET INSTANCE OF GMG CLASS TO RECEIVE NEW ATTRIBUTES
-        coordinate_list.parent = parent
+        self.parent = parent
 
         # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
-        coordinate_list.Bind(wx.EVT_CLOSE, coordinate_list.on_close_button)
+        self.Bind(wx.EVT_CLOSE, self.on_close_button)
 
         # CREATE LIST CONTROL
-        coordinate_list.table = wx.ListCtrl(coordinate_list.input_panel, size=(350, 500), style=wx.LC_REPORT)
-        coordinate_list.table.InsertColumn(0, 'X')
-        coordinate_list.table.InsertColumn(1, 'Y')
+        self.table = wx.ListCtrl(self.input_panel, size=(260, 500), style=wx.LC_REPORT)
+        self.table.InsertColumn(0, 'X')
+        self.table.InsertColumn(1, 'Y')
+        self.table.SetColumnWidth(0, 130)
+        self.table.SetColumnWidth(1, 130)
 
         # CREATE SAVE BUTTON
-        coordinate_list.save_btn = wx.Button(coordinate_list.input_panel, label="Save coordinates")
-        coordinate_list.save_btn.Bind(wx.EVT_BUTTON, coordinate_list.on_save)
+        self.save_btn = wx.Button(self.input_panel, label="Save coordinates")
+        self.save_btn.Bind(wx.EVT_BUTTON, self.on_save)
 
         # ADD FEATURES TO SIZER
         sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(coordinate_list.table, 0, wx.ALL | wx.EXPAND, 5)
-        sizer.Add(coordinate_list.save_btn, 0, wx.ALL | wx.CENTER, 5)
-        coordinate_list.input_panel.SetSizer(sizer)
-        sizer.Fit(coordinate_list)
+        sizer.Add(self.table, 0, wx.ALL | wx.EXPAND, 5)
+        sizer.Add(self.save_btn, 0, wx.ALL | wx.CENTER, 5)
+        self.input_panel.SetSizer(sizer)
+        sizer.Fit(self)
 
-    def on_save(coordinate_list, event):
+    def on_save(self, event):
         # CREATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(coordinate_list, "Save XY data", "", "", "xy files (*.xy)|*.xy",
+        save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # USER CHANGED THEIR MIND
@@ -6290,16 +6253,16 @@ class CaptureCoordinates(wx.Frame):
         # GET DATA
         x = []
         y = []
-        for i in range(coordinate_list.table.GetItemCount()):
-            x.append(float(coordinate_list.table.GetItem(itemIdx=i, col=0).GetText()))
-            y.append(float(coordinate_list.table.GetItem(itemIdx=i, col=1).GetText()))
+        for i in range(self.table.GetItemCount()):
+            x.append(float(self.table.GetItem(itemIdx=i, col=0).GetText()))
+            y.append(float(self.table.GetItem(itemIdx=i, col=1).GetText()))
 
         # OUTPUT DATA
         np.savetxt(output_stream, zip(x, y), delimiter=' ', fmt='%0.6f %0.6f')
 
-    def on_close_button(coordinate_list, event):
-        coordinate_list.parent.capture = False
-        coordinate_list.Destroy()
+    def on_close_button(self, event):
+        self.parent.capture = False
+        self.Destroy()
 
 
 class PlotSettingsDialog(wx.Frame):
@@ -6572,7 +6535,7 @@ class AttributeEditor(wx.Frame):
     """OPENS A TABLE FOR VIEWING AND EDITING LABEL ATTRIBUTES"""
 
     def __init__(self, parent, id, title, tree_items, layer_list):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 'Attribute editor', size=(650, 1000))
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'Attribute editor', size=(600, 500))
         self.input_panel = wx.Panel(self)
 
         # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
@@ -6583,7 +6546,7 @@ class AttributeEditor(wx.Frame):
         self.layer_list = layer_list
 
         # DEFINE ATTRIBUTE GRID
-        self.attr_grid = gridlib.Grid(self.input_panel, -1, size=(650, 980))
+        self.attr_grid = gridlib.Grid(self.input_panel, -1, size=(599, 499))
         self.attr_grid.CreateGrid(len(self.tree_items) - 1, 7)
         self.attr_grid.SetColLabelValue(0, 'Layer Name')
         self.attr_grid.SetColLabelValue(1, 'Density')
@@ -6592,6 +6555,10 @@ class AttributeEditor(wx.Frame):
         self.attr_grid.SetColLabelValue(4, 'Angle A')
         self.attr_grid.SetColLabelValue(5, 'Angle B')
         self.attr_grid.SetColLabelValue(6, 'Layer color')
+
+        # # SET COLUMN WIDTHS
+        # for i in range(0, 6):
+        #    self.attr_grid.SetColumnWidth(i, 130)
 
         # SET COLUMN FORMATS
         self.attr_grid.SetColFormatFloat(1, 3, 2)
@@ -6629,16 +6596,18 @@ class AttributeEditor(wx.Frame):
 
         # ACTION BINDINGS
         self.Bind(wx.EVT_CHAR_HOOK, self.on_key)
+        self.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.open_colour_box)
         self.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.open_colour_box)
-        self.attr_grid.Bind(wx.EVT_SIZE, self.on_size)
+        # self.attr_grid.Bind(wx.EVT_SIZE, self.on_size)
 
-    def on_size(self, event):
-        width, height = self.GetClientSize()
-        for col in range(6):
-            self.attr_grid.SetColSize(col, width / (10 + 1))
+    # def on_size(self, event):
+    #     width, height = self.GetClientSize()
+    #     for col in range(6):
+    #         self.attr_grid.SetColSize(col, width / (10 + 1))
 
     def open_colour_box(self, event):
-        if event.GetCol() == 5:
+        """IF THE ROW SELECTED IS 6 (THE LAYER COLOR) THEN OPEN THE COLOR SELECTION WIDGET"""
+        if event.GetCol() == 6:
             row = event.GetRow()
             self.on_color_dlg(event, row)
         else:
@@ -6653,8 +6622,13 @@ class AttributeEditor(wx.Frame):
 
         if dlg.ShowModal() == wx.ID_OK:
             rgb = dlg.GetColourData().GetColour().Get()
+            rgb = rgb[0:3]
+            print("rgb = ")
+            print(rgb)
             html = struct.pack('BBB', *rgb).encode('hex')
-            self.attr_grid.SetCellValue(row, 5, '#' + str(html))
+            print("html = ")
+            print(html)
+            self.attr_grid.SetCellValue(row, 6, '#' + str(html))
         dlg.Destroy()
 
     def on_key(self, event):
