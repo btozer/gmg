@@ -3832,10 +3832,10 @@ class Gmg(wx.Frame):
         self.fault_tree_items[self.currently_active_fault_id] = str(new_label)
 
     def write_layers_xy(self, event):
-        """OUTPUT LAYER DATA TO FILE"""
+        """OUTPUT ALL LAYERS XY DATA TO INDIVIDUAL TEXT FILES"""
 
         # CREATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
+        save_file_dialog = wx.FileDialog(self, "Save LAYER XY", "", "", "xy files (*.xy)|*.xy",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # THE USER CHANGED THERE MIND
@@ -3848,23 +3848,45 @@ class Gmg(wx.Frame):
         # NOW WRITE OUT THE DATA
         with open(all_layers_output_file, 'wb') as f:
             try:
+
+                # OPEN "ALL LAYERS" OUTPUT FILE
+                out = csv.writer(f, delimiter=' ')
+
+                # LOOP THROUGH THE LAYERS
                 for i in range(1, self.total_layer_count + 1):
-                    out = csv.writer(f, delimiter=' ')
-                    f.write('>\n')
-                    data = [self.plotx_list[i], self.ploty_list[i]]
+                    print("DOING LAYERS %i") % i
+                    print(self.layer_list[i].type)
+
+                    # DEFINE THE LAYER NODES (REMOVE FIXED LAYER PADDING NODES)
+                    if self.layer_list[i].type == 'fixed':
+                        data = [self.layer_list[i].x_nodes[1:-1], self.layer_list[i].y_nodes[1:-1]]
+                        layer_write = zip(self.layer_list[i].x_nodes[1:-1], self.layer_list[i].y_nodes[1:-1])
+                    else:
+                        data = [self.layer_list[i].x_nodes, self.layer_list[i].y_nodes]
+                        layer_write = zip(self.layer_list[i].x_nodes, self.layer_list[i].y_nodes)
+
+                    print data
+                    print layer_write
+
+                    # OUTPUT THE LAYER NAME TO THE ALL LAYERS FILE
+                    f.write(">" + self.loaded_tree_items[i] + "\n")
+
+                    # WRITE LAYER TO "ALL LAYERS" FILE
                     out.writerows(zip(*data))
-                    layer_write = zip(self.plotx_list[i], self.ploty_list[i])
-                    # WRITE INDIVIDUAL LAYER
+
+                    # SAVE THE LAYER AS AN INDIVIDUAL FILE
                     np.savetxt(output_dir + '/' + self.loaded_tree_items[i] + '.xy', layer_write, delimiter=' ',
                                fmt='%f %f')
-                    f.close()
+
+                # CLOSE THE "ALL LAYERS" OUTPUT FILE
+                f.close()
             except IndexError:
                 f.close()
                 pass
 
     def write_c_xy(self, event):
         # CREATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
+        save_file_dialog = wx.FileDialog(self, "Save c.in RayInvr file", "", "", "in files (*.in)|*.in",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # THE USER CHANGED THEIR MIND
@@ -3875,13 +3897,22 @@ class Gmg(wx.Frame):
             # LAYER NODES
             for i in range(0, self.total_layer_count + 1):
                 f.write('B  {0}\n'.format(i + 1))
-                data = zip(self.plotx_list[i], self.ploty_list[i], np.ones(len(self.ploty_list[i])))
-                # print data
+
+                # DEFINE THE LAYER NODES (REMOVE FIXED LAYER PADDING NODES)
+                if self.layer_list[i].type == 'fixed':
+                    x_nodes = self.layer_list[i].x_nodes[1:-1]
+                    y_nodes = self.layer_list[i].y_nodes[1:-1]
+                else:
+                    x_nodes = self.layer_list[i].x_nodes
+                    y_nodes = self.layer_list[i].y_nodes
+
+                # SAVE FILE
+                data = zip(x_nodes, y_nodes, np.ones(len(y_nodes)))
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d')
 
             # VELOCITY NODES
             for i in range(0, self.total_layer_count):
-                density = (self.background_density + self.densities[i])
+                density = self.layer_list[i].density
 
                 # CONVERT DENSITY TO VELOCITY USING GARNERS RULE
                 velocity = round((m.pow((density / 1670.), (1. / .25))), 2)
@@ -3890,11 +3921,18 @@ class Gmg(wx.Frame):
                 # velocity = (1.6612*density) - (0.4721*density)**2 + (0.0671*density)**3 -
                 # (0.0043*density)**4 + (0.000106*density)**5
 
+                # DEFINE THE LAYER NODES (REMOVE FIXED LAYER PADDING NODES)
+                if self.layer_list[i].type == 'fixed':
+                    x_nodes = self.layer_list[i].x_nodes[1:-1]
+                    y_nodes = self.layer_list[i].y_nodes[1:-1]
+                else:
+                    x_nodes = self.layer_list[i].x_nodes
+                    y_nodes = self.layer_list[i].y_nodes
+
                 # FORMAT c.in FILE
                 f.write('B  {0}\n'.format(i))
-                data = zip(self.plotx_list[i], np.linspace(velocity, velocity, len(self.ploty_list[i])),
-                           np.ones(len(self.ploty_list[i])), np.linspace(velocity, velocity, len(self.ploty_list[i])),
-                           np.ones(len(self.ploty_list[i])))
+                data = zip(x_nodes, np.linspace(velocity, velocity, len(y_nodes)), np.ones(len(x_nodes)),
+                           np.linspace(velocity, velocity, len(x_nodes)), np.ones(len(x_nodes)))
 
                 # OUTPUT FILE
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d %3.02f %1d')
