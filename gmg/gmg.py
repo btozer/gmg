@@ -866,8 +866,6 @@ class Gmg(wx.Frame):
             self.current_node = self.model_frame.scatter(-40000., 0, s=50, color='r', zorder=10)  # PALCE HOLDER ONLY
 
             self.layer_list.append(layer0)
-            print(self.layer_list)
-            print(len(self.layer_list))
 
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
         'Make Attribute Label'
@@ -2731,8 +2729,6 @@ class Gmg(wx.Frame):
         self.draw()
 
     def show_hide_well(self, event):
-        print("Hide/Show well")
-        print(event.Id)
         id = event.Id - 2000
         if self.well_data_list[id].mpl_actor[0].get_visible():
             # HIDE WELL
@@ -2987,7 +2983,6 @@ class Gmg(wx.Frame):
                     self.pinched_index_arg_list = []
 
                     for l in self.layer_list[self.currently_active_layer_id].pinched_list:
-                        print("WORKING ON LAYER %s") % l
                         # GET LAYER NODES
                         xt = self.layer_list[l].x_nodes
                         yt = self.layer_list[l].y_nodes
@@ -3653,7 +3648,7 @@ class Gmg(wx.Frame):
             self.aspect_decrease2(event)
 
         if event.key == 'return':
-            print("return")
+            pass
 
     def toogle_fault_mode(self, event):
         """SWITCH FAULT PICKING MODE ON AND OFF"""
@@ -3770,7 +3765,6 @@ class Gmg(wx.Frame):
         else:
             # PROMPT NEW FAULT DIALOG BOX
             if self.total_fault_count == 0:
-                print("self.total_fault_count = 0 so creating a new current fault mpl actor")
                 # CREATE NEW CURRENT FAULT GRAPHIC
                 self.currently_active_fault, = self.model_frame.plot([-100000, -100000], [-100000, -100000], marker='s',
                                                                      color='green', linewidth=0.75, alpha=1.0, zorder=2,
@@ -3790,8 +3784,6 @@ class Gmg(wx.Frame):
 
         # GET THE SELECTED FAULT INDEX NUMBER
         self.currently_active_fault_id = self.fault_tree.GetPyData(event.GetItem())
-        print("self.currently_active_fault_id =")
-        print(self.currently_active_fault_id)
 
         if self.fault_picking_switch is False:
             self.fault_picking_switch = True
@@ -3854,9 +3846,6 @@ class Gmg(wx.Frame):
 
                 # LOOP THROUGH THE LAYERS
                 for i in range(1, self.total_layer_count + 1):
-                    print("DOING LAYERS %i") % i
-                    print(self.layer_list[i].type)
-
                     # DEFINE THE LAYER NODES (REMOVE FIXED LAYER PADDING NODES)
                     if self.layer_list[i].type == 'fixed':
                         data = [self.layer_list[i].x_nodes[1:-1], self.layer_list[i].y_nodes[1:-1]]
@@ -3864,9 +3853,6 @@ class Gmg(wx.Frame):
                     else:
                         data = [self.layer_list[i].x_nodes, self.layer_list[i].y_nodes]
                         layer_write = zip(self.layer_list[i].x_nodes, self.layer_list[i].y_nodes)
-
-                    print data
-                    print layer_write
 
                     # OUTPUT THE LAYER NAME TO THE ALL LAYERS FILE
                     f.write(">" + self.loaded_tree_items[i] + "\n")
@@ -4319,7 +4305,6 @@ class Gmg(wx.Frame):
                                                                          linewidth=None, ec=None)
 
             # SET CURRENTLY ACTIVE LAYER AS THE NEW LAYER
-            # self.currently_active_layer.set_data(new_layer.x_nodes, new_layer.y_nodes)
             self.currently_active_layer.set_xdata(new_layer.x_nodes)
             self.currently_active_layer.set_ydata(new_layer.y_nodes)
             self.currently_active_layer.set_color(new_layer.color)
@@ -4342,8 +4327,6 @@ class Gmg(wx.Frame):
             self.layer_list.append(new_layer)
             
             # UPDATE GMG FRAME
-            print("y nodes =" )
-            print self.layer_list[1].y_nodes
             self.update_layer_data()
             self.draw()
 
@@ -4602,16 +4585,11 @@ class Gmg(wx.Frame):
             # INCREMENT THE CURRENT LAYER ID
             if self.currently_active_layer_id == self.total_layer_count:
                 self.currently_active_layer_id -= 1
-                print("self.currently_active_layer_id = %s") % self.currently_active_layer_id
             else:
                 self.currently_active_layer_id += 1
-                print("self.currently_active_layer_id = %s") % self.currently_active_layer_id
 
             # INCREMENT THE TOTAL LAYER COUNT
             self.total_layer_count -= 1
-
-            print(self.currently_active_layer_id)
-            print(self.total_layer_count)
 
             # SET OBJECTS WITH THE CHOSEN LAYER
             self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
@@ -4731,9 +4709,6 @@ class Gmg(wx.Frame):
 
     def attribute_set(self, new_tree_items, new_layer_list):
         """UPDATE GMG ATTRIBUTES WITH NEW ATTRIBUTES FROM THE ATTRIBUTE TABLE"""
-
-        print("TREE ITEM CLICKED")
-
         # UPDATE MAIN FRAME TREE LIST
         current_tree_items = self.tree.GetRootItem().GetChildren()
         for i in range(0, len(self.tree_items) - 1):
@@ -4790,8 +4765,6 @@ class Gmg(wx.Frame):
             # UPDATE PLOT LISTS WITH LATEST EDIT
             self.layer_list[self.currently_active_layer_id].x_nodes = self.current_x_nodes
             self.layer_list[self.currently_active_layer_id].y_nodes = self.current_y_nodes
-            # print("total layer count = %s") % self.total_layer_count
-            # print("")
 
             # CREATE UPDATED POLYGON XYs -------------------------------------------------------------------------------
             # FIRST CREATE THE POLYLINE DATA (THE BOTTOM LINE OF THE LAYER POLYGON - (THIS DONE FIRST SO THE WHOLE
@@ -4833,7 +4806,6 @@ class Gmg(wx.Frame):
                             continue
                 else:
                     # IF THE LAYER IS A SIMPLE 'FLOATING LAYER'
-                    print("layer is floating")
                     polygon_x = np.array(self.layer_list[i].x_nodes)
                     polygon_y = np.array(self.layer_list[i].y_nodes)
 
@@ -6661,11 +6633,7 @@ class AttributeEditor(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             rgb = dlg.GetColourData().GetColour().Get()
             rgb = rgb[0:3]
-            print("rgb = ")
-            print(rgb)
             html = struct.pack('BBB', *rgb).encode('hex')
-            print("html = ")
-            print(html)
             self.attr_grid.SetCellValue(row, 6, '#' + str(html))
         dlg.Destroy()
 
