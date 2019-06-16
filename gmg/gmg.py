@@ -822,6 +822,7 @@ class Gmg(wx.Frame):
         cnorm = colors.Normalize(vmin=-0.8, vmax=0.8)
         self.colormap = cm.ScalarMappable(norm=cnorm, cmap=colormap)
 
+        # SHOW DENSITY CONTRAST SCALEBAR
         # self.scale_canvas = plt.subplot2grid((24, 12), (23, 10), rowspan=1, colspan=2)
         # self.cb1 = matplotlib.colorbar.ColorbarBase(self.scale_canvas,
         #                                             cmap=colormap, norm=cnorm, orientation='horizontal')
@@ -2200,6 +2201,8 @@ class Gmg(wx.Frame):
 
             # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
     def load_topo(self, event):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'topography')
         self.load_window.Show(True)
@@ -2263,6 +2266,89 @@ class Gmg(wx.Frame):
         self.observed_topography_list[obj_id] = None
 
         # UPDATE MODEL
+        self.update_layer_data()
+        self.draw()
+
+    def filter_observed_topography(self, event):
+        """FILTER OBSERVED TOPOGRAPHY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # RUN FILTER
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_topography_list)
+        answer = median_filter_box.ShowModal()
+
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed = ObservedData()
+
+        # SET ATTRIBUTES
+        observed.id = int(self.observed_topography_counter)
+        observed.type = str('filtered')
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.topo_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
+                                                     color=observed.color, s=5, gid=observed.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_topography_list.append(observed)
+
+        # APPEND NEW DATA MENU TO 'TOPO data MENU'
+        self.topo_submenu = wx.Menu()
+        self.m_topo_submenu.Append(10000+observed.id, observed.name, self.topo_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.topo_submenu.Append(10000+observed.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_observed_topography, id=10000+observed.id)
+
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_topography_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def take_topography_horizontal_derivative(self, event):
+        """
+        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
+        CALLS class HorizontalDerivative
+        """
+
+        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
+        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative',
+                                                         self.observed_topography_list)
+        answer = horizontal_derivative_box.ShowModal()
+
+        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        new_derivative = ObservedData()
+        new_derivative.data = horizontal_derivative_box.deriv
+        new_derivative.name = horizontal_derivative_box.output_name
+        new_derivative.color = horizontal_derivative_box.output_color
+        new_derivative.id = 10000 + self.observed_topography_counter
+        new_derivative.type = str('derivative')
+        new_derivative.mpl_actor = self.topo_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                         marker='o', color=new_derivative.color, s=5,
+                                                         gid=10000 + self.observed_topography_counter)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_topography_list.append(new_derivative)
+
+        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
+        self.topo_submenu = wx.Menu()
+        self.m_topo_submenu.Append(10000 + self.observed_topography_counter, new_derivative.name,
+                                    self.topo_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.topo_submenu.Append(10000 + self.observed_topography_counter, 'delete observed data')
+
+        # BIND TO DEL FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_topo, id=10000 + self.observed_topography_counter)
+
+        # INCREMENT TOPO DERIV COUNTER
+        self.observed_topography_counter += 1
+
+        # UPDATE GMG GUI
         self.update_layer_data()
         self.draw()
 
@@ -2343,6 +2429,92 @@ class Gmg(wx.Frame):
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
         np.savetxt(outputfile, zip((self.xp * 0.001), self.predicted_gravity), delimiter=' ', fmt='%.6f %.6f')
+
+    def filter_observed_gravity(self, event):
+        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # RUN FILTER
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_gravity_list)
+        answer = median_filter_box.ShowModal()
+
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed = ObservedData()
+
+        # SET ATTRIBUTES
+        observed.id = int(self.observed_gravity_counter)
+        observed.type = str('filtered')
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.gravity_frame.scatter(observed.data[:, 0],
+                                                                observed.data[:, 1], marker='o',
+                                                                color=observed.color, s=5,
+                                                                gid=observed.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_gravity_list.append(observed)
+
+        # TURN ON OBSERVED GRAVITY SWITCH
+        self.observed_gravity_switch = True
+
+        # APPEND NEW DATA MENU TO 'GRAV data MENU'
+        self.grav_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(11000+observed.id, observed.name, self.grav_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.grav_submenu.Append(11000+observed.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+observed.id)
+
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_gravity_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def take_gravity_horizontal_derivative(self, event):
+        """
+        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
+        CALLS class HorizontalDerivative
+        """
+
+        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
+        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative', self.observed_gravity_list)
+        answer = horizontal_derivative_box.ShowModal()
+
+        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        new_derivative = ObservedData()
+        new_derivative.data = horizontal_derivative_box.deriv
+        new_derivative.name = horizontal_derivative_box.output_name
+        new_derivative.color = horizontal_derivative_box.output_color
+        new_derivative.id = 11000 + self.observed_gravity_counter
+        new_derivative.type = str('derivative')
+        new_derivative.mpl_actor = self.gravity_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                         marker='o', color=new_derivative.color, s=5,
+                                                         gid=11000 + self.observed_gravity_counter)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_gravity_list.append(new_derivative)
+
+        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
+        self.grav_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(11000 + self.observed_gravity_counter, new_derivative.name, self.grav_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.grav_submenu.Append(11000 + self.observed_gravity_counter, 'delete observed data')
+
+        # BIND TO DEL FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.observed_gravity_counter)
+
+        # INCREMENT GRAV DERIV COUNTER
+        self.observed_gravity_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.draw()
 
     # MAGNETIC DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2429,6 +2601,88 @@ class Gmg(wx.Frame):
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
         np.savetxt(outputfile, zip((self.xp * 0.001), self.predicted_nt), delimiter=' ', fmt='%.6f %.6f')
+
+    def filter_observed_magnetic(self, event):
+        """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # RUN FILTER
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_magnetic_list)
+        answer = median_filter_box.ShowModal()
+
+        # CREATE NEW OBSERVED GRAVITY OBJECT
+        observed = ObservedData()
+
+        # SET ATTRIBUTES
+        observed.id = int(self.observed_magnetic_counter)
+        observed.type = str('filtered')
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.magnetic_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
+                                                        color=observed.color, s=5, gid=observed.id)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_magnetic_list.append(observed)
+
+        # APPEND NEW DATA MENU TO 'MAG data MENU'
+        self.mag_submenu = wx.Menu()
+        self.m_obs_mag_submenu.Append(12000+observed.id, observed.name, self.mag_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.mag_submenu.Append(12000+observed.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED GRAVITY FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+observed.id)
+
+        # INCREMENT OBSERVED GRAVITY COUNTER
+        self.observed_magnetic_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def take_magnetic_horizontal_derivative(self, event):
+        """
+        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
+        CALLS class HorizontalDerivative
+        """
+
+        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
+        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative', self.observed_magnetic_list)
+        answer = horizontal_derivative_box.ShowModal()
+
+        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        new_derivative = ObservedData()
+        new_derivative.data = horizontal_derivative_box.deriv
+        new_derivative.name = horizontal_derivative_box.output_name
+        new_derivative.color = horizontal_derivative_box.output_color
+        new_derivative.id = 12000 + self.observed_magnetic_counter
+        new_derivative.type = str('derivative')
+        new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                             marker='o', color=new_derivative.color, s=5,
+                                                             gid=12000 + self.observed_magnetic_counter)
+
+        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+        self.observed_magnetic_list.append(new_derivative)
+
+        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
+        self.mag_submenu = wx.Menu()
+        self.m_obs_mag_submenu.Append(12500 + self.observed_magnetic_counter, new_derivative.name,
+                                      self.mag_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.mag_submenu.Append(12500 + self.observed_magnetic_counter, 'delete observed data')
+
+        # BIND TO DEL FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12500 + self.observed_magnetic_counter)
+
+        # INCREMENT MAG DERIV COUNTER
+        self.observed_magnetic_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.draw()
 
     # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3650,179 +3904,6 @@ class Gmg(wx.Frame):
         if event.key == 'return':
             pass
 
-    def toogle_fault_mode(self, event):
-        """SWITCH FAULT PICKING MODE ON AND OFF"""
-        if self.fault_picking_switch is True:
-            self.fault_picking_switch = False
-
-        elif self.fault_picking_switch is False:
-            self.fault_picking_switch = True
-
-    def fault_mode_key_press(self, event):
-        """KEY PRESS CALLBACKS WHEN FAULT MODE IS ACTIVATED"""
-
-        'i = INSERT NEW NODE AT MOUSE POSITION'
-        if event.key == 'i':
-            if event.inaxes is None:
-                return
-
-            # INSERT NEW NODE INTO XY LIST
-            self.xt = np.insert(self.xt, [self.index_arg + 1], event.xdata)
-            self.yt = np.insert(self.yt, [self.index_arg + 1], event.ydata)
-
-            # UPDATE THE FAULT LIST RECORDS
-            self.fault_list[self.currently_active_fault_id].x_nodes = self.xt
-            self.fault_list[self.currently_active_fault_id].y_nodes = self.yt
-
-            # UPDATE FAULT GRAPHICS
-            self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_xdata(self.xt)
-            self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_ydata(self.yt)
-
-            # UPDATE CURRENT FAULT OVERLAY GRAPHIC
-            self.currently_active_fault.set_data(self.xt, self.yt)
-
-        'd = DELETE NODE AT MOUSE POSITION'
-        if event.key == 'd':
-            if event.inaxes is None:
-                return
-            # FIND NODE CLOSEST TO CURSOR LOCATION
-            d = np.sqrt((self.xt - event.xdata) ** 2 + (self.yt - event.ydata) ** 2)
-            self.index_arg = np.argmin(d)
-            self.distance = d[self.index_arg]
-
-            if self.index_arg == 0 or \
-                    self.index_arg == (len(self.fault_list[self.currently_active_fault_id].x_nodes) - 1):
-                # PREVENT END NODES BEING DELETED
-                return 0
-            if self.distance >= self.node_click_limit:
-                # CLICK WAS TO FAR AWAY FROM A NODE TO DELETE IT
-                return 0
-            else:
-                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
-                self.xt = [tup for i, tup in enumerate(self.xt) if i != self.index_arg]  # DELETE X
-
-                self.yt = [tup for i, tup in enumerate(self.yt) if i != self.index_arg]  # DELETE Y
-
-                # UPDATE THE FAULT LIST RECORDS
-                self.fault_list[self.currently_active_fault_id].x_nodes = self.xt
-                self.fault_list[self.currently_active_fault_id].y_nodes = self.yt
-
-                # UPDATE FAULT GRAPHICS
-                self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_xdata(self.xt)
-                self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_ydata(self.yt)
-
-                # UPDATE CURRENT FAULT OVERLAY GRAPHIC
-                self.currently_active_fault.set_data(self.xt, self.yt)
-
-                # RESET CURRENT NOT POSITION TO FIRST NODE
-                self.current_node.set_offsets([self.xt[0], self.yt[0]])
-
-            # UPDATE GMG
-            self.update_layer_data()
-
-        '< = INCREMENT WHICH FAULT IS BEING EDITED'
-        if event.key == ',':
-            if self.currently_active_fault_id <= self.total_fault_count - 1 and self.currently_active_fault_id > 0:
-                # INCREMENT TO NEXT FAULT
-                self.currently_active_fault_id -= 1
-            else:
-                # GO TO NEWEST FAULT
-                self.currently_active_fault_id = self.total_fault_count - 1
-
-            # UPDATE CURRENT PLOT GRAPHICS
-            self.currently_active_fault.set_data(self.fault_list[self.currently_active_fault_id].x_nodes,
-                                                 self.fault_list[self.currently_active_fault_id].y_nodes)
-
-            self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
-            self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
-
-        '> = INCREMENT WHICH FAULT IS BEING EDITED'
-        if event.key == '.':
-            if self.currently_active_fault_id < self.total_fault_count - 1:
-                # INCREMENT TO NEXT FAULT
-                self.currently_active_fault_id += 1
-            elif self.currently_active_fault_id == self.total_fault_count - 1:
-                # GO BACK TO FIRST FAULT
-                self.currently_active_fault_id = 0
-
-            # UPDATE CURRENT PLOT GRAPHICS
-            self.currently_active_fault.set_data(self.fault_list[self.currently_active_fault_id].x_nodes,
-                                                 self.fault_list[self.currently_active_fault_id].y_nodes)
-
-            self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
-            self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
-
-        # UPDATE GMG
-        self.update_layer_data()
-
-    def pick_new_fault(self, event):
-        """FAULT PICKING/LINE DRAWING MODE"""
-
-        # CHECK IF FAULT PICKING MODE IS ON
-        if self.fault_picking_switch is False:
-            MessageDialog(self, -1, "Faulting picking mode is not activated.\nTurn on fault picking mode first.",
-                          "Fault picker")
-        else:
-            # PROMPT NEW FAULT DIALOG BOX
-            if self.total_fault_count == 0:
-                # CREATE NEW CURRENT FAULT GRAPHIC
-                self.currently_active_fault, = self.model_frame.plot([-100000, -100000], [-100000, -100000], marker='s',
-                                                                     color='green', linewidth=0.75, alpha=1.0, zorder=2,
-                                                                     picker=True)
-            # START CREATE NEW FAULT PROCESS
-            MessageDialog(self, -1, "Select three nodes to create a new fault", "Select New Fault")
-            self.select_new_fault_nodes = True
-            self.new_plotx = []
-            self.new_ploty = []
-            self.click_count = 0
-            self.new_layer_nodes = None
-            # NOW WAIT FOR USER NODE CLICKS - ON THE THIRD CLICK THE button_release FUNC
-            # WILL ACTIVATE create_new_fault()
-
-    def fault_activated(self, event):
-        """RESPONSE WHEN A FAULT NAME IS SELECTED"""
-
-        # GET THE SELECTED FAULT INDEX NUMBER
-        self.currently_active_fault_id = self.fault_tree.GetPyData(event.GetItem())
-
-        if self.fault_picking_switch is False:
-            self.fault_picking_switch = True
-
-        # SET CHECKBOX AS CHECKED
-        self.fault_tree.GetSelection().Check(checked=True)
-
-        # UPDATE CURRENT PLOT GRAPHICS
-        self.currently_active_fault.set_data(self.fault_list[self.currently_active_fault_id].x_nodes,
-                                             self.fault_list[self.currently_active_fault_id].y_nodes)
-        self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
-        self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
-
-        # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
-        self.update_layer_data()
-
-    def fault_checked(self, event):
-        """TOGGLE WHETHER OR NOT A FAULT WILL BE PLOTTED IN THE MODEL FIGURE"""
-        i = self.fault_tree.GetPyData(event.GetItem())
-
-        if self.faults[i][0].get_visible() == True:
-            # HIDE FAULT
-            self.faults[i][0].set_visible(False)
-            self.currently_active_fault.set_visible(False)
-        else:
-            # SHOW FAULT
-            self.faults[i][0].set_visible(True)
-            self.currently_active_fault.set_visible(True)
-
-        # UPDATE FIGURE
-        self.draw()
-
-    def on_begin_edit_fault_label(self, event):
-        self.currently_active_fault_id = self.fault_tree.GetPyData(event.GetItem())
-
-    def on_end_edit_fault_label(self, event):
-        new_label = self.fault_tree.GetItemText(event.GetItem())
-        self.fault_tree_items[self.currently_active_fault_id] = str(new_label)
-
     def write_layers_xy(self, event):
         """OUTPUT ALL LAYERS XY DATA TO INDIVIDUAL TEXT FILES"""
 
@@ -4001,257 +4082,6 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
-    def filter_observed_topography(self, event):
-        """FILTER OBSERVED TOPOGRAPHY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
-
-        # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_topography_list)
-        answer = median_filter_box.ShowModal()
-
-        # CREATE NEW OBSERVED GRAVITY OBJECT
-        observed = ObservedData()
-
-        # SET ATTRIBUTES
-        observed.id = int(self.observed_topography_counter)
-        observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
-        observed.mpl_actor = self.topo_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
-                                                     color=observed.color, s=5, gid=observed.id)
-
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_topography_list.append(observed)
-
-        # APPEND NEW DATA MENU TO 'TOPO data MENU'
-        self.topo_submenu = wx.Menu()
-        self.m_topo_submenu.Append(10000+observed.id, observed.name, self.topo_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.topo_submenu.Append(10000+observed.id, 'delete observed data')
-
-        # BIND TO DELETE OBSERVED GRAVITY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_observed_topography, id=10000+observed.id)
-
-        # INCREMENT OBSERVED GRAVITY COUNTER
-        self.observed_topography_counter += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.set_frame_limits()
-        self.draw()
-
-    def filter_observed_gravity(self, event):
-        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
-
-        # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_gravity_list)
-        answer = median_filter_box.ShowModal()
-
-        # CREATE NEW OBSERVED GRAVITY OBJECT
-        observed = ObservedData()
-
-        # SET ATTRIBUTES
-        observed.id = int(self.observed_gravity_counter)
-        observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
-        observed.mpl_actor = self.gravity_frame.scatter(observed.data[:, 0],
-                                                                observed.data[:, 1], marker='o',
-                                                                color=observed.color, s=5,
-                                                                gid=observed.id)
-
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_gravity_list.append(observed)
-
-        # TURN ON OBSERVED GRAVITY SWITCH
-        self.observed_gravity_switch = True
-
-        # APPEND NEW DATA MENU TO 'GRAV data MENU'
-        self.grav_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(11000+observed.id, observed.name, self.grav_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11000+observed.id, 'delete observed data')
-
-        # BIND TO DELETE OBSERVED GRAVITY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000+observed.id)
-
-        # INCREMENT OBSERVED GRAVITY COUNTER
-        self.observed_gravity_counter += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.set_frame_limits()
-        self.draw()
-
-    def filter_observed_magnetic(self, event):
-        """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
-
-        # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_magnetic_list)
-        answer = median_filter_box.ShowModal()
-
-        # CREATE NEW OBSERVED GRAVITY OBJECT
-        observed = ObservedData()
-
-        # SET ATTRIBUTES
-        observed.id = int(self.observed_magnetic_counter)
-        observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
-        observed.mpl_actor = self.magnetic_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
-                                                        color=observed.color, s=5, gid=observed.id)
-
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_magnetic_list.append(observed)
-
-        # APPEND NEW DATA MENU TO 'MAG data MENU'
-        self.mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(12000+observed.id, observed.name, self.mag_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.mag_submenu.Append(12000+observed.id, 'delete observed data')
-
-        # BIND TO DELETE OBSERVED GRAVITY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000+observed.id)
-
-        # INCREMENT OBSERVED GRAVITY COUNTER
-        self.observed_magnetic_counter += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.set_frame_limits()
-        self.draw()
-
-    def take_topography_horizontal_derivative(self, event):
-        """
-        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
-        CALLS class HorizontalDerivative
-        """
-
-        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
-        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative',
-                                                         self.observed_topography_list)
-        answer = horizontal_derivative_box.ShowModal()
-
-        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
-        new_derivative = ObservedData()
-        new_derivative.data = horizontal_derivative_box.deriv
-        new_derivative.name = horizontal_derivative_box.output_name
-        new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 10000 + self.observed_topography_counter
-        new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.topo_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
-                                                         marker='o', color=new_derivative.color, s=5,
-                                                         gid=10000 + self.observed_topography_counter)
-
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_topography_list.append(new_derivative)
-
-        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
-        self.topo_submenu = wx.Menu()
-        self.m_topo_submenu.Append(10000 + self.observed_topography_counter, new_derivative.name,
-                                    self.topo_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.topo_submenu.Append(10000 + self.observed_topography_counter, 'delete observed data')
-
-        # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_topo, id=10000 + self.observed_topography_counter)
-
-        # INCREMENT TOPO DERIV COUNTER
-        self.observed_topography_counter += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.draw()
-
-    def take_gravity_horizontal_derivative(self, event):
-        """
-        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
-        CALLS class HorizontalDerivative
-        """
-
-        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
-        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative', self.observed_gravity_list)
-        answer = horizontal_derivative_box.ShowModal()
-
-        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
-        new_derivative = ObservedData()
-        new_derivative.data = horizontal_derivative_box.deriv
-        new_derivative.name = horizontal_derivative_box.output_name
-        new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 11000 + self.observed_gravity_counter
-        new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.gravity_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
-                                                         marker='o', color=new_derivative.color, s=5,
-                                                         gid=11000 + self.observed_gravity_counter)
-
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_gravity_list.append(new_derivative)
-
-        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
-        self.grav_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(11000 + self.observed_gravity_counter, new_derivative.name, self.grav_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11000 + self.observed_gravity_counter, 'delete observed data')
-
-        # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.observed_gravity_counter)
-
-        # INCREMENT GRAV DERIV COUNTER
-        self.observed_gravity_counter += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.draw()
-
-    def take_magnetic_horizontal_derivative(self, event):
-        """
-        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
-        CALLS class HorizontalDerivative
-        """
-
-        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
-        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative', self.observed_magnetic_list)
-        answer = horizontal_derivative_box.ShowModal()
-
-        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
-        new_derivative = ObservedData()
-        new_derivative.data = horizontal_derivative_box.deriv
-        new_derivative.name = horizontal_derivative_box.output_name
-        new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 12000 + self.observed_magnetic_counter
-        new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
-                                                             marker='o', color=new_derivative.color, s=5,
-                                                             gid=12000 + self.observed_magnetic_counter)
-
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_magnetic_list.append(new_derivative)
-
-        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
-        self.mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(12500 + self.observed_magnetic_counter, new_derivative.name,
-                                      self.mag_submenu)
-
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.mag_submenu.Append(12500 + self.observed_magnetic_counter, 'delete observed data')
-
-        # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12500 + self.observed_magnetic_counter)
-
-        # INCREMENT MAG DERIV COUNTER
-        self.observed_magnetic_counter += 1
-
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.draw()
-
     def new_layer(self, event):
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer')
         answer = new_layer_dialogbox.ShowModal()
@@ -4401,95 +4231,6 @@ class Gmg(wx.Frame):
         self.run_algorithms()
         self.draw()
 
-    def on_fault_tree_right_click_down(self, event):
-        """WHEN A FAULT IN THE FAULT TREE MENU IS RIGHT CLICKED"""
-
-        # SET THE CURRENTLY ACTIVE LAYER AS THE LAYER CLICKED
-        self.currently_active_layer_id = self.tree.GetPyData(event.GetItem())
-
-        # CREATE POPOUT MENU WITH OPTIONS AND BIND OPTIONS TO ACTIONS
-        menu = wx.Menu()
-
-        item1 = menu.Append(wx.ID_ANY, "Change fault colour")
-        item2 = menu.Append(wx.ID_ANY, "Rename fault")
-
-        self.Bind(wx.EVT_MENU, self.change_fault_color, item1)
-        self.Bind(wx.EVT_MENU, self.rename_fault, item2)
-
-        self.PopupMenu(menu)
-        menu.Destroy()
-
-    def rename_fault(self, event):
-        """USE A POPUP MENU TO RENAME THE FAULT"""
-
-        # CREATE POP OUT MENU AND SHOW
-        fault_name_box = LayerNameDialog(self, -1, 'Rename fault',
-                                         self.fault_tree_items[self.currently_active_fault_id])
-        new = fault_name_box.ShowModal()
-
-        # WAIT FOR USER TO CLOSE POP OUT
-
-        # GET THE NEW LAYER NAME FROM POP OUT
-        new_name = fault_name_box.name
-
-        # SET THE TREE AND LAYER OBJECT WITH THE NEW NAME
-        current_tree_items = self.fault_tree.GetRootItem().GetChildren()
-        self.fault_tree.SetItemText(current_tree_items[self.currently_active_fault_id], str(new_name))
-        self.fault_tree_items[self.currently_active_fault_id] = str(new_name)
-        self.fault_list[self.currently_active_fault_id].name = str(new_name)
-
-    def change_fault_color(self, event):
-        pass
-
-    def create_new_fault(self):
-        """CREATE A NEW FAULT USING THREE USER INPUT MOUSE CLICKS"""
-
-        # SET CURRENTLY ACTIVE LAYER AS THE NEWLY CREATED LAYER
-        self.currently_active_fault_id = self.total_fault_count
-
-        # CREATE NEW LAYER OBJECT
-        new_fault = Fault()
-
-        # SOURCE NEW NODES FROM USER CLICKS
-        new_fault.id = self.currently_active_fault_id
-        new_fault.name = str('Fault')
-        new_fault.x_nodes = self.new_plotx
-        new_fault.y_nodes = self.new_ploty
-
-        # SET CURRENTLY ACTIVE LAYER NODE OBJECTS
-        self.current_x_nodes = new_fault.x_nodes
-        self.current_y_nodes = new_fault.y_nodes
-
-        # SET SOME OF THE NEW LAYERS ATTRIBUTES
-        new_fault.id = self.currently_active_layer_id
-        new_fault.name = str('Fault %s') % self.currently_active_fault_id
-        # CREATE LAYER LINE
-        new_fault.mpl_actor = self.model_frame.plot(new_fault.x_nodes, new_fault.y_nodes, color='green',
-                                                         marker='o', linewidth=0.5, zorder=1, alpha=1.0)
-
-        # APPEND THE NEW FAULT TO THE FAULT TREE SIDE PANEL USING add_new_tree_nodes FUNC
-        # LIST OF FAULT NAMES
-        self.fault_tree_items.append('fault %s' % (int(self.currently_active_fault_id)))
-        self.fault_item = 'fault %s' % (int(self.currently_active_fault_id))
-        self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.currently_active_fault_id)
-        self.fold_panel_three.Collapse()
-        self.fold_panel_three.Expand()
-
-        # UPDATE CURRENT PLOT GRAPHICS
-        self.currently_active_fault.set_data(new_fault.x_nodes, new_fault.y_nodes)
-
-        # UPDATE CURRENT NODE RED DOT GRAPHIC
-        self.current_node.set_offsets([new_fault.x_nodes[0], new_fault.y_nodes[0]])
-
-        # APPEND NEW LAYER TO THE LAYER LIST
-        self.fault_list.append(new_fault)
-
-        # INCREMENT THE TOTAL LAYER COUNT
-        self.total_fault_count += 1
-
-        # UPDATE MODEL
-        self.draw()
-
     def load_layer(self, event):
         """LOAD A NEW FLOATING LAYER FROM A SPACE DELIMITED XY TEXT FILE"""
         open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
@@ -4610,6 +4351,270 @@ class Gmg(wx.Frame):
             self.current_node.set_offsets([self.layer_list[self.currently_active_layer_id].x_nodes[0],
                                            self.layer_list[self.currently_active_layer_id].y_nodes[0]])
             self.draw()
+
+    # FAULT MODE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def toogle_fault_mode(self, event):
+        """SWITCH FAULT PICKING MODE ON AND OFF"""
+        if self.fault_picking_switch is True:
+            self.fault_picking_switch = False
+
+        elif self.fault_picking_switch is False:
+            self.fault_picking_switch = True
+
+    def fault_mode_key_press(self, event):
+        """KEY PRESS CALLBACKS WHEN FAULT MODE IS ACTIVATED"""
+
+        'i = INSERT NEW NODE AT MOUSE POSITION'
+        if event.key == 'i':
+            if event.inaxes is None:
+                return
+
+            # INSERT NEW NODE INTO XY LIST
+            self.xt = np.insert(self.xt, [self.index_arg + 1], event.xdata)
+            self.yt = np.insert(self.yt, [self.index_arg + 1], event.ydata)
+
+            # UPDATE THE FAULT LIST RECORDS
+            self.fault_list[self.currently_active_fault_id].x_nodes = self.xt
+            self.fault_list[self.currently_active_fault_id].y_nodes = self.yt
+
+            # UPDATE FAULT GRAPHICS
+            self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_xdata(self.xt)
+            self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_ydata(self.yt)
+
+            # UPDATE CURRENT FAULT OVERLAY GRAPHIC
+            self.currently_active_fault.set_data(self.xt, self.yt)
+
+        'd = DELETE NODE AT MOUSE POSITION'
+        if event.key == 'd':
+            if event.inaxes is None:
+                return
+            # FIND NODE CLOSEST TO CURSOR LOCATION
+            d = np.sqrt((self.xt - event.xdata) ** 2 + (self.yt - event.ydata) ** 2)
+            self.index_arg = np.argmin(d)
+            self.distance = d[self.index_arg]
+
+            if self.index_arg == 0 or \
+                    self.index_arg == (len(self.fault_list[self.currently_active_fault_id].x_nodes) - 1):
+                # PREVENT END NODES BEING DELETED
+                return 0
+            if self.distance >= self.node_click_limit:
+                # CLICK WAS TO FAR AWAY FROM A NODE TO DELETE IT
+                return 0
+            else:
+                # DELETE NODE BY RECREATING XY DATA WITHOUT CURRENT NODE
+                self.xt = [tup for i, tup in enumerate(self.xt) if i != self.index_arg]  # DELETE X
+
+                self.yt = [tup for i, tup in enumerate(self.yt) if i != self.index_arg]  # DELETE Y
+
+                # UPDATE THE FAULT LIST RECORDS
+                self.fault_list[self.currently_active_fault_id].x_nodes = self.xt
+                self.fault_list[self.currently_active_fault_id].y_nodes = self.yt
+
+                # UPDATE FAULT GRAPHICS
+                self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_xdata(self.xt)
+                self.fault_list[self.currently_active_fault_id].mpl_actor[0].set_ydata(self.yt)
+
+                # UPDATE CURRENT FAULT OVERLAY GRAPHIC
+                self.currently_active_fault.set_data(self.xt, self.yt)
+
+                # RESET CURRENT NOT POSITION TO FIRST NODE
+                self.current_node.set_offsets([self.xt[0], self.yt[0]])
+
+            # UPDATE GMG
+            self.update_layer_data()
+
+        '< = INCREMENT WHICH FAULT IS BEING EDITED'
+        if event.key == ',':
+            if self.currently_active_fault_id <= self.total_fault_count - 1 and self.currently_active_fault_id > 0:
+                # INCREMENT TO NEXT FAULT
+                self.currently_active_fault_id -= 1
+            else:
+                # GO TO NEWEST FAULT
+                self.currently_active_fault_id = self.total_fault_count - 1
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.currently_active_fault.set_data(self.fault_list[self.currently_active_fault_id].x_nodes,
+                                                 self.fault_list[self.currently_active_fault_id].y_nodes)
+
+            self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
+            self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
+
+        '> = INCREMENT WHICH FAULT IS BEING EDITED'
+        if event.key == '.':
+            if self.currently_active_fault_id < self.total_fault_count - 1:
+                # INCREMENT TO NEXT FAULT
+                self.currently_active_fault_id += 1
+            elif self.currently_active_fault_id == self.total_fault_count - 1:
+                # GO BACK TO FIRST FAULT
+                self.currently_active_fault_id = 0
+
+            # UPDATE CURRENT PLOT GRAPHICS
+            self.currently_active_fault.set_data(self.fault_list[self.currently_active_fault_id].x_nodes,
+                                                 self.fault_list[self.currently_active_fault_id].y_nodes)
+
+            self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
+            self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
+
+        # UPDATE GMG
+        self.update_layer_data()
+
+    def pick_new_fault(self, event):
+        """FAULT PICKING/LINE DRAWING MODE"""
+
+        # CHECK IF FAULT PICKING MODE IS ON
+        if self.fault_picking_switch is False:
+            MessageDialog(self, -1, "Faulting picking mode is not activated.\nTurn on fault picking mode first.",
+                          "Fault picker")
+        else:
+            # PROMPT NEW FAULT DIALOG BOX
+            if self.total_fault_count == 0:
+                # CREATE NEW CURRENT FAULT GRAPHIC
+                self.currently_active_fault, = self.model_frame.plot([-100000, -100000], [-100000, -100000], marker='s',
+                                                                     color='green', linewidth=0.75, alpha=1.0, zorder=2,
+                                                                     picker=True)
+            # START CREATE NEW FAULT PROCESS
+            MessageDialog(self, -1, "Select three nodes to create a new fault", "Select New Fault")
+            self.select_new_fault_nodes = True
+            self.new_plotx = []
+            self.new_ploty = []
+            self.click_count = 0
+            self.new_layer_nodes = None
+            # NOW WAIT FOR USER NODE CLICKS - ON THE THIRD CLICK THE button_release FUNC
+            # WILL ACTIVATE create_new_fault()
+
+    def fault_activated(self, event):
+        """RESPONSE WHEN A FAULT NAME IS SELECTED"""
+
+        # GET THE SELECTED FAULT INDEX NUMBER
+        self.currently_active_fault_id = self.fault_tree.GetPyData(event.GetItem())
+
+        if self.fault_picking_switch is False:
+            self.fault_picking_switch = True
+
+        # SET CHECKBOX AS CHECKED
+        self.fault_tree.GetSelection().Check(checked=True)
+
+        # UPDATE CURRENT PLOT GRAPHICS
+        self.currently_active_fault.set_data(self.fault_list[self.currently_active_fault_id].x_nodes,
+                                             self.fault_list[self.currently_active_fault_id].y_nodes)
+        self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
+        self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
+
+        # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
+        self.update_layer_data()
+
+    def fault_checked(self, event):
+        """TOGGLE WHETHER OR NOT A FAULT WILL BE PLOTTED IN THE MODEL FIGURE"""
+        i = self.fault_tree.GetPyData(event.GetItem())
+
+        if self.faults[i][0].get_visible() == True:
+            # HIDE FAULT
+            self.faults[i][0].set_visible(False)
+            self.currently_active_fault.set_visible(False)
+        else:
+            # SHOW FAULT
+            self.faults[i][0].set_visible(True)
+            self.currently_active_fault.set_visible(True)
+
+        # UPDATE FIGURE
+        self.draw()
+
+    def on_begin_edit_fault_label(self, event):
+        self.currently_active_fault_id = self.fault_tree.GetPyData(event.GetItem())
+
+    def on_end_edit_fault_label(self, event):
+        new_label = self.fault_tree.GetItemText(event.GetItem())
+        self.fault_tree_items[self.currently_active_fault_id] = str(new_label)
+
+    def on_fault_tree_right_click_down(self, event):
+        """WHEN A FAULT IN THE FAULT TREE MENU IS RIGHT CLICKED"""
+
+        # SET THE CURRENTLY ACTIVE LAYER AS THE LAYER CLICKED
+        self.currently_active_layer_id = self.tree.GetPyData(event.GetItem())
+
+        # CREATE POPOUT MENU WITH OPTIONS AND BIND OPTIONS TO ACTIONS
+        menu = wx.Menu()
+
+        item1 = menu.Append(wx.ID_ANY, "Change fault colour")
+        item2 = menu.Append(wx.ID_ANY, "Rename fault")
+
+        self.Bind(wx.EVT_MENU, self.change_fault_color, item1)
+        self.Bind(wx.EVT_MENU, self.rename_fault, item2)
+
+        self.PopupMenu(menu)
+        menu.Destroy()
+
+    def rename_fault(self, event):
+        """USE A POPUP MENU TO RENAME THE FAULT"""
+
+        # CREATE POP OUT MENU AND SHOW
+        fault_name_box = LayerNameDialog(self, -1, 'Rename fault',
+                                         self.fault_tree_items[self.currently_active_fault_id])
+        new = fault_name_box.ShowModal()
+
+        # WAIT FOR USER TO CLOSE POP OUT
+
+        # GET THE NEW LAYER NAME FROM POP OUT
+        new_name = fault_name_box.name
+
+        # SET THE TREE AND LAYER OBJECT WITH THE NEW NAME
+        current_tree_items = self.fault_tree.GetRootItem().GetChildren()
+        self.fault_tree.SetItemText(current_tree_items[self.currently_active_fault_id], str(new_name))
+        self.fault_tree_items[self.currently_active_fault_id] = str(new_name)
+        self.fault_list[self.currently_active_fault_id].name = str(new_name)
+
+    def change_fault_color(self, event):
+        pass
+
+    def create_new_fault(self):
+        """CREATE A NEW FAULT USING THREE USER INPUT MOUSE CLICKS"""
+
+        # SET CURRENTLY ACTIVE LAYER AS THE NEWLY CREATED LAYER
+        self.currently_active_fault_id = self.total_fault_count
+
+        # CREATE NEW LAYER OBJECT
+        new_fault = Fault()
+
+        # SOURCE NEW NODES FROM USER CLICKS
+        new_fault.id = self.currently_active_fault_id
+        new_fault.name = str('Fault')
+        new_fault.x_nodes = self.new_plotx
+        new_fault.y_nodes = self.new_ploty
+
+        # SET CURRENTLY ACTIVE LAYER NODE OBJECTS
+        self.current_x_nodes = new_fault.x_nodes
+        self.current_y_nodes = new_fault.y_nodes
+
+        # SET SOME OF THE NEW LAYERS ATTRIBUTES
+        new_fault.id = self.currently_active_layer_id
+        new_fault.name = str('Fault %s') % self.currently_active_fault_id
+        # CREATE LAYER LINE
+        new_fault.mpl_actor = self.model_frame.plot(new_fault.x_nodes, new_fault.y_nodes, color='green',
+                                                         marker='o', linewidth=0.5, zorder=1, alpha=1.0)
+
+        # APPEND THE NEW FAULT TO THE FAULT TREE SIDE PANEL USING add_new_tree_nodes FUNC
+        # LIST OF FAULT NAMES
+        self.fault_tree_items.append('fault %s' % (int(self.currently_active_fault_id)))
+        self.fault_item = 'fault %s' % (int(self.currently_active_fault_id))
+        self.add_new_tree_nodes(self.fault_tree_root, self.fault_item, self.currently_active_fault_id)
+        self.fold_panel_three.Collapse()
+        self.fold_panel_three.Expand()
+
+        # UPDATE CURRENT PLOT GRAPHICS
+        self.currently_active_fault.set_data(new_fault.x_nodes, new_fault.y_nodes)
+
+        # UPDATE CURRENT NODE RED DOT GRAPHIC
+        self.current_node.set_offsets([new_fault.x_nodes[0], new_fault.y_nodes[0]])
+
+        # APPEND NEW LAYER TO THE LAYER LIST
+        self.fault_list.append(new_fault)
+
+        # INCREMENT THE TOTAL LAYER COUNT
+        self.total_fault_count += 1
+
+        # UPDATE MODEL
+        self.draw()
 
     # LAYER AND MODEL ATTRIBUTE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -5097,7 +5102,7 @@ class Gmg(wx.Frame):
         # UPDATE GMG GRAPHICS
         self.draw()
 
-    # EXTERNAL FIGURE CONSTRUCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # EXTERNAL FIGURE CONSTRUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def plot_model(self, event):
         """CREATE EXTERNAL FIGURE OF MODEL USING INBUILT FIGURE CONSTRUCTION TOOL"""
@@ -5232,9 +5237,7 @@ class Gmg(wx.Frame):
         result = dlg.ShowModal()
         dlg.Destroy()
 
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # EXIT FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def exit(self, event):
         """ SHUTDOWN APP (FROM FILE MENU)"""
@@ -6566,10 +6569,6 @@ class AttributeEditor(wx.Frame):
         self.attr_grid.SetColLabelValue(5, 'Angle B')
         self.attr_grid.SetColLabelValue(6, 'Layer color')
 
-        # # SET COLUMN WIDTHS
-        # for i in range(0, 6):
-        #    self.attr_grid.SetColumnWidth(i, 130)
-
         # SET COLUMN FORMATS
         self.attr_grid.SetColFormatFloat(1, 3, 2)
         self.attr_grid.SetColFormatFloat(2, 3, 2)
@@ -6609,11 +6608,6 @@ class AttributeEditor(wx.Frame):
         self.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_CLICK, self.open_colour_box)
         self.attr_grid.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.open_colour_box)
         # self.attr_grid.Bind(wx.EVT_SIZE, self.on_size)
-
-    # def on_size(self, event):
-    #     width, height = self.GetClientSize()
-    #     for col in range(6):
-    #         self.attr_grid.SetColSize(col, width / (10 + 1))
 
     def open_colour_box(self, event):
         """IF THE ROW SELECTED IS 6 (THE LAYER COLOR) THEN OPEN THE COLOR SELECTION WIDGET"""
@@ -6706,6 +6700,7 @@ class AttributeEditor(wx.Frame):
             wx.MessageBox("Can't open the clipboard", "Error")
 
     def set_attr_button(self, event):
+        """WHEN THE SET ATTRIBUTES BUTTON IS PRESSED"""
         # RECREATE ARRAYS (INCLUDE VALUES FOR "LAYER 0)"
         self.tree_items = ['Layer 1']
 
@@ -6722,6 +6717,7 @@ class AttributeEditor(wx.Frame):
         # UPDATE MAIN FRAME
         self.parent.attribute_set(self.tree_items, self.layer_list)
 
+        # UPDATE GMG MODEL
         self.parent.update_layer_data()
         self.parent.run_algorithms()
         self.parent.draw()
