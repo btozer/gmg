@@ -85,6 +85,7 @@ from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as Navigat
 import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
+from wx.adv import SplashScreen as SplashScreen
 from wx.lib.agw import floatspin as fs
 import wx.grid as gridlib
 import wx.lib.agw.customtreectrl as ct
@@ -128,8 +129,15 @@ class Gmg(wx.Frame):
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
-        # DIR CONTAINING PROGRAM ICONS
+        # DEFIND ICONS DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__))+"/icons/"
+
+        # SET AND SHOW SPLASH SCREEN
+        bitmap = wx.Bitmap(self.gui_icons_dir+"gmg_logo_scaled.png")
+        splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000,
+                                     self, id=wx.ID_ANY, size=(1, 1), style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
+        splash.Show()
+        self.Show()
 
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
@@ -5139,69 +5147,74 @@ class Gmg(wx.Frame):
         self.set_values = PlotSettingsDialog(self, -1, 'Set figure parameters', self.model_aspect, self.grav_frame_aspect)
         self.set_values.Show(True)
 
-    # def draw_model(self):
-    #     self.file_path = self.set_values.file_path
-    #     self.file_type = self.set_values.file_type
-    #     self.fs = self.set_values.fs
-    #     self.ms = self.set_values.ms
-    #     self.lw = self.set_values.lw
-    #     self.font_type = self.set_values.font_type
-    #     self.aspect_ratio = self.set_values.aspect_ratio
-    #     self.use_tight_layout = self.set_values.use_tight_layout
-    #     self.poly_alpha = self.set_values.poly_alpha
-    #     self.draw_polygons = self.set_values.draw_polygons
-    #     self.draw_layers = self.set_values.draw_layers
-    #     self.floating_layers = self.set_values.draw_floating_layers
-    #     self.draw_colorbar = self.set_values.draw_colorbar
-    #     self.draw_wells = self.set_values.draw_wells
-    #     self.draw_xy_data = self.set_values.draw_xy_data
-    #     self.well_fs = self.set_values.well_fs
-    #     self.well_line_width = self.set_values.well_line_width
-    #     self.draw_faults = self.set_values.draw_faults
-    #     self.xy_size = self.set_values.xy_size
-    #     self.xy_color = self.set_values.xy_color
-    #     self.colorbar_x = self.set_values.colorbar_x
-    #     self.colorbar_y = self.set_values.colorbar_y
-    #     self.colorbar_size_x = self.set_values.colorbar_size_x
-    #     self.colorbar_size_y = self.set_values.colorbar_size_y
-    #     self.layer_line_width = self.set_values.layer_line_width
-    #     self.layer_alpha = self.set_values.layer_alpha
-    #     self.grav_y_min = self.set_values.grav_frame_min
-    #     self.grav_y_max = self.set_values.grav_frame_max
-    #
-    #     # GET FIGURE DIMENSIONS
-    #     xmin, xmax = self.model_frame.get_xlim()
-    #     ymin, ymax = self.model_frame.get_ylim()
-    #     area = np.array([xmin, xmax, ymin, ymax])
-    #
-    #     # RUN PLOT MODEL CODE
-    #     fig_plot = plot_model.plot_fig(self.file_path, self.file_type, area, self.xp, self.obs_topo, self.pred_topo,
-    #                                    self.obs_grav, self.predicted_gravity, self.obs_mag, self.predicted_nt, self.total_layer_count,
-    #                                    self.layer_lock_list, self.plotx_list, self.ploty_list, self.densities,
-    #                                    self.absolute_densities, self.reference_densities, self.segy_plot_list,
-    #                                    self.well_list, self.well_name_list, self.topo_frame, self.gravity_frame,
-    #                                    self.magnetic_frame, self.aspect_ratio, self.use_tight_layout, self.poly_alpha,
-    #                                    self.fs, self.ms, self.lw, self.font_type, self.layer_colors, self.draw_polygons,
-    #                                    self.draw_layers, self.floating_layers, self.draw_colorbar, self.draw_xy_data,
-    #                                    self.xy_size, self.xy_color, self.colorbar_x, self.colorbar_y,
-    #                                    self.colorbar_size_x, self.colorbar_size_y, self.layer_line_width,
-    #                                    self.layer_alpha, self.grav_rms_value, self.mag_rms_value, self.grav_y_min,
-    #                                    self.grav_y_max, self.xy_data_list_save, self.draw_wells, self.wells, self.well_fs,
-    #                                    self.well_line_width, self.draw_faults, self.faults)
-    #     del fig_plot
-    #
-    #     # # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-    #     # if sys.platform == 'linux2':
-    #     #     subprocess.call(["xdg-open", self.file_path])
-    #     # # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-    #     # elif sys.platform == 'darwin':
-    #     #     os.open(self.file_path)
-    #
-    #     # UPDATE GMG
-    #     self.update_layer_data()
-    #     self.draw()
-    #
-    #     return
+    def draw_model(self):
+        # GET USER INPUT FROM POPOUT BOX
+        self.file_path = self.set_values.file_path
+        self.file_type = self.set_values.file_type
+        self.fs = self.set_values.fs  # FONT SIZE
+        self.ms = self.set_values.ms
+        self.lw = self.set_values.lw  # LINE WIDTH
+        self.ft = self.set_values.font_type
+        self.aspect_ratio = self.set_values.aspect_ratio
+        self.use_tight_layout = self.set_values.use_tight_layout
+        self.poly_alpha = self.set_values.poly_alpha
+        self.draw_polygons = self.set_values.draw_polygons
+        self.draw_layers = self.set_values.draw_layers
+        self.floating_layers = self.set_values.draw_floating_layers
+        self.draw_colorbar = self.set_values.draw_colorbar
+        self.draw_wells = self.set_values.draw_wells
+        self.draw_xy_data = self.set_values.draw_xy_data
+        self.well_fs = self.set_values.well_fs
+        self.well_line_width = self.set_values.well_line_width
+        self.draw_faults = self.set_values.draw_faults
+        self.xy_size = self.set_values.xy_size
+        self.xy_color = self.set_values.xy_color
+        self.colorbar_x = self.set_values.colorbar_x
+        self.colorbar_y = self.set_values.colorbar_y
+        self.colorbar_size_x = self.set_values.colorbar_size_x
+        self.colorbar_size_y = self.set_values.colorbar_size_y
+        self.layer_line_width = self.set_values.layer_line_width
+        self.layer_alpha = self.set_values.layer_alpha
+        self.grav_y_min = self.set_values.grav_frame_min
+        self.grav_y_max = self.set_values.grav_frame_max
+
+        # GET FIGURE DIMENSIONS
+        xmin, xmax = self.model_frame.get_xlim()
+        ymin, ymax = self.model_frame.get_ylim()
+        area = np.array([xmin, xmax, ymin, ymax])
+
+        # RUN PLOT MODEL CODE
+        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, area, self.xp,
+                                       self.aspect_ratio, self.use_tight_layout, self.fs, self.ms, self.lw, self.ft,
+                                       self.topo_frame, self.obs_topo, self.pred_topo,
+                                       self.gravity_frame, self.obs_grav, self.predicted_gravity, self.grav_rms_value,
+                                       self.grav_y_min, self.grav_y_max,
+                                       self.magnetic_frame, self.obs_mag, self.predicted_nt, self.mag_rms_value,
+                                       self.layer_list, self.total_layer_count, self.draw_layers, self.floating_layers,
+                                       self.layer_line_width, self.layer_alpha, self.draw_polygons, self.poly_alpha,
+                                       self.segy_plot_list,
+                                       self.draw_colorbar, self.colorbar_x, self.colorbar_y, self.colorbar_size_x,
+                                       self.colorbar_size_y,
+                                       self.draw_xy_data, self.xy_data_list, self.xy_size, self.xy_color,
+                                       self.draw_wells, self.well_list, self.well_fs, self.well_line_width,
+                                       self.draw_faults, self.fault_list)
+        del fig_plot
+
+        # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+        try:
+            if sys.platform == 'linux2':
+                subprocess.call(["xdg-open", self.file_path])
+            # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+            elif sys.platform == 'darwin':
+                os.open(self.file_path)
+        except IOError:
+            pass
+
+        # UPDATE GMG
+        self.update_layer_data()
+        self.draw()
+
+        return
 
     # DOCUMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -5614,7 +5627,6 @@ class LayerNameDialog(wx.Dialog):
     def set_button(self, event):
         self.name = str(self.set_name_text.GetValue())
         self.EndModal(1)
-
 
 
 class MagDialog(wx.Dialog):
