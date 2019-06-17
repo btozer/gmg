@@ -6322,7 +6322,7 @@ class PlotSettingsDialog(wx.Frame):
     """CREATE AN EXTERNAL FIGURE PLOT FROM THE MODEL. RETURNS DRAW PARAMETERS"""
 
     def __init__(self, parent, id, title, model_aspect, dcanvas_aspect):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 'Figure settings')
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'Figure Construction Menu')
         input_panel = wx.Panel(self, -1)
 
         # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
@@ -6334,207 +6334,500 @@ class PlotSettingsDialog(wx.Frame):
         # CREATE MAIN WINDOW FRAME
         self.main_box = wx.BoxSizer(wx.HORIZONTAL)
 
-        # FIGURE FILE
+        # MAKE SIZER
+        sizer = wx.GridBagSizer(hgap=3, vgap=3)
+        r = 0  # CURRENT ROW
+        c = 0  # CURRENT COLUMN
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Separator
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # FIGURE OUTPUT TITLE
+        r += 1
+        c = 0
+        self.figure_output_title = wx.StaticText(input_panel, -1, "Set figure output path:")
+        sizer.Add(self.figure_output_title, pos=(r, c), span=(1, 4), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 FIGURE OUTPUT FILE NAME
+        r += 1
+        c = 0
         self.file_path_text = wx.TextCtrl(input_panel, -1, value="model_figure", size=(150, -1))
+        sizer.Add(self.file_path_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+        # 1 FILE TYPE SELECTION
         self.file_types = ['pdf', 'png', 'eps', 'ps']
         self.file_type_text = wx.ComboBox(input_panel, -1, value='pdf', choices=self.file_types, size=(75, -1),
                                           style=wx.CB_DROPDOWN)
+        sizer.Add(self.file_type_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2 FILE BUTTON
         self.b_file_path = wx.Button(input_panel, -1, "File...")
         self.Bind(wx.EVT_BUTTON, self.file_path, self.b_file_path)
+        sizer.Add(self.b_file_path, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
 
-        # FIGURE FONT SIZE
+        # 3 USE TIGHT LAYOUT SWITCH
+        self.use_tight_layout_checkbox = wx.CheckBox(input_panel, -1, "Use tight\nlayout?")
+        sizer.Add(self.use_tight_layout_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_BOTTOM, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0-3 STATIC LINE SEPERATOR
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 FIGURE FONT SIZE TEXT LABEL
+        r += 1
+        c = 0
         self.set_fs = wx.StaticText(input_panel, -1, "Text size:")
-        self.fs_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=8.,
-                                    size=(75, -1))
+        sizer.Add(self.set_fs, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1 FIGURE FONT SIZE
+        self.fs_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=8., size=(75, -1))
         self.fs_text.SetFormat("%f")
         self.fs_text.SetDigits(3)
-        self.place_holder_text_02 = wx.StaticText(input_panel, -1, "")
+        sizer.Add(self.fs_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
 
-        # MODEL ASPECT RATIO
-        self.set_aspect_ratio = wx.StaticText(input_panel, -1, "Model Aspect ratio:")
+        # 2 MODEL ASPECT RATIO
+        c += 1
+        self.set_aspect_ratio = wx.StaticText(input_panel, -1, "Model aspect\nratio:")
+        sizer.Add(self.set_aspect_ratio, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 3 MODEL ASPECT RATIO TEXT
         self.aspect_ratio_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=2000.0, increment=0.1,
                                               value=self.model_aspect, size=(75, -1))
+        self.aspect_ratio_text.SetFormat("%f")
+        self.aspect_ratio_text.SetDigits(2)
+        sizer.Add(self.aspect_ratio_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # POLYGON ALPHA VALUE
-        self.set_poly_alpha = wx.StaticText(input_panel, -1, " Polygon \n alpha val:")
-        self.poly_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=1.0, increment=0.01, value=0.5,
-                                            size=(75, -1))
-        self.poly_alpha_text.SetFormat("%f")
-        self.poly_alpha_text.SetDigits(3)
-        self.place_holder_text_03 = wx.StaticText(input_panel, -1, "")
+        # --------------------------------------------------------------------------------------------------------------
+        r += 1
+        c = 0
 
-        # MARKER SIZE
+        # 0 MARKER SIZE
         self.set_ms = wx.StaticText(input_panel, -1, "Observed point size:")
+        sizer.Add(self.set_ms, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1 MARKER SIZE TEXT
         self.ms_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=0.5,
                                     size=(75, -1))
         self.ms_text.SetFormat("%f")
-        self.ms_text.SetDigits(3)
-        self.place_holder_text_04 = wx.StaticText(input_panel, -1, "")
+        self.ms_text.SetDigits(2)
+        sizer.Add(self.ms_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
 
-        # LINE WIDTH
-        self.set_lw = wx.StaticText(input_panel, -1, " Calculated anomaly \n line width:")
+        # 2 LINE WIDTH
+
+        self.set_lw = wx.StaticText(input_panel, -1, "Calculated\nline width:")
+        sizer.Add(self.set_lw, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 3 LINE WIDTH TEXT
         self.lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.0,
                                     size=(75, -1))
         self.lw_text.SetFormat("%f")
-        self.lw_text.SetDigits(3)
-        self.place_holder_text_05 = wx.StaticText(input_panel, -1, "")
+        self.lw_text.SetDigits(2)
+        sizer.Add(self.lw_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # FONT TYPE
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 FONT TYPE
+        r += 1
+        c = 0
         self.fonts = ['Times New Roman', 'Times', 'Courier', 'Courier New', 'Helvetica', 'Sans', 'verdana', 'Arial']
         self.set_font_type = wx.StaticText(input_panel, -1, "Font type:")
+        sizer.Add(self.set_font_type, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1 FONT TYPE TEXT
         self.font_type_text = wx.ComboBox(input_panel, -1, value='Times New Roman', choices=self.fonts, size=(75, -1),
                                           style=wx.CB_DROPDOWN)
-        self.place_holder_text_06 = wx.StaticText(input_panel, -1, "")
+        sizer.Add(self.font_type_text, pos=(r, c), span=(1, 2), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # LAYER POLYGONS
-        self.draw_polygons_checkbox = wx.CheckBox(input_panel, -1, " Draw layer \n polygons")
-        self.draw_polygons_checkbox.SetValue(True)
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Seperator
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # LAYER LINES
-        self.draw_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw layer \n lines")
-        self.draw_layer_lines_checkbox.SetValue(True)
-        self.place_holder_text_07 = wx.StaticText(input_panel, -1, "")
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 OBSERVED TOPO AXIS Y-MIN & Y-MAX
+        r += 1
+        c = 0
+        self.topo_frame_text = wx.StaticText(input_panel, -1, "Observed topography\ny-axis max/min:")
+        sizer.Add(self.topo_frame_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
 
-        # FLOATING LAYER LINES
-        self.draw_floating_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw floating \n layer outlines")
-        self.draw_floating_layer_lines_checkbox.SetValue(True)
-
-        # DRAW COLORBAR LINES
-        self.draw_colorbar_checkbox = wx.CheckBox(input_panel, -1, "Draw colorbar")
-        self.draw_colorbar_checkbox.SetValue(True)
-        self.place_holder_text_08 = wx.StaticText(input_panel, -1, "")
-
-        # DRAW XY DATA
-        self.draw_xy_checkbox = wx.CheckBox(input_panel, -1, "Draw XY data")
-        self.draw_xy_checkbox.SetValue(True)
-
-        # DRAW WELLS
-        self.draw_wells_checkbox = wx.CheckBox(input_panel, -1, "Draw Wells")
-        self.draw_wells_checkbox.SetValue(True)
-        self.place_holder_text_09 = wx.StaticText(input_panel, -1, "")
-
-        # DRAW FAULTS
-        self.draw_faults_checkbox = wx.CheckBox(input_panel, -1, "Draw Faults")
-        self.draw_faults_checkbox.SetValue(True)
-        self.place_holder_text_10 = wx.StaticText(input_panel, -1, "")
-
-        # TIGHT LAYOUT
-        self.use_tight_layout_checkbox = wx.CheckBox(input_panel, -1, " Tight \n layout?")
-        self.draw_wells_checkbox.SetValue(True)
-        self.place_holder_text_11 = wx.StaticText(input_panel, -1, "")
-
-        # WELL FONT SIZE
-        self.set_well_font_size = wx.StaticText(input_panel, -1, "Well font size:")
-        self.well_font_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
-                                                size=(75, -1))
-        self.well_font_size_text.SetFormat("%f")
-        self.well_font_size_text.SetDigits(2)
-        self.place_holder_text_12 = wx.StaticText(input_panel, -1, "")
-
-        # WELL LINE WIDTH
-        self.set_well_lw = wx.StaticText(input_panel, -1, "Well line width:")
-        self.well_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
-                                         size=(75, -1))
-        self.well_lw_text.SetFormat("%f")
-        self.well_lw_text.SetDigits(3)
-        self.place_holder_text_13 = wx.StaticText(input_panel, -1, "")
-
-        # XY POINT SIZE
-        self.set_xy_size = wx.StaticText(input_panel, -1, "XY point size:")
-        self.xy_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
-                                         size=(75, -1))
-        self.xy_size_text.SetFormat("%f")
-        self.xy_size_text.SetDigits(2)
-        self.place_holder_text_14 = wx.StaticText(input_panel, -1, "")
-
-        # XY COLOR
-        self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
-        self.set_xy_color = wx.StaticText(input_panel, -1, "XY color:")
-        self.xy_color_text = wx.ComboBox(input_panel, -1, value='black', choices=self.colors, size=(75, -1),
-                                         style=wx.CB_DROPDOWN)
-        self.place_holder_text_15 = wx.StaticText(input_panel, -1, "")
-
-        # LAYER LINE WIDTH
-        self.set_layer_lw = wx.StaticText(input_panel, -1, "Layer line width:")
-        self.layer_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
+        # 1
+        self.topo_min_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=-100,
                                           size=(75, -1))
-        self.layer_lw_text.SetFormat("%f")
-        self.layer_lw_text.SetDigits(3)
-        self.place_holder_text_16 = wx.StaticText(input_panel, -1, "")
+        self.topo_min_text.SetFormat("%f")
+        self.topo_min_text.SetDigits(2)
+        sizer.Add(self.topo_min_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
 
-        # LAYER TRANSPARENCY
-        self.set_layer_alpha = wx.StaticText(input_panel, -1, "Layer transparency:")
-        self.layer_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
-                                             size=(75, -1))
-        self.layer_alpha_text.SetFormat("%f")
-        self.layer_alpha_text.SetDigits(2)
-        self.place_holder_text_17 = wx.StaticText(input_panel, -1, "")
+        # 2
+        self.topo_max_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=100,
+                                          size=(75, -1))
+        self.topo_max_text.SetFormat("%f")
+        self.topo_max_text.SetDigits(2)
+        sizer.Add(self.topo_max_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # COLORBAR XY
-        self.colorbar_xy = wx.StaticText(input_panel, -1, "Colorbar xy position:")
-        self.colorbar_x_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
-                                            size=(75, -1))
-        self.colorbar_x_text.SetFormat("%f")
-        self.colorbar_x_text.SetDigits(2)
-        self.colorbar_y_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.55,
-                                            size=(75, -1))
-        self.colorbar_y_text.SetFormat("%f")
-        self.colorbar_y_text.SetDigits(2)
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 OBSERVED GRAVITY AXIS Y-MIN & Y-MAX
+        r += 1
+        c = 0
+        self.grav_frame_text = wx.StaticText(input_panel, -1, "Observed gravity\ny-axis max/min:")
+        sizer.Add(self.grav_frame_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
 
-        # COLORBAR SIZE
-        self.colorbar_size = wx.StaticText(input_panel, -1, "Colorbar size:")
-        self.colorbar_size_x_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.15,
-                                                 size=(75, -1))
-        self.colorbar_size_x_text.SetFormat("%f")
-        self.colorbar_size_x_text.SetDigits(2)
-        self.colorbar_size_y_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.005,
-                                                 size=(75, -1))
-        self.colorbar_size_y_text.SetFormat("%f")
-        self.colorbar_size_y_text.SetDigits(3)
-
-        # GRAV FRAME Y VALUES
-        self.grav_frame_text = wx.StaticText(input_panel, -1, "Gravity frame \nY-axis max/min:")
+        # 1
         self.grav_min_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=-100,
                                           size=(75, -1))
         self.grav_min_text.SetFormat("%f")
         self.grav_min_text.SetDigits(2)
+        sizer.Add(self.grav_min_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2
         self.grav_max_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=100,
                                           size=(75, -1))
         self.grav_max_text.SetFormat("%f")
         self.grav_max_text.SetDigits(2)
+        sizer.Add(self.grav_max_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # DRAW BUTTON
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 OBSERVED GRAVITY AXIS Y-MIN & Y-MAX
+        r += 1
+        c = 0
+        self.mag_frame_text = wx.StaticText(input_panel, -1, "Observed magnetic\ny-axis max/min:")
+        sizer.Add(self.mag_frame_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1
+        self.mag_min_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=-100,
+                                          size=(75, -1))
+        self.mag_min_text.SetFormat("%f")
+        self.mag_min_text.SetDigits(2)
+        sizer.Add(self.mag_min_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2
+        self.mag_max_text = fs.FloatSpin(input_panel, -1, min_val=-2000., max_val=2000.0, increment=1, value=100,
+                                          size=(75, -1))
+        self.mag_max_text.SetFormat("%f")
+        self.mag_max_text.SetDigits(2)
+        sizer.Add(self.mag_max_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Seperator
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 LAYER POLYGONS
+        r += 1
+        c = 0
+        self.draw_polygons_checkbox = wx.CheckBox(input_panel, -1, " Draw layer polygons?")
+        self.draw_polygons_checkbox.SetValue(True)
+        sizer.Add(self.draw_polygons_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1. POLYGON ALPHA
+        self.set_poly_alpha = wx.StaticText(input_panel, -1, "Polygon\ntransparency:")
+        sizer.Add(self.set_poly_alpha, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2 POLYGON ALPHA TEXT
+        self.poly_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=1.0, increment=0.01, value=0.5,
+                                            size=(75, -1))
+        self.poly_alpha_text.SetFormat("%f")
+        self.poly_alpha_text.SetDigits(2)
+        sizer.Add(self.poly_alpha_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 LAYER LINES
+        r += 1
+        c = 0
+        self.draw_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw fixed layers?")
+        self.draw_layer_lines_checkbox.SetValue(True)
+        sizer.Add(self.draw_layer_lines_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c +=1
+
+        # 1 LAYER LINE WIDTH
+        self.set_layer_lw = wx.StaticText(input_panel, -1, "Layer line\nwidth:")
+        sizer.Add(self.set_layer_lw, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2 LAYER LINE WIDTH TEXT
+        self.layer_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
+                                          size=(75, -1))
+        self.layer_lw_text.SetFormat("%f")
+        self.layer_lw_text.SetDigits(3)
+        sizer.Add(self.layer_lw_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 FLOATING LAYER LINES
+        r += 1
+        c = 0
+        self.draw_floating_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw floating layers?")
+        self.draw_floating_layer_lines_checkbox.SetValue(True)
+        sizer.Add(self.draw_floating_layer_lines_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+                  border=10)
+        c += 1
+        # 1 LAYER LINE TRANSPARENCY
+        self.set_layer_alpha = wx.StaticText(input_panel, -1, "Layer line\ntransparency:")
+        sizer.Add(self.set_layer_alpha, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2 LAYER LINE TRANSPARENCY TEXT
+        self.layer_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
+                                             size=(75, -1))
+        self.layer_alpha_text.SetFormat("%f")
+        self.layer_alpha_text.SetDigits(2)
+        sizer.Add(self.layer_alpha_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Seperator
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 13.0 DRAW COLORBAR LINES
+        r += 1
+        c = 0
+        self.draw_colorbar_checkbox = wx.CheckBox(input_panel, -1, "Draw colorbar?")
+        self.draw_colorbar_checkbox.SetValue(True)
+        sizer.Add(self.draw_colorbar_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 14.0 COLORBAR XY
+        r += 1
+        c = 0
+        self.colorbar_xy = wx.StaticText(input_panel, -1, "Colorbar XY Location:")
+        sizer.Add(self.colorbar_xy, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 14.1 COLORBAR XY
+        self.colorbar_x_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
+                                            size=(75, -1))
+        self.colorbar_x_text.SetFormat("%f")
+        self.colorbar_x_text.SetDigits(2)
+        sizer.Add(self.colorbar_x_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 14.2 COLORBAR XY
+        self.colorbar_y_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.55,
+                                            size=(75, -1))
+        self.colorbar_y_text.SetFormat("%f")
+        self.colorbar_y_text.SetDigits(2)
+        sizer.Add(self.colorbar_y_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 15.0 COLORBAR SIZE
+        r += 1
+        c = 0
+        self.colorbar_size = wx.StaticText(input_panel, -1, "Colorbar X/Y text size:")
+        sizer.Add(self.colorbar_size, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 15.1
+        self.colorbar_size_x_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.15,
+                                                 size=(75, -1))
+        self.colorbar_size_x_text.SetFormat("%f")
+        self.colorbar_size_x_text.SetDigits(2)
+        sizer.Add(self.colorbar_size_x_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 15.2
+        self.colorbar_size_y_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.005,
+                                                 size=(75, -1))
+        self.colorbar_size_y_text.SetFormat("%f")
+        self.colorbar_size_y_text.SetDigits(3)
+        sizer.Add(self.colorbar_size_y_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        #--------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Seperator
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 DRAW XY DATA
+        r += 1
+        c = 0
+        self.draw_xy_checkbox = wx.CheckBox(input_panel, -1, "Draw XY data?")
+        self.draw_xy_checkbox.SetValue(True)
+        sizer.Add(self.draw_xy_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 XY POINT SIZE
+        r += 1
+        c = 0
+        self.set_xy_size = wx.StaticText(input_panel, -1, "XY point size:")
+        sizer.Add(self.set_xy_size, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1 XY POINT SIZE TEXT
+        self.xy_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
+                                         size=(75, -1))
+        self.xy_size_text.SetFormat("%f")
+        self.xy_size_text.SetDigits(2)
+        sizer.Add(self.xy_size_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+        # 2 XY COLOR
+        self.colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
+        self.set_xy_color = wx.StaticText(input_panel, -1, "XY color:")
+        sizer.Add(self.set_xy_color, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 3 XY COLOR TEXT
+        self.xy_color_text = wx.ComboBox(input_panel, -1, value='black', choices=self.colors, size=(75, -1),
+                                         style=wx.CB_DROPDOWN)
+        sizer.Add(self.xy_color_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Seperator
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 DRAW WELLS
+        r += 1
+        c = 0
+        self.draw_wells_checkbox = wx.CheckBox(input_panel, -1, "Draw wells?")
+        self.draw_wells_checkbox.SetValue(True)
+        sizer.Add(self.draw_wells_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 WELL FONT SIZE
+        r += 1
+        c = 0
+        self.set_well_font_size = wx.StaticText(input_panel, -1, "Well font size:")
+        sizer.Add(self.set_well_font_size, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1 WELL FONT SIZE TEXT
+        self.well_font_size_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=1.5,
+                                                size=(75, -1))
+        self.well_font_size_text.SetFormat("%f")
+        self.well_font_size_text.SetDigits(2)
+        sizer.Add(self.well_font_size_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 2 WELL LINE WIDTH
+
+        self.set_well_lw = wx.StaticText(input_panel, -1, "Well line width:")
+        sizer.Add(self.set_well_lw, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 3 WELL LINE WIDTH TEXT
+        self.well_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
+                                         size=(75, -1))
+        self.well_lw_text.SetFormat("%f")
+        self.well_lw_text.SetDigits(3)
+        sizer.Add(self.well_lw_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 Line Seperator
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 DRAW FAULTS
+        r += 1
+        c = 0
+        self.draw_faults_checkbox = wx.CheckBox(input_panel, -1, "Draw Faults?")
+        self.draw_faults_checkbox.SetValue(True)
+        sizer.Add(self.draw_faults_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 FAULTS LINE WIDTH
+        r += 1
+        c = 0
+        self.set_fault_lw = wx.StaticText(input_panel, -1, "Faults line width:")
+        sizer.Add(self.set_fault_lw, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
+
+        # 1 FAULTS LINE WIDTH TEXT
+        self.fault_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
+                                         size=(75, -1))
+        self.fault_lw_text.SetFormat("%f")
+        self.fault_lw_text.SetDigits(3)
+        sizer.Add(self.fault_lw_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 LINE SEPERATOR
+        r += 1
+        c = 0
+        line = wx.StaticLine(input_panel)
+        sizer.Add(line, pos=(r, c), span=(1, 4), flag=wx.EXPAND | wx.ALIGN_LEFT, border=10)
+        c += 1
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # 0 DRAW BUTTON
+        r += 1
+        c = 0
         self.b_draw_button = wx.Button(input_panel, -1, "Draw figure")
         self.Bind(wx.EVT_BUTTON, self.draw_button, self.b_draw_button)
+        sizer.Add(self.b_draw_button, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        c += 1
 
-        # EXIT BUTTON
+        # 1 EXIT BUTTON
         self.b_exit = wx.Button(input_panel, -1, "Exit")
         self.Bind(wx.EVT_BUTTON, self.exit, self.b_exit)
+        sizer.Add(self.b_exit, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # --------------------------------------------------------------------------------------------------------------
 
-        # MAKE SIZER
-        sizer = wx.FlexGridSizer(cols=3, hgap=8, vgap=8)
-        sizer.AddMany([self.file_path_text, self.file_type_text, self.b_file_path,
-                       self.set_fs, self.fs_text, self.place_holder_text_02,
-                       self.set_aspect_ratio, self.aspect_ratio_text, self.place_holder_text_03,
-                       self.set_poly_alpha, self.poly_alpha_text, self.place_holder_text_04,
-                       self.set_ms, self.ms_text, self.place_holder_text_05,
-                       self.set_lw, self.lw_text, self.place_holder_text_06,
-                       self.set_font_type, self.font_type_text, self.place_holder_text_07,
-                       self.draw_polygons_checkbox, self.draw_layer_lines_checkbox, self.place_holder_text_08,
-                       self.draw_floating_layer_lines_checkbox, self.draw_colorbar_checkbox, self.place_holder_text_09,
-                       self.draw_xy_checkbox, self.draw_wells_checkbox, self.place_holder_text_10,
-                       self.draw_faults_checkbox, self.use_tight_layout_checkbox, self.place_holder_text_11,
-                       self.set_well_font_size, self.well_font_size_text, self.place_holder_text_12,
-                       self.set_well_lw, self.well_lw_text, self.place_holder_text_13,
-                       self.set_xy_size, self.xy_size_text, self.place_holder_text_14,
-                       self.set_xy_color, self.xy_color_text, self.place_holder_text_15,
-                       self.set_layer_lw, self.layer_lw_text, self.place_holder_text_16,
-                       self.set_layer_alpha, self.layer_alpha_text, self.place_holder_text_17,
-                       self.colorbar_xy, self.colorbar_x_text, self.colorbar_y_text,
-                       self.colorbar_size, self.colorbar_size_x_text, self.colorbar_size_y_text,
-                       self.grav_frame_text, self.grav_min_text, self.grav_max_text,
-                       self.b_draw_button, self.b_exit])
-
+        # NOW ADD THE SIZER TO THE PANEL
         self.main_box.Add(sizer, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
         input_panel.SetSizerAndFit(self.main_box)
         self.main_box.Fit(self)
