@@ -107,6 +107,7 @@ from scipy import interpolate as ip
 from fatiando.mesher import Polygon
 import bott
 import talwani_and_heirtzler
+import plot_model
 import model_stats
 import struct
 import gc
@@ -734,7 +735,7 @@ class Gmg(wx.Frame):
         self.absolute_densities = True
         self.calc_grav_switch = False
         self.obs_gravity_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
-        self.grav_rms_value = 0.  # TOTAL RMS MISFIT VALUE
+        self.gravity_rms_value = None  # TOTAL RMS MISFIT VALUE
         self.grav_residuals = []  # CALCULATED RESIDUAL
 
         # INITIALISE OBSERVED MAGNETIC ATTRIBUTES
@@ -746,7 +747,7 @@ class Gmg(wx.Frame):
         self.profile_azimuth = 0.
         self.calc_mag_switch = False
         self.obs_mag_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
-        self.mag_rms_value = 0.  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
+        self.magnetic_rms_value = None  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
         self.mag_residuals = []  # CALCULATED RESIDUAL
 
         # INITIALISE GEOLOGICAL CONTACT ATTRIBUTES
@@ -1586,8 +1587,8 @@ class Gmg(wx.Frame):
                                      " || Currently Editing Layer: %s  || "
                                      " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
                                      " || MAG RMS = %s  ||" % (self.currently_active_layer_id,
-                                                               self.model_frame.get_aspect(), self.grav_rms_value,
-                                                               self.mag_rms_value), 2)
+                                                               self.model_frame.get_aspect(), self.gravity_rms_value,
+                                                               self.magnetic_rms_value), 2)
         self.statusbar.Update()
 
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -4726,7 +4727,7 @@ class Gmg(wx.Frame):
         if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
             x = xp * 0.001
             y = self.predicted_gravity
-            self.grav_rms_value, self.grav_residuals = model_stats.rms(self.obs_gravity_data_for_rms[:, 0],
+            self.gravity_rms_value, self.grav_residuals = model_stats.rms(self.obs_gravity_data_for_rms[:, 0],
                                                                        self.obs_gravity_data_for_rms[:, 1], x, y)
         else:
             pass
@@ -4734,7 +4735,7 @@ class Gmg(wx.Frame):
         if self.obs_mag_data_for_rms != [] and self.calc_mag_switch is True:
             x = self.xp * 0.001
             y = self.predicted_nt
-            self.mag_rms_value, self.mag_residuals = model_stats.rms(self.obs_mag_data_for_rms[:, 0],
+            self.magnetic_rms_value, self.mag_residuals = model_stats.rms(self.obs_mag_data_for_rms[:, 0],
                                                                      self.obs_mag_data_for_rms[:, 1], x, y)
         else:
             pass
@@ -5150,65 +5151,82 @@ class Gmg(wx.Frame):
     def draw_model(self):
         # GET USER INPUT FROM POPOUT BOX
         self.file_path = self.set_values.file_path
-        self.file_type = self.set_values.file_type
-        self.fs = self.set_values.fs  # FONT SIZE
-        self.ms = self.set_values.ms
-        self.lw = self.set_values.lw  # LINE WIDTH
-        self.ft = self.set_values.font_type
-        self.aspect_ratio = self.set_values.aspect_ratio
+        self.file_type =self.set_values.file_type
         self.use_tight_layout = self.set_values.use_tight_layout
-        self.poly_alpha = self.set_values.poly_alpha
+
+        self.fs = self.set_values.fs  # FONT SIZE
+        self.aspect_ratio = self.set_values.aspect_ratio  # MODEL ASPECT RATIO
+        self.ps = self.set_values.ps  # OBSERVED POINT SIZE
+        self.calc_line_width = self.set_values.lw  # CALCUALTED LINE WIDTH
+
+        self.font_type = self.set_values.font_type_text.GetValue()
+
+        self.topo_frame_min = self.set_values.topo_min_text.GetValue()
+        self.topo_frame_max = self.set_values.topo_max_text.GetValue()
+        self.grav_frame_min = self.set_values.grav_min_text.GetValue()
+        self.grav_frame_max = self.set_values.grav_max_text.GetValue()
+        self.mag_frame_min = self.set_values.mag_min_text.GetValue()
+        self.mag_frame_max = self.set_values.mag_max_text.GetValue()
+
         self.draw_polygons = self.set_values.draw_polygons
-        self.draw_layers = self.set_values.draw_layers
-        self.floating_layers = self.set_values.draw_floating_layers
+        self.polygon_alpha = self.set_values.polygon_alpha
+
+        self.draw_fixed_layers = self.set_values.draw_fixed_layers
+        self.layer_line_width = self.set_values.layer_line_width
+
+        self.draw_floating_layers = self.set_values.draw_floating_layers
+        self.layer_line_alpha = self.set_values.layer_line_alpha
+
         self.draw_colorbar = self.set_values.draw_colorbar
-        self.draw_wells = self.set_values.draw_wells
-        self.draw_xy_data = self.set_values.draw_xy_data
-        self.well_fs = self.set_values.well_fs
-        self.well_line_width = self.set_values.well_line_width
-        self.draw_faults = self.set_values.draw_faults
-        self.xy_size = self.set_values.xy_size
-        self.xy_color = self.set_values.xy_color
         self.colorbar_x = self.set_values.colorbar_x
         self.colorbar_y = self.set_values.colorbar_y
         self.colorbar_size_x = self.set_values.colorbar_size_x
         self.colorbar_size_y = self.set_values.colorbar_size_y
-        self.layer_line_width = self.set_values.layer_line_width
-        self.layer_alpha = self.set_values.layer_alpha
-        self.grav_y_min = self.set_values.grav_frame_min
-        self.grav_y_max = self.set_values.grav_frame_max
+
+        self.draw_xy_data = self.set_values.draw_xy_data
+        self.xy_size = self.set_values.xy_size
+        self.xy_color = self.set_values.xy_color
+
+        self.draw_wells = self.set_values.draw_wells
+        self.well_fs = self.set_values.well_fs
+        self.well_line_width = self.set_values.well_line_width
+
+        self.draw_faults = self.set_values.draw_faults
+        self.faults_lw = self.set_values.faults_lw
 
         # GET FIGURE DIMENSIONS
         xmin, xmax = self.model_frame.get_xlim()
         ymin, ymax = self.model_frame.get_ylim()
         area = np.array([xmin, xmax, ymin, ymax])
 
-        # RUN PLOT MODEL CODE
-        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, area, self.xp,
-                                       self.aspect_ratio, self.use_tight_layout, self.fs, self.ms, self.lw, self.ft,
-                                       self.topo_frame, self.obs_topo, self.pred_topo,
-                                       self.gravity_frame, self.obs_grav, self.predicted_gravity, self.grav_rms_value,
-                                       self.grav_y_min, self.grav_y_max,
-                                       self.magnetic_frame, self.obs_mag, self.predicted_nt, self.mag_rms_value,
-                                       self.layer_list, self.total_layer_count, self.draw_layers, self.floating_layers,
-                                       self.layer_line_width, self.layer_alpha, self.draw_polygons, self.poly_alpha,
-                                       self.segy_plot_list,
+        # # RUN PLOT MODEL CODE
+        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, self.use_tight_layout, self.fs,
+                                       self.aspect_ratio, self.ps, self.calc_line_width, self.font_type,
+                                       self.topo_frame_min, self.topo_frame_max, self.grav_frame_min,
+                                       self.grav_frame_max, self.mag_frame_min, self.mag_frame_max,
+                                       self.draw_polygons, self.polygon_alpha, self.draw_fixed_layers,
+                                       self.layer_line_width, self.draw_floating_layers, self.layer_line_alpha,
                                        self.draw_colorbar, self.colorbar_x, self.colorbar_y, self.colorbar_size_x,
-                                       self.colorbar_size_y,
-                                       self.draw_xy_data, self.xy_data_list, self.xy_size, self.xy_color,
-                                       self.draw_wells, self.well_list, self.well_fs, self.well_line_width,
-                                       self.draw_faults, self.fault_list)
+                                       self.colorbar_size_y, self.draw_xy_data, self.xy_size, self.xy_color,
+                                       self.draw_wells, self.well_fs, self.well_line_width, self.draw_faults,
+                                       self.faults_lw,
+                                       self.layer_list, self.fault_list, self.observed_topography_list,
+                                       self.observed_gravity_list, self.observed_magnetic_list,
+                                       self.outcrop_data_list, self.well_data_list, self.segy_data_list,
+                                       self.topo_frame, self.gravity_frame, self.magnetic_frame, self.predicted_gravity, 
+                                       self.gravity_rms_value, self.predicted_nt, self.magnetic_rms_value, self.area,
+                                       self.xp)
         del fig_plot
-
-        # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-        try:
-            if sys.platform == 'linux2':
-                subprocess.call(["xdg-open", self.file_path])
-            # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-            elif sys.platform == 'darwin':
-                os.open(self.file_path)
-        except IOError:
-            pass
+        #
+        # # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+        # try:
+        #     if sys.platform == 'linux2':
+        #         subprocess.call(["xdg-open", self.file_path])
+        #     # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
+        #     elif sys.platform == 'darwin':
+        #         os.open(self.file_path)
+        # except IOError:
+        #     pass
 
         # UPDATE GMG
         self.update_layer_data()
@@ -6418,17 +6436,17 @@ class PlotSettingsDialog(wx.Frame):
         r += 1
         c = 0
 
-        # 0 MARKER SIZE
-        self.set_ms = wx.StaticText(input_panel, -1, "Observed point size:")
-        sizer.Add(self.set_ms, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        # 0 POINT SIZE
+        self.set_ps = wx.StaticText(input_panel, -1, "Observed point size:")
+        sizer.Add(self.set_ps, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         c += 1
 
         # 1 MARKER SIZE TEXT
-        self.ms_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=0.5,
+        self.ps_text = fs.FloatSpin(input_panel, -1, min_val=0.01, max_val=20.0, increment=0.1, value=0.5,
                                     size=(75, -1))
-        self.ms_text.SetFormat("%f")
-        self.ms_text.SetDigits(2)
-        sizer.Add(self.ms_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        self.ps_text.SetFormat("%f")
+        self.ps_text.SetDigits(2)
+        sizer.Add(self.ps_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         c += 1
 
         # 2 LINE WIDTH
@@ -6575,9 +6593,9 @@ class PlotSettingsDialog(wx.Frame):
         # 0 LAYER LINES
         r += 1
         c = 0
-        self.draw_layer_lines_checkbox = wx.CheckBox(input_panel, -1, " Draw fixed layers?")
-        self.draw_layer_lines_checkbox.SetValue(True)
-        sizer.Add(self.draw_layer_lines_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        self.draw_fixed_layers_checkbox = wx.CheckBox(input_panel, -1, " Draw fixed layers?")
+        self.draw_fixed_layers_checkbox.SetValue(True)
+        sizer.Add(self.draw_fixed_layers_checkbox, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         c +=1
 
         # 1 LAYER LINE WIDTH
@@ -6603,16 +6621,16 @@ class PlotSettingsDialog(wx.Frame):
                   border=10)
         c += 1
         # 1 LAYER LINE TRANSPARENCY
-        self.set_layer_alpha = wx.StaticText(input_panel, -1, "Layer line\ntransparency:")
-        sizer.Add(self.set_layer_alpha, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        self.set_layer_line_alpha = wx.StaticText(input_panel, -1, "Layer line\ntransparency:")
+        sizer.Add(self.set_layer_line_alpha, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         c += 1
 
         # 2 LAYER LINE TRANSPARENCY TEXT
-        self.layer_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
+        self.layer_line_alpha_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=1.0, increment=0.1, value=0.7,
                                              size=(75, -1))
-        self.layer_alpha_text.SetFormat("%f")
-        self.layer_alpha_text.SetDigits(2)
-        sizer.Add(self.layer_alpha_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        self.layer_line_alpha_text.SetFormat("%f")
+        self.layer_line_alpha_text.SetDigits(2)
+        sizer.Add(self.layer_line_alpha_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
@@ -6791,16 +6809,16 @@ class PlotSettingsDialog(wx.Frame):
         # 0 FAULTS LINE WIDTH
         r += 1
         c = 0
-        self.set_fault_lw = wx.StaticText(input_panel, -1, "Faults line width:")
-        sizer.Add(self.set_fault_lw, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        self.set_faults_lw = wx.StaticText(input_panel, -1, "Faults line width:")
+        sizer.Add(self.set_faults_lw, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         c += 1
 
         # 1 FAULTS LINE WIDTH TEXT
-        self.fault_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
+        self.faults_lw_text = fs.FloatSpin(input_panel, -1, min_val=0.0, max_val=20.0, increment=0.1, value=0.1,
                                          size=(75, -1))
-        self.fault_lw_text.SetFormat("%f")
-        self.fault_lw_text.SetDigits(3)
-        sizer.Add(self.fault_lw_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
+        self.faults_lw_text.SetFormat("%f")
+        self.faults_lw_text.SetDigits(3)
+        sizer.Add(self.faults_lw_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=10)
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
@@ -6835,33 +6853,49 @@ class PlotSettingsDialog(wx.Frame):
     def draw_button(self, event):
         self.file_path = str(self.file_path_text.GetValue())
         self.file_type = str(self.file_type_text.GetValue())
-        self.fs = float(self.fs_text.GetValue())
-        self.ms = float(self.ms_text.GetValue())
-        self.lw = float(self.lw_text.GetValue())
-        self.font_type = str(self.font_type_text.GetValue())
-        self.poly_alpha = float(self.poly_alpha_text.GetValue())
-        self.aspect_ratio = float(self.aspect_ratio_text.GetValue())
         self.use_tight_layout = self.use_tight_layout_checkbox.GetValue()
+        #
+        self.fs = float(self.fs_text.GetValue())  # FONT SIZE
+        self.aspect_ratio = float(self.aspect_ratio_text.GetValue())  # MODEL ASPECT RATIO
+        self.ps = float(self.ps_text.GetValue())  # OBSERVED POINT SIZE?
+        self.lw = float(self.lw_text.GetValue())  # CALCUALTED LINE WIDTH
+        #
+        self.font_type = str(self.font_type_text.GetValue())
+        #
+        self.topo_frame_min = float(self.topo_min_text.GetValue())
+        self.topo_frame_max = float(self.topo_max_text.GetValue())
+        self.grav_frame_min = float(self.grav_min_text.GetValue())
+        self.grav_frame_max = float(self.grav_max_text.GetValue())
+        self.mag_frame_min = float(self.mag_min_text.GetValue())
+        self.mag_frame_max = float(self.mag_max_text.GetValue())
+        #
         self.draw_polygons = self.draw_polygons_checkbox.GetValue()
-        self.draw_layers = self.draw_layer_lines_checkbox.GetValue()
+        self.polygon_alpha = float(self.poly_alpha_text.GetValue())
+        #
+        self.draw_fixed_layers = self.draw_fixed_layers_checkbox.GetValue()
+        self.layer_line_width = float(self.layer_lw_text.GetValue())
+        #
         self.draw_floating_layers = self.draw_floating_layer_lines_checkbox.GetValue()
+        self.layer_line_alpha = float(self.layer_line_alpha_text.GetValue())
+        #
         self.draw_colorbar = self.draw_colorbar_checkbox.GetValue()
-        self.draw_wells = self.draw_wells_checkbox.GetValue()
-        self.well_fs = float(self.well_font_size_text.GetValue())
-        self.well_line_width = float(self.well_lw_text.GetValue())
-        self.draw_faults = self.draw_faults_checkbox.GetValue()
-        self.draw_xy_data = self.draw_xy_checkbox.GetValue()
-        self.xy_size = self.xy_size_text.GetValue()
-        self.xy_color = str(self.xy_color_text.GetValue())
         self.colorbar_x = float(self.colorbar_x_text.GetValue())
         self.colorbar_y = float(self.colorbar_y_text.GetValue())
         self.colorbar_size_x = float(self.colorbar_size_x_text.GetValue())
         self.colorbar_size_y = float(self.colorbar_size_y_text.GetValue())
-        self.layer_line_width = float(self.layer_lw_text.GetValue())
-        self.layer_alpha = float(self.layer_alpha_text.GetValue())
-        self.grav_frame_min = float(self.grav_min_text.GetValue())
-        self.grav_frame_max = float(self.grav_max_text.GetValue())
+        #
+        self.draw_xy_data = self.draw_xy_checkbox.GetValue()
+        self.xy_size = self.xy_size_text.GetValue()
+        self.xy_color = str(self.xy_color_text.GetValue())
+        #
+        self.draw_wells = self.draw_wells_checkbox.GetValue()
+        self.well_fs = float(self.well_font_size_text.GetValue())
+        self.well_line_width = float(self.well_lw_text.GetValue())
+        #
+        self.draw_faults = self.draw_faults_checkbox.GetValue()
+        self.faults_lw = float(self.faults_lw_text.GetValue())
 
+        # CALL DRAW FUNCTION
         self.parent.draw_model()
 
     def exit(self, event):
@@ -6871,7 +6905,7 @@ class PlotSettingsDialog(wx.Frame):
         self.save_file_dialog = wx.FileDialog(self, "Save As", "", "", "Figure files (*.*)|*.*",
                                               wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if self.save_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # the user changed idea...
+            return  # THE USER CHANGED IDEA...
         self.chosen_path = self.save_file_dialog.GetPath()
         self.file_path_text.SetValue(str(self.chosen_path))
         self.save_file_dialog.Destroy()
