@@ -69,7 +69,7 @@ Documentation created using Sphinx.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-NB. before launching gmg you must run:
+NB. before launching gmg you must activate the conda env e.g.:
 
     source activate py27-gmg
 
@@ -134,11 +134,11 @@ class Gmg(wx.Frame):
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__))+"/icons/"
 
         # SET AND SHOW SPLASH SCREEN
-        bitmap = wx.Bitmap(self.gui_icons_dir+"gmg_logo_scaled.png")
-        splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000,
-                                     self, id=wx.ID_ANY, size=(1, 1), style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
-        splash.Show()
-        self.Show()
+        # bitmap = wx.Bitmap(self.gui_icons_dir+"gmg_logo_scaled.png")
+        # splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000,
+        #                              self, id=wx.ID_ANY, size=(1, 1), style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
+        # splash.Show()
+        # self.Show()
 
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
@@ -261,6 +261,7 @@ class Gmg(wx.Frame):
 
     def create_menu(self):
         """CREATE GUI MENUBAR"""
+
         self.menubar = wx.MenuBar()
         menu_file = wx.Menu()
         m_new_model = menu_file.Append(-1, "New Model...\tCtrl-N", "New Model...")
@@ -509,11 +510,11 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.legal, m_legal)
         self.menubar.Append(help_file, "&Help")
 
-        'SET MENUBAR'
+        # SET MENUBAR
         self.SetMenuBar(self.menubar)
         # --------------------------------------------------------------------------------------------------------------
 
-        'TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)'
+        # TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)
         self.toolbar = self.CreateToolBar()
 
         t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
@@ -772,7 +773,7 @@ class Gmg(wx.Frame):
 
     def draw_main_frame(self):
         """
-        DRAW THE PROGRAM CANVASES
+        DRAW THE GUI FRAMES (TOPO, GRAVITY, MAGNETICS, MODEL)
         docs: https://matplotlib.org/api/axes_api.html
         """
         self.columns = 87  # NUMBER OF COLUMNS THE MODEL FRAMES WILL TAKE UP (89/100)
@@ -1008,8 +1009,9 @@ class Gmg(wx.Frame):
 
         # ADJUST FRAME SIZING AND SET PROGRAM WINDOW
         if self.topo_frame_switch is True and self.gravity_frame_switch is True and self.magnetic_frame_switch is True:
-            'TRUE TRUE TRUE'
-            'TOPO CANVAS'
+            # TRUE TRUE TRUE
+
+            # TOPO CANVAS
             self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
             self.topo_frame.set_ylabel("(m)")
             self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1021,7 +1023,7 @@ class Gmg(wx.Frame):
             self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'GRAV CANVAS'
+            # GRAV CANVAS
             self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1033,7 +1035,7 @@ class Gmg(wx.Frame):
             self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'MAG CANVAS'
+            # MAG CANVAS
             self.magnetic_frame = plt.subplot2grid((26, 100), (5, self.x_orig), rowspan=3, colspan=self.columns)
             self.magnetic_frame.set_ylabel("(nT)")
             self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1047,10 +1049,11 @@ class Gmg(wx.Frame):
 
         elif self.topo_frame_switch is False and self.gravity_frame_switch is True and \
                 self.magnetic_frame_switch is True:
-            'FALSE TRUE TRUE'
-            'TOPO CANVAS'
-            # HIDDEN
-            'GRAV CANVAS'
+            # FALSE TRUE TRUE
+
+            # TOPO CANVAS - HIDDEN
+
+            # GRAV CANVAS
             self.gravity_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=4, colspan=self.columns)
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.grid()
@@ -1061,7 +1064,7 @@ class Gmg(wx.Frame):
             self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'MAG CANVAS'
+            # MAG CANVAS
             self.magnetic_frame = plt.subplot2grid((26, 100), (4, self.x_orig), rowspan=4, colspan=self.columns)
             self.magnetic_frame.set_ylabel("(nT)")
             self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1075,8 +1078,9 @@ class Gmg(wx.Frame):
 
         elif self.topo_frame_switch is True and self.gravity_frame_switch is False and \
                 self.magnetic_frame_switch is True:
-            'TRUE FALSE TRUE'
-            'TOPO CANVAS'
+            # TRUE FALSE TRUE
+
+            # TOPO CANVAS
             self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
             self.topo_frame.set_ylabel("(m)")
             self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1087,9 +1091,9 @@ class Gmg(wx.Frame):
             self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'GRAV CANVAS'
-            # HIDDEN
-            'MAG CANVAS'
+            # GRAV CANVAS - HIDDEN
+
+            # MAG CANVAS
             self.magnetic_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=6, colspan=self.columns)
             self.magnetic_frame.set_ylabel("(nT)")
             self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1103,8 +1107,8 @@ class Gmg(wx.Frame):
 
         elif self.topo_frame_switch is True and self.gravity_frame_switch is True and \
                 self.magnetic_frame_switch is False:
-            'TRUE TRUE FALSE'
-            'TOPO CANVAS'
+            # TRUE TRUE FALSE
+            # TOPO CANVAS
             self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
             self.topo_frame.set_ylabel("(m)")
             self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1115,7 +1119,7 @@ class Gmg(wx.Frame):
             self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'GRAV CANVAS'
+            # GRAV CANVAS
             self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=6, colspan=self.columns)
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.grid()
@@ -1126,8 +1130,7 @@ class Gmg(wx.Frame):
             self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'MAG CANVAS'
-            # HIDDEN
+            # MAG CANVAS - HIDDEN
 
         elif self.topo_frame_switch is False and self.gravity_frame_switch is False and \
                 self.magnetic_frame_switch is True:
@@ -1150,10 +1153,11 @@ class Gmg(wx.Frame):
 
         elif self.topo_frame_switch is False and self.gravity_frame_switch is True and \
                 self.magnetic_frame_switch is False:
-            'FALSE TRUE FALSE'
-            'TOPO CANVAS'
-            # HIDDEN
-            'GRAV CANVAS'
+            # FALSE TRUE FALSE
+
+            # TOPO CANVAS - HIDDEN
+
+            # GRAV CANVAS
             self.gravity_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=8, colspan=self.columns)
             self.gravity_frame.set_ylabel("(mGal)")
             self.gravity_frame.grid()
@@ -1164,13 +1168,13 @@ class Gmg(wx.Frame):
             self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'MAG CANVAS'
-            # HIDDEN
+            # MAG CANVAS -HIDDEN
 
         elif self.topo_frame_switch is True and self.gravity_frame_switch is False and \
                 self.magnetic_frame_switch is False:
-            'TRUE FALSE FALSE'
-            'TOPO CANVAS'
+            # TRUE FALSE FALSE
+
+            # TOPO CANVAS
             self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=8, colspan=self.columns)
             self.topo_frame.set_ylabel("(m)")
             self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1181,21 +1185,17 @@ class Gmg(wx.Frame):
             self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
             self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-            'GRAV CANVAS'
-            # HIDDEN
-            'MAG CANVAS'
-            # HIDDEN
+            # GRAV CANVAS - HIDDEN
+
+            # MAG CANVAS - HIDDEN
 
         elif self.topo_frame_switch is False and self.gravity_frame_switch is False and \
                 self.magnetic_frame_switch is False:
             pass
-            'FALSE FALSE FALSE'
-            'TOPO CANVAS'
-            # HIDDEN
-            'GRAV CANVAS'
-            # HIDDEN
-            'MAG CANVAS'
-            # HIDDEN
+            # FALSE FALSE FALSE
+            # TOPO CANVAS - HIDDEN
+            # GRAV CANVAS - HIDDEN
+            # MAG CANVAS - HIDDEN
 
         # SET CANVAS LIMITS
         self.model_frame.set_xlim(self.current_xlim)
@@ -4919,12 +4919,12 @@ class Gmg(wx.Frame):
                                              self.layer_list[layer].reference_density) * -1)
 
             # PASS POLYGONS TO BOTT ALGORITHM AND RETURN THE PREDICTED VALUES
-            bott_input = []
+            bott_input_polygons = []
             for p, d in zip(polygons_to_use, densities_to_use):
-                bott_input.append(Polygon(1000 * np.array(p), {'density': d}))
+                bott_input_polygons.append(Polygon(1000 * np.array(p), {'density': d}))
 
             # SET THE PREDICTED VALUES AS THE BOTT OUTPUT
-            self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input)
+            self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input_polygons)
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_gravity = np.zeros_like(self.xp)
@@ -4951,20 +4951,20 @@ class Gmg(wx.Frame):
                     angle_b_to_use.append(self.layer_list[layer].angle_b)
 
             # PASS TO TALWANI & HEIRTZLER ALGORITHM
-            mag_input = []
-            for p, s, in zip(polygons_to_use, susceptibilities_to_use):
-                mag_input.append(Polygon(1000. * np.array(p), {'susceptibility': s}))
+            mag_input_polygons = []
+            for p, s, a, b, in zip(polygons_to_use, susceptibilities_to_use, angle_a_to_use, angle_b_to_use,):
+                mag_input_polygons.append(Polygon(1000. * np.array(p), {'susceptibility': s, 'angle_a' : a,
+                                                  'angle_b' : b}))
 
             # SET THE PREDICTED VALUES AS THE TALWANI & HEIRTZLER OUTPUT
-            self.predicted_nt = talwani_and_heirtzler.ntz(self.xp, self.gravity_observation_elv, mag_input, 
-                                                    self.model_azimuth, self.earth_field, angle_a_to_use, 
-                                                    angle_b_to_use, self.mag_observation_elv)
+            self.predicted_nt = talwani_and_heirtzler.nt(self.xp, self.mag_observation_elv, mag_input_polygons,
+                                                         self.earth_field, self.model_azimuth)
+
             # MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
             self.predicted_nt * -1
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_nt = np.zeros_like(self.xp)
-
 
         # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
         self.predicted_nt_plot.set_data(self.xp * 0.001, self.predicted_nt)
@@ -6397,7 +6397,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0-3 STATIC LINE SEPERATOR
+        # 0-3 STATIC LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6479,7 +6479,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 Line Seperator
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6559,7 +6559,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 Line Seperator
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6634,7 +6634,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 Line Seperator
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6699,7 +6699,7 @@ class PlotSettingsDialog(wx.Frame):
         #--------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 Line Seperator
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6742,7 +6742,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 Line Seperator
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6789,7 +6789,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 Line Seperator
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -6822,7 +6822,7 @@ class PlotSettingsDialog(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
-        # 0 LINE SEPERATOR
+        # 0 LINE SEPARATOR
         r += 1
         c = 0
         line = wx.StaticLine(input_panel)
@@ -7047,8 +7047,7 @@ class AttributeEditor(wx.Frame):
             for c in range(cols):
                 data = data + str(
                     self.attr_grid.GetCellValue(self.attr_grid.GetSelectionBlockTopLeft()[0][0] + r,
-                                                          self.attr_grid.GetSelectionBlockTopLeft()[0][
-                                                              1] + c))
+                                                self.attr_grid.GetSelectionBlockTopLeft()[0][1] + c))
                 if c < cols - 1:
                     data = data + '\t'
             data = data + '\n'

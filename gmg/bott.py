@@ -9,7 +9,7 @@ Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
 **Components**
 
-* :func:`~gmg.gravmag.bott.gz`
+* :func:`~gmg.bott.gz`
 
 **References**
 
@@ -24,7 +24,7 @@ from numpy import arctan2, sin, cos, log
 from fatiando.constants import G, SI2MGAL
 
 
-def Gz(xp, zp, polygons, dens=None):
+def gz(xp, zp, polygons):
     """
     Calculates the :math:`g_z` gravity acceleration component.
 
@@ -36,12 +36,12 @@ def Gz(xp, zp, polygons, dens=None):
 
     * xp, zp : arrays
         The x and z coordinates of the computation points.
+
     * polygons : list of :func:`~fatiando.mesher.Polygon`
         The density model used.
         Polygons must have the property ``'density'``. Polygons that don't have
         this property will be ignored in the computations. Elements of
         *polygons* that are None will also be ignored.
-    * dens : float or None
 
         .. note:: The y coordinate of the polygons is used as z!
         .. note:: Data are numpy arrays
@@ -51,30 +51,37 @@ def Gz(xp, zp, polygons, dens=None):
 
     * g_z : array
         The :math:`g_z` component calculated on the computation points
-
     """
 
+    # INITIALIZE OUTPUT ARRAY
     g_z = numpy.zeros_like(xp)
+
+    # LOOP THROUGH THE MODEL POLYGONS
     for polygon in polygons:
-        if polygon is None or ('density' not in polygon.props and dens is None):
+
+        # CHECK IF THE CURRENT LAYER HAS A DENSITY CONTRAST SET. SKIP LAYER IF FALSE
+        if polygon is None or 'density' not in polygon.props:
             continue
-        if dens is None:
-            density = polygon.props['density']
         else:
-            density = dens
+            density = polygon.props['density']
+
+        # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
         x = polygon.x
         z = polygon.y
         nverts = polygon.nverts
+
+        # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
         for v in range(nverts):
-            # CHANGE THE COORDINATES OF THIS VERTICE
+            # SET THE CURRENT INPUT VERTEX
             xv = x[v] - xp
             zv = z[v] - zp
 
-            # THE LAST VERTICE PAIRS WITH THE FIRST ONE
+            # SET THE SECOND VERTEX
             if v == nverts - 1:
                 xvp1 = x[0] - xp
                 zvp1 = z[0] - zp
             else:
+                # PAIR THE LAST VERTEX WITH THE FIRST ONE
                 xvp1 = x[v + 1] - xp
                 zvp1 = z[v + 1] - zp
 
@@ -85,10 +92,12 @@ def Gz(xp, zp, polygons, dens=None):
             r1 = numpy.sqrt(zv ** 2 + xv ** 2)
             r2 = numpy.sqrt(zvp1 ** 2 + xvp1 ** 2)
 
-            tmp = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1)) +
-                                                                  (cos(theta)) * (phi_2 - phi_1)) +
-                                                                    ((zvp1 * phi_2) - (zv * phi_1)))
+            current_layer_anomly = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1))
+                                         + (cos(theta)) * (phi_2 - phi_1)) + ((zvp1 * phi_2) - (zv * phi_1)))
 
-            g_z = g_z + tmp * density
+            # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
+            g_z = g_z + current_layer_anomly * density
+
+    # CONVERT TO MGAL AND RETURN ARRAY
     g_z = g_z * SI2MGAL * 2.0 * G
     return g_z

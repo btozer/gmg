@@ -1,5 +1,7 @@
 """
-SAVE GMG MODEL AS A EDITABLE VECTOR GRAPHICS FIGURE
+SAVE GMG MODEL AS A EDITABLE VECTOR GRAPHICS FIGURE.
+
+CALLED FROM gmg draw_model() FUNC
 """
 
 import numpy as np, copy
@@ -10,7 +12,7 @@ import os
 from matplotlib import rcParams
 
 # def draw_line(file_name, ax3):
-#     """DRAW AUXILIARY XY LINES ON FIGURE"""
+#     """DRAW EXTERNAL XY LINES ON FIGURE"""
 #     # READ IN DATA
 #     line = np.genfromtxt(file_name, dtype=str, autostrip=True, delimiter=' ', filling_values='>')
 #
@@ -68,14 +70,14 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     plt.rc('xtick', labelsize=8.0)
     plt.rc('ytick', labelsize=8.0)
 
-    # AXIS TICK POSITIONS'
+    # AXIS TICK POSITIONS
     rcParams['xtick.direction'] = 'out'
     rcParams['ytick.direction'] = 'out'
 
     # SET FONT TYPE AS ONE WHICH IS EDITABLE BY VECTOR PROGRAMS ILLUSTRATOR/INKSCAPE ETC
     rcParams['pdf.fonttype'] = 42
 
-    #GRID LINE STYLE
+    # GRID LINE STYLE
     plt.rc('grid', c='0.5', ls='-', lw=1)
 
 
@@ -224,26 +226,46 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     plt.ylabel('Depth (Km)', fontsize=fs, labelpad=-1)
     plt.xlim(x_start_model, x_end_model)
     plt.ylim(y_end_model, y_start_model)
+    plt.gca().invert_yaxis()
     ax4.spines['top'].set_color('none')
     ax4.tick_params(axis='x', which='both', labelbottom='on', labeltop='off')
 
+    # ******************************************************************************************************************
     # # PLOT SEISMIC DATA
-    # for s in range(0, len(segy_plot_list)):
-    #     if segy_plot_list[s]:
-    #         ax4.add_image(copy.copy(segy_plot_list[s]))
-    #
-    # if draw_faults is True:
-    #     # PLOT FAULTS
-    #     for i in range(0, len(faults)-1):
-    #         fault = faults[i][0]
-    #         # CHECK IF FAULT IS SET AS VISIBLE; IF YES, THEN PLOT
-    #         if fault.get_visible() == True:
-    #             x = fault.get_xdata()
-    #             y = fault.get_ydata()
-    #             ax4.plot(x, y, color='k', linewidth=0.5, zorder=1, alpha=1.0)
-    #         else:
-    #             continue
-    #
+    for s in range(0, len(segy_data_list)):
+        if segy_data_list[s].pml_actor.get_visible() is True:
+            ax4.add_image(copy.copy(segy_data_list[s]))
+    # ******************************************************************************************************************
+    # draw_polygons, polygon_alpha, draw_fixed_layers, layer_line_width, draw_floating_layers,
+    # ******************************************************************************************************************
+    # # PLOT LAYER POLYGONS
+    print(draw_polygons)
+    print len(layer_list)
+    if draw_polygons is True:
+        print("draw_polygons is True")
+        for i in range(0, len(layer_list)):
+            print("drawing polygon %s") % i
+            # GET ACTOR ATTRIBUTES
+            x = layer_list[i].polygon_mpl_actor[0].get_xy()[:,0]
+            y = layer_list[i].polygon_mpl_actor[0].get_xy()[:,1]
+            fc =  layer_list[i].polygon_mpl_actor[0].get_fc()
+            fa =  layer_list[i].polygon_mpl_actor[0].get_alpha()
+            lc = layer_list[i].color
+
+            print x
+            print y
+            print fc
+            print fa
+            print lc
+
+            # DRAW ACTOR LINE
+            ax4.plot(x, y, color=lc, linewidth=layer_line_width, alpha=layer_line_alpha, zorder=1)
+
+            # DRAW ACTOR FILL
+            ax4.fill(x, y, color=fc, alpha=fa, closed=True, ec='none', zorder=1)
+    # ******************************************************************************************************************
+
+    # ******************************************************************************************************************
     # if draw_wells:
     #     # PLOT WELL DATA
     #     for w in range(0, len(well_list)):
@@ -291,56 +313,25 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     #                                               weight='bold', horizontalalignment='right',
     #                                               verticalalignment='bottom', color='black',
     #                                               bbox=dict(boxstyle="round,pad=.4", fc="0.8", ec='None'), clip_on=True)
-    #
-    # # PLOT LAYER POLYGONS
-    # if draw_polygons is True:
-    #     for i in range(layer_count, -1, -1):
-    #         # CREATE POLYGONS
-    #         if layer_lock_list[i] == 0 and i >= 1:
-    #             # CREATE POLYGON
-    #             plotx_polygon = np.append(np.array(plotx_list[i]), np.array(plotx_list[i-1])[::-1])
-    #             ploty_polygon = np.append(np.array(ploty_list[i]), np.array(ploty_list[i-1])[::-1])
+    # ******************************************************************************************************************
+
+
+
+    # ******************************************************************************************************************
+    # if draw_faults is True:
+    #     # PLOT FAULTS
+    #     for i in range(0, len(faults)-1):
+    #         fault = faults[i][0]
+    #         # CHECK IF FAULT IS SET AS VISIBLE; IF YES, THEN PLOT
+    #         if fault.get_visible() == True:
+    #             x = fault.get_xdata()
+    #             y = fault.get_ydata()
+    #             ax4.plot(x, y, color='k', linewidth=0.5, zorder=1, alpha=1.0)
     #         else:
-    #             plotx_polygon = np.array(plotx_list[i])
-    #             ploty_polygon = np.array(ploty_list[i])
-    #
-    #         # DEFINE COLOR MAP
-    #         colormap = cm.coolwarm
-    #         cnorm  = colors.Normalize(vmin=-0.8, vmax=0.8)
-    #         colormap = cm.ScalarMappable(norm=cnorm, cmap=colormap)
-    #
-    #         # CREATE POLYGON FILL
-    #         if densities[i] != 0 and absolute_densities == True:
-    #             next_color = colormap.to_rgba(0.001*densities[i] - 0.001*reference_densities[i])
-    #         elif densities[i] != 0:
-    #             next_color = colormap.to_rgba(0.001 * densities[i])
-    #         else:
-    #             next_color = colormap.to_rgba(0.0)
-    #
-    #         # DRAW
-    #         ax4.fill(plotx_polygon, ploty_polygon, color=next_color, alpha=poly_alpha, closed=True, ec='none', zorder=1)
-    #
-    # # PLOT LAYER LINES
-    # if draw_layers is True:
-    #     for i in range(layer_count, -1, -1):
-    #         # CREATE POLYGONS
-    #         if layer_lock_list[i] == 0 and i >= 1:
-    #              plotx = np.array(plotx_list[i])
-    #              ploty = np.array(ploty_list[i])
-    #              ax4.plot(plotx, ploty, color=layer_colors[i], linewidth=layer_line_width, alpha=layer_alpha, zorder=1)
-    #         else:
-    #             pass
-    #
-    # if draw_floating_layers is True:
-    #     for i in range(layer_count, -1, -1):
-    #         # CREATE POLYGONS
-    #         if layer_lock_list[i] == 1 and i >= 1:
-    #              plotx = np.append(plotx_list[i], plotx_list[i][0])
-    #              ploty = np.append(ploty_list[i], ploty_list[i][0])
-    #              ax4.plot(plotx, ploty, color=layer_colors[i], linewidth=layer_line_width, alpha=layer_alpha, zorder=1)
-    #         else:
-    #             pass
-    #
+    #             continue
+    # ******************************************************************************************************************
+
+    # ******************************************************************************************************************
     # # DRAW OTHER XY DATA e.g. EARTHQUAKE HYPOCENTERS
     # if draw_xy_data:
     #     for i in range(0, len(xy_list)):
@@ -348,17 +339,19 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     #             xy = xy_list[i]
     #             ax4.scatter(xy[:, 0], xy[:, 1], marker='o', edgecolors='none', facecolors=xy_color,
     #                         s=xy_size, gid=i, alpha=1.0, zorder=2)
-    #
+    # ******************************************************************************************************************
+
+    # ******************************************************************************************************************
     # # PLOT EXTERNAL LINES
     # # for i in range(0, len(external_lines)):
     # #     # READ FILE PATH OF LINE'
     # #     line_file_path = external_lines[i]
     # #     #  DRAW LINE ON FIGURE'
     # #     draw_line(line_file_path, ax3)
-    #
-    # # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #
+    # ******************************************************************************************************************
+
+
+    # ******************************************************************************************************************
     # # SET AXIS DIMENSIONS SO X AXIS IS THE SAME AS THE MODEL PLOT
     # pos1 = ax4.get_position()
     # if self.t_frame and obs_topo:
@@ -370,10 +363,9 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     # ifself.m_frame and obs_mag:
     #     pos2 = ax3.get_position()
     #     ax3.set_position([pos1.x0, pos2.y0, pos1.width, pos2.height])
-    #
-    # # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    # # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    #
+    # ******************************************************************************************************************
+
+    # ******************************************************************************************************************
     # # PLOT COLOR MAP
     # if draw_colorbar:
     #     colormap = cm.coolwarm
@@ -383,7 +375,8 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     #     c_cax = plt.axes([colorbar_x, colorbar_y, colorbar_size_x, colorbar_size_y])
     #     cbar = plt.colorbar(C, ticks=[-0.8, -0.4, 0.0, 0.4, 0.8], orientation="horizontal", cax=c_cax)
     #     cbar.set_label('Density contrast ($g/cm^{3}$)', fontsize=fs, labelpad=-1)
-    #
+    # ******************************************************************************************************************
+
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
