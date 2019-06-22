@@ -924,7 +924,7 @@ class Gmg(wx.Frame):
         self.y_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.y_input.SetDigits(4)
         # Make Set button
-        self.node_set_button = wx.Button(self.fold_panel_one, -1, "Set layer attributes")
+        self.node_set_button = wx.Button(self.fold_panel_one, -1, "Set")
 
         # MAKE DENSITY CONTRAST SCALEBAR
         # colormap = matplotlib.cm.coolwarm
@@ -934,9 +934,9 @@ class Gmg(wx.Frame):
         # self.cb1.ax.tick_params(labelsize=6)
         # self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=6)
 
-        # INITALISE CALCULATED P.F. LINES
-        self.predplot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
-        self.grav_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+        # INITALISE CALCULATED ANOMALY LINES
+        self.pred_gravity_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
+        self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         self.predicted_nt_plot, = self.magnetic_frame.plot([], [], '-g', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
@@ -1214,8 +1214,8 @@ class Gmg(wx.Frame):
 
         # INITALISE CALCULATED P.F. LINES
         if self.gravity_frame is not None:
-            self.predplot, = self.gravity_frame.plot([], [], '-r', linewidth=2)
-            self.grav_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5)
+            self.pred_gravity_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2)
+            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5)
         if self.magnetic_frame is not None:
             self.predicted_nt_plot, = self.magnetic_frame.plot([], [], '-g', linewidth=2)
             self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5)
@@ -1664,11 +1664,11 @@ class Gmg(wx.Frame):
             self.calc_grav_switch = False
             if self.grav_residuals != [] and self.obs_gravity_data_for_rms != []:
                 self.grav_residuals[:, 1] = np.zeros(len(self.obs_gravity_data_for_rms[:, 0]))
-                self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
-            self.grav_rms_plot.set_visible(False)
+                self.gravity_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
+            self.gravity_rms_plot.set_visible(False)
         else:
             self.calc_grav_switch = True
-            self.grav_rms_plot.set_visible(True)
+            self.gravity_rms_plot.set_visible(True)
         self.update_layer_data()
         self.run_algorithms()
         self.draw()
@@ -3198,15 +3198,19 @@ class Gmg(wx.Frame):
         CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT, THEN SKIP THIS PART AND ONLY UPDATE ATTRIBUTES
         """
 
+        print self.index_node
+        print self.layer_list[self.currently_active_layer_id].type
+
         # GET NEW XY POINT
         new_x = float(self.x_input.GetValue())
         new_y = float(self.y_input.GetValue())
 
-        # GET CURRENT NODES
+        # GET CURRENTLY ACTIVE LAYER NODES AND LABEL THEM xt AND yt
         xt = self.layer_list[self.currently_active_layer_id].x_nodes
         yt = self.layer_list[self.currently_active_layer_id].y_nodes
 
-        if self.layer_list[self.currently_active_layer_id].layer_type == 'fixed' and self.index_node is not None:
+        # MODIFY xt and yt DEPENDING ON WHAT CONDITIONS ARE MET
+        if self.layer_list[self.currently_active_layer_id].type == 'fixed' and self.index_node is not None:
             if xt[self.index_node] == 0 and yt[self.index_node] != 0.001:
                 xt[self.index_node] = 0  # REPLACE OLD X WITH NEW X
                 yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
@@ -3225,7 +3229,8 @@ class Gmg(wx.Frame):
             else:
                 xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                 yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
-        elif self.layer_list[self.currently_active_layer_id].layer_type == 'floating':
+        elif self.layer_list[self.currently_active_layer_id].type == 'floating' and self.index_node is not None:
+            print("MOVING NODE ON FLOATING LAYER")
             if new_y <= 0:
                 xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                 yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
@@ -3233,10 +3238,12 @@ class Gmg(wx.Frame):
                 xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
                 yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
 
+        # UPDATE THE CURRENTLY ACTIVE LAYER NODE LIST
         self.current_x_nodes = xt
         self.current_y_nodes = yt
         self.currently_active_layer.set_data(self.current_x_nodes, self.current_y_nodes)
 
+        # UPDATE THE CURRENTLY ACTIVE LAYER layer_list ENTRY
         self.layer_list[self.currently_active_layer_id].x_nodes = xt
         self.layer_list[self.currently_active_layer_id].y_nodes = yt
 
@@ -3250,9 +3257,9 @@ class Gmg(wx.Frame):
         self.set_angle_b(self)
 
         # UPDATE GMG
-        self.draw()
         self.update_layer_data()
         self.run_algorithms()
+        self.draw()
 
     def get_node_under_point(self, event):
         """
@@ -4937,7 +4944,7 @@ class Gmg(wx.Frame):
             self.predicted_gravity = np.zeros_like(self.xp)
 
         # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
-        self.predplot.set_data(self.xp * 0.001, self.predicted_gravity)
+        self.pred_gravity_plot.set_data(self.xp * 0.001, self.predicted_gravity)
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
@@ -4986,7 +4993,7 @@ class Gmg(wx.Frame):
         # SET GRAVITY RMS
         if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch is True and \
                 self.calc_grav_switch is True and self.predicted_gravity != []:
-            self.grav_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
+            self.gravity_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         else:
             pass
 
@@ -5338,7 +5345,7 @@ class Layer:
     def __init__(self):
         self.id = None  # THE LAYER NUMBER
         self.name = None  # THE LAYER NAME
-        self.layer_type = None  # EITHER str('fixed') OR str('floating')
+        self.type = None  # EITHER str('fixed') OR str('floating')
         self.node_mpl_actor = None
         self.polygon_mpl_actor = None
         self.poly_plot = None

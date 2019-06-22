@@ -108,15 +108,19 @@ def nt(xp, zp, polygons, f, model_azimuth):
 
             # DETERMINE ANGLES IN RADIANS
             inclination = polygon.props['angle_a']
-            declination = polygon.props['angle_b']
-
             CDIP = m.cos(m.radians(inclination))
             CDIPD = m.cos(m.radians(inclination))
             SDIP = m.sin(m.radians(inclination))
             SDIPD = m.sin(m.radians(inclination))
 
+            declination = polygon.props['angle_b']
             SD = m.cos(m.radians(model_azimuth - declination))
             SDD = m.cos(m.radians(model_azimuth - declination))
+
+            print("model_azimuth = %s") % model_azimuth
+            print("declination = %s") % declination
+            print("SD = %s") % SD
+            print("SDD = %s") % SDD
 
             # INITIALIZE CURRENT LAYER OUTPUT ARRAYS
             PSUM = np.zeros_like(xp)
@@ -149,17 +153,17 @@ def nt(xp, zp, polygons, f, model_azimuth):
                 XZ = Z2_1 * X1_2
                 GL = 0.5 * np.log(R2s / R1s)
 
-                # CALCULATE P AND ! FOR EACH NODE PAIR
+                # CALCULATE P AND Q FOR EACH NODE PAIR
                 P = ((ZSQ / (XSQ + ZSQ)) * thetad) + ((XZ / (XSQ + ZSQ)) * GL)
                 Q = ((XZ / (XSQ + ZSQ)) * thetad) - ((ZSQ / (XSQ + ZSQ)) * GL)
                 P[zv == zv2] = 0  # IF zv == zv2 THEN P = 0
                 Q[zv == zv2] = 0  # IF zv == zv2 THEN Q = 0
 
-                # COUNT RUNNING TOTAL
+                # ADD P AND Q ANOMALIES TO THE RUNNING TOTAL FOR THE CURRENT POLYGON
                 PSUM = P + PSUM
                 QSUM = Q + QSUM
 
-            # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
+            # ADD CURRENT POLYGON ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
             VASUM = VASUM + 2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM))
             HASUM = HASUM + 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
 
