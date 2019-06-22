@@ -2614,6 +2614,8 @@ class Gmg(wx.Frame):
         self.draw()
 
     def delete_obs_mag(self, event):
+        """DELETE A MAGNETIC ANOMLY FROM THE MAGNETIC DATA PANEL"""
+
         # DESTROY MENUBAR
         self.m_obs_mag_submenu.DestroyItem(event.Id)
 
@@ -2628,7 +2630,10 @@ class Gmg(wx.Frame):
         self.draw()
 
     def set_mag_variables(self, event):
-        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.area)
+        """POPOUT BOX TO LET USER DEFINE MAGNETIC FIELD VALUES"""
+
+        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.mag_observation_elv, self.model_azimuth,
+                            self.earth_field)
         answer = mag_box.ShowModal()
         self.mag_observation_elv = mag_box.mag_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
         self.model_azimuth = mag_box.model_azimuth
@@ -2636,6 +2641,8 @@ class Gmg(wx.Frame):
         self.draw()
 
     def save_modelled_mag(self, event):
+        """SAVE THE MODELLED MAGNETIC ANOMALY TO DISC"""
+
         save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
@@ -5650,26 +5657,26 @@ class LayerNameDialog(wx.Dialog):
 class MagDialog(wx.Dialog):
     """SET MAGNETIC FIELD PARAMETERS"""
 
-    def __init__(self, parent, id, title, area):
+    def __init__(self, parent, id, title, mag_observation_elv, model_azimuth, earth_field):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                          | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
         # OBSERVATION ELEVATION
         self.set_mag_observation_elv = wx.StaticText(input_panel, -1, "Observation\nElevation:")
-        self.mag_observation_elv_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
+        self.mag_observation_elv_text = wx.TextCtrl(input_panel, -1, str(mag_observation_elv * 0.001), size=(75, -1))
         self.mag_observation_elv_units = wx.StaticText(input_panel, -1, "km")
         self.mag_observation_elv_text.SetInsertionPoint(0)
 
         # MODEL AZIMUTH
         self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth\n(angle C):")
-        self.model_azimuth_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
+        self.model_azimuth_text = wx.TextCtrl(input_panel, -1, str(model_azimuth), size=(75, -1))
         self.model_azimuth_units = wx.StaticText(input_panel, -1, "Degrees")
         self.model_azimuth_text.SetInsertionPoint(0)
 
         # EARTHS FIELD
         self.set_earth_field = wx.StaticText(input_panel, -1, "Earth's Regional\nField Intensity:")
-        self.earth_field_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
+        self.earth_field_text = wx.TextCtrl(input_panel, -1, str(earth_field), size=(75, -1))
         self.earth_field_units = wx.StaticText(input_panel, -1, "nT")
         sizer = wx.FlexGridSizer(cols=3, hgap=7, vgap=7)
         self.b_set_button_mag = wx.Button(input_panel, -1, "Set")

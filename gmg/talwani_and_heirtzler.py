@@ -24,8 +24,7 @@ for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115
 import numpy as np
 import math as m
 
-
-def nt(xp, zp, polygons, F, model_azimuth):
+def nt(xp, zp, polygons, f, model_azimuth):
     """
     Calculates the :math:`ntz` magnetic field strength in nT.
 
@@ -86,72 +85,88 @@ def nt(xp, zp, polygons, F, model_azimuth):
     for polygon in polygons:
 
         # CHECK IF THE CURRENT LAYER HAS A SUSCEPTIBILITY CONTRAST SET. SKIP LAYER IF FALSE
-        if polygon is None or 'susceptibility' not in polygon.props:
+        if polygon is None or polygon.props['susceptibility'] == 0.0:
             continue
         else:
             k = polygon.props['susceptibility']
             k = k / (4 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
 
-        # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
-        x = polygon.x
-        z = polygon.y
-        nverts = polygon.nverts
+            print("zp = %s") % zp
+            print("k = %s") % k
+            print("f = %s") % f
+            print polygon.props['angle_a']
+            print polygon.props['angle_b']
 
-        # DETERMINE ANGLES IN RADIANS
-        inclination = polygon.props['angle_a']
-        declination = polygon.props['angle_b']
+            # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
+            x = polygon.x
+            z = polygon.y
+            nverts = polygon.nverts
 
-        CDIP = m.cos(m.radians(inclination))
-        CDIPD = m.cos(m.radians(inclination))
-        SDIP = m.sin(m.radians(inclination))
-        SDIPD = m.sin(m.radians(inclination))
+            print x
+            print z
+            print nverts
 
-        SD = m.cos(m.radians(model_azimuth - declination))
-        SDD = m.cos(m.radians(model_azimuth - declination))
+            # DETERMINE ANGLES IN RADIANS
+            inclination = polygon.props['angle_a']
+            declination = polygon.props['angle_b']
 
-        # INITIALIZE CURRENT LAYER OUTPUT ARRAYS
-        PSUM = np.zeros_like(xp)
-        QSUM = np.zeros_like(xp)
+            CDIP = m.cos(m.radians(inclination))
+            CDIPD = m.cos(m.radians(inclination))
+            SDIP = m.sin(m.radians(inclination))
+            SDIPD = m.sin(m.radians(inclination))
 
-        # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
-        for v in range(0, nverts):
-            # SET THE CURRENT INPUT VERTEX
-            xv = x[v] - xp
-            zv = z[v] - zp
-            # SET THE SECOND VERTEX
-            if v == nverts - 1:
-                xv2 = x[0] - xp
-                zv2 = z[0] - zp
-            else:
-                # PAIR THE LAST VERTEX WITH THE FIRST ONE
-                xv2 = x[v + 1] - xp
-                zv2 = z[v + 1] - zp
+            SD = m.cos(m.radians(model_azimuth - declination))
+            SDD = m.cos(m.radians(model_azimuth - declination))
 
-            # RUN T&H ALGORITHM
-            R1s = (xv ** 2) + (zv ** 2)
-            theta = np.arctan2(zv, xv)
-            R2s = (xv2 ** 2) + (zv2 ** 2)
-            thetab = np.arctan2(zv2, xv2)
-            thetad = theta - thetab
-            X1_2 = xv - xv2
-            Z2_1 = zv2 - zv
-            XSQ = X1_2 ** 2
-            ZSQ = Z2_1 ** 2
-            XZ = Z2_1 * X1_2
-            GL = 0.5 * np.log(R2s / R1s)
+            # INITIALIZE CURRENT LAYER OUTPUT ARRAYS
+            PSUM = np.zeros_like(xp)
+            QSUM = np.zeros_like(xp)
 
-            P = ((ZSQ / (XSQ + ZSQ)) * thetad) + ((XZ / (XSQ + ZSQ)) * GL)
-            Q = ((XZ / (XSQ + ZSQ)) * thetad) - ((ZSQ / (XSQ + ZSQ)) * GL)
-            P[zv == zv2] = 0
-            Q[zv == zv2] = 0
+            # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
+            for v in range(0, nverts):
+                # SET THE CURRENT INPUT VERTEX
+                xv = x[v] - xp
+                zv = z[v] - zp
+                # SET THE SECOND VERTEX
+                if v == nverts - 1:
+                    xv2 = x[0] - xp
+                    zv2 = z[0] - zp
+                else:
+                    # PAIR THE LAST VERTEX WITH THE FIRST ONE
+                    xv2 = x[v + 1] - xp
+                    zv2 = z[v + 1] - zp
 
-            PSUM = P + PSUM
-            QSUM = Q + QSUM
+                # RUN T&H ALGORITHM
+                R1s = (xv ** 2) + (zv ** 2)
+                theta = np.arctan2(zv, xv)
+                R2s = (xv2 ** 2) + (zv2 ** 2)
+                thetab = np.arctan2(zv2, xv2)
+                thetad = theta - thetab
+                X1_2 = xv - xv2
+                Z2_1 = zv2 - zv
+                XSQ = X1_2 ** 2
+                ZSQ = Z2_1 ** 2
+                XZ = Z2_1 * X1_2
+                GL = 0.5 * np.log(R2s / R1s)
 
-        # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
-        VASUM = VASUM + 2. * k * F * ((CDIP * SD * QSUM) - (SDIP * PSUM))
-        HASUM = HASUM + 2. * k * F * ((CDIP * SD * PSUM) + (SDIP * QSUM))
+                # CALCULATE P AND ! FOR EACH NODE PAIR
+                P = ((ZSQ / (XSQ + ZSQ)) * thetad) + ((XZ / (XSQ + ZSQ)) * GL)
+                Q = ((XZ / (XSQ + ZSQ)) * thetad) - ((ZSQ / (XSQ + ZSQ)) * GL)
+                P[zv == zv2] = 0  # IF zv == zv2 THEN P = 0
+                Q[zv == zv2] = 0  # IF zv == zv2 THEN Q = 0
 
-    # CALCULATE TOTAL FIELD ANOMALY
-    n_t = (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
+                # COUNT RUNNING TOTAL
+                PSUM = P + PSUM
+                QSUM = Q + QSUM
+
+            # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
+            VASUM = VASUM + 2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM))
+            HASUM = HASUM + 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
+
+            print ("VASUM = %s") % VASUM
+            print ("HASUM = %s") % HASUM
+            print("")
+
+        # CALCULATE TOTAL FIELD ANOMALY
+        n_t = (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
     return n_t
