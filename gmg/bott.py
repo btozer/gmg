@@ -34,8 +34,11 @@ def gz(xp, zp, polygons):
 
     Parameters:
 
-    * xp, zp : arrays
-        The x and z coordinates of the computation points.
+    * xp : array
+        The x coordinates of the computation points.
+
+    * zp : array
+        The z coordinates of the computation points. (Equals gmg.gravity_observation_elv)
 
     * polygons : list of :func:`~fatiando.mesher.Polygon`
         The density model used.

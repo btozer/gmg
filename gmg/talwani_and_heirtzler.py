@@ -24,7 +24,7 @@ for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115
 import numpy as np
 import math as m
 
-def nt(xp, zp, polygons, f, model_azimuth):
+def nt(xp, zp, polygons, f):
     """
     Calculates the :math:`ntz` magnetic field strength in nT.
 
@@ -56,9 +56,9 @@ def nt(xp, zp, polygons, f, model_azimuth):
         horizontal plane, in a positive clockwise direction from geographic north, in degrees. Will equal D (the
         declination of earth's field) if magnetisation is induced only.
 
-    * model_azimuth : float
-        This is "Angle C" as shown in the documentation. The angle between the positive x axis and geographic north,
-        measured clockwise from geographic north, in degrees.
+    * angle_c : float
+        The angle between the positive x axis and geographic north, measured clockwise from geographic north, in
+        degrees.
 
     * observation_elv : float
         The elevation at which to calculate the predeicted magnetic anomaly. Zero is default (For data reduced to MSL).
@@ -73,13 +73,14 @@ def nt(xp, zp, polygons, f, model_azimuth):
 
     Returns:
 
-    * nt : array
-        The :math:`nt` component calculated on the computation points (xp, zp) (Equal to TASUM in T&H 1964)
+        * nt : array
+        The :math:`n_t` component calculated on the computation points (xp, zp) (TASUM in T&H 1964)
     """
 
     # INITIALISE TOTAL ANOMALY OUTPUT ARRAYS
     VASUM = np.zeros_like(xp)
     HASUM = np.zeros_like(xp)
+    n_t = np.zeros_like(xp)
 
     # LOOP THROUGH THE MODEL POLYGONS
     for polygon in polygons:
@@ -91,20 +92,10 @@ def nt(xp, zp, polygons, f, model_azimuth):
             k = polygon.props['susceptibility']
             k = k / (4 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
 
-            print("zp = %s") % zp
-            print("k = %s") % k
-            print("f = %s") % f
-            print polygon.props['angle_a']
-            print polygon.props['angle_b']
-
             # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
             x = polygon.x
             z = polygon.y
             nverts = polygon.nverts
-
-            print x
-            print z
-            print nverts
 
             # DETERMINE ANGLES IN RADIANS
             inclination = polygon.props['angle_a']
@@ -114,13 +105,10 @@ def nt(xp, zp, polygons, f, model_azimuth):
             SDIPD = m.sin(m.radians(inclination))
 
             declination = polygon.props['angle_b']
+            model_azimuth = polygon.props['angle_c']
             SD = m.cos(m.radians(model_azimuth - declination))
             SDD = m.cos(m.radians(model_azimuth - declination))
 
-            print("model_azimuth = %s") % model_azimuth
-            print("declination = %s") % declination
-            print("SD = %s") % SD
-            print("SDD = %s") % SDD
 
             # INITIALIZE CURRENT LAYER OUTPUT ARRAYS
             PSUM = np.zeros_like(xp)
@@ -131,8 +119,9 @@ def nt(xp, zp, polygons, f, model_azimuth):
                 # SET THE CURRENT INPUT VERTEX
                 xv = x[v] - xp
                 zv = z[v] - zp
-                # SET THE SECOND VERTEX
+
                 if v == nverts - 1:
+                    # SET THE SECOND VERTEX
                     xv2 = x[0] - xp
                     zv2 = z[0] - zp
                 else:
@@ -166,10 +155,6 @@ def nt(xp, zp, polygons, f, model_azimuth):
             # ADD CURRENT POLYGON ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
             VASUM = VASUM + 2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM))
             HASUM = HASUM + 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
-
-            print ("VASUM = %s") % VASUM
-            print ("HASUM = %s") % HASUM
-            print("")
 
         # CALCULATE TOTAL FIELD ANOMALY
         n_t = (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
