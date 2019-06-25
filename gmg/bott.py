@@ -1,15 +1,10 @@
 """
 Calculate the gravitational attraction of a 2D body defined as a polygon of
-infinte extent orthogonal to the cross section using the method of Bott (1965).
+infinite extent orthogonal to the cross section using the method of Bott (1965).
 
 Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
-.. warning:: the vertices must be given clockwise! If not, the result will have
-    an inverted sign.
-
-**Components**
-
-* :func:`~gmg.bott.gz`
+.. warning:: the vertices must be given clockwise! If not, the result will have an inverted sign.
 
 **References**
 
@@ -19,7 +14,7 @@ Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), F
 Python package for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 """
 
-import numpy
+import numpy as np
 from numpy import arctan2, sin, cos, log
 from fatiando.constants import G, SI2MGAL
 
@@ -41,15 +36,15 @@ def gz(xp, zp, polygons):
         The z coordinates of the computation points. (Equals gmg.gravity_observation_elv)
 
     * polygons : list of :func:`~fatiando.mesher.Polygon`
-        The density model used.
-        Polygons must have the property ``'density'``. Polygons that don't have
-        this property will be ignored in the computations. Elements of
-        *polygons* that are None will also be ignored.
+        Polygons must have the property ``'density'``. Polygons that don't have this property will be ignored in the
+        computations. Elements of*polygons* that are None will also be ignored.
 
         .. note:: The y coordinate of the polygons is used as z!
-        .. note:: Data are numpy arrays
-        .. note:: Uses numpy arrays to calculate gravity effect for slope of node pairs
-                  at all Xp observation points simultaneously
+
+        .. note:: Data are np arrays
+
+        .. note:: Uses np arrays to calculate gravity effect for slope of node pairs at all Xp observation points
+                  simultaneously
     Returns:
 
     * g_z : array
@@ -57,7 +52,7 @@ def gz(xp, zp, polygons):
     """
 
     # INITIALIZE OUTPUT ARRAY
-    g_z = numpy.zeros_like(xp)
+    g_z = np.zeros_like(xp)
 
     # LOOP THROUGH THE MODEL POLYGONS
     for polygon in polygons:
@@ -92,14 +87,14 @@ def gz(xp, zp, polygons):
             theta = -1 * arctan2((zvp1 - zv), (xvp1 - xv))
             phi_1 = arctan2(zv, xv)
             phi_2 = arctan2(zvp1, xvp1)
-            r1 = numpy.sqrt(zv ** 2 + xv ** 2)
-            r2 = numpy.sqrt(zvp1 ** 2 + xvp1 ** 2)
+            r1 = np.sqrt(zv ** 2 + xv ** 2)
+            r2 = np.sqrt(zvp1 ** 2 + xvp1 ** 2)
 
-            current_layer_anomly = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1))
-                                         + (cos(theta)) * (phi_2 - phi_1)) + ((zvp1 * phi_2) - (zv * phi_1)))
+            current_layer_anomaly = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1)) 
+                                     + (cos(theta)) * (phi_2 - phi_1)) + ((zvp1 * phi_2) - (zv * phi_1)))
 
             # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
-            g_z = g_z + current_layer_anomly * density
+            g_z = g_z + current_layer_anomaly * density
 
     # CONVERT TO MGAL AND RETURN ARRAY
     g_z = g_z * SI2MGAL * 2.0 * G

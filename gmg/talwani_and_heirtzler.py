@@ -4,12 +4,7 @@ Heirtzler, J. R. (1964). Polygons are of infinite extent orthogonal to the model
 
 Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
-.. warning:: the vertices must be given clockwise! If not, the result will have
-    an inverted sign.
-
-**Components**
-
-* :func:`~gmg.talwani_and_heirtzler.ntz`
+.. warning:: The vertices must be given clockwise! If not, the result will have an inverted sign.
 
 **References**
 
@@ -24,7 +19,7 @@ for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115
 import numpy as np
 import math as m
 
-def nt(xp, zp, polygons, f):
+def nt(xp, zp, polygons):
     """
     Calculates the :math:`ntz` magnetic field strength in nT.
 
@@ -44,7 +39,7 @@ def nt(xp, zp, polygons, f):
         Polygons must have the property ``'susceptibility'``. Polygons that don't have
         this property will be ignored in the computations. Elements of *polygons* that are None will also be ignored.
 
-    * F : float
+    * f: float
         The total magnetic regional field intensity, in nT.
 
     * angle_a : float
@@ -74,7 +69,7 @@ def nt(xp, zp, polygons, f):
     Returns:
 
         * nt : array
-        The :math:`n_t` component calculated on the computation points (xp, zp) (TASUM in T&H 1964)
+            The :math:`n_t` component calculated on the computation points (xp, zp) (TASUM in T&H 1964)
     """
 
     # INITIALISE TOTAL ANOMALY OUTPUT ARRAYS
@@ -89,8 +84,14 @@ def nt(xp, zp, polygons, f):
         if polygon is None or polygon.props['susceptibility'] == 0.0:
             continue
         else:
+            f = polygon.props['f']
             k = polygon.props['susceptibility']
-            k = k / (4 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
+            if f != 1.0:
+                # IN MAGNETIZATION IS INDUCED ONLY (f > 1.0) THEN CONVERT TO e.m.u UNITS; ELSE INPUT IS IN (A m^-1)
+                k = k / (4 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
+
+            # SET EARTH FIELD
+            f = polygon.props['f']
 
             # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
             x = polygon.x
@@ -108,7 +109,6 @@ def nt(xp, zp, polygons, f):
             model_azimuth = polygon.props['angle_c']
             SD = m.cos(m.radians(model_azimuth - declination))
             SDD = m.cos(m.radians(model_azimuth - declination))
-
 
             # INITIALIZE CURRENT LAYER OUTPUT ARRAYS
             PSUM = np.zeros_like(xp)
