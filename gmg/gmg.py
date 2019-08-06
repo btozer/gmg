@@ -100,10 +100,10 @@ import os
 import sys
 from sys import platform
 from obspy import read
-import cPickle as Pickle
+import pickle as Pickle
 from scipy import signal
 from scipy import interpolate as ip
-from fatiando.mesher import Polygon
+from polygon import Polygon
 import plot_model
 import bott
 import talwani_and_heirtzler
@@ -137,7 +137,7 @@ class Gmg(wx.Frame):
         # print(self.gui_icons_dir)
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__))+"/icons/"
 
-        print(self.gui_icons_dir)
+        print((self.gui_icons_dir))
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
 
@@ -878,7 +878,7 @@ class Gmg(wx.Frame):
             self.ploty = [0.001, 0.001, 0.001, 0.001]
             self.plotx_list[0] = self.plotx
             self.ploty_list[0] = self.ploty
-            self.nextpoly = zip(self.plotx, self.ploty)
+            self.nextpoly = list(zip(self.plotx, self.ploty))
             self.polyline, = self.model_frame.plot(self.plotx, self.ploty, marker='o',
                                                color='k', linewidth=1.0, alpha=0.5, picker=True)
             self.plotx_polygon = np.array(self.plotx)
@@ -893,60 +893,69 @@ class Gmg(wx.Frame):
             self.nextpoly = []
 
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
-        'Make Attribute Label'
+        # MAKE ATTRIBUTE LABEL
         self.attr_text = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
         self.attr_text2 = wx.StaticText(self.fold_panel_one, -1, label="", style=wx.ALIGN_LEFT)
-        'Make NODE X Y Label'
+
+        # MAKE NODE X Y LABEL
         self.node_text = wx.StaticText(self.fold_panel_one, -1, label="Node Position:", style=wx.ALIGN_LEFT)
-        'Make density spinner'
+
+        # MaKE DENSITY SPINNER
         self.density_text = wx.StaticText(self.fold_panel_one, -1, label="Density:         ", style=wx.ALIGN_LEFT)
         self.density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
         self.density_input.SetFormat("%f")
         self.density_input.SetDigits(4)
-        'Make refernece density spinner'
+
+        # MAKE REFERENCE DENSITY SPINNER
         self.ref_density_text = wx.StaticText(self.fold_panel_one, -1, label="Reference:     \nDensity",
                                               style=wx.ALIGN_LEFT)
         self.ref_density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001,
                                               value=0.00)
         self.ref_density_input.SetFormat("%f")
         self.ref_density_input.SetDigits(4)
-        'Make susceptibility spinner'
+
+        # MAKE SUSCEPTIBILITY SPINNER
         self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label="Susceptibility:", style=wx.ALIGN_LEFT)
         self.susceptibility_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-2.0, max_val=2.0, increment=0.00001,
                                                  value=0.00)
         self.susceptibility_input.SetFormat("%f")
         self.susceptibility_input.SetDigits(6)
-        'MAKE ANGLE A SPINNER'
+
+        # MAKE ANGLE A SPINNER
         self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label="Angle A (Inc): ", style=wx.ALIGN_LEFT)
         self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=90.0, increment=1.0, value=0.0)
         self.angle_a_input.SetFormat("%f")
         self.angle_a_input.SetDigits(1)
-        'Make ANGLE B SPINNER'
+
+        # MAKE ANGLE B SPINNER'
         self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label="Angle B (Dec):", style=wx.ALIGN_LEFT)
         self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=180.0, increment=1.0, value=0.0)
         self.angle_b_input.SetFormat("%f")
         self.angle_b_input.SetDigits(1)
-        'Make well text size slider'
+
+        # MAKE WELL TEXT SIZE SLIDER
         self.text_size_text = wx.StaticText(self.fold_panel_one, -1, label="Label Text Size:")
         self.text_size_input = wx.Slider(self.fold_panel_one, value=1, minValue=1, maxValue=20., size=(175, -1),
                                          style=wx.SL_HORIZONTAL)
-        'Make Node XY spinners'
+
+        # MAKE NODE XY SPINNERS
         self.x_text = wx.StaticText(self.fold_panel_one, -1, label="X:")
         self.x_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.x_input.SetDigits(4)
         self.y_text = wx.StaticText(self.fold_panel_one, -1, label="Y:")
         self.y_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
         self.y_input.SetDigits(4)
-        'Make Set button'
+
+        # MAKE SET BUTTON
         self.node_set_button = wx.Button(self.fold_panel_one, -1, "Set layer attributes")
 
-        'INITALISE CALCULATED P.F. LINES'
+        # INITALISE CALCULATED P.F. LINES
         self.predplot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
         self.grav_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         self.prednt_plot, = self.magnetic_frame.plot([], [], '-g', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
-        'MAKE LAYER TREE'
+        # MAKE LAYER TREE'
         self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
         self.tree.SetIndent(0.0)
@@ -954,7 +963,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.tree)
         self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.tree)
 
-        'TREE ATTRIBUTES'
+        # TREE ATTRIBUTES
         self.root = self.tree.AddRoot("Layers:")
         self.tree.SetItemPyData(self.root, None)
         self.tree_items = ["Layer 0"]
@@ -963,7 +972,7 @@ class Gmg(wx.Frame):
         self.error = 0.
         self.last_layer = 0
 
-        'MAKE FAULT TREE'
+        # MAKE FAULT TREE
         self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 331),
                                             agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_EDIT_LABELS | wx.TR_HIDE_ROOT)
         self.fault_tree.SetIndent(0.0)
@@ -972,16 +981,16 @@ class Gmg(wx.Frame):
         ### self.Bind(wx.EVT_TREE_BEGIN_LABEL_EDIT, self.on_begin_edit_label, self.fault_tree)
         ### self.Bind(wx.EVT_TREE_END_LABEL_EDIT, self.on_end_edit_label, self.fault_tree)
 
-        'TREE ATTRIBUTES'
+        # TREE ATTRIBUTES
         self.fault_tree_root = self.fault_tree.AddRoot("Faults:")
         self.fault_tree.SetItemPyData(self.fault_tree_root, None)
         self.fault_tree_items = []
         self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.fault_checked, self.fault_tree)
 
-        'UPDATE INFO BAR'
+        # UPDATE INFO BAR
         self.display_info()
 
-        'DRAW MAIN'
+        # DRAW MAIN
         self.draw()
 
     def frame_adjustment(self, event):
@@ -1020,8 +1029,8 @@ class Gmg(wx.Frame):
 
         # ADJUST FRAME SIZING AND SET PROGRAM WINDOW
         if self.topo_frame_switch is True and self.gravity_frame_switch is True and self.magnetic_frame_switch is True:
-            'TRUE TRUE TRUE'
-            'TOPO CANVAS'
+            # TRUE TRUE TRUE
+            # TOPO CANVAS
             self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
             self.topo_frame.set_ylabel("(m)")
             self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -1738,7 +1747,7 @@ class Gmg(wx.Frame):
             try:
                 self.save_dict[header[i]] = model_params[i]
             except IOError:
-                print(header[i])
+                print((header[i]))
         try:
             output_stream = save_file_dialog.GetPath()
             out = open(output_stream, 'w')
@@ -1775,7 +1784,7 @@ class Gmg(wx.Frame):
 
             # LOAD DATA INTO MODEL
             for x in range(len(model_data)):
-                setattr(self, model_data.keys()[x], model_data.values()[x])
+                setattr(self, list(model_data.keys())[x], list(model_data.values())[x])
 
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
@@ -2123,8 +2132,8 @@ class Gmg(wx.Frame):
                 outcrop.labels = [None] * len(outcrop.data)
 
                 # CREATE TEXT XYT
-                text = zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
-                           outcrop.data[:, 3].astype(str))
+                text = list(zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
+                           outcrop.data[:, 3].astype(str)))
 
                 for i in range(len(outcrop.data)):
 
@@ -2353,7 +2362,7 @@ class Gmg(wx.Frame):
             return  # THE USER CHANGED THEIR MIND
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
-        np.savetxt(outputfile, zip((self.xp * 0.001), self.predgz), delimiter=' ', fmt='%.6f %.6f')
+        np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predgz)), delimiter=' ', fmt='%.6f %.6f')
 
     # MAGNETIC DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2439,7 +2448,7 @@ class Gmg(wx.Frame):
 
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
-        np.savetxt(outputfile, zip((self.xp * 0.001), self.prednt), delimiter=' ', fmt='%.6f %.6f')
+        np.savetxt(outputfile, list(zip((self.xp * 0.001), self.prednt)), delimiter=' ', fmt='%.6f %.6f')
 
     # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2644,7 +2653,7 @@ class Gmg(wx.Frame):
         """
         LOAD A WELL RECORD INTO THE MODEL FRAME.
         IDs BEGIN AT 3000.
-        HIDE/SHOW TOGGLE IDs BEGIN AT 2000.    
+        HIDE/SHOW TOGGLE IDs BEGIN AT 2000.
         """
 
         # CREATE INSTANCE OF LOADING DIALOG BOX
@@ -2741,7 +2750,7 @@ class Gmg(wx.Frame):
 
     def show_hide_well(self, event):
         print("Hide/Show well")
-        print(event.Id)
+        print((event.Id))
         id = event.Id - 2000
         if self.well_data_list[id].mpl_actor[0].get_visible():
             # HIDE WELL
@@ -2832,8 +2841,8 @@ class Gmg(wx.Frame):
         outcrop.labels = [None] * len(outcrop.data)
 
         # CREATE TEXT XYT
-        text = zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
-                   outcrop.data[:, 3].astype(str))
+        text = list(zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
+                   outcrop.data[:, 3].astype(str)))
 
         for i in range(len(outcrop.data)):
 
@@ -3004,7 +3013,7 @@ class Gmg(wx.Frame):
                             # THEN RETURN THE INDEX
                             self.index_arg2_list[x] = i
                             print("self.index_arg2_list =")
-                            print self.index_arg2_list
+                            print(self.index_arg2_list)
                             self.pinch_switch = True
                         else:
                             continue
@@ -3278,7 +3287,7 @@ class Gmg(wx.Frame):
             elif self.click_count < 3:
                 self.new_layer_nodes[0].set_xdata(self.new_plotx)
                 self.new_layer_nodes[0].set_ydata(self.new_ploty)
-                self.new_layer_fill[0].set_xy(zip(self.new_plotx, self.new_ploty))
+                self.new_layer_fill[0].set_xy(list(zip(self.new_plotx, self.new_ploty)))
 
                 # INCREMENT CLICK COUNTER
                 self.click_count += 1
@@ -3779,8 +3788,8 @@ class Gmg(wx.Frame):
                     out = csv.writer(f, delimiter=' ')
                     f.write('>\n')
                     data = [self.plotx_list[i], self.ploty_list[i]]
-                    out.writerows(zip(*data))
-                    layer_write = zip(self.plotx_list[i], self.ploty_list[i])
+                    out.writerows(list(zip(*data)))
+                    layer_write = list(zip(self.plotx_list[i], self.ploty_list[i]))
                     # WRITE INDIVIDUAL LAYER
                     np.savetxt(output_dir + '/' + self.loaded_tree_items[i] + '.xy', layer_write, delimiter=' ',
                                fmt='%f %f')
@@ -3802,7 +3811,7 @@ class Gmg(wx.Frame):
             # LAYER NODES
             for i in range(0, self.layer_count + 1):
                 f.write('B  {0}\n'.format(i + 1))
-                data = zip(self.plotx_list[i], self.ploty_list[i], np.ones(len(self.ploty_list[i])))
+                data = list(zip(self.plotx_list[i], self.ploty_list[i], np.ones(len(self.ploty_list[i]))))
                 # print data
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d')
 
@@ -3819,9 +3828,9 @@ class Gmg(wx.Frame):
 
                 # FORMAT c.in FILE
                 f.write('B  {0}\n'.format(i))
-                data = zip(self.plotx_list[i], np.linspace(velocity, velocity, len(self.ploty_list[i])),
+                data = list(zip(self.plotx_list[i], np.linspace(velocity, velocity, len(self.ploty_list[i])),
                            np.ones(len(self.ploty_list[i])), np.linspace(velocity, velocity, len(self.ploty_list[i])),
-                           np.ones(len(self.ploty_list[i])))
+                           np.ones(len(self.ploty_list[i]))))
 
                 # OUTPUT FILE
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d %3.02f %1d')
@@ -4161,7 +4170,7 @@ class Gmg(wx.Frame):
             self.new_layer_thickness = new_layer_dialogbox.new_thickness
             self.plotx = layer_above_x
             self.ploty = layer_above_y + self.new_layer_thickness
-            self.nextpoly = zip(self.plotx, self.ploty)
+            self.nextpoly = list(zip(self.plotx, self.ploty))
 
             # CREATE LAYER LINE
             self.layer_lines[self.layer_counter] = self.model_frame.plot(self.plotx_list[self.layer_counter],
@@ -4230,7 +4239,7 @@ class Gmg(wx.Frame):
             self.item = 'layer %s' % (int(self.layer_counter))
             self.add_new_tree_nodes(self.root, self.item, self.layer_counter)
             self.layers_calculation_switch.append(1)
-            self.nextpoly = zip(self.plotx, self.ploty)
+            self.nextpoly = list(zip(self.plotx, self.ploty))
 
             # CREATE LAYER LINE
             self.layer_lines[self.layer_counter] = self.model_frame.plot(self.plotx_list[self.layer_counter],
@@ -4293,7 +4302,7 @@ class Gmg(wx.Frame):
         self.layers_calculation_switch.append(0)
         self.plotx = new_layer[:, 0]
         self.ploty = new_layer[:, 1]
-        self.nextpoly = zip(self.plotx, self.ploty)
+        self.nextpoly = list(zip(self.plotx, self.ploty))
 
         # CREATE LAYER LINE
         self.layer_lines[self.layer_counter] = self.model_frame.plot(self.plotx_list[self.layer_counter],
@@ -4578,7 +4587,7 @@ class Gmg(wx.Frame):
                                                       alpha=self.layer_transparency, closed=True, linewidth=None,
                                                       ec=None)
 
-            self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
+            self.polygons.append(list(zip(self.plotx_polygon, self.ploty_polygon)))
 
         # MODEL LAYERS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # CREATE LAYER LINES
@@ -4677,7 +4686,7 @@ class Gmg(wx.Frame):
                     self.plotx_polygon = np.array(self.plotx_list[i])
                     self.ploty_polygon = np.array(self.ploty_list[i])
 
-                self.polygons.append(zip(self.plotx_polygon, self.ploty_polygon))
+                self.polygons.append(list(zip(self.plotx_polygon, self.ploty_polygon)))
             # -----------------------------------------------------------------------------------------------------------
 
             # UPDATE LAYER POLYGONS AND LINES
@@ -5129,7 +5138,7 @@ class Gmg(wx.Frame):
 class Layer:
     """
     CREATE A MODEL LAYER OBJECT.
-    THE LAYER WILL BE STORED IN THE gmg.layers_list LIST
+    THE LAYER WILL BE STORED IN THE *gmg.layers_list'* LIST
     """
     def __init__(self):
         self.mpl_actor = None
@@ -5150,7 +5159,7 @@ class Layer:
         self.layer_transparency = 0.4
         self.pinch_node_list = [[], []]
         self.pinch_count = 0
-        self.layers_calculation_switch = True  # SWITCH TO DICTATE IF THE LAYER IS INCLUDED IN THE CURRENT CALC
+        self.layers_calculation_switch = True  # SWITCH TO DICTATE IF THE LAYER IS INCLUDED IN THE CURRENT CALCULATIONS
 
 
 class ObservedData:
@@ -5167,7 +5176,7 @@ class ObservedData:
 class ObservedOutcropData:
     """GENERIC CLASS FOR AN OBSERVATIONAL OUTCROP DATA OBJECT"""
     def __init__(self):
-        self.id = None
+        self.id = None  # OBJECT ID VALUE FOR wx
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
         self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
@@ -5181,8 +5190,6 @@ class SegyData:
         self.mpl_actor = None
         self.axis = None
         self.color_map = cm.gray
-        
-        
         self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
         self.gain_positive = 4.0
         self.gain_neg = -self.gain_positive
@@ -6089,7 +6096,7 @@ class CaptureCoordinates(wx.Frame):
             y.append(float(coordinate_list.table.GetItem(itemIdx=i, col=1).GetText()))
 
         # OUTPUT DATA
-        np.savetxt(output_stream, zip(x, y), delimiter=' ', fmt='%0.6f %0.6f')
+        np.savetxt(output_stream, list(zip(x, y)), delimiter=' ', fmt='%0.6f %0.6f')
 
     def on_close_button(coordinate_list, event):
         coordinate_list.parent.capture = False
@@ -6470,25 +6477,25 @@ class AttributeEditor(wx.Frame):
         # SHOW CELL SELECTION
         # IF SELECTION IS CELL
         if attribute_edit.attr_grid.GetSelectedCells():
-            print("Selected cells " + str(attribute_edit.GetSelectedCells()))
+            print(("Selected cells " + str(attribute_edit.GetSelectedCells())))
         # IF SELECTION IS BLOCK
         if attribute_edit.attr_grid.GetSelectionBlockTopLeft():
-            print("Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft()))
+            print(("Selection block top left " + str(attribute_edit.attr_grid.GetSelectionBlockTopLeft())))
         if attribute_edit.attr_grid.GetSelectionBlockbottomRight():
-            print("Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight()))
+            print(("Selection block bottom right " + str(attribute_edit.attr_grid.GetSelectionBlockbottomRight())))
         # IF SELECTION IS COL
         if attribute_edit.attr_grid.GetSelectedCols():
-            print("Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols()))
+            print(("Selected cols " + str(attribute_edit.attr_grid.GetSelectedCols())))
         # IF SELECTION IS ROW
         if attribute_edit.attr_grid.GetSelectedRows():
-            print("Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows()))
+            print(("Selected rows " + str(attribute_edit.attr_grid.GetSelectedRows())))
 
     def currentcell(attribute_edit):
         # SHOW CURSOR POSITION
         row = attribute_edit.attr_grid.GetGridCursorRow()
         col = attribute_edit.attr_grid.GetGridCursorCol()
         cell = (row, col)
-        print("Current cell " + str(cell))
+        print(("Current cell " + str(cell)))
 
     def copy(attribute_edit):
         # NUMBER OF ROWS AND COLS
