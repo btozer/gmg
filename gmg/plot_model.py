@@ -55,7 +55,7 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     # FIGURE FONT SIZE
     fs = fs
 
-    print str(font_type)
+    print(str(font_type))
 
     # FONT TYPE
     plt.rc('font', family=str(font_type), size=fs)
@@ -240,11 +240,11 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
     # ******************************************************************************************************************
     # # PLOT LAYER POLYGONS
     print(draw_polygons)
-    print len(layer_list)
+    print(len(layer_list))
     if draw_polygons is True:
         print("draw_polygons is True")
         for i in range(0, len(layer_list)):
-            print("drawing polygon %s") % i
+            print(("drawing polygon %s") % i)
             # GET ACTOR ATTRIBUTES
             x = layer_list[i].polygon_mpl_actor[0].get_xy()[:,0]
             y = layer_list[i].polygon_mpl_actor[0].get_xy()[:,1]
@@ -252,11 +252,11 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
             fa =  layer_list[i].polygon_mpl_actor[0].get_alpha()
             lc = layer_list[i].color
 
-            print x
-            print y
-            print fc
-            print fa
-            print lc
+            print(x)
+            print(y)
+            print(fc)
+            print(fa)
+            print(lc)
 
             # DRAW ACTOR LINE
             ax4.plot(x, y, color=lc, linewidth=layer_line_width, alpha=layer_line_alpha, zorder=1)

@@ -294,7 +294,7 @@ class Gmg(wx.Frame):
         self.gravity_frame_switch = True
         self.magnetic_frame_switch = True
         self.m_model_frames_submenu = wx.Menu()
-        model_view_file.Append(-1, 'Toggle Model Frames', self.m_model_frames_submenu)
+        model_view_file.AppendSubMenu(self.m_model_frames_submenu, "Toggle Model Frames")
         self.m_model_frames_submenu.Append(601, 'Topography')
         self.Bind(wx.EVT_MENU, self.frame_adjustment, id=601)
         self.m_model_frames_submenu.Append(602, 'Gravity')
@@ -318,7 +318,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_obs_g, m_load_obs_g)
         # EDIT
         self.m_obs_g_submenu = wx.Menu()
-        self.gravity_data.Append(-1, 'Gravity Data...', self.m_obs_g_submenu)
+        self.gravity_data.AppendSubMenu(self.m_obs_g_submenu, "Gravity Data...")
         # FILTER MENU
         grav_m_filter_observed = self.gravity_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_gravity, grav_m_filter_observed)
@@ -349,7 +349,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_obs_m, m_load_obs_m)
         # EDIT
         self.m_obs_mag_submenu = wx.Menu()
-        self.magnetic_data.Append(-1, 'Magnetic Anomalies...', self.m_obs_mag_submenu)
+        self.magnetic_data.AppendSubMenu(self.m_obs_mag_submenu, "Magnetic Anomalies...")
         # FILTER MENU
         mag_m_filter_observed = self.magnetic_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_magnetic, mag_m_filter_observed)
@@ -379,7 +379,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_topo, m_load_topo)
         # EDIT
         self.m_topo_submenu = wx.Menu()
-        self.topography_data.Append(-1, 'Topography Data', self.m_topo_submenu)
+        self.topography_data.AppendSubMenu(self.m_topo_submenu, "Topography Data")
         # FILTER MENU
         topo_m_filter_observed = self.topography_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_topography, topo_m_filter_observed)
@@ -397,7 +397,7 @@ class Gmg(wx.Frame):
         m_load_xy = self.xy_data.Append(-1, "&Load XY Points...\tCtrl-L", "Load XY Points...")
         self.Bind(wx.EVT_MENU, self.load_xy, m_load_xy)
         self.m_xy_submenu = wx.Menu()
-        self.xy_data.Append(-1, 'XY Data...', self.m_xy_submenu)
+        self.xy_data.AppendSubMenu(self.m_xy_submenu, "XY Data...")
         # DRAW MENU
         self.menubar.Append(self.xy_data, "&XY Data")
         # --------------------------------------------------------------------------------------------------------------
@@ -409,13 +409,13 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.segy_input, self.m_load_segy)
         # SEGY NAME LIST
         self.m_segy_submenu = wx.Menu()
-        self.seismic_data.Append(-1, 'SEGY Data...', self.m_segy_submenu)
+        self.seismic_data.AppendSubMenu(self.m_segy_submenu, "SEGY Data...")
         # GAIN
         self.m_gain = wx.Menu()
-        self.seismic_data.Append(-1, 'Gain', self.m_gain)
+        self.seismic_data.AppendSubMenu(self.m_gain, "Gain")
         # COLOR PALETTE
         self.m_color_palette = wx.Menu()
-        self.seismic_data.Append(-1, 'Color Palette', self.m_color_palette)
+        self.seismic_data.AppendSubMenu(self.m_color_palette, "Color Palette")
         self.m_color_palette.Append(901, 'Grey')
         self.Bind(wx.EVT_MENU, self.segy_color_adjustment, id=901)
         self.m_color_palette.Append(902, 'Seismic')
@@ -436,7 +436,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_well, self.m_load_well)
         # WELL SUBMENU
         self.m_wells_submenu = wx.Menu()
-        self.well_data.Append(-1, 'Wells...', self.m_wells_submenu)
+        self.well_data.AppendSubMenu(self.m_wells_submenu, "Wells...")
         # DRAW MENU
         self.menubar.Append(self.well_data, "&Well Data")
         # --------------------------------------------------------------------------------------------------------------
@@ -448,7 +448,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_outcrop_data, self.m_load_outcrop_data)
 
         self.m_outcrop_submenu = wx.Menu()
-        self.outcrop_file.Append(-1, 'Outcrop Data...', self.m_outcrop_submenu)
+        self.outcrop_file.AppendSubMenu(self.m_outcrop_submenu, "Outcrop Data...")
 
         self.menubar.Append(self.outcrop_file, "&Outcrop data")
         # --------------------------------------------------------------------------------------------------------------
@@ -463,7 +463,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_layer, self.m_load_layer)
         # TRANSPARENCY
         self.m_layer_transperency = wx.Menu()
-        self.layer_file.Append(-1, 'Transparency', self.m_layer_transperency)
+        self.layer_file.AppendSubMenu(self.m_layer_transperency, "Transparency")
         # TRANSPARENCY INCREASE
         self.m_layer_transparency_increase = self.m_layer_transperency.Append(-1, "Increase...", "Increase...")
         self.Bind(wx.EVT_MENU, self.transparency_increase, self.m_layer_transparency_increase)
@@ -4767,7 +4767,7 @@ class Gmg(wx.Frame):
             polys = []
             for p, d in zip(polygons_to_use, densities_to_use):
                 polys.append(Polygon(1000 * np.array(p), {'density': d}))
-            self.predgz = bott.Gz(self.xp, self.zp, polys)
+            self.predgz = bott.gz(self.xp, self.zp, polys)
         else:
             self.predgz = np.zeros_like(self.xp)
         self.predplot.set_data(self.xp * 0.001, self.predgz)
