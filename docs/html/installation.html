@@ -183,27 +183,26 @@
 <div class="section" id="pre-installation">
 <h2>Pre-Installation<a class="headerlink" href="#pre-installation" title="Permalink to this headline">¶</a></h2>
 <p><strong>Step 1: Install an Anaconda python distribution</strong></p>
-<p>The simplest way to install gmg is to first install an Anaconda Python distribution: www.anaconda.com/download</p>
+<p>The simplest way to install GMG is to first install an Anaconda Python distribution: www.anaconda.com/download</p>
 <p>This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
-package manager. It is recommended you download the python3 version, even though GMG is written in python2.7 (you can
-create a python2.7 environment to run GMG).</p>
+package manager. GMG is written in python3 so you will need the python3 version of Anaconda.</p>
 <p><strong>Step 2: Create a new python environment for gmg</strong></p>
-<p>It may be useful to create a new python2.7 conda environment to use when running gmg. This will avoid any potential
-conflicts with your current system configuration. e.g.:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda create -n py27-gmg python=2.7 anaconda
-</pre></div>
-</div>
+<p>It may be useful to create a new conda environment to use when running gmg. This will avoid any potential conflicts
+with your current system configuration. e.g.:</p>
+<blockquote>
+<div><p>conda create -n gmg-env python=3.7 anaconda</p>
+</div></blockquote>
 <p>Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
-but the documentation will use the name py27-gmg).</p>
+but the documentation will use the name gmg-env).</p>
 <p>On macOS and Linux this environment can then be activated using:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source activate py27-gmg
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source activate gmg-env
 </pre></div>
 </div>
 <p>Or on Windows use:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate py27-gmg
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate gmg-env
 </pre></div>
 </div>
-<p>Once the environment is activated any call to python will only “see” the packages install within the py27-gmg
+<p>Once the environment is activated any call to python will only “see” the packages install within the gmg-env
 environment. To deactivate the environment either close the terminal window or on macOS and Linux run:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source deactivate
 </pre></div>
@@ -220,12 +219,12 @@ installation problems on github.</p>
 <div class="section" id="installing-gmg">
 <h2>Installing gmg<a class="headerlink" href="#installing-gmg" title="Permalink to this headline">¶</a></h2>
 <p><strong>Step 1:</strong></p>
-<p>Ensure your py27-gmg environment is active, on macOS or Linux use:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source activate py27-gmg
+<p>Ensure your gmg-env environment is active, on macOS or Linux use:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source activate gmg-env
 </pre></div>
 </div>
 <p>Or on Windows use:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate py27-gmg
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate gmg-env
 </pre></div>
 </div>
 <p><strong>Step 2: Install dependencies</strong></p>
@@ -238,7 +237,7 @@ installation problems on github.</p>
 <li><p><a class="reference external" href="http://www.fatiando.org/">fatiando a terra</a></p></li>
 <li><p><a class="reference external" href="http://docs.obspy.org/">ObsPy</a></p></li>
 </ul>
-<p>These dependencies can be installed in your py27-gmg environment using the command:</p>
+<p>These dependencies can be installed in your gmg-env environment using the command:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda install wxpython numpy scipy matplotlib fatiando obspy
 </pre></div>
 </div>
@@ -272,7 +271,7 @@ directory.</p>
 </pre></div>
 </div>
 <p>and then add the line:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>alias gmg=&#39;python ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>alias gmg=&#39;python ~/anaconda3/envs/gmg-env/lib/python2.7/site-packages/gmg/gmg.py&#39;
 </pre></div>
 </div>
 <p>NB. for macOS users you may need to invoke pythonw instead of python if you receive the message:</p>
@@ -282,7 +281,7 @@ on the main display of your Mac.
 </pre></div>
 </div>
 <p>i.e.:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>alias gmg=&#39;pythonw ~/anaconda3/envs/py27-gmg/lib/python2.7/site-packages/gmg/gmg.py&#39;
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>alias gmg=&#39;pythonw ~/anaconda3/envs/gmg-env/lib/python3.7/site-packages/gmg/gmg.py&#39;
 </pre></div>
 </div>
 <p>Now, in a fresh terminal, simple type “gmg” on the command line to launch the software:</p>
