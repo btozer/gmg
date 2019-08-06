@@ -16,8 +16,10 @@ Python package for modeling and inversion in geophysics. figshare. doi:10.6084/m
 
 import numpy as np
 from numpy import arctan2, sin, cos, log
-from fatiando.constants import G, SI2MGAL
 
+# CONSTANTS
+SI2MGAL = 100000.0  # Conversion factor from SI units to mGal: :math:`1\ m/s^2 = 10^5\ mGal`
+G = 0.00000000006673  # The gravitational constant in :math:`m^3 kg^{-1} s^{-1}`
 
 def gz(xp, zp, polygons):
     """
@@ -90,7 +92,7 @@ def gz(xp, zp, polygons):
             r1 = np.sqrt(zv ** 2 + xv ** 2)
             r2 = np.sqrt(zvp1 ** 2 + xvp1 ** 2)
 
-            current_layer_anomaly = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1)) 
+            current_layer_anomaly = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1))
                                      + (cos(theta)) * (phi_2 - phi_1)) + ((zvp1 * phi_2) - (zv * phi_1)))
 
             # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
