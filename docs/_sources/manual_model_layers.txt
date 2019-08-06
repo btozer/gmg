@@ -21,6 +21,10 @@ You will be prompted with the option of adding a *'New fixed layer'* or a *'New 
 
 Floating layers are polygons that are fully contained within the model space. For example, a narrow salt dome.
 
+..warning:
+
+    Floating layer nodes must be input **counter clockwise** otherwise the calculated anomaly will have the wrong sign!
+
 **Fixed layers:**
 
 Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basin

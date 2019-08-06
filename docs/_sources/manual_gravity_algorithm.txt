@@ -7,7 +7,7 @@
 Two dimensional gravity anomalies are calculated using a python implementation of Bott's (1969) :cite:`bott1969`
 algorithm. This is similar to that derived by Talwani et al., (1959) :cite:`talwani1959` and operates by setting the
 observation point as the origin of a Cartesian coordinate system and treating the periphery of a given body as an
-n-sided polygon, defined by of discrete set of nodal points. The total gravity anomaly is then calculated by evaluating
+n-sided polygon, defined by a discrete set of nodal points. The total gravity anomaly is then calculated by evaluating
 the solution for a semi-infinite horizontal slab with one sloping interface for each set of nodal pairs and then summing
 the results. The analytic solution for this is given by Heiland (1940) :cite:`heiland1940` page. 153 as:
 

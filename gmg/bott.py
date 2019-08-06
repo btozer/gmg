@@ -1,15 +1,10 @@
 """
 Calculate the gravitational attraction of a 2D body defined as a polygon of
-infinte extent orthogonal to the cross section using the method of Bott (1965).
+infinite extent orthogonal to the cross section using the method of Bott (1965).
 
 Use the :func:`~fatiando.mesher.Polygon` object to create polygons.
 
-.. warning:: the vertices must be given clockwise! If not, the result will have
-    an inverted sign.
-
-**Components**
-
-* :func:`~gmg.gravmag.bott.gz`
+.. warning:: the vertices must be given clockwise! If not, the result will have an inverted sign.
 
 **References**
 
@@ -19,12 +14,12 @@ Uieda, L, Oliveira Jr, V C, Ferreira, A, Santos, H B; Caparica Jr, J F (2014), F
 Python package for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115194
 """
 
-import numpy
+import numpy as np
 from numpy import arctan2, sin, cos, log
 from fatiando.constants import G, SI2MGAL
 
 
-def Gz(xp, zp, polygons, dens=None):
+def gz(xp, zp, polygons):
     """
     Calculates the :math:`g_z` gravity acceleration component.
 
@@ -34,47 +29,57 @@ def Gz(xp, zp, polygons, dens=None):
 
     Parameters:
 
-    * xp, zp : arrays
-        The x and z coordinates of the computation points.
+    * xp : array
+        The x coordinates of the computation points.
+
+    * zp : array
+        The z coordinates of the computation points. (Equals gmg.gravity_observation_elv)
+
     * polygons : list of :func:`~fatiando.mesher.Polygon`
-        The density model used.
-        Polygons must have the property ``'density'``. Polygons that don't have
-        this property will be ignored in the computations. Elements of
-        *polygons* that are None will also be ignored.
-    * dens : float or None
+        Polygons must have the property ``'density'``. Polygons that don't have this property will be ignored in the
+        computations. Elements of*polygons* that are None will also be ignored.
 
         .. note:: The y coordinate of the polygons is used as z!
-        .. note:: Data are numpy arrays
-        .. note:: Uses numpy arrays to calculate gravity effect for slope of node pairs
-                  at all Xp observation points simultaneously
+
+        .. note:: Data are np arrays
+
+        .. note:: Uses np arrays to calculate gravity effect for slope of node pairs at all Xp observation points
+                  simultaneously
     Returns:
 
     * g_z : array
         The :math:`g_z` component calculated on the computation points
-
     """
 
-    g_z = numpy.zeros_like(xp)
+    # INITIALIZE OUTPUT ARRAY
+    g_z = np.zeros_like(xp)
+
+    # LOOP THROUGH THE MODEL POLYGONS
     for polygon in polygons:
-        if polygon is None or ('density' not in polygon.props and dens is None):
+
+        # CHECK IF THE CURRENT LAYER HAS A DENSITY CONTRAST SET. SKIP LAYER IF FALSE
+        if polygon is None or 'density' not in polygon.props:
             continue
-        if dens is None:
-            density = polygon.props['density']
         else:
-            density = dens
+            density = polygon.props['density']
+
+        # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
         x = polygon.x
         z = polygon.y
         nverts = polygon.nverts
+
+        # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
         for v in range(nverts):
-            # CHANGE THE COORDINATES OF THIS VERTICE
+            # SET THE CURRENT INPUT VERTEX
             xv = x[v] - xp
             zv = z[v] - zp
 
-            # THE LAST VERTICE PAIRS WITH THE FIRST ONE
+            # SET THE SECOND VERTEX
             if v == nverts - 1:
                 xvp1 = x[0] - xp
                 zvp1 = z[0] - zp
             else:
+                # PAIR THE LAST VERTEX WITH THE FIRST ONE
                 xvp1 = x[v + 1] - xp
                 zvp1 = z[v + 1] - zp
 
@@ -82,13 +87,15 @@ def Gz(xp, zp, polygons, dens=None):
             theta = -1 * arctan2((zvp1 - zv), (xvp1 - xv))
             phi_1 = arctan2(zv, xv)
             phi_2 = arctan2(zvp1, xvp1)
-            r1 = numpy.sqrt(zv ** 2 + xv ** 2)
-            r2 = numpy.sqrt(zvp1 ** 2 + xvp1 ** 2)
+            r1 = np.sqrt(zv ** 2 + xv ** 2)
+            r2 = np.sqrt(zvp1 ** 2 + xvp1 ** 2)
 
-            tmp = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1)) +
-                                                                  (cos(theta)) * (phi_2 - phi_1)) +
-                                                                    ((zvp1 * phi_2) - (zv * phi_1)))
+            current_layer_anomaly = (((xv * (sin(theta))) + (zv * (cos(theta)))) * ((sin(theta)) * (log(r2 / r1)) 
+                                     + (cos(theta)) * (phi_2 - phi_1)) + ((zvp1 * phi_2) - (zv * phi_1)))
 
-            g_z = g_z + tmp * density
+            # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
+            g_z = g_z + current_layer_anomaly * density
+
+    # CONVERT TO MGAL AND RETURN ARRAY
     g_z = g_z * SI2MGAL * 2.0 * G
     return g_z
