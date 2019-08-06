@@ -52,26 +52,25 @@ Pre-Installation
 The simplest way to install GMG is to first install an Anaconda Python distribution: www.anaconda.com/download
 
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows)
-using the Conda package manager.  It is recommended you download the python3 version, even though GMG is written 
-in python2.7 (you can create a python2.7 environment to run GMG).
+using the Conda package manager.  GMG is written in python3 so you will need the python3 version of Anaconda.
 
 **Step 2: Create a new python environment for gmg**
 
-It may be useful to create a new python2.7 conda environment to use when running gmg. This will avoid any potential
+It may be useful to create a new conda environment to use when running gmg. This will avoid any potential
 conflicts with your current system configuration. e.g.:
 
-    conda create -n py27-gmg python=2.7 anaconda
+    conda create -n gmg-env python=3.7 anaconda
 
 Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like,
-but the documentation will use the name py27-gmg).
+but the documentation will use the name gmg-env).
 
 On macOS and Linux this environment can then be activated using:
 
-    source activate py27-gmg
+    source activate gmg-env
 
 On Windows use:
 
-    activate py27-gmg
+    activate gmg-env
 
 Once the environment is activated any call to python will only "see" the packages installed within the py27-gmg
 environment. To deactivate the environment either close the terminal window or on macOS and Linux run:
@@ -84,7 +83,7 @@ On Windows use:
 
 **OS Support:**
 
-GMG is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS High Sierra** operating systems. 
+GMG is (for the time being) only tested on **Ubuntu 14.04 Linux** and **macOS Mojave** operating systems. 
 It is possible that issues may arise when trying to install on other distributions. Please raise any information 
 regarding installation problems on github.
 
@@ -95,13 +94,13 @@ Installing gmg
 
 **Step 1:**
 
-Ensure your py27-gmg environment is active, on macOS or Linux use:
+Ensure your gmg-env environment is active, on macOS or Linux use:
 
-    source activate py27-gmg
+    source activate gmg-env
 
 Or on Windows use:
 
-    activate py27-gmg
+    activate gmg-env
 
 **Step 2: Install dependencies**
 
@@ -114,7 +113,7 @@ GMG depends on several other packages to run. These are:
 * [fatiando a terra](http://www.fatiando.org/)
 * [ObsPy](http://docs.obspy.org/)
 
-These dependencies can be installed in your py27-gmg environment using the command:
+These dependencies can be installed in your gmg-env environment using the command:
 
     conda config --add channels conda-forge
     conda install wxpython numpy scipy matplotlib fatiando obspy
