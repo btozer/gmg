@@ -902,8 +902,8 @@ class Gmg(wx.Frame):
 
         # MAKE ANGLE A SPINNER
         self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label="Angle A (Inc): ", style=wx.ALIGN_LEFT)
-        self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=90.0, increment=1.0, value=0.0,
-                                          style=wx.ALIGN_RIGHT)
+        self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-90.0, max_val=90.0, increment=1.0,
+                                          value=0.0, style=wx.ALIGN_RIGHT)
         self.angle_a_input.SetFormat("%f")
         self.angle_a_input.SetDigits(1)
 
@@ -1859,19 +1859,20 @@ class Gmg(wx.Frame):
             pass
 
     def transparency_increase(self, event):
-        self.layer_transparency = self.layer_transparency + 0.1
-        for i in range(0, self.total_layer_count):
-            self.polygon_fills[i][0].set_alpha(self.layer_transparency)
+        for l in range(0, len(self.layer_list)):
+            if self.layer_list[l].polygon_mpl_actor[0] is not None \
+                    and self.layer_list[l].polygon_mpl_actor[0].get_alpha() <= 0.9:
+                new_alpha = self.layer_list[l].polygon_mpl_actor[0].get_alpha() + 0.1
+                self.layer_list[l].polygon_mpl_actor[0].set_alpha(new_alpha)
         self.draw()
 
     def transparency_decrease(self, event):
-        if self.layer_transparency >= 0.1:
-            self.layer_transparency = self.layer_transparency - 0.1
-            for i in range(0, self.total_layer_count):
-                self.polygon_fills[i][0].set_alpha(self.layer_transparency)
-            self.draw()
-        else:
-            pass
+        for l in range(0, len(self.layer_list)):
+            if self.layer_list[l].polygon_mpl_actor[0] is not None \
+                    and self.layer_list[l].polygon_mpl_actor[0].get_alpha() >= 0.1:
+                new_alpha = self.layer_list[l].polygon_mpl_actor[0].get_alpha() - 0.1
+                self.layer_list[l].polygon_mpl_actor[0].set_alpha(new_alpha)
+        self.draw()
 
     # SAVE/LOAD MODEL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1889,9 +1890,9 @@ class Gmg(wx.Frame):
         # CREATE SAVE DICTIONARY
         self.save_dict = {}
 
-        header = ['model_aspect',  'area', 'xp', 'gravity_observation_elv',
+        header = ['model_aspect', 'area', 'xp',
                   'tree_items', 'fault_tree_items',
-                  'earth_field', 'model_azimuth', 'mag_observation_elv',
+                  'gravity_observation_elv', 'mag_observation_elv',
                   'obs_gravity_data_for_rms', 'obs_mag_data_for_rms',
                   'layer_list',
                   'fault_list',
@@ -1903,9 +1904,9 @@ class Gmg(wx.Frame):
                   'outcrop_data_list',
                   'segy_data_list']
 
-        model_params = [self.model_aspect, self.area, self.xp, self.gravity_observation_elv,
+        model_params = [self.model_aspect, self.area, self.xp,
                         self.tree_items, self.fault_tree_items,
-                        self.earth_field, self.model_azimuth, self.mag_observation_elv,
+                        self.gravity_observation_elv, self.mag_observation_elv,
                         self.obs_gravity_data_for_rms, self.obs_mag_data_for_rms,
                         self.layer_list,
                         self.fault_list,
@@ -5234,15 +5235,13 @@ class Gmg(wx.Frame):
         self.model_rms(self.xp)
 
         # SET GRAVITY RMS
-        if self.obs_gravity_data_for_rms != [] and self.observed_gravity_switch is True and \
-                self.calc_grav_switch is True and self.predicted_gravity != []:
+        if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True and self.predicted_gravity != []:
             self.gravity_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         else:
             pass
 
         # SET MAGNETIC RMS
-        if self.obs_mag_data_for_rms != [] and self.mag_obs_switch is True and self.calc_mag_switch is True \
-                and self.predicted_nt != []:
+        if self.obs_mag_data_for_rms != [] and self.calc_mag_switch is True and self.predicted_nt != []:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
         else:
             pass
@@ -5276,9 +5275,9 @@ class Gmg(wx.Frame):
             ymin_list.append(self.predicted_gravity.min())
             ymax_list.append(self.predicted_gravity.max())
 
-            # APPEND RMS GRAVITY ANOMALY
-            ymin_list.append(self.grav_residuals.min() - 2.0)
-            ymax_list.append(self.grav_residuals.max() + 2.0)
+            # # APPEND RMS GRAVITY ANOMALY
+            # ymin_list.append(self.grav_residuals.min() - 2.0)
+            # ymax_list.append(self.grav_residuals.max() + 2.0)
 
             # SET YMIN AND YMAX
             ymin = min(ymin_list)
@@ -5296,7 +5295,7 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED GRAVITY ANOMALY
-            if self.predicted_gravity != []:
+            if self.predicted_gravity is not None:
                 ymin_list.append(self.predicted_gravity.min() - 2.0)
                 ymax_list.append(self.predicted_gravity.max() + 2.0)
 
@@ -5304,10 +5303,11 @@ class Gmg(wx.Frame):
             ymin = min(ymin_list)
             ymax = max(ymax_list)
 
-        else:
+        elif self.predicted_gravity is not None:
             ymin = self.predicted_gravity.min() - 2.0
             ymax = self.predicted_gravity.max() + 2.0
-
+        else:
+            pass
 
         if self.gravity_frame is not None:
             self.gravity_frame.set_ylim(ymin, ymax)
@@ -5372,10 +5372,12 @@ class Gmg(wx.Frame):
             ymin = min(ymin_list)
             ymax = max(ymax_list)
 
-        else:
+        elif self.predicted_nt is not None:
             # APPEND PREDICTED GRAVITY ANOMALY
             ymin = self.predicted_nt.min() - 2.0
             ymax = self.predicted_nt.max() + 2.0
+        else:
+            pass
 
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_ylim(ymin, ymax)
@@ -5386,7 +5388,7 @@ class Gmg(wx.Frame):
         ymin_list = []
         ymax_list = []
         for i in range(len(self.observed_magnetic_list)):
-            if self.observed_magnetic_list[i].type == 'derivative':
+            if self.observed_magnetic_list[i].type == str('derivative'):
                 ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 0.1)
                 ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 0.1)
         self.magnetic_d_frame.set_ylim(ymin, ymax)
@@ -5930,7 +5932,7 @@ class LayerNameDialog(wx.Dialog):
 class MagDialog(wx.Dialog):
     """SET MAGNETIC FIELD PARAMETERS"""
 
-    def __init__(self, parent, id, title, mag_observation_elv, model_azimuth, earth_field):
+    def __init__(self, parent, id, title, mag_observation_elv):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                          | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)

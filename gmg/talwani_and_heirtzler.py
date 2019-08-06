@@ -87,7 +87,7 @@ def nt(xp, zp, polygons):
             f = polygon.props['f']
             k = polygon.props['susceptibility']
             if f != 1.0:
-                # IN MAGNETIZATION IS INDUCED ONLY (f > 1.0) THEN CONVERT TO e.m.u UNITS; ELSE INPUT IS IN (A m^-1)
+                # IF MAGNETIZATION IS INDUCED ONLY (f > 1.0) THEN CONVERT TO e.m.u UNITS; ELSE INPUT IS IN (A m^-1)
                 k = k / (4 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
 
             # SET EARTH FIELD
