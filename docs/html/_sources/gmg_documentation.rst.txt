@@ -10,7 +10,7 @@ Overview
 --------
 
 GMG is an open-source Graphical User Interface (GUI) designed principally for modelling
-2D potential field (gravity and magnetic) profiles. GMG is written in python 2.7 and uses
+2D potential field (gravity and magnetic) profiles. GMG is written in python 3.7 and uses
 wxPython for GUI implementation.
 
 GMG makes use of several other open-source python packages to preform various tasks

@@ -215,7 +215,7 @@ geophysicist Martin Bott (Bott, 1967) <a class="reference internal" href="z_bibl
 10. How to load 2D seismic reflection data into a model.
 </pre></div>
 </div>
-<p><strong>1.1 Geologic background of our example study</strong></p>
+<p><strong>1.1 Geologic background</strong></p>
 <p>The Weardale granite is located in the Northern Pennines, in Northern England. The presence of this Caledonian-aged
 granite was first proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby
 outcrops. Later gravity surveys and magnetic surveys by various authors strongly  corroborated this suggestion.
@@ -223,9 +223,11 @@ outcrops. Later gravity surveys and magnetic surveys by various authors strongly
 <a class="reference internal" href="z_bibliography.html#bott1967" id="id2">[2]</a>. Its presence was finally confirmed with the drilling of the Rookhope borehole (Dunham et al., 1961).
 The location of this borehole is shown as the yellow circle in <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and
 <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a>. In this tutorial, we will model the subsurface structure of this granite using gravity and
-magnetic data as well as structural and physical constraints provided by other data sources (namely the Rookhope
+magnetic data as well as structural and physical constraints provided by other data sources (namely, the Rookhope
 borehole, geological surface outcrops and fictional seismic reflection reflector picks).</p>
-<p>50 km profile from points:</p>
+<p><strong>1.2 Model profile</strong></p>
+<p>Our model profile runs south-to-north for a total length of 50 km. The profile start and end coordinates (in British
+National Grid format [EPSG code: 27700]) are:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>A  = 393956 E 521000 N
 A* = 393956 E 571000 N
 </pre></div>
@@ -234,13 +236,14 @@ A* = 393956 E 571000 N
 <img alt="_images/bott_BA_map.png" src="_images/bott_BA_map.png" />
 <p class="caption"><span class="caption-number">Figure 7 </span><span class="caption-text">Land based Bouguer gravity anomaly contoured at 1 mGal increments
 (digitized from Bott (1967) <a class="reference internal" href="z_bibliography.html#bott1967" id="id3">[2]</a> Fig. 2). The red line A-A* shows the profile we will model in this
-tutorial and is chosen to intersect the Rookhope well (yellow circle). The data are projected on a local cartesian
-grid.</span><a class="headerlink" href="#bouguer-gravity-map" title="Permalink to this image">¶</a></p>
+tutorial and is chosen to intersect the Rookhope well (yellow circle). Note the map uses the British
+National Grid projection [EPSG code: 27700].</span><a class="headerlink" href="#bouguer-gravity-map" title="Permalink to this image">¶</a></p>
 </div>
 <div class="figure align-center" id="magnetic-map">
 <img alt="_images/bott_magnetic_map.png" src="_images/bott_magnetic_map.png" />
 <p class="caption"><span class="caption-number">Figure 8 </span><span class="caption-text">Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface, flown with a line
-spacing and 2 km and contoured at 10 nT increments.</span><a class="headerlink" href="#magnetic-map" title="Permalink to this image">¶</a></p>
+spacing and 2 km and contoured at 10 nT increments. Note the map uses the British
+National Grid projection [EPSG code: 27700].</span><a class="headerlink" href="#magnetic-map" title="Permalink to this image">¶</a></p>
 </div>
 </div>
 
@@ -266,7 +269,7 @@ spacing and 2 km and contoured at 10 nT increments.</span><a class="headerlink" 
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on May 15, 2019.
+        Last updated on Aug 06, 2019.
       </span>
 
     </p>

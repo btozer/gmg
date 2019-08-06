@@ -33,7 +33,7 @@ The tutorial will walk through the following steps::
 
     10. How to load 2D seismic reflection data into a model.
 
-**1.1 Geologic background of our example study**
+**1.1 Geologic background**
 
 The Weardale granite is located in the Northern Pennines, in Northern England. The presence of this Caledonian-aged
 granite was first proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby
@@ -42,28 +42,33 @@ outcrops. Later gravity surveys and magnetic surveys by various authors strongly
 :cite:`bott1967`. Its presence was finally confirmed with the drilling of the Rookhope borehole (Dunham et al., 1961).
 The location of this borehole is shown as the yellow circle in :numref:`bouguer_gravity_map` and
 :numref:`magnetic_map`. In this tutorial, we will model the subsurface structure of this granite using gravity and
-magnetic data as well as structural and physical constraints provided by other data sources (namely the Rookhope
+magnetic data as well as structural and physical constraints provided by other data sources (namely, the Rookhope
 borehole, geological surface outcrops and fictional seismic reflection reflector picks).
 
-50 km profile from points::
+**1.2 Model profile**
+
+Our model profile runs south-to-north for a total length of 50 km. The profile start and end coordinates (in British
+National Grid format [EPSG code: 27700]) are::
 
     A  = 393956 E 521000 N
     A* = 393956 E 571000 N
+
 
 .. figure:: _static/bott_BA_map.png
     :name: bouguer_gravity_map
 
     Land based Bouguer gravity anomaly contoured at 1 mGal increments
     (digitized from Bott (1967) :cite:`bott1967` Fig. 2). The red line A-A* shows the profile we will model in this
-    tutorial and is chosen to intersect the Rookhope well (yellow circle). The data are projected on a local cartesian
-    grid.
+    tutorial and is chosen to intersect the Rookhope well (yellow circle). Note the map uses the British
+    National Grid projection [EPSG code: 27700].
 
 
 .. figure:: _static/bott_magnetic_map.png
     :name: magnetic_map
 
     Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface, flown with a line
-    spacing and 2 km and contoured at 10 nT increments.
+    spacing and 2 km and contoured at 10 nT increments. Note the map uses the British
+    National Grid projection [EPSG code: 27700].
 
 
 
