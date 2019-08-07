@@ -110,7 +110,6 @@ GMG depends on several other packages to run. These are:
 * [numpy](http://www.numpy.org)
 * [scipy](http://scipy.org/)
 * [matplotlib](http://matplotlib.sourceforge.net/)
-* [fatiando a terra](http://www.fatiando.org/)
 * [ObsPy](http://docs.obspy.org/)
 
 These dependencies can be installed in your gmg-env environment using the command:
