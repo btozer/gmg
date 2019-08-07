@@ -23,7 +23,6 @@ setup(name='gmg',
       'scipy',
       'matplotlib',
       'numpy',
-      'fatiando',
       'obspy',
       'wxpython'
       ],

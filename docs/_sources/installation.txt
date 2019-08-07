@@ -67,12 +67,11 @@ GMG depends on several other packages to run. These are:
 * `numpy <http://www.numpy.org>`_
 * `scipy <http://scipy.org/>`_
 * `matplotlib <http://matplotlib.sourceforge.net/>`_
-* `fatiando a terra <http://www.fatiando.org/>`_
 * `ObsPy <http://docs.obspy.org/>`_
 
 These dependencies can be installed in your gmg-env environment using the command::
 
-    conda install wxpython numpy scipy matplotlib fatiando obspy
+    conda install wxpython numpy scipy matplotlib obspy
 
 
 **Step 3: Get gmg**
