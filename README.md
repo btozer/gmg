@@ -115,7 +115,7 @@ GMG depends on several other packages to run. These are:
 These dependencies can be installed in your gmg-env environment using the command:
 
     conda config --add channels conda-forge
-    conda install wxpython numpy scipy matplotlib fatiando obspy
+    conda install wxpython numpy scipy matplotlib obspy
 
 **Step 3: Get gmg**
 
