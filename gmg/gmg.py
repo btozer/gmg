@@ -83,6 +83,7 @@ from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as Navigat
 import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
+import wx.adv
 from wx.lib.agw import floatspin as fs
 import wx.grid as gridlib
 import wx.lib.agw.customtreectrl as ct
@@ -134,12 +135,12 @@ class Gmg(wx.Frame):
         # DEFIND ICONS DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
 
-        # # SET AND SHOW SPLASH SCREEN
-        # bitmap = wx.Bitmap(self.gui_icons_dir + "gmg_logo_scaled.png")
-        # splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000,
-        #                              self, id=wx.ID_ANY, size=(1, 1), style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
-        # splash.Show()
-        # self.Show()
+        # SET AND SHOW SPLASH SCREEN
+        bitmap = wx.Bitmap(self.gui_icons_dir + "gmg_logo_scaled.png")
+        splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000,
+                                     self, id=wx.ID_ANY, size=(1, 1), style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
+        splash.Show()
+        self.Show()
 
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
@@ -2109,8 +2110,9 @@ class Gmg(wx.Frame):
         for x in range(len(self.observed_xy_data_list)):
             if self.observed_xy_data_list[x] is not None:
                 # DRAW DATA IN MODEL FRAME
-                self.self.observed_xy_data_list[x].mpl_actor = self.topo_frame.scatter(
-                    self.self.observed_xy_data_list[x].data[:, 0], self.observed_xy_data_list[x].data[:, 1],
+
+                self.observed_xy_data_list[x].mpl_actor = self.model_frame.scatter(
+                    self.observed_xy_data_list[x].data[:, 0], self.observed_xy_data_list[x].data[:, 1],
                     marker='o', color=self.observed_xy_data_list[x].color, s=5,
                     gid=self.observed_xy_data_list[x].id)
 
@@ -3045,6 +3047,7 @@ class Gmg(wx.Frame):
 
         # SET ATTRIBUTES
         new_xy.data = np.genfromtxt(xy_input_file, dtype=float, autostrip=True)
+        new_xy.id = self.xy_data_counter
         new_xy.name = self.load_window.observed_name
         new_xy.color = self.load_window.color_picked
         new_xy.type = str('observed')
