@@ -444,14 +444,14 @@ class Gmg(wx.Frame):
 
         # OUTCROP MENU ------------------------------------------------------------------------------------------------
         self.outcrop_file = wx.Menu()
-        self.m_load_outcrop_data = self.outcrop_file.Append(-1, "&Load Outcrop data...\tCtrl-Shift-w",
-                                                            "Load outcrop data")
+        self.m_load_outcrop_data = self.outcrop_file.Append(-1, "&Load Outcrop Data...\tCtrl-Shift-w",
+                                                            "Load outcrop Data")
         self.Bind(wx.EVT_MENU, self.load_outcrop_data, self.m_load_outcrop_data)
 
         self.m_outcrop_submenu = wx.Menu()
         self.outcrop_file.AppendSubMenu(self.m_outcrop_submenu, "Outcrop Data...")
 
-        self.menubar.Append(self.outcrop_file, "&Outcrop data")
+        self.menubar.Append(self.outcrop_file, "&Outcrop Data")
         # --------------------------------------------------------------------------------------------------------------
 
         # MODEL LAYERS MENU --------------------------------------------------------------------------------------------
@@ -1751,10 +1751,12 @@ class Gmg(wx.Frame):
                 print((header[i]))
         try:
             output_stream = save_file_dialog.GetPath()
-            out = open(output_stream, 'w')
-            Pickle.dump(self.save_dict, out)
+            with open(output_stream, 'wb') as output_file:
+                Pickle.dump(self.save_dict, output_file, protocol=Pickle.HIGHEST_PROTOCOL)
             self.model_saved = True
             self.update_layer_data()
+
+            # DISPLAY MESSAGE
             MessageDialog(self, -1, "Model saved successfully", "Save")
         except IOError:
             MessageDialog(self, -1, "Error in save process.\nModel not saved", "Save")
@@ -1776,8 +1778,8 @@ class Gmg(wx.Frame):
             self.model_aspect = 1.
 
             # OPEN DATA STREAM
-            file_in = open_file_dialog.GetPath()
-            model_data = Pickle.load(open(file_in, "r+"))
+            with open(open_file_dialog.GetPath(), 'rb') as input_file:
+                model_data = Pickle.load(input_file)
 
             # CLEAR MEMORY
             gc.collect()
@@ -2598,40 +2600,44 @@ class Gmg(wx.Frame):
         OPEN THE XY DATA SELECTED BY THE USER USING THE load_xy FUNC
         NB: IDs START AT 5000
         """
-        xy_input_file = self.load_window.file_path
-        self.xy_name = self.load_window.observed_name
-        self.xy_color = self.load_window.color_picked
+        try:
+            xy_input_file = self.load_window.file_path
+            self.xy_name = self.load_window.observed_name
+            self.xy_color = self.load_window.color_picked
 
-        # CREATE NEW OBSERVED GRAVITY OBJECT
-        new_xy = ObservedData()
+            # CREATE NEW OBSERVED GRAVITY OBJECT
+            new_xy = ObservedData()
 
-        # SET ATTRIBUTES
-        new_xy.data = np.genfromtxt(xy_input_file, dtype=float, autostrip=True)
-        new_xy.name = self.load_window.observed_name
-        new_xy.color = self.load_window.color_picked
-        new_xy.type = str('observed')
-        new_xy.mpl_actor = self.model_frame.scatter(new_xy.data[:, 0], new_xy.data[:, 1], marker='o',
-                                                    color=new_xy.color, s=3, gid=4000 + self.xy_data_counter)
+            # SET ATTRIBUTES
+            new_xy.data = np.genfromtxt(xy_input_file, dtype=float, autostrip=True, delimiter=' ')
+            new_xy.name = self.load_window.observed_name
+            new_xy.color = self.load_window.color_picked
+            new_xy.type = str('observed')
+            new_xy.mpl_actor = self.model_frame.scatter(new_xy.data[:, 0], new_xy.data[:, 1], marker='o',
+                                                        color=new_xy.color, s=3, gid=4000 + self.xy_data_counter)
 
-        # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
-        self.observed_xy_data_list.append(new_xy)
+            # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
+            self.observed_xy_data_list.append(new_xy)
 
-        # APPEND NEW DATA MENU TO 'XY data MENU'
-        self.obs_submenu = wx.Menu()
-        self.m_xy_submenu.Append(4000 + self.xy_data_counter, new_xy.name, self.obs_submenu)
+            # APPEND NEW DATA MENU TO 'XY data MENU'
+            self.obs_submenu = wx.Menu()
+            self.m_xy_submenu.Append(4000 + self.xy_data_counter, new_xy.name, self.obs_submenu)
 
-        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.obs_submenu.Append(4000 + self.xy_data_counter, 'delete observed data')
+            # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+            self.obs_submenu.Append(4000 + self.xy_data_counter, 'delete observed data')
 
-        # BIND TO DEL XY FUNC
-        self.Bind(wx.EVT_MENU, self.delete_xy, id=4000 + self.xy_data_counter)
+            # BIND TO DEL XY FUNC
+            self.Bind(wx.EVT_MENU, self.delete_xy, id=4000 + self.xy_data_counter)
 
-        # INCREMENT XY COUNTER
-        self.xy_data_counter += 1
+            # INCREMENT XY COUNTER
+            self.xy_data_counter += 1
 
-        # UPDATE GMG GUI
-        self.update_layer_data()
-        self.draw()
+            # UPDATE GMG GUI
+            self.update_layer_data()
+            self.draw()
+        except IOError:
+            print("ERROR LOADING XY DATA")
+            return
 
     def delete_xy(self, event):
         """"DELETE OBSERVED XY DATA NB: ID's start at 4000"""
