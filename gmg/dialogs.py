@@ -11,8 +11,29 @@ from scipy import interpolate as ip
 
 
 class NewModelDialog(wx.Dialog):
-    """CREATE A NEW MODEL. RETURNS MODEL PARAMETERS AND CALCULATION INCREMENT"""
+    """
+    CREATE A NEW MODEL FRAME. RETURNS MODEL PARAMETERS AND CALCULATION INCREMENT
+
+    **Paramaters**
+
+    * User input : Wx.Dialog entries
+
+    Returns:
+
+        * x1 : float
+        The start x value for the model frame
+        * x2 : float
+        The end x value for the model frame
+        * z1 : float
+        The start z value for the model frame
+        * z2 : float
+        The end z value for the model frame
+        * xp_inc : float
+        The increment at which predicted anomalies are calculated
+    """
+
     def __init__(self, parent, id, title, m_x1=None, m_x2=None, m_z1=None, m_z2=None):
+        """DIALOG BOX USED TO GATHER USER INPUT FOR CREATING A NEW MODEL"""
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.OK | wx.CANCEL
                                                           | wx.BORDER_RAISED)
 
@@ -79,6 +100,7 @@ class NewModelDialog(wx.Dialog):
         self.main_box.Fit(self)
 
     def create_button(self, event):
+        """WHEN THE "Create Model" BUTTON IS PRESSED"""
         self.x1 = float(self.new_x1.GetValue())
         self.x2 = float(self.new_x2.GetValue())
         self.z1 = float(self.new_z1.GetValue())
@@ -141,7 +163,7 @@ class LoadObservedDataFrame(wx.Frame):
         if self.open_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # the user changed idea...
 
-        #SET FILE PATH IN CLASS PANEL
+        # SET FILE PATH IN CLASS PANEL
         self.chosen_path = self.open_file_dialog.GetPath()
         self.file_path_text.SetValue(str(self.chosen_path))
 
@@ -214,61 +236,107 @@ class SeisDialog(wx.Dialog):
         self.EndModal(1)
 
 
+class LayerNameDialog(wx.Dialog):
+    """SET MAGNETIC FIELD PARAMETERS"""
+
+    def __init__(self, parent, id, title, current_name):
+        wx.Dialog.__init__(self, parent, id, 'Rename layer', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                                   | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+
+        # OBSERVATION ELEVATION
+        self.set_name = wx.StaticText(input_panel, -1, "New layer name:")
+        self.set_name_text = wx.TextCtrl(input_panel, -1, current_name, size=(75, -1))
+        self.set_name_text.SetInsertionPoint(0)
+
+        # SET BUTTON
+        self.b_set_button = wx.Button(input_panel, -1, "Set")
+        self.Bind(wx.EVT_BUTTON, self.set_button, self.b_set_button)
+
+        sizer = wx.FlexGridSizer(cols=2, hgap=7, vgap=7)
+        sizer.AddMany([self.set_name, self.set_name_text, self.b_set_button])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def set_button(self, event):
+        self.name = str(self.set_name_text.GetValue())
+        self.EndModal(1)
+
+
 class MagDialog(wx.Dialog):
     """SET MAGNETIC FIELD PARAMETERS"""
 
-    def __init__(self, parent, id, title, area):
+    def __init__(self, parent, id, title, mag_observation_elv):
         wx.Dialog.__init__(self, parent, id, 'Set Magnetic Field', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                          | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
 
         # OBSERVATION ELEVATION
         self.set_mag_observation_elv = wx.StaticText(input_panel, -1, "Observation\nElevation:")
-        self.mag_observation_elv_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
+        self.mag_observation_elv_text = wx.TextCtrl(input_panel, -1, str(mag_observation_elv * 0.001), size=(75, -1))
         self.mag_observation_elv_units = wx.StaticText(input_panel, -1, "km")
         self.mag_observation_elv_text.SetInsertionPoint(0)
 
-        # MODEL AZIMUTH
-        self.set_model_azimuth = wx.StaticText(input_panel, -1, "Profile Azimuth\n(angle C):")
-        self.model_azimuth_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
-        self.model_azimuth_units = wx.StaticText(input_panel, -1, "Degrees")
-        self.model_azimuth_text.SetInsertionPoint(0)
-
-        # EARTHS FIELD
-        self.set_earth_field = wx.StaticText(input_panel, -1, "Earth's Regional\nField Intensity:")
-        self.earth_field_text = wx.TextCtrl(input_panel, -1, "0", size=(75, -1))
-        self.earth_field_units = wx.StaticText(input_panel, -1, "nT")
+        # CREATE BOX SIZER
         sizer = wx.FlexGridSizer(cols=3, hgap=7, vgap=7)
         self.b_set_button_mag = wx.Button(input_panel, -1, "Set")
-        self.Bind(wx.EVT_BUTTON, self.set_button_mag, self.b_set_button_mag)
+        self.Bind(wx.EVT_BUTTON, self.set_button_mag_elv, self.b_set_button_mag)
+
+        # ADD ITEMS TO SIZER
         sizer.AddMany([self.set_mag_observation_elv, self.mag_observation_elv_text, self.mag_observation_elv_units,
-                       self.set_model_azimuth, self.model_azimuth_text, self.model_azimuth_units,
-                       self.set_earth_field, self.earth_field_text, self.earth_field_units,
                        self.b_set_button_mag])
         input_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
-    def set_button_mag(self, event):
+    def set_button_mag_elv(self, event):
         self.mag_observation_elv = float(self.mag_observation_elv_text.GetValue())
-        self.model_azimuth = float(self.model_azimuth_text.GetValue())
-        self.earth_field = float(self.earth_field_text.GetValue())
+        self.EndModal(1)
+
+
+class GravDialog(wx.Dialog):
+    """POPOUT BOX TO LET THE USER SET THE ELEVATION AT WHICH GRAVITY ANOMALIES ARE CALCULATED"""
+
+    def __init__(self, parent, id, title, grav_observation_elv):
+        wx.Dialog.__init__(self, parent, id, 'Set Gravity elevation', style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                                            | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+
+        # OBSERVATION ELEVATION
+        self.set_grav_observation_elv = wx.StaticText(input_panel, -1, "Observation\nElevation:")
+        self.grav_observation_elv_text = wx.TextCtrl(input_panel, -1, str(grav_observation_elv * 0.001), size=(75, -1))
+        self.grav_observation_elv_units = wx.StaticText(input_panel, -1, "km")
+        self.grav_observation_elv_text.SetInsertionPoint(0)
+
+        # CREATE BOX SIZER
+        sizer = wx.FlexGridSizer(cols=3, hgap=7, vgap=7)
+        self.b_set_button_grav_elv = wx.Button(input_panel, -1, "Set")
+        self.Bind(wx.EVT_BUTTON, self.set_button_grav_elv, self.b_set_button_grav_elv)
+
+        # ADD ITEMS TO SIZER
+        sizer.AddMany([self.set_grav_observation_elv, self.grav_observation_elv_text, self.grav_observation_elv_units,
+                       self.b_set_button_grav_elv])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def set_button_grav_elv(self, event):
+        """ON BUTTON PRESS - SET THE NEW GRAVITY ELEVATION"""
+        self.grav_observation_elv = float(self.grav_observation_elv_text.GetValue())
         self.EndModal(1)
 
 
 class PinchDialog(wx.Dialog):
     """PINCH A LAYER TO ANOTHER LAYER"""
 
-    def __init__(self, parent, id, title, plotx_list, ploty_list, i):
+    def __init__(self, parent, id, title, layer_list, currently_active_layer_id):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.plotx_list = plotx_list
-        self.ploty_list = ploty_list
-        self.layer_counter = i
-        self.p_start = wx.StaticText(input_panel, -1, "Pinch From (km):")
+        self.layer_list = layer_list
+        self.currently_active_layer_id = currently_active_layer_id
+        self.p_start = wx.StaticText(input_panel, -1, "Pinch from (km):")
         self.p_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.p_start_Text.SetInsertionPoint(0)
-        self.p_end = wx.StaticText(input_panel, -1, "Pinch To (km):")
+        self.p_end = wx.StaticText(input_panel, -1, "Pinch to (km):")
         self.p_end_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         self.b_up_set_button = wx.Button(input_panel, -1, "Pinch up")
@@ -284,10 +352,13 @@ class PinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.layer_counter]
-        current_y = self.ploty_list[self.layer_counter]
-        above_x = self.plotx_list[self.layer_counter - 1]
-        above_y = self.ploty_list[self.layer_counter - 1]
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
+        above_x = self.layer_list[self.currently_active_layer_id - 1].x_nodes
+        above_y = self.layer_list[self.currently_active_layer_id - 1].y_nodes
+
+        # SET ID FOR LAYER GETTING PINCHED
+        self.layer_getting_pinched = self.currently_active_layer_id - 1
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -310,16 +381,20 @@ class PinchDialog(wx.Dialog):
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
+        # CLOSE POPOUT BOX
         self.EndModal(1)
 
     def down_set_button(self, event):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.layer_counter]
-        current_y = self.ploty_list[self.layer_counter]
-        below_x = self.plotx_list[self.layer_counter + 1]
-        below_y = self.ploty_list[self.layer_counter + 1]
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
+        below_x = self.layer_list[self.currently_active_layer_id + 1].x_nodes
+        below_y = self.layer_list[self.currently_active_layer_id + 1].y_nodes
+
+        # SET ID FOR LAYER GETTING PINCHED
+        self.layer_getting_pinched = self.currently_active_layer_id + 1
 
         # REMOVE PINCHED NODES
         self.pinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
@@ -343,24 +418,24 @@ class PinchDialog(wx.Dialog):
         self.pinched_x[insert_point:1] = new_xs
         self.pinched_y[insert_point:1] = new_ys
 
+        # CLOSE POPOUT BOX
         self.EndModal(1)
 
 
 class DepinchDialog(wx.Dialog):
     """DEPINCH A LAYER"""
 
-    def __init__(self, parent, id, title, plotx_list, ploty_list, i, layer_count):
+    def __init__(self, parent, id, title, layer_list, currently_active_layer_id, total_layer_count):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.plotx_list = plotx_list
-        self.ploty_list = ploty_list
-        self.layer_counter = i
-        self.layer_count = layer_count
-        self.p_start = wx.StaticText(input_panel, -1, "Pinch From:")
+        self.layer_list = layer_list
+        self.currently_active_layer_id = currently_active_layer_id
+        self.total_layer_count = total_layer_count
+        self.p_start = wx.StaticText(input_panel, -1, "Depinch from (km):")
         self.p_start_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.p_start_Text.SetInsertionPoint(0)
-        self.p_end = wx.StaticText(input_panel, -1, "Pinch Too")
+        self.p_end = wx.StaticText(input_panel, -1, "Depinch to (km):")
         self.p_end_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
         self.b_depinch_button = wx.Button(input_panel, -1, "depinch")
@@ -373,21 +448,21 @@ class DepinchDialog(wx.Dialog):
         p_start = float(self.p_start_Text.GetValue())
         p_end = float(self.p_end_Text.GetValue())
 
-        current_x = self.plotx_list[self.layer_counter]
-        current_y = self.ploty_list[self.layer_counter]
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
 
-        if self.layer_counter != 0:
-            above_x = self.plotx_list[self.layer_counter - 1]
-            above_y = self.ploty_list[self.layer_counter - 1]
-        if self.layer_counter != self.layer_count:
-            below_x = self.plotx_list[self.layer_counter + 1]
-            below_y = self.ploty_list[self.layer_counter + 1]
+        if self.currently_active_layer_id != 0:
+            above_x = self.layer_list[self.currently_active_layer_id - 1].x_nodes
+            above_y = self.layer_list[self.currently_active_layer_id - 1].y_nodes
+        if self.currently_active_layer_id != self.total_layer_count:
+            below_x = self.layer_list[self.currently_active_layer_id + 1].x_nodes
+            below_y = self.layer_list[self.currently_active_layer_id + 1].y_nodes
 
         # REMOVE PINCHED NODES
         self.depinched_x = [tup for i, tup in enumerate(current_x) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH range
+            i] > p_end]  # PASS X VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
         self.depinched_y = [tup for i, tup in enumerate(current_y) if current_x[i] < p_start or current_x[
-            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH range
+            i] > p_end]  # PASS Y VALUES IF THEY ARE OUTSIDE THE PINCH RANGE
 
         # FIND NODES WITHIN PINCH ZONE - TRY ABOVE LAYER FIRST
         # PASS X VALUES IF THEY ARE INSIDE THE PINCH range
@@ -412,11 +487,13 @@ class DepinchDialog(wx.Dialog):
         self.depinched_x[insert_point:1] = new_xs
         self.depinched_y[insert_point:1] = new_ys_list
 
+        # CLOSE POPOUT
         self.EndModal(1)
 
 
 class MedianFilterDialog(wx.Dialog):
     """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
+
     def __init__(self, parent, id, title, observed_list):
         wx.Dialog.__init__(self, parent, id, "Apply Median Filter", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
@@ -477,6 +554,7 @@ class MedianFilterDialog(wx.Dialog):
 
 class HorizontalDerivative(wx.Dialog):
     """ESTIMATE THE HORIZONTAL DERIVATIVE OF THE OBSERVED DATA"""
+
     def __init__(self, parent, id, title, observed_list):
         wx.Dialog.__init__(self, parent, id, "Take Horizontal Derivative", style=wx.DEFAULT_DIALOG_STYLE |
                                                                                  wx.RESIZE_BORDER | wx.MAXIMIZE_BOX
@@ -563,12 +641,12 @@ class HorizontalDerivative(wx.Dialog):
 
             # CALC USING FINITE DIFFERENCE METHOD
             self.deriv[i, 1] = abs((float(input_interpolated[i + 1, 1]) - float(input_interpolated[i - 1, 1]))) \
-                          / (2. * float(self.x_inc))
+                               / (2. * float(self.x_inc))
 
         # SET FIRST AND LAST VALUES (WHICH ARE NOT CALCULATED BY FD METHOD) EQUAL TO SECOND AND SECOND-TO-LAST VALUES
-        self.deriv[0, 0] = self.deriv[1, 0]-self.x_inc
+        self.deriv[0, 0] = self.deriv[1, 0] - self.x_inc
         self.deriv[0, 1] = self.deriv[1, 1]
-        self.deriv[-1, 0] = self.deriv[-2, 0]+self.x_inc
+        self.deriv[-1, 0] = self.deriv[-2, 0] + self.x_inc
         self.deriv[-1, 1] = self.deriv[-2, 1]
 
         # CLOSE
@@ -615,17 +693,16 @@ class SetBackgroundDensityDialog(wx.Dialog):
 class BulkShiftDialog(wx.Dialog):
     """APPLY A BULK SHIFT OF A LAYER IN THE Z DIRECTION"""
 
-    def __init__(self, parent, id, title, plotx_list, ploty_list, i):
+    def __init__(self, parent, id, title, layer_list, currently_active_layer_id):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         input_panel = wx.Panel(self, -1)
-        self.ploty_list = ploty_list
-        self.plotx_list = plotx_list
-        self.layer_counter = i
-        self.bulk_panel_x = wx.StaticText(input_panel, -1, "Set x bulk shift value:")
+        self.layer_list = layer_list
+        self.currently_active_layer_id = currently_active_layer_id
+        self.bulk_panel_x = wx.StaticText(input_panel, -1, "X shift (km):")
         self.bulk_panel_x_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.bulk_panel_x_Text.SetInsertionPoint(0)
-        self.bulk_panel_y = wx.StaticText(input_panel, -1, "Set y bulk shift value:")
+        self.bulk_panel_y = wx.StaticText(input_panel, -1, "Y shift (km):")
         self.bulk_panel_y_Text = wx.TextCtrl(input_panel, -1, "0", size=(100, -1))
         self.bulk_panel_y_Text.SetInsertionPoint(0)
         sizer = wx.FlexGridSizer(cols=2, hgap=6, vgap=6)
@@ -637,14 +714,18 @@ class BulkShiftDialog(wx.Dialog):
         sizer.Fit(self)
 
     def bulk_shift_button(self, event):
+        """WHEN BUTTON IS PRESSED TO EXECUTE A BULK SHIFT"""
+        # GET THE USER INPUT
         self.x_shift_value = float(self.bulk_panel_x_Text.GetValue())
         self.y_shift_value = float(self.bulk_panel_y_Text.GetValue())
-        current_y = self.ploty_list[self.layer_counter]
-        current_x = self.plotx_list[self.layer_counter]
 
-        # BULKSHIFT Y NODES, SET TO ZERO IF NEW VALUE IS < 0
-        self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0. else 0.01 for x in current_x]
-        self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0. else 0.01 for y in current_y]
+        # GET THE CURRENT VALUES
+        current_x = self.layer_list[self.currently_active_layer_id].x_nodes
+        current_y = self.layer_list[self.currently_active_layer_id].y_nodes
+
+        # BULK SHIFT NODES, SET TO ZERO (a.k.k 0.01) IF NEW VALUE IS < 0.01
+        self.new_x = [x + self.x_shift_value if x + self.x_shift_value > 0.01 else 0.01 for x in current_x]
+        self.new_y = [y + self.y_shift_value if y + self.y_shift_value > 0.01 else 0.01 for y in current_y]
 
         # CLOSE
         self.EndModal(1)
@@ -723,7 +804,6 @@ class NewLayerDialog(wx.Dialog):
         # self.x2, self.y2 = floating_dialogbox.x2, floating_dialogbox.y2
         # self.x3, self.y3 = floating_dialogbox.x3, floating_dialogbox.y3
         # self.x4, self.y4 = floating_dialogbox.x4, floating_dialogbox.y4
-
 
     class SetNewThickness(wx.Dialog):
         """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""
