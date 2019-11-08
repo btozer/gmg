@@ -114,7 +114,7 @@ To start gmg, the best way is to create an alias within your .bashrc or equivale
 
 and then add the line::
 
-    alias gmg='python ~/anaconda3/envs/gmg-env/lib/python2.7/site-packages/gmg/gmg.py'
+    alias gmg='python ~/anaconda3/envs/gmg-env/lib/python3.7/site-packages/gmg/gmg.py'
 
 NB. for macOS users you may need to invoke pythonw instead of python if you receive the message::
 
