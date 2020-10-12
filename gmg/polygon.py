@@ -3,7 +3,7 @@ Polygon objects - used for passing model layers and attributes to the Bott and T
 
 Taken from: Fatiando a Terra: https://github.com/fatiando/fatiando/blob/master/fatiando/mesher/geometry.py
 
-Recreated here becuase fatiando is a python 2.7 package only and hence incompatiable with the gmg python3 project.
+Recreated here because fatiando is a python 2.7 package only and hence incompatible with the gmg python3 project.
 
 Uieda, L., V. C. Oliveira Jr, and V. C. F. Barbosa (2013), Modeling the Earth with Fatiando a Terra, Proceedings of
 the 12th Python in Science Conference, pp. 91 - 98.

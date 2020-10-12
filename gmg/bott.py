@@ -21,6 +21,7 @@ from numpy import arctan2, sin, cos, log
 SI2MGAL = 100000.0  # Conversion factor from SI units to mGal: :math:`1\ m/s^2 = 10^5\ mGal`
 G = 0.00000000006673  # The gravitational constant in :math:`m^3 kg^{-1} s^{-1}`
 
+
 def gz(xp, zp, polygons):
     """
     Calculates the :math:`g_z` gravity acceleration component.
@@ -78,10 +79,11 @@ def gz(xp, zp, polygons):
 
             # SET THE SECOND VERTEX
             if v == nverts - 1:
+                # PAIR THE LAST VERTEX WITH THE FIRST ONE
                 xvp1 = x[0] - xp
                 zvp1 = z[0] - zp
             else:
-                # PAIR THE LAST VERTEX WITH THE FIRST ONE
+                # SET THE SECOND NODE
                 xvp1 = x[v + 1] - xp
                 zvp1 = z[v + 1] - zp
 

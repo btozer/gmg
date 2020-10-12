@@ -768,42 +768,42 @@ class SetObsRmsDialog(wx.Dialog):
 class NewLayerDialog(wx.Dialog):
     """CREATE A NEW MODEL LAYER"""
 
-    def __init__(self, parent, id, title):
+    def __init__(self, parent, id, title, kind):
         wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
-        input_panel = wx.Panel(self, -1)
+        self.input_panel = wx.Panel(self, -1)
+
+        self.kind = str(kind)
 
         # CREATE FIXED LAYER BUTTON
-        self.b_fixed = wx.Button(input_panel, -1, "New fixed layer")
+        self.b_fixed = wx.Button(self.input_panel, -1, "New fixed layer")
         self.Bind(wx.EVT_BUTTON, self.set_fixed, self.b_fixed)
         # CREATE FLOATING LAYER BUTTON
-        self.b_floating = wx.Button(input_panel, -1, "New floating layer")
+        self.b_floating = wx.Button(self.input_panel, -1, "New floating layer")
         self.Bind(wx.EVT_BUTTON, self.set_floating, self.b_floating)
         #  DEFINE SIZER
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         sizer.AddMany([self.b_fixed, self.b_floating])
-        input_panel.SetSizerAndFit(sizer)
+        self.input_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
     def set_fixed(self, event):
         """ APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
         self.fixed = True
-        floating_dialogbox = self.SetNewThickness(self, -1, "Set new layer thickness")
-        answer = floating_dialogbox.ShowModal()
-        self.new_thickness = floating_dialogbox.new_thickness
+        print("here")
+        print(self.kind)
+        if self.kind == str('load'):
+            print("type = load")
+        if self.kind == str('new'):
+            floating_dialogbox = self.SetNewThickness(self, -1, "Set new layer thickness")
+            answer = floating_dialogbox.ShowModal()
+            self.new_thickness = floating_dialogbox.new_thickness
         self.EndModal(1)
 
     def set_floating(self, event):
         """ APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
         self.fixed = False
         self.EndModal(1)
-
-        # floating_dialogbox = self.SetFloatingLayer(self, -1, "Set new layer nodes")
-        # answer = floating_dialogbox.ShowModal()
-        # self.x1, self.y1 = floating_dialogbox.x1, floating_dialogbox.y1
-        # self.x2, self.y2 = floating_dialogbox.x2, floating_dialogbox.y2
-        # self.x3, self.y3 = floating_dialogbox.x3, floating_dialogbox.y3
-        # self.x4, self.y4 = floating_dialogbox.x4, floating_dialogbox.y4
 
     class SetNewThickness(wx.Dialog):
         """APPEND NEW FLOATING LAYER AT USER SPECIFIED POSITION. RETURNS XY NODE POSITIONS"""

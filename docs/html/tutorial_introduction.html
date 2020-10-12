@@ -188,10 +188,10 @@
             
   <div class="section" id="introduction">
 <span id="tutorial-introduction"></span><h1><strong>1.0 Introduction</strong><a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>In this tutorial we will learn how to use GMG by modelling an example data set.</p>
-<p>We will systematically work through the steps required to load data and model the gravity and magnetic anomalies
-produced by the Weardale granite in the Northern Pennines, UK. Thereby recreating the study published by the British
-geophysicist Martin Bott (Bott, 1967) <a class="reference internal" href="z_bibliography.html#bott1967" id="id1">[2]</a>.</p>
+<p>In this tutorial you will learn how to use GMG by working through an example.</p>
+<p>We will cover all the steps required to create a 2D subsurface model based on the gravity and magnetic
+anomalies produced by the Weardale granite in the Northern Pennines, UK. Thereby, recreating the study
+published by the British geophysicist Martin Bott (Bott, 1967) <a class="reference internal" href="z_bibliography.html#bott1967" id="id1">[2]</a>.</p>
 <p>The tutorial will walk through the following steps:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1. Creating a new model and how to save and reload models.
 
@@ -218,16 +218,17 @@ geophysicist Martin Bott (Bott, 1967) <a class="reference internal" href="z_bibl
 <p><strong>1.1 Geologic background</strong></p>
 <p>The Weardale granite is located in the Northern Pennines, in Northern England. The presence of this Caledonian-aged
 granite was first proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby
-outcrops. Later gravity surveys and magnetic surveys by various authors strongly  corroborated this suggestion.
-<a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a> show collations of these data published by Bott (1967)
-<a class="reference internal" href="z_bibliography.html#bott1967" id="id2">[2]</a>. Its presence was finally confirmed with the drilling of the Rookhope borehole (Dunham et al., 1961).
-The location of this borehole is shown as the yellow circle in <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and
-<a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a>. In this tutorial, we will model the subsurface structure of this granite using gravity and
-magnetic data as well as structural and physical constraints provided by other data sources (namely, the Rookhope
-borehole, geological surface outcrops and fictional seismic reflection reflector picks).</p>
-<p><strong>1.2 Model profile</strong></p>
-<p>Our model profile runs south-to-north for a total length of 50 km. The profile start and end coordinates (in British
-National Grid format [EPSG code: 27700]) are:</p>
+outcrops. Later, gravity and magnetic surveys conducted by various authors strongly corroborated this suggestion and
+Bott (1967) <a class="reference internal" href="z_bibliography.html#bott1967" id="id2">[2]</a> collated these data and published the regional maps shown in figures
+<a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a>. The granites presence was finally confirmed with the
+drilling of the Rookhope borehole (Dunham et al., 1961). The location of this borehole is shown as the yellow circle
+in <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 7</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 8</span></a>. In this tutorial, we will model the subsurface structure
+of this granite based on the gravity and magnetic data as well as structural and physical constraints provided by other
+data  sources. Namely, (1) the Rookhope borehole; (2) geological surface outcrops and (3) <em>fictional</em> seismic reflection
+horizon picks.</p>
+<p><strong>1.2 Defining the model profile</strong></p>
+<p>Our model profile runs south-to-north with a total length of 50 km. The profile start and end coordinates (in British
+National Grid format; EPSG code: 27700) are:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>A  = 393956 E 521000 N
 A* = 393956 E 571000 N
 </pre></div>
@@ -269,7 +270,7 @@ National Grid projection [EPSG code: 27700].</span><a class="headerlink" href="#
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Aug 06, 2019.
+        Last updated on Aug 13, 2019.
       </span>
 
     </p>

@@ -52,10 +52,9 @@ obspy.org
 ***
 
 ***
-Icons where designed using the Free icon Maker:
+Icons where designed using the free icon maker:
 
-icons8.com
-https://icons8.com/icon/set/circle/all
+icons8.com: https://icons8.com/icon/set/circle/all
 
 Pixel size: 24
 Font: Roboto Slab
@@ -64,7 +63,7 @@ Color: 3498db
 ***
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The documentation is created using Sphinx.
+Documentation is created using Sphinx.
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -106,6 +105,7 @@ from polygon import Polygon
 import plot_model
 import bott
 import talwani_and_heirtzler
+import kim_and_wessel
 from frames import *
 from dialogs import *
 from objects import *
@@ -692,7 +692,7 @@ class Gmg(wx.Frame):
         self.pinch_switch = False  # SWITCH FOR NODE PINCHING MODE
         self.pinch_count = 0
         self.didnt_get_node = False  # SWTICH FOR MOSUE CLICK (EITHER CLICKED A NODE OR DIDN'T)
-        self.node_click_limit = 0.2  # CONTROLS HOW CLOSE A MOUSE CLICK MUST BE TO ACTIVATE A NODE
+        self.node_click_limit = 0.4  # CONTROLS HOW CLOSE A MOUSE CLICK MUST BE TO ACTIVATE A NODE
         self.index_node = None  # THE ACTIVE NODE
         self.select_new_layer_nodes = False  # SWITCH TO TURN ON WHEN MOUSE CLICK IS TO BE CAPTURED FOR A NEW LAYER
         self.currently_active_layer_id = 0  # LAYER COUNTER
@@ -848,7 +848,7 @@ class Gmg(wx.Frame):
 
         # ADD FIRST LAYER
         if self.newmodel:
-            # CREATE LAYER0 - PLACE HOLDER FOR THE TOP OF THE MODEL - NOT ACCESSIBLE BY USER
+            # CREATE LAYER 0 - THIS IS A PLACE HOLDER FOR THE TOP OF THE MODEL AND NOT ACCESSIBLE BY USER
             layer0 = Layer()
             layer0.type = str('fixed')
             # CREATE THE XY NODES
@@ -3358,10 +3358,10 @@ class Gmg(wx.Frame):
         CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT, THEN SKIP THIS PART AND ONLY UPDATE ATTRIBUTES
         """
 
-        print()
-        self.index_node
-        print()
-        self.layer_list[self.currently_active_layer_id].type
+        # print()
+        # self.index_node
+        # print()
+        # self.layer_list[self.currently_active_layer_id].type
 
         # GET NEW XY POINT
         new_x = float(self.x_input.GetValue())
@@ -4247,7 +4247,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def new_layer(self, event):
-        new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer')
+        new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer', 'new')
         answer = new_layer_dialogbox.ShowModal()
 
         if new_layer_dialogbox.fixed:
@@ -4327,7 +4327,7 @@ class Gmg(wx.Frame):
             self.draw()
 
         elif not new_layer_dialogbox.fixed:
-            # CREATEING A NEW FLOATING LAYER
+            # CREATING A NEW FLOATING LAYER
             self.new_plotx = []
             self.new_ploty = []
             self.click_count = 0
@@ -4338,7 +4338,7 @@ class Gmg(wx.Frame):
             self.select_new_layer_nodes = True
 
         else:
-            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED = EXIT FUNC
+            # USER CHANGED THEIR MIND - NO NEW LAYER ADDED
             pass
 
     def create_new_floating_layer(self):
@@ -4401,27 +4401,85 @@ class Gmg(wx.Frame):
 
     def load_layer(self, event):
         """LOAD A NEW FLOATING LAYER FROM A SPACE DELIMITED XY TEXT FILE"""
-        open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
-                                         wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-        if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-            return  # THE USER CHANGED THERE MIND
 
-        file_in = open_file_dialog.GetPath()
-        new_layer_nodes = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
+        # OPEN NEW LAYER DIALOG AND LET USER CHOSE BETWEEN FIXED AND FLOATING LAYER
+        new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer', 'load')
+        answer = new_layer_dialogbox.ShowModal()
+        # # IF THE USER CHANGES THERE MIND, THEN CLOSE THE DIALOG BOX AND RETURN TO MODELLNG
+        # if new_layer_dialogbox.ShowModal() == wx.ID_CANCEL:
+        #     return  # THE USER CHANGED THERE MIND
 
-        # INCREMENT THE LAYER COUNT
-        self.currently_active_layer_id = self.total_layer_count
-        self.currently_active_layer_id += 1
+        # 1. IF THE USER CHOOSES TO LOAD A NEW FIXED LAYER
+        if new_layer_dialogbox.fixed:
+            print("got to here")
 
-        # INCREMENT THE TOTAL LAYER COUNT
-        self.total_layer_count += 1
+            # BEGIN LOADING LAYER
+            open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
+                                             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            answer = open_file_dialog.ShowModal()
 
-        # CREATE NEW LAYER OBJECT
-        new_layer = Layer()
+            file_in = open_file_dialog.GetPath()
+            new_layer_nodes = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
 
-        # SOURCE NEW NODES FROM USER CLICKS
-        new_layer.x_nodes = new_layer_nodes[:, 0]
-        new_layer.y_nodes = new_layer_nodes[:, 1]
+            # 1.1 DETERMINE WHICH LAYER IS THE LAST PREVIOUS "FIXED LAYER"; SET THIS LAYER AS "previous_fixed_layer"
+            if self.total_layer_count > 0:
+                for i in range(0, self.total_layer_count):
+                    if self.layer_list[i].type == 'fixed':
+                        previous_fixed_layer = i
+                    else:
+                        continue
+            else:
+                previous_fixed_layer = 0
+
+
+
+            # INCREMENT THE LAYER COUNT
+            self.currently_active_layer_id = self.total_layer_count
+            self.currently_active_layer_id += 1
+
+            # INCREMENT THE TOTAL LAYER COUNT
+            self.total_layer_count += 1
+
+            # CREATE NEW LAYER OBJECT
+            new_layer = Layer()
+
+            # 1.2 SET NEW NODES FROM LOADED FILE
+            # SET FIRST PADDING NODE
+            new_layer.x_nodes = np.array(-(float(self.padding))+new_layer_nodes[0, 0])
+            new_layer.y_nodes = np.array(new_layer_nodes[0, 1])
+            # APPEND LOADED NODES
+            new_layer.x_nodes.append(new_layer_nodes[:, 0])
+            new_layer.y_nodes.append(new_layer_nodes[:, 1])
+            # SET LAST PADDING NODE
+            new_layer.x_nodes = np.append((float(self.padding)) + new_layer_nodes[0, 0])
+            new_layer.y_nodes = np.append(new_layer_nodes[0, 1])
+
+            new_layer.type = str('fixed')
+
+        # 2. IF THE USER CHOOSES TO LOAD A NEW FLOATING LAYER
+        elif not new_layer_dialogbox.fixed:
+
+            # # BEGIN LOADING LAYER
+            # open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
+            #                                  wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            #
+            # file_in = open_file_dialog.GetPath()
+            new_layer_nodes = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
+
+            # INCREMENT THE LAYER COUNT
+            self.currently_active_layer_id = self.total_layer_count
+            self.currently_active_layer_id += 1
+
+            # INCREMENT THE TOTAL LAYER COUNT
+            self.total_layer_count += 1
+
+            # CREATE NEW LAYER OBJECT
+            new_layer = Layer()
+
+            # 2.1 SET NEW NODES FROM LOADED FILE
+            new_layer.x_nodes = new_layer_nodes[:, 0]
+            new_layer.y_nodes = new_layer_nodes[:, 1]
+            new_layer.type = str('floating')
 
         # SET CURRENTLY ACTIVE LAYER NODE OBJECTS
         self.current_x_nodes = new_layer.x_nodes
@@ -4430,7 +4488,6 @@ class Gmg(wx.Frame):
         # SET SOME OF THE NEW LAYERS ATTRIBUTES
         new_layer.id = self.currently_active_layer_id
         new_layer.name = str('layer %s') % self.currently_active_layer_id
-        new_layer.type = str('floating')
         new_layer.include_in_calculations_switch = True
 
         # ADD NEW LAYER TO THE LAYER TREE DISPLAY
@@ -5159,7 +5216,7 @@ class Gmg(wx.Frame):
         # UPDATE GMG GRAPHICS
         self.draw()
 
-    def run_algorithms(self):
+    def  run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # --------------------------------------------------------------------------------------------------------------
         # CALCULATE TOPOGRAPHY - :FUTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
@@ -5187,7 +5244,8 @@ class Gmg(wx.Frame):
 
             # SET THE PREDICTED VALUES AS THE BOTT OUTPUT
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
-            self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input_polygons) * -1
+            # self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input_polygons) * -1
+            self.predicted_gravity = kim_and_wessel.gz(self.xp, self.gravity_observation_elv, bott_input_polygons)
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_gravity = np.zeros_like(self.xp)
@@ -5316,7 +5374,12 @@ class Gmg(wx.Frame):
             pass
 
         if self.gravity_frame is not None:
+            # print('')
+            # print(ymin)
+            # print(ymax)
+            # print('')
             self.gravity_frame.set_ylim(ymin, ymax)
+            # self.gravity_frame.set_ylim(-100, 100)
         # --------------------------------------------------------------------------------------------------------------
         # SET DERIVATIVE Y-AXIS LIMITS
 

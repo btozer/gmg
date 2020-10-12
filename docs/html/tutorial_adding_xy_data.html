@@ -1,0 +1,242 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>9.0 Adding XY data &mdash; GMG: An open source geophysical modelling GUI</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="gmg_documentation.html">
+          
+
+          
+            
+            <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="manual.html"><strong>Manual</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
+</ul>
+<p class="caption"><span class="caption-text">Credits</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="gmg_documentation.html">gmg</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="gmg_documentation.html">Docs</a> &raquo;</li>
+        
+      <li><strong>9.0 Adding XY data</strong></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/tutorial_adding_xy_data.txt" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="adding-xy-data">
+<h1><strong>9.0 Adding XY data</strong><a class="headerlink" href="#adding-xy-data" title="Permalink to this headline">¶</a></h1>
+<p>We can load XY data points into the model frame by using the <code class="docutils literal notranslate"><span class="pre">*XY</span> <span class="pre">Data*</span></code> menu located in the Menubar. XY data can be
+used to represent any subsurface data type, for example, earthquake hypocenters. In this case we will load in
+seismic reflection horizon <code class="docutils literal notranslate"><span class="pre">picks</span></code> take from a depth convert seismic reflection profile (Note these picks are
+hypothetical and were created specifically for use in this tutorial).</p>
+<p>We will load two <code class="docutils literal notranslate"><span class="pre">horzions</span></code>. The first is taken from the top of a band of reflectivity interpreted to represent the
+base of the Weardale granite. The second is take from the base of the same band of reflectivity. Together, these
+horzions place bounds on the depth of the base of the granite.</p>
+<p>To load these XY data, navigate to:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>XY Data -&gt; Load XY Points...
+</pre></div>
+</div>
+<p>Now select the <strong>File…</strong> button and use the file explorer to navigate to and select the file
+<strong>Weardale_seismic_reflection_picks_top_depth_converted.xy</strong>. This file is located in the directory:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gmg/docs/tutorial/XY_DATA
+</pre></div>
+</div>
+<p>Repeat this process for the file <strong>Weardale_seismic_reflection_picks_bottom_depth_converted.xy</strong>.</p>
+<p>There are several faults in this region across which the thickness of the sedimentary rocks varies significantly.
+Lets load some hypocenter locations to help map these structures (again, these data are hypothetical and were created
+specifically for use in this tutorial).</p>
+<p>Repeat the XY data loading process, but this time, lets load the file <strong>Weardale_eqs.xy</strong>.</p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014-2019, B. Tozer
+      <span class="lastupdated">
+        Last updated on Aug 13, 2019.
+      </span>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

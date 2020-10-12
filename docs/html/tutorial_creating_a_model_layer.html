@@ -189,37 +189,31 @@
   <div class="section" id="creating-a-model-layer">
 <h1><strong>6.0 Creating a model layer</strong><a class="headerlink" href="#creating-a-model-layer" title="Permalink to this headline">¶</a></h1>
 <p>Now we have loaded our observed anomaly data into the model environment, we are ready to start constructing our model.</p>
-<p>To add a new layer to the model navigate to the <em>‘Layers’</em> menu and select <em>‘New Layer’</em>:</p>
+<p>To add a new layer to the model navigate to the <em>‘Layers’</em> menu and select <em>``New Layer``</em>:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Layers -&gt; New Layer
 </pre></div>
 </div>
 <p>Alternatively, use the keyboard shortcut, <strong>n</strong> key.</p>
-<p>You will be prompted with the option of adding a <em>‘New fixed layer’</em> or a <em>‘New floating layer’</em>.</p>
+<p>You will be prompted with the option of adding a <em>``New fixed layer``</em> or a <em>``New floating layer``</em>.</p>
 <p><strong>Floating layers:</strong></p>
-<p>Floating layers are polygons that are fully contained within the model space. For example, a narrow salt dome.</p>
+<p>Floating layers are polygons with all nodes defined by the user. This layer type is useful for modelling features that
+will be full contained within the model profile, for example, a narrow salt dome or volcanic dyke.</p>
 <p><strong>Fixed layers:</strong></p>
-<p>Fixed layers span the entire width of the model and are useful for modelling <em>layers</em>, such as sedimentary basin
-strata. Fixed layers have fixed boundary nodes that can only be moved vertically along the model edges.</p>
+<p>Fixed layers span the entire width of the model and are useful for modelling features such as sedimentary basin
+strata that will span the entire model profile width. Fixed layers have fixed boundary nodes (at the edge of the model
+profile) that can only be moved vertically along the model edges.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Fixed layers are automatically <em>‘padded’</em> horizontally from the boundary nodes by an additional 400 km in order to
 avoid edge effects.</p>
 </div>
 <p>Lets chose to create a new <strong>floating</strong> layer, which we will use to represent the Weardale granite.</p>
-<p>When creating a new floating layer, you must assign the X and Y coordinates of four nodes that will define the layer.
-These nodes <strong>must</strong> be input in anti-clockwise order to ensure layers field effects are calculated with the correct
-sign. Beside the ordering of the nodes, there actual positions are not important as then can easily be modified using
-the mouse once the layer has been created.</p>
-<p>Lets set the initial node positions for our new floating layer as follows:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>X1: 10    Y1: 1
-X2: 10    Y2: 8
-X3: 30    Y3: 8
-X4: 30    Y4: 1
-</pre></div>
-</div>
-<p>Finally, select <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">layer</span></code>. The new layer will appear in the modelling environment.</p>
-<p>We can rename the layer from its default name of <code class="docutils literal notranslate"><span class="pre">layer</span> <span class="pre">1</span></code> by twice single clicking its name under the <code class="docutils literal notranslate"><span class="pre">Layers</span></code> menu
-on the middle left <code class="docutils literal notranslate"><span class="pre">Controls</span> <span class="pre">panel</span></code>. Lets rename the layer <code class="docutils literal notranslate"><span class="pre">Weardale</span></code>.</p>
+<p>After selecting to create a <em>floating layer</em> your next four mouse clicks will define the initial position of the first
+four nodes for the new layer. Note that these nodes <strong>must</strong> be input in anti-clockwise order to ensure layers field
+effects are calculated with the correct sign. Besides the ordering of the nodes, there actual positions of the nodes are
+not particularly important, as then can be easily modified once the layer has been created.</p>
+<p>We can rename the layer from its default name of <code class="docutils literal notranslate"><span class="pre">layer</span> <span class="pre">1</span></code> by right clicking its name under the <code class="docutils literal notranslate"><span class="pre">Layers</span></code> menu
+on the middle left <code class="docutils literal notranslate"><span class="pre">Controls</span> <span class="pre">panel</span></code> and selecting <code class="docutils literal notranslate"><span class="pre">Rename</span> <span class="pre">layer</span></code>. Lets rename the layer <code class="docutils literal notranslate"><span class="pre">Weardale</span></code>.</p>
 </div>
 
 
@@ -244,7 +238,7 @@ on the middle left <code class="docutils literal notranslate"><span class="pre">
     <p>
         &copy; Copyright 2014-2019, B. Tozer
       <span class="lastupdated">
-        Last updated on Aug 06, 2019.
+        Last updated on Aug 13, 2019.
       </span>
 
     </p>
