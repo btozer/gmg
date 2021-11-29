@@ -76,6 +76,7 @@ NB. If you created a seperate conda env for gmg you must activate it before laun
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
+
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -83,8 +84,8 @@ import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
 import wx.adv
-from wx.lib.agw import floatspin as fs
-import wx.grid as gridlib
+# from wx.lib.agw import floatspin as fs
+# import wx.grid as gridlib
 import wx.lib.agw.customtreectrl as ct
 import wx.py as py
 import wx.lib.agw.aui as aui
@@ -99,8 +100,8 @@ import sys
 from sys import platform
 from obspy import read
 import pickle as Pickle
-from scipy import signal
-from scipy import interpolate as ip
+# from scipy import signal
+# from scipy import interpolate as ip
 from polygon import Polygon
 import plot_model
 import bott
@@ -113,7 +114,9 @@ import model_stats
 import struct
 import gc
 import webbrowser
-import time
+
+
+# import time
 # FUTURE
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
@@ -156,16 +159,16 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1000), style=wx.SP_NOBORDER)
-        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 700),
+        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 500), style=wx.SP_NOBORDER)
+        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 500),
                                              style=wx.SP_NOBORDER)
         # self.leftPanel.SetMinimumPaneSize(1)
         # self.leftPanel_b.SetMinimumPaneSize(1)
 
         # FIRST PANE; LEFT PANEL (=ATTRIBUTES)
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 400),
+        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 500),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 400),
+        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 500),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
                                                                        foldIcons=images)
@@ -173,25 +176,23 @@ class Gmg(wx.Frame):
 
         # SECOND PANE; LEFT PANEL (=LAYERS)
         # GREY wx PANEL
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 300),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
+        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 250),
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
         # THE LAYER TREE SCROLL BAR GOES IN HERE
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 300),
+        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 250),
                                                        agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
         self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
-        self.fold_panel_two.SetSize(200, 300)
 
         # THIRD PANE; LEFT PANEL (=FAULTS)
         # GREY wx PANEL
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 300),
-                                                           style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
+        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 250),
+                                                           style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
         # THE FAULT TREE SCROLL BAR GOES IN HERE
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 300),
+        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 250),
                                                          agwStyle=fpb.FPB_VERTICAL)
         self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
         self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
-        self.fold_panel_three.SetSize(200, 300)
 
         # SET SPLITTERS
         self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three)
@@ -655,7 +656,7 @@ class Gmg(wx.Frame):
         # SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
         self.draw = self.fig.canvas.draw
 
-        # GET THE MODEL DIMENSIONS AND SAMPLE LOCATIONS'
+        # GET THE MODEL DIMENSIONS AND SAMPLE LOCATIONS
         self.area = area
         self.x1, self.x2, self.z1, self.z2 = 0.001 * np.array(area)
         self.xp = np.array(xp, dtype='f')
@@ -679,7 +680,7 @@ class Gmg(wx.Frame):
         self.Show()
 
         # FINIALISE INIT PROCESS
-        # self.run_algorithms()
+        self.run_algorithms()
         self.draw()
 
     def initalize_model(self):
@@ -776,12 +777,18 @@ class Gmg(wx.Frame):
         self.linex = []
         self.liney = []
 
+    def on_wx_key_press(self, evt):
+        evt.Skip(False)
+
+    def on_wx_key_release(self, evt):
+        evt.Skip(False)
+
     def draw_main_frame(self):
         """
         DRAW THE GUI FRAMES ( 1. TOPO; 2. GRAVITY; 3. MAGNETICS; 4. MODEL)
         docs: https://matplotlib.org/api/axes_api.html
         """
-        self.columns = 87  # NUMBER OF COLUMNS THE MODEL FRAMES WILL TAKE UP (89/100)
+        self.columns = 87  # NUMBER OF COLUMNS THE MODEL FRAMES WILL TAKE UP (I.E. 87/100)
         self.x_orig = 10  # X ORIGIN OF MODEL FRAMES (RELATIVE TO 0 AT LEFT MARGIN)
 
         # TOPOGRAPHY CANVAS
@@ -931,7 +938,7 @@ class Gmg(wx.Frame):
 
         # MAKE WELL TEXT SIZE SLIDER
         self.text_size_text = wx.StaticText(self.fold_panel_one, -1, label="Label Text Size:")
-        self.text_size_input = wx.Slider(self.fold_panel_one, value=1, minValue=1, maxValue=20., size=(175, -1),
+        self.text_size_input = wx.Slider(self.fold_panel_one, value=1, minValue=1, maxValue=20, size=(175, -1),
                                          style=wx.SL_HORIZONTAL)
         # MAKE NODE XY SPINNERS
         self.x_text = wx.StaticText(self.fold_panel_one, -1, label="X Value:")
@@ -986,6 +993,8 @@ class Gmg(wx.Frame):
         # UPDATE INFO BAR
         self.display_info()
 
+        # self.blocker= wx.EventBlocker(self.rightPanel, wx.Bell())
+
         # REDRAW MAIN
         self.draw()
 
@@ -998,7 +1007,7 @@ class Gmg(wx.Frame):
         r = 1  # CURRENT ROW
         c = 0  # CURRENT COLUMN
 
-        # LINE SEP
+        # LINE SEPx
         line = wx.StaticLine(self.fold_panel_one)
         self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.EXPAND, border=5)
 
@@ -1169,16 +1178,14 @@ class Gmg(wx.Frame):
         # PLACE BOX SIZERS IN CORRECT PANELS
         self.fold_panel_one.SetSizerAndFit(self.attributes_box)
         self.fold_panel_two.SetSizerAndFit(self.tree_box)
-        self.fold_panel_two.SetSize(200, 300)
         self.fold_panel_three.SetSizerAndFit(self.fault_tree_box)
         self.leftPanel.SetSizer(self.splitter_left_panel_sizer)
-        self.fold_panel_three.SetSize(200, 300)
-        self.fold_panel_one.Collapse()
-        self.fold_panel_one.Expand()
         self.fold_panel_two.Collapse()
         self.fold_panel_two.Expand()
         self.fold_panel_three.Collapse()
         self.fold_panel_three.Expand()
+        self.fold_panel_one.Collapse()
+        self.fold_panel_one.Expand()
 
         self.rightPanel.SetSizerAndFit(self.canvas_box)
         self.rightPanel.SetSize(self.GetSize())
@@ -1425,11 +1432,11 @@ class Gmg(wx.Frame):
 
         # INITALISE CALCULATED P.F. LINES
         if self.gravity_frame is not None:
-            self.pred_gravity_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2)
-            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5)
+            self.pred_gravity_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
+            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         if self.magnetic_frame is not None:
-            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], '-g', linewidth=2)
-            self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5)
+            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], '-g', linewidth=2, alpha=0.5)
+            self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
         # PLOT OBSERVED TOPO DATA
         if self.topo_frame is not None:
@@ -1437,7 +1444,7 @@ class Gmg(wx.Frame):
             for x in range(len(self.observed_topography_list)):
                 if self.observed_topography_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
-                    if self.observed_topography_list[x].type is not "derivative":
+                    if self.observed_topography_list[x].type != "derivative":
                         self.observed_topography_list[x].mpl_actor = self.topo_frame.scatter(
                             self.observed_topography_list[x].data[:, 0],
                             self.observed_topography_list[x].data[:, 1],
@@ -1457,7 +1464,7 @@ class Gmg(wx.Frame):
             for x in range(len(self.observed_gravity_list)):
                 if self.observed_gravity_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
-                    if self.observed_gravity_list[x].type is not "derivative":
+                    if self.observed_gravity_list[x].type != "derivative":
                         self.observed_gravity_list[x].mpl_actor = self.gravity_frame.scatter(
                             self.observed_gravity_list[x].data[:, 0],
                             self.observed_gravity_list[x].data[:, 1],
@@ -1478,7 +1485,7 @@ class Gmg(wx.Frame):
             for x in range(len(self.observed_magnetic_list)):
                 if self.observed_magnetic_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
-                    if self.observed_magnetic_list[x].type is not "derivative":
+                    if self.observed_magnetic_list[x].type != "derivative":
                         self.observed_magnetic_list[x].mpl_actor = self.magnetic_frame.scatter(
                             self.observed_magnetic_list[x].data[:, 0],
                             self.observed_magnetic_list[x].data[:, 1],
@@ -1561,13 +1568,15 @@ class Gmg(wx.Frame):
 
     def connect(self):
         """CONNECT MOUSE AND EVENT BINDINGS"""
+
+        # CONNECT MPL INTERACTIONS
         self.fig.canvas.mpl_connect('button_press_event', self.button_press)
         self.fig.canvas.mpl_connect('motion_notify_event', self.move)
         self.fig.canvas.mpl_connect('button_release_event', self.button_release)
         self.fig.canvas.mpl_connect('key_press_event', self.key_press)
         # self.fig.canvas.mpl_connect('pick_event', self.on_pick)
 
-        'Connect wx.widgets'
+        # CONNECT wx.widgetsf
         self.density_input.Bind(fs.EVT_FLOATSPIN, self.set_density)
         self.ref_density_input.Bind(fs.EVT_FLOATSPIN, self.set_reference_density)
         self.susceptibility_input.Bind(fs.EVT_FLOATSPIN, self.set_susceptibility)
@@ -1577,6 +1586,18 @@ class Gmg(wx.Frame):
         self.earth_field_input.Bind(fs.EVT_FLOATSPIN, self.set_earth_field)
         self.text_size_input.Bind(wx.EVT_SLIDER, self.set_text_size)
         self.node_set_button.Bind(wx.EVT_BUTTON, self.on_menu_set_button_press)
+
+
+    #
+    #
+    # def on_wx_key_press(self, evt):
+    #     print('pressed')
+    #     evt.Skip(False)
+    #     self.key_press(evt)
+    #
+    #
+    # def on_wx_key_release(self, evt):
+    #     evt.Skip(False)
 
     # LAYER TREE FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def add_tree_nodes(self, parent_item, items):
@@ -2298,7 +2319,7 @@ class Gmg(wx.Frame):
 
                 # CREATE TEXT XYT
                 text = list(zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
-                           outcrop.data[:, 3].astype(str)))
+                                outcrop.data[:, 3].astype(str)))
 
                 for i in range(len(outcrop.data)):
 
@@ -3284,7 +3305,7 @@ class Gmg(wx.Frame):
 
         # CREATE TEXT XYT
         text = list(zip(outcrop.data[:, 0].astype(float), outcrop.data[:, 1].astype(float),
-                   outcrop.data[:, 3].astype(str)))
+                        outcrop.data[:, 3].astype(str)))
 
         for i in range(len(outcrop.data)):
 
@@ -3393,12 +3414,8 @@ class Gmg(wx.Frame):
                 yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
         elif self.layer_list[self.currently_active_layer_id].type == 'floating' and self.index_node is not None:
             print("MOVING NODE ON FLOATING LAYER")
-            if new_y <= 0:
-                xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            else:
-                xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
-                yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
+            xt[self.index_node] = new_x  # REPLACE OLD X WITH NEW X
+            yt[self.index_node] = new_y  # REPLACE OLD Y WITH NEW Y
 
         # UPDATE THE CURRENTLY ACTIVE LAYER NODE LIST
         self.current_x_nodes = xt
@@ -3518,7 +3535,7 @@ class Gmg(wx.Frame):
 
     def button_press(self, event):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
-
+        # print("clicked")
         if event.inaxes is None:
             return  # CLICK IS OUTSIDE MODEL FRAME SO RETURN
         if event.button != 1:
@@ -3526,7 +3543,7 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is False and self.capture is False and self.select_new_layer_nodes is False:
             # THEN GMG IS IN LAYER MODE
-
+            # print("layer_mode")
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
             self.index_node, self.pinched_index_arg_list = self.get_node_under_point(event)
             if self.index_node is None:
@@ -3592,7 +3609,7 @@ class Gmg(wx.Frame):
 
                     # REDRAW MODEL
                     self.update_layer_data()
-                    # self.draw()
+                    self.draw()
             else:
                 # GMG IS IN SIMPLE LAYER MODE - SO JUST SET THE NEW NODE LOCATION
                 xyt = self.currently_active_layer.get_xydata()
@@ -3671,9 +3688,6 @@ class Gmg(wx.Frame):
             elif self.xt[self.selected_node] == self.x2 and self.yt[self.selected_node] == 0.001:
                 self.xt[self.selected_node] = self.x2  # REPLACE OLD X WITH NEW X
                 self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-            elif self.new_y <= 0:
-                self.xt[self.selected_node] = self.new_x  # REPLACE OLD X WITH NEW X
-                self.yt[self.selected_node] = 0.001  # REPLACE OLD Y WITH NEW Y
             else:
                 self.xt[self.selected_node] = self.new_x  # REPLACE OLD X WITH NEW X
                 self.yt[self.selected_node] = self.new_y  # REPLACE OLD Y WITH NEW Y
@@ -3740,12 +3754,8 @@ class Gmg(wx.Frame):
                 current_x_value = xt[self.index_node]
                 current_y_value = yt[self.index_node]
 
-                if y <= 0:
-                    xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = 0.001  # REPLACE OLD Y WITH NEW Y
-                else:
-                    xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
-                    yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
+                xt[self.index_node] = x  # REPLACE OLD X WITH NEW X
+                yt[self.index_node] = y  # REPLACE OLD Y WITH NEW Y
 
             # RESET THE LAYER WITH THE NEW NODE POSITION
             self.layer_list[self.currently_active_layer_id].x_nodes = xt
@@ -3865,8 +3875,10 @@ class Gmg(wx.Frame):
             # UPDATE GMG GRAPHICS
             self.draw()
 
+    def key_release(self, event):
+        pass
+
     def key_press(self, event):
-        """DEFINE KEY PRESS LINKS"""
 
         if self.fault_picking_switch is True:
             # GMG IS IN FAULT MODE SO USE FAULT MODE KEY FUNCTIONS
@@ -3883,6 +3895,7 @@ class Gmg(wx.Frame):
 
         # i = INSERT NEW NODE AT MOUSE POSITION
         if event.key == 'i':
+
             if event.inaxes is None:
                 return
 
@@ -4131,8 +4144,8 @@ class Gmg(wx.Frame):
         if event.key == 'ctrl+down':
             self.aspect_decrease2(event)
 
-        if event.key == 'return':
-            pass
+        # if event.key == 'return':
+        #     pass
 
     def pinch_out_layer(self, event):
         """PINCH OUT A FIXED LAYER OVER A GIVEN X RANGE"""
@@ -4327,6 +4340,7 @@ class Gmg(wx.Frame):
             self.draw()
 
         elif not new_layer_dialogbox.fixed:
+            print("not")
             # CREATING A NEW FLOATING LAYER
             self.new_plotx = []
             self.new_ploty = []
@@ -4431,8 +4445,6 @@ class Gmg(wx.Frame):
             else:
                 previous_fixed_layer = 0
 
-
-
             # INCREMENT THE LAYER COUNT
             self.currently_active_layer_id = self.total_layer_count
             self.currently_active_layer_id += 1
@@ -4445,14 +4457,14 @@ class Gmg(wx.Frame):
 
             # 1.2 SET NEW NODES FROM LOADED FILE
             # SET FIRST PADDING NODE
-            new_layer.x_nodes = np.array(-(float(self.padding))+new_layer_nodes[0, 0])
+            new_layer.x_nodes = np.array(-(float(self.padding)) + new_layer_nodes[0, 0])
             new_layer.y_nodes = np.array(new_layer_nodes[0, 1])
             # APPEND LOADED NODES
-            new_layer.x_nodes.append(new_layer_nodes[:, 0])
-            new_layer.y_nodes.append(new_layer_nodes[:, 1])
+            new_layer.x_nodes = np.append(new_layer.x_nodes, new_layer_nodes[:, 0])
+            new_layer.y_nodes = np.append(new_layer.y_nodes, new_layer_nodes[:, 1])
             # SET LAST PADDING NODE
-            new_layer.x_nodes = np.append((float(self.padding)) + new_layer_nodes[0, 0])
-            new_layer.y_nodes = np.append(new_layer_nodes[0, 1])
+            new_layer.x_nodes = np.append(new_layer.x_nodes, (float(self.padding)+new_layer_nodes[0, 0]))
+            new_layer.y_nodes = np.append(new_layer.y_nodes, new_layer_nodes[0, 1])
 
             new_layer.type = str('fixed')
 
@@ -4600,7 +4612,7 @@ class Gmg(wx.Frame):
         output_dir = os.path.dirname(all_layers_output_file)
 
         # NOW WRITE OUT THE DATA
-        with open(all_layers_output_file, 'wb') as f:
+        with open(all_layers_output_file, 'w') as f:
             try:
 
                 # OPEN "ALL LAYERS" OUTPUT FILE
@@ -4680,7 +4692,7 @@ class Gmg(wx.Frame):
                 # FORMAT c.in FILE
                 f.write('B  {0}\n'.format(i))
                 data = list(zip(x_nodes, np.linspace(velocity, velocity, len(y_nodes)), np.ones(len(x_nodes)),
-                           np.linspace(velocity, velocity, len(x_nodes)), np.ones(len(x_nodes))))
+                                np.linspace(velocity, velocity, len(x_nodes)), np.ones(len(x_nodes))))
 
                 # OUTPUT FILE
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d %3.02f %1d')
@@ -4994,13 +5006,14 @@ class Gmg(wx.Frame):
         # WELL DATA
         # LOOP THROUGH ALL WELL NAMES
         for i in range(len(self.well_data_list)):
-            self.well_data_list[i].text_size = self.textsize
-            self.well_data_list[i].mpl_actor_name.set_size(self.textsize)
-
-            # LOOP THROUGH ALL WELL HORIZON LABELS
-            for l in range(len(self.well_data_list[i].labels_list)):
-                if self.well_data_list[i].labels_list[l] is not None:
-                    self.well_data_list[i].labels_list[l].set_size(self.textsize)
+            if self.well_data_list[i] is not None:
+                self.well_data_list[i].text_size = self.textsize
+                self.well_data_list[i].mpl_actor_name.set_size(self.textsize)
+                # LOOP THROUGH ALL WELL HORIZON LABELS
+                for l in range(len(self.well_data_list[i].labels_list)):
+                    if self.well_data_list[i] is not None:
+                        if self.well_data_list[i].labels_list[l] is not None:
+                            self.well_data_list[i].labels_list[l].set_size(self.textsize)
 
         # # LOOP THROUGH OUTCROP DATA LABELS
         if self.outcrop_data_count > 0:
@@ -5017,19 +5030,23 @@ class Gmg(wx.Frame):
         selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_gravity_list)
         answer = selection.ShowModal()
         for i in range(0, len(self.observed_gravity_list)):
-            if self.observed_gravity_list[i].name == selection.obs_name:
-                self.obs_gravity_data_for_rms = self.observed_gravity_list[i].data
+
+            if self.observed_gravity_list[i] is not None:
+                if self.observed_gravity_list[i].name == selection.obs_name:
+                    self.obs_gravity_data_for_rms = self.observed_gravity_list[i].data
 
     def set_obs_mag_rms(self, value):
         """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
         selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_magnetic_list)
         answer = selection.ShowModal()
         for i in range(0, len(self.observed_magnetic_list)):
-            if self.observed_magnetic_list[i].name == selection.obs_name:
-                self.obs_mag_data_for_rms = self.observed_magnetic_list[i].data
+            if self.observed_magnetic_list[i] is not None:
+                if self.observed_magnetic_list[i].name == selection.obs_name:
+                    self.obs_mag_data_for_rms = self.observed_magnetic_list[i].data
 
     def model_rms(self, xp):
         """CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
+        # GRAVITY RMS
         if self.obs_gravity_data_for_rms != [] and self.calc_grav_switch is True:
             x = xp * 0.001
             y = self.predicted_gravity
@@ -5037,7 +5054,7 @@ class Gmg(wx.Frame):
                                                                           self.obs_gravity_data_for_rms[:, 1], x, y)
         else:
             pass
-
+        # MAGNETICS RMS
         if self.obs_mag_data_for_rms != [] and self.calc_mag_switch is True:
             x = self.xp * 0.001
             y = self.predicted_nt
@@ -5216,14 +5233,15 @@ class Gmg(wx.Frame):
         # UPDATE GMG GRAPHICS
         self.draw()
 
-    def  run_algorithms(self):
+    def run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # --------------------------------------------------------------------------------------------------------------
-        # CALCULATE TOPOGRAPHY - :FUTURE: PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
+        # :FUTURE: CALCULATE PREDICTED TOPOGRAPHY FROM ISOSTATIC FUNC
         self.pred_topo = np.zeros_like(self.xp)
         # --------------------------------------------------------------------------------------------------------------
         # tree.GetRootItem().GetChildren()[i].GetValue()
         # --------------------------------------------------------------------------------------------------------------
+
         # CALCULATE GRAVITY
         polygons_to_use = []
         densities_to_use = []
@@ -5244,8 +5262,8 @@ class Gmg(wx.Frame):
 
             # SET THE PREDICTED VALUES AS THE BOTT OUTPUT
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
-            # self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input_polygons) * -1
-            self.predicted_gravity = kim_and_wessel.gz(self.xp, self.gravity_observation_elv, bott_input_polygons)
+            self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input_polygons) * -1
+            # self.predicted_gravity = kim_and_wessel.gz(self.xp, self.gravity_observation_elv, bott_input_polygons)
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_gravity = np.zeros_like(self.xp)
@@ -5379,7 +5397,6 @@ class Gmg(wx.Frame):
             # print(ymax)
             # print('')
             self.gravity_frame.set_ylim(ymin, ymax)
-            # self.gravity_frame.set_ylim(-100, 100)
         # --------------------------------------------------------------------------------------------------------------
         # SET DERIVATIVE Y-AXIS LIMITS
 
@@ -5387,7 +5404,7 @@ class Gmg(wx.Frame):
         ymin_list = [-1]
         ymax_list = [1]
         for i in range(len(self.observed_gravity_list)):
-            if self.observed_gravity_list[i].type == str('derivative'):
+            if self.observed_gravity_list[i] == str('derivative'):
                 ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 0.1)
                 ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 0.1)
         if self.gravity_frame is not None:
@@ -5570,7 +5587,7 @@ class Gmg(wx.Frame):
 
         self.doc_dir = os.path.dirname(os.path.abspath(__file__)).split('/')
         doc_url = self.doc_dir[0] + '/' + self.doc_dir[1] + '/' + self.doc_dir[2] + '/' + self.doc_dir[3] + \
-                  '/docs/html/gmg_documentation.html'
+                  '/' + self.doc_dir[4] + '/docs/html/gmg_documentation.html'
 
         if platform == "linux" or platform == "linux2":
             # LINUX
@@ -5604,7 +5621,7 @@ class Gmg(wx.Frame):
 
     def legal(self, event):
         """ SHOW LICENCE"""
-        licence = ["Copyright 2015-2019 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
+        licence = ["Copyright 2015-2020 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
                    "without modification, are permitted provided that the following conditions are met: \n \n"
                    "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
                    "and the following disclaimer. \n\n2. Redistributions in binary form must reproduce the above "
