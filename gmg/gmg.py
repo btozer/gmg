@@ -1,7 +1,7 @@
 """
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-GUI application for Forward modelling 2D potential field profiles.
-Written by Brook Tozer, University of Oxford 2015-17. SIO 2018-19.
+GUI application for forward modelling 2D potential field profiles with adidtional geophysical data.
+Written by Brook Tozer, University of Oxford 2015-17; SIO 2018-19; GNS Science 2020-Present.
 Includes ability to import seismic reflection, well, surface outcrop and xy points into the model frame.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -61,9 +61,10 @@ Font: Roboto Slab
 Font size: 200
 Color: 3498db
 ***
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+***
 Documentation is created using Sphinx.
+***
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -84,8 +85,6 @@ import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
 import wx.adv
-# from wx.lib.agw import floatspin as fs
-# import wx.grid as gridlib
 import wx.lib.agw.customtreectrl as ct
 import wx.py as py
 import wx.lib.agw.aui as aui
@@ -100,8 +99,6 @@ import sys
 from sys import platform
 from obspy import read
 import pickle as Pickle
-# from scipy import signal
-# from scipy import interpolate as ip
 from polygon import Polygon
 import plot_model
 import bott
@@ -115,9 +112,13 @@ import struct
 import gc
 import webbrowser
 
-
-# import time
 # FUTURE
+# from wx.lib.agw import floatspin as fs
+# import wx.grid as gridlib
+# import time
+# from scipy import signal
+# from scipy import interpolate as ip
+# from colormap import rgb2hex
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -125,10 +126,9 @@ import webbrowser
 
 class Gmg(wx.Frame):
     """
-    Master Class for GMG GUI.
-    Most functions are contained in this Class.
-    Upon startup this sets the panels, sizer's and event bindings.
-    Additional classes are used for handling "popout" windows (Dialog boxes).
+    Master Class for GMG GUI. Most functions are contained in this Class.
+    Upon App launch this sets the panels, sizer's and event bindings.
+    Additional classes are used for handling "pop out" windows (Dialog boxes).
     Objects are passed between this "master" GUI class and the Dialog Boxes.
     """
 
@@ -1576,7 +1576,7 @@ class Gmg(wx.Frame):
         self.fig.canvas.mpl_connect('key_press_event', self.key_press)
         # self.fig.canvas.mpl_connect('pick_event', self.on_pick)
 
-        # CONNECT wx.widgetsf
+        # CONNECT wx.widgets
         self.density_input.Bind(fs.EVT_FLOATSPIN, self.set_density)
         self.ref_density_input.Bind(fs.EVT_FLOATSPIN, self.set_reference_density)
         self.susceptibility_input.Bind(fs.EVT_FLOATSPIN, self.set_susceptibility)
@@ -1586,18 +1586,6 @@ class Gmg(wx.Frame):
         self.earth_field_input.Bind(fs.EVT_FLOATSPIN, self.set_earth_field)
         self.text_size_input.Bind(wx.EVT_SLIDER, self.set_text_size)
         self.node_set_button.Bind(wx.EVT_BUTTON, self.on_menu_set_button_press)
-
-
-    #
-    #
-    # def on_wx_key_press(self, evt):
-    #     print('pressed')
-    #     evt.Skip(False)
-    #     self.key_press(evt)
-    #
-    #
-    # def on_wx_key_release(self, evt):
-    #     evt.Skip(False)
 
     # LAYER TREE FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def add_tree_nodes(self, parent_item, items):
@@ -1681,7 +1669,10 @@ class Gmg(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             rgb = dlg.GetColourData().GetColour().Get()
             rgb = rgb[0:3]
+            print(rgb)
             html = struct.pack('BBB', *rgb).encode('hex')
+
+            # html = rgb2hex(struct.pack('BBB', *rgb))
 
             # SET FAULT OR LAYER COLOR
             if self.fault_picking_switch == True:
@@ -2004,7 +1995,7 @@ class Gmg(wx.Frame):
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
-            # Set VARIABLE VALUES FROM LOADED DATA - USING LAYER 1
+            # SET VARIABLE VALUES FROM LOADED DATA - USING LAYER 1
             self.currently_active_layer_id = 1
             self.total_layer_count = len(self.layer_list) - 1
 
@@ -2065,7 +2056,7 @@ class Gmg(wx.Frame):
                                                                  color='g', linewidth=0.75, alpha=1.0, zorder=2,
                                                                  picker=True)
 
-            # Set Fault PICKING SWITCH OFF (DEFAULT TO LAYER MODE)
+            # SET FAULT PICKING SWITCH OFF (DEFAULT TO LAYER MODE)
             self.fault_picking_swtich = False
             # ----------------------------------------------------------------------------------------------------------
 
@@ -3781,14 +3772,19 @@ class Gmg(wx.Frame):
             # UPDATE "CURRENT NODE" RED DOT
             if xt[self.index_node] == self.x1:
                 self.current_node.set_offsets([self.x1, y])
+                # UPDATE NODE POSITION TEXT BOXES
             elif xt[self.index_node] == self.x2:
                 self.current_node.set_offsets([self.x2, y])
             else:
                 self.current_node.set_offsets([x, y])
 
+            # UPDATE NODE POSITION TEXT BOXES
+            self.x_input.SetValue(x)
+            self.y_input.SetValue(y)
+
         # UPDATE LAYER DATA
         self.update_layer_data()
-
+        
     def button_release(self, event):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS RELEASED"""
 
