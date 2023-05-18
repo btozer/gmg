@@ -1,25 +1,49 @@
 .. _pre-modelling_considerations:
 
-====================================
-**2.0 Pre-modelling considerations**
-====================================
+========================================================
+**2.0 Pre-modelling data processing and considerations**
+========================================================
 
-As we are interested in modelling the structure of the Weardale granite, an important processing step prior to modelling
-is to consider the other factors contributing to the total gravity anomaly.
+As we are interested in modelling the structure of the Weardale granite, important preprocessing steps 
+prior to forward modelling the gravity and magnetic anomalies is to consider other factors contributing to 
+the total field anomalies.
 
-One common step is to preform a separation of the "regional" component of the gravity anomaly from the total anomaly
-in order to remove the contribution from sub-crustal density anomalies. As these anomalies are generated from deep
-sources, they are of much longer wavelength than that produced by our target, which resides in the upper crust.
+One common preprocessing step when modelling near surface structure using potential field data, is to preform a separation of the "regional" component of the anoamly 
+from the total anomaly in order to remove the contribution from the longer wavelength regional signal (which may be sourced, for example, from the juxerposition of 
+different basement terranes). Because these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced 
+by our target strucuture, which resides in the upper crust.
 
-There are several strategies for calculating the regional gravity anomaly component but here we will use that determined
-by :cite:`Kimbell2011` as shown in :numref:`regional_gravity_map`. As can be seen there is a long wavelength positive
-anomaly anomaly with amplitudes ranging :math:`\sim` :math:`14-21` :math:`mGal`.
+==============================
+*2.1 Residual gravity anomaly*
+==============================
 
-.. figure:: _static/regional_GA.png
+There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity feild 
+as determined by :cite:`Kimbell2011` as shown in :numref:`regional_gravity_map`. As can be seen in this figure, there is a long
+wavelength positive anomaly in this region with amplitudes ranging :math:`\sim` :math:`14-21` :math:`mGal`.
+
+We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown 
+in :numref:`residual_gravity_map`. We will model this residual signal to estimate the subsurface structure of the Weardale granite.
+
+.. figure:: _static/regional_anomaly.png
     :name: regional_gravity_map
 
-    Regional gravity anomaly related to long-wavelength sub-crustal density anomalies from :cite:`Kimbell2011`. The
+    Regional gravity anomaly related to long wavelength density anomalies from :cite:`Kimbell2011`. The
     red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
-    (yellow circle). The data are projected on a local cartesian grid.
+    (yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].
 
+.. figure:: _static/residual_bouguer_anomaly.png
+    :name: residual_gravity_map
+
+    Regional gravity anomaly related to long wavelength density anomalies from :cite:`Kimbell2011`. The
+    red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
+    (yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].
+
+=======================================================
+*2.1 Continuous Reduction To the Pole magnetic anomaly*
+=======================================================
+
+In order to model the magnetic anomaly, we'll first convert apply a Continuous Reduction To the 
+Pole (RTP) operation on the grid. The purpose of this is to simplify the interpretation of the anomaly by
+transforming the anomaly so that it appears as if it were observed at the geomagnetic pole, such that 
+the subsurface bodies are magnetized vertically see, for example, . 
 

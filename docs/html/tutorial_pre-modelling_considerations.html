@@ -1,40 +1,25 @@
 
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>2.0 Pre-modelling considerations &mdash; GMG: An open source geophysical modelling GUI</title>
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2.0 Pre-modelling data processing and considerations &mdash; GMG: An open source geophysical modelling GUI</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="3.0 Creating a new model" href="tutorial_creating_a_new_model.html" />
@@ -43,65 +28,42 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="gmg_documentation.html">
           
-
-          
+          <a href="gmg_documentation.html">
             
-            <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
-          
+              <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
           </a>
-
-          
-            
-            
               <div class="version">
                 1.0.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Guide</span></p>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual.html"><strong>Manual</strong></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="tutorial_introduction.html"><strong>1.0 Introduction</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>2.0 Pre-modelling considerations</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>2.0 Pre-modelling data processing and considerations</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#residual-gravity-anomaly"><em>2.1 Residual gravity anomaly</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#continuous-reduction-to-the-pole-magnetic-anomaly"><em>2.1 Continuous Reduction To the Pole magnetic anomaly</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
@@ -113,147 +75,111 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
 </ul>
-<p class="caption"><span class="caption-text">Credits</span></p>
+<p class="caption" role="heading"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="gmg_documentation.html">gmg</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="gmg_documentation.html">Docs</a> &raquo;</li>
-        
-          <li><a href="tutorial.html"><strong>Tutorial</strong></a> &raquo;</li>
-        
-      <li><strong>2.0 Pre-modelling considerations</strong></li>
-    
-    
+      <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="tutorial.html"><strong>Tutorial</strong></a></li>
+      <li class="breadcrumb-item active"><strong>2.0 Pre-modelling data processing and considerations</strong></li>
       <li class="wy-breadcrumbs-aside">
-        
-            
-            
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/tutorial_pre-modelling_considerations.txt" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="pre-modelling-considerations">
-<span id="id1"></span><h1><strong>2.0 Pre-modelling considerations</strong><a class="headerlink" href="#pre-modelling-considerations" title="Permalink to this headline">¶</a></h1>
-<p>As we are interested in modelling the structure of the Weardale granite, an important processing step prior to modelling
-is to consider the other factors contributing to the total gravity anomaly.</p>
-<p>One common step is to preform a separation of the “regional” component of the gravity anomaly from the total anomaly
-in order to remove the contribution from sub-crustal density anomalies. As these anomalies are generated from deep
-sources, they are of much longer wavelength than that produced by our target, which resides in the upper crust.</p>
-<p>There are several strategies for calculating the regional gravity anomaly component but here we will use that determined
-by <a class="reference internal" href="z_bibliography.html#kimbell2011" id="id2">[6]</a> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 9</span></a>. As can be seen there is a long wavelength positive
-anomaly anomaly with amplitudes ranging <span class="math notranslate nohighlight">\(\sim\)</span> <span class="math notranslate nohighlight">\(14-21\)</span> <span class="math notranslate nohighlight">\(mGal\)</span>.</p>
-<div class="figure align-center" id="regional-gravity-map">
-<img alt="_images/regional_GA.png" src="_images/regional_GA.png" />
-<p class="caption"><span class="caption-number">Figure 9 </span><span class="caption-text">Regional gravity anomaly related to long-wavelength sub-crustal density anomalies from <a class="reference internal" href="z_bibliography.html#kimbell2011" id="id3">[6]</a>. The
+             
+  <section id="pre-modelling-data-processing-and-considerations">
+<span id="pre-modelling-considerations"></span><h1><strong>2.0 Pre-modelling data processing and considerations</strong><a class="headerlink" href="#pre-modelling-data-processing-and-considerations" title="Permalink to this heading"></a></h1>
+<p>As we are interested in modelling the structure of the Weardale granite, important preprocessing steps
+prior to forward modelling the gravity and magnetic anomalies is to consider other factors contributing to
+the total field anomalies.</p>
+<p>One common preprocessing step when modelling near surface structure using potential field data, is to preform a separation of the “regional” component of the anoamly
+from the total anomaly in order to remove the contribution from the longer wavelength regional signal (which may be sourced, for example, from the juxerposition of
+different basement terranes). Because these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced
+by our target strucuture, which resides in the upper crust.</p>
+</section>
+<section id="residual-gravity-anomaly">
+<h1><em>2.1 Residual gravity anomaly</em><a class="headerlink" href="#residual-gravity-anomaly" title="Permalink to this heading"></a></h1>
+<p>There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity feild
+as determined by <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 9</span></a>. As can be seen in this figure, there is a long
+wavelength positive anomaly in this region with amplitudes ranging <span class="math notranslate nohighlight">\(\sim\)</span> <span class="math notranslate nohighlight">\(14-21\)</span> <span class="math notranslate nohighlight">\(mGal\)</span>.</p>
+<p>We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown
+in <a class="reference internal" href="#residual-gravity-map"><span class="std std-numref">Figure 10</span></a>. We will model this residual signal to estimate the subsurface structure of the Weardale granite.</p>
+<figure class="align-default" id="regional-gravity-map">
+<img alt="_images/regional_anomaly.png" src="_images/regional_anomaly.png" />
+<figcaption>
+<p><span class="caption-number">Figure 9 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies from <span id="id2">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>. The
 red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
-(yellow circle). The data are projected on a local cartesian grid.</span><a class="headerlink" href="#regional-gravity-map" title="Permalink to this image">¶</a></p>
-</div>
-</div>
+(yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].</span><a class="headerlink" href="#regional-gravity-map" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="residual-gravity-map">
+<img alt="_images/residual_bouguer_anomaly.png" src="_images/residual_bouguer_anomaly.png" />
+<figcaption>
+<p><span class="caption-number">Figure 10 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies from <span id="id3">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>. The
+red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
+(yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].</span><a class="headerlink" href="#residual-gravity-map" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="continuous-reduction-to-the-pole-magnetic-anomaly">
+<h1><em>2.1 Continuous Reduction To the Pole magnetic anomaly</em><a class="headerlink" href="#continuous-reduction-to-the-pole-magnetic-anomaly" title="Permalink to this heading"></a></h1>
+<p>In order to model the magnetic anomaly, we’ll first convert apply a Continuous Reduction To the
+Pole (RTP) operation on the grid. The purpose of this is to simplify the interpretation of the anomaly by
+transforming the anomaly so that it appears as if it were observed at the geomagnetic pole, such that
+the subsurface bodies are magnetized vertically see, for example, .</p>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="tutorial_creating_a_new_model.html" class="btn btn-neutral float-right" title="3.0 Creating a new model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="tutorial_introduction.html" class="btn btn-neutral float-left" title="1.0 Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tutorial_introduction.html" class="btn btn-neutral float-left" title="1.0 Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial_creating_a_new_model.html" class="btn btn-neutral float-right" title="3.0 Creating a new model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2014-2019, B. Tozer
-      <span class="lastupdated">
-        Last updated on Aug 13, 2019.
-      </span>
-
-    </p>
+    <p>&#169; Copyright 2014-2023, B. Tozer.
+      <span class="lastupdated">Last updated on May 19, 2023.
+      </span></p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

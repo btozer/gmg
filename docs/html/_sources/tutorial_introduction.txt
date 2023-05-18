@@ -4,7 +4,7 @@
 **1.0 Introduction**
 ====================
 
-In this tutorial you will learn how to use GMG by working through an example.
+By following this tutorial the user will learn how to use GMG by working through loading and modelling of an example dataset.
 
 We will cover all the steps required to create a 2D subsurface model based on the gravity and magnetic
 anomalies produced by the Weardale granite in the Northern Pennines, UK. Thereby, recreating the study
@@ -12,64 +12,68 @@ published by the British geophysicist Martin Bott (Bott, 1967) :cite:`bott1967`.
 
 The tutorial will walk through the following steps::
 
-    1. Creating a new model and how to save and reload models.
+    1. Creating a new 2D model.
 
-    2. Loading observed 2D profile data (both Bouguer gravity and magnetic anomalies) into your GMG modelling
+    2. Saving and reloading a model.
+
+    3. Loading observed 2D profile data (both Bouguer gravity and magnetic anomalies) into the GMG modelling
        environment.
 
-    3. Loading borehole horizon top data into your GMG modelling environment.
+    4. Loading borehole horizon tops into your model.
 
-    4. Adding new layers to your model and assigning attributes (e.g. bulk density) to them.
+    5. Adding new layers to your model and assigning attributes such as bulk density and magnetic susceptibility to them.
 
-    5. Setting magnetic field attributes in your model (e.g. the strength of Earth's field).
+    6. Setting magnetic field attributes in your model (e.g. the strength of Earth's field and the elevation of data acquisition).
 
-    6. Running forward model calculations of the predicted gravity and magnetic anomalies.
+    7. Loading a 2D seismic reflection profile into you model.
 
-    7. How to use the GMG interface for forward modelling.
+    8. Running forward model calculations of the predicted gravity, vertical gravity gradient and magnetic anomalies.
 
-    8. How to save the predicted anomaly profiles as external text files.
+    9. How to use the GMG interface to forward model gravity and magnetic anomalies.
 
-    9. How to produce a raster figure and save this to disc using GMGs inbuilt figure production module.
+    10. How to save the predicted anomaly profiles as external text files.
 
-    10. How to load 2D seismic reflection data into a model.
+    1. How to produce a raster figure and save this to disc using GMGs inbuilt figure production module.
+
 
 **1.1 Geologic background**
 
-The Weardale granite is located in the Northern Pennines, in Northern England. The presence of this Caledonian-aged
+The Weardale granite is located in the Northern Pennines, Northern England. The presence of this Caledonian-aged
 granite was first proposed by Dunham (1934) as a means of explaining observed lead-zinc mineralization in nearby
 outcrops. Later, gravity and magnetic surveys conducted by various authors strongly corroborated this suggestion and
 Bott (1967) :cite:`bott1967` collated these data and published the regional maps shown in figures
-:numref:`bouguer_gravity_map` and :numref:`magnetic_map`. The granites presence was finally confirmed with the
+:numref:`bouguer_gravity_map` and :numref:`magnetic_map`. The granites presence was then confirmed with the
 drilling of the Rookhope borehole (Dunham et al., 1961). The location of this borehole is shown as the yellow circle
-in :numref:`bouguer_gravity_map` and :numref:`magnetic_map`. In this tutorial, we will model the subsurface structure
-of this granite based on the gravity and magnetic data as well as structural and physical constraints provided by other
-data  sources. Namely, (1) the Rookhope borehole; (2) geological surface outcrops and (3) *fictional* seismic reflection
-horizon picks.
+in :numref:`bouguer_gravity_map` and :numref:`magnetic_map`.
+
+In this tutorial, we will model the subsurface structure of this granite based on the gravity and magnetic anomalies as
+well as structural and physical constraints provided by other data sources. Namely, (1) the Rookhope borehole;
+(2) geological surface outcrops and (3) A *fictional* depth migrated seismic reflection horizon.
 
 **1.2 Defining the model profile**
 
-Our model profile runs south-to-north with a total length of 50 km. The profile start and end coordinates (in British
+Our model profile runs south to north from A-A* with a total length of 50 km. The profile start and end coordinates (in British
 National Grid format; EPSG code: 27700) are::
 
     A  = 393956 E 521000 N
     A* = 393956 E 571000 N
 
 
-.. figure:: _static/bott_BA_map.png
+.. figure:: _static/bouguer_anomaly.png
     :name: bouguer_gravity_map
 
-    Land based Bouguer gravity anomaly contoured at 1 mGal increments
-    (digitized from Bott (1967) :cite:`bott1967` Fig. 2). The red line A-A* shows the profile we will model in this
-    tutorial and is chosen to intersect the Rookhope well (yellow circle). Note the map uses the British
-    National Grid projection [EPSG code: 27700].
+    Bouguer gravity anomaly contoured at 1 mGal increments
+    (digitized from figure 2 of Bott (1967) :cite:`bott1967`). The red line A-A* shows the profile we will model in this
+    tutorial and is chosen to intersect the Rookhope well (yellow circle). Note map coordinates are British
+    National Grid Projection [EPSG code: 27700].
 
 
-.. figure:: _static/bott_magnetic_map.png
+.. figure:: _static/magnetic_anomaly.png
     :name: magnetic_map
 
-    Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface, flown with a line
-    spacing and 2 km and contoured at 10 nT increments. Note the map uses the British
-    National Grid projection [EPSG code: 27700].
+    Areo-magnetic anomaly map acquired at an average elevation of 305 m above the ground surface. This survey was flown 
+    with a line spacing of 2 km and is contoured at 10 nT increments.  Note map coordinates are British
+    National Grid Projection [EPSG code: 27700].
 
 
 

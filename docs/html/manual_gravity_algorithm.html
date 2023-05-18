@@ -1,40 +1,25 @@
 
-
-
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>A1 Bott (1969) 2D gravity algorithm &mdash; GMG: An open source geophysical modelling GUI</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="A2 Talwani and Heirtzler (1964) magnetic algorithm" href="manual_magnetic_algorithm.html" />
@@ -43,60 +28,35 @@
 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="gmg_documentation.html">
           
-
-          
+          <a href="gmg_documentation.html">
             
-            <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
-          
+              <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
           </a>
-
-          
-            
-            
               <div class="version">
                 1.0.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Getting Started</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
 </ul>
-<p class="caption"><span class="caption-text">User Guide</span></p>
+<p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
@@ -123,89 +83,48 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="contribute.html"><strong>Contribute</strong></a></li>
 </ul>
-<p class="caption"><span class="caption-text">Credits</span></p>
+<p class="caption" role="heading"><span class="caption-text">Credits</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="gmg_documentation.html">gmg</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="gmg_documentation.html">Docs</a> &raquo;</li>
-        
-          <li><a href="manual.html"><strong>Manual</strong></a> &raquo;</li>
-        
-      <li><strong>A1 Bott (1969) 2D gravity algorithm</strong></li>
-    
-    
+      <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="manual.html"><strong>Manual</strong></a></li>
+      <li class="breadcrumb-item active"><strong>A1 Bott (1969) 2D gravity algorithm</strong></li>
       <li class="wy-breadcrumbs-aside">
-        
-            
-            
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_gravity_algorithm.txt" class="fa fa-github"> Edit on GitHub</a>
-            
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="a1-bott-1969-2d-gravity-algorithm">
-<span id="manual-gravity-algorithm"></span><h1><strong>A1 Bott (1969) 2D gravity algorithm</strong><a class="headerlink" href="#a1-bott-1969-2d-gravity-algorithm" title="Permalink to this headline">¶</a></h1>
-<p>Two dimensional gravity anomalies are calculated using a python implementation of Bott’s (1969) <a class="reference internal" href="z_bibliography.html#bott1969" id="id1">[1]</a>
-algorithm. This is similar to that derived by Talwani et al., (1959) <a class="reference internal" href="z_bibliography.html#talwani1959" id="id2">[9]</a> and operates by setting the
+             
+  <section id="a1-bott-1969-2d-gravity-algorithm">
+<span id="manual-gravity-algorithm"></span><h1><strong>A1 Bott (1969) 2D gravity algorithm</strong><a class="headerlink" href="#a1-bott-1969-2d-gravity-algorithm" title="Permalink to this heading"></a></h1>
+<p>Two dimensional gravity anomalies are calculated using a python implementation of Bott’s (1969) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span>
+algorithm. This is similar to that derived by Talwani et al., (1959) <span id="id2">[<a class="reference internal" href="z_bibliography.html#id3" title="Manik Talwani, J. Lamar Worzel, and Mark Landisman. Rapid Gravity Computations for Two-Dimensional Bodies with Application to the Mendocino Submarine Fracture Zone. Journal of Geophysical Research, 64(1):49–59, 1959. doi:10.1029/JZ064i001p00049.">9</a>]</span> and operates by setting the
 observation point as the origin of a Cartesian coordinate system and treating the periphery of a given body as an
 n-sided polygon, defined by a discrete set of nodal points. The total gravity anomaly is then calculated by evaluating
 the solution for a semi-infinite horizontal slab with one sloping interface for each set of nodal pairs and then summing
-the results. The analytic solution for this is given by Heiland (1940) <a class="reference internal" href="z_bibliography.html#heiland1940" id="id3">[4]</a> page. 153 as:</p>
+the results. The analytic solution for this is given by Heiland (1940) <span id="id3">[<a class="reference internal" href="z_bibliography.html#id4" title="C.A. Heiland. Geophysical Exploration. Geology series / edited by Norman E.A. Hinds. Prentice-Hall, Incorporated, 1940.">4</a>]</span> page. 153 as:</p>
 <div class="math notranslate nohighlight" id="equation-bott-algorithm">
-<span class="eqno">(1)<a class="headerlink" href="#equation-bott-algorithm" title="Permalink to this equation">¶</a></span>\[\Delta g = 2 G \Delta\rho \left[ - \left\{ x_{1} \sin \theta + z_{1} \cos \theta \right\} \times
+<span class="eqno">(1)<a class="headerlink" href="#equation-bott-algorithm" title="Permalink to this equation"></a></span>\[\Delta g = 2 G \Delta\rho \left[ - \left\{ x_{1} \sin \theta + z_{1} \cos \theta \right\} \times
 \left\{ \sin \theta \log_{e} \frac{r_{2}}{r_{1}} + \cos \theta (\phi_{2}-\phi_{1}) \right\} +
 z_{2}\phi_{2} - z_{1}\phi_{1} \right]\]</div>
 <p>Where G is the Universal Gravitational Constant; <cite>Deltarho</cite> is the density contrast between the polygon and the
@@ -216,112 +135,99 @@ this parametrisation is shown in <a class="reference internal" href="#bott-metho
 <p>The total gravity anomaly produced by a given polygon is then determined by moving progressively counter-clockwise
 around the polygon and summing the contribution of each side (Equation <a class="reference internal" href="#equation-bott-sum">(2)</a>).</p>
 <div class="math notranslate nohighlight" id="equation-bott-sum">
-<span class="eqno">(2)<a class="headerlink" href="#equation-bott-sum" title="Permalink to this equation">¶</a></span>\[\Delta g = \sum_{i=1}^{N} \Delta g_{i}\]</div>
+<span class="eqno">(2)<a class="headerlink" href="#equation-bott-sum" title="Permalink to this equation"></a></span>\[\Delta g = \sum_{i=1}^{N} \Delta g_{i}\]</div>
 <p>When <span class="math notranslate nohighlight">\(z_{2} &gt; z_{1}\)</span> the contribution is positive and when <span class="math notranslate nohighlight">\(z_{2} &lt; z_{1}\)</span> the contribution is
 negative, such that, in the summation, the contributions outside of the polygon cancel, leaving only the gravity
 anomaly produced by the polygon itself (<a class="reference internal" href="#bott-method"><span class="std std-numref">Figure 1</span></a>).</p>
-<p>The Bott (1969) <a class="reference internal" href="z_bibliography.html#bott1969" id="id4">[1]</a> algorithm is preferred to the Talwani et al., (1959) <a class="reference internal" href="z_bibliography.html#talwani1959" id="id5">[9]</a> because a) it
+<p>The Bott (1969) <span id="id4">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span> algorithm is preferred to the Talwani et al., (1959) <span id="id5">[<a class="reference internal" href="z_bibliography.html#id3" title="Manik Talwani, J. Lamar Worzel, and Mark Landisman. Rapid Gravity Computations for Two-Dimensional Bodies with Application to the Mendocino Submarine Fracture Zone. Journal of Geophysical Research, 64(1):49–59, 1959. doi:10.1029/JZ064i001p00049.">9</a>]</span> because a) it
 runs slightly faster and b) it does not explicitly require closed polygons.</p>
-<div class="figure align-center" id="bott-method">
+<figure class="align-default" id="bott-method">
 <img alt="_images/bott_method.png" src="_images/bott_method.png" />
-<p class="caption"><span class="caption-number">Figure 1 </span><span class="caption-text">a) An example of a infinite slab with one sloping horizontal side, showing the geometric values relative to the
+<figcaption>
+<p><span class="caption-number">Figure 1 </span><span class="caption-text">a) An example of a infinite slab with one sloping horizontal side, showing the geometric values relative to the
 observation point (0,0) using in solving Equation <a class="reference internal" href="#equation-bott-sum">(2)</a>. b) Example of calculating the gravity anomaly due
 to a two dimensional body (red dashed line) estimated using five nodes (A-E) by summing the effects of the five
-infinite slabs with sloping sides (modified after, Kearey et al., (2013) <a class="reference internal" href="z_bibliography.html#kearey2013" id="id6">[5]</a>).</span><a class="headerlink" href="#bott-method" title="Permalink to this image">¶</a></p>
-</div>
-<div class="section" id="bott-1969-algorithm-testing">
-<h2>Bott (1969) algorithm testing<a class="headerlink" href="#bott-1969-algorithm-testing" title="Permalink to this headline">¶</a></h2>
-<p>To assess the accuracy of the Bott (1969) <a class="reference internal" href="z_bibliography.html#bott1969" id="id7">[1]</a> method, the gravity anomaly determined using the algorithm is
+infinite slabs with sloping sides (modified after, Kearey et al., (2013) <span id="id6">[<a class="reference internal" href="z_bibliography.html#id5" title="P Kearey, M Brooks, and I Hill. An Introduction to Geophysical Exploration. Blackwell Publishing, 2013.">5</a>]</span>).</span><a class="headerlink" href="#bott-method" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<section id="bott-1969-algorithm-testing">
+<h2>Bott (1969) algorithm testing<a class="headerlink" href="#bott-1969-algorithm-testing" title="Permalink to this heading"></a></h2>
+<p>To assess the accuracy of the Bott (1969) <span id="id7">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span> method, the gravity anomaly determined using the algorithm is
 compared to that of an exact analytic solution for a simple body. In this case, the solution for a buried horizontal
 cylinder of constant density contrast, that extends infinitely into and out of the model plane is used. The solution
-for this case is given by, for example, Garland (1965) <a class="reference internal" href="z_bibliography.html#garland1965" id="id8">[3]</a> Pg. 70 as:</p>
+for this case is given by, for example, Garland (1965) <span id="id8">[<a class="reference internal" href="z_bibliography.html#id6" title="G D Garland. The Earth's Shape and Gravity. Elsevier, 1965. ISBN 9780080108223. doi:10.1016/B978-0-08-010822-3.50011-X.">3</a>]</span> Pg. 70 as:</p>
 <div class="math notranslate nohighlight" id="equation-garland">
-<span class="eqno">(3)<a class="headerlink" href="#equation-garland" title="Permalink to this equation">¶</a></span>\[g_{z} = 2 \pi G r^{2} \Delta\rho \hspace{2pt} \frac{z}{x^{2}+z^{2}}\]</div>
-<div class="figure align-center" id="grav-cylinder">
+<span class="eqno">(3)<a class="headerlink" href="#equation-garland" title="Permalink to this equation"></a></span>\[g_{z} = 2 \pi G r^{2} \Delta\rho \hspace{2pt} \frac{z}{x^{2}+z^{2}}\]</div>
+<figure class="align-default" id="grav-cylinder">
 <img alt="_images/grav_cylinder.png" src="_images/grav_cylinder.png" />
-<p class="caption"><span class="caption-number">Figure 2 </span><span class="caption-text">Two-dimensional geometric parameters required for calculating the gravity anomaly produced by a
-buried cylinder.</span><a class="headerlink" href="#grav-cylinder" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-number">Figure 2 </span><span class="caption-text">Two-dimensional geometric parameters required for calculating the gravity anomaly produced by a
+buried cylinder.</span><a class="headerlink" href="#grav-cylinder" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
 <p>Where <span class="math notranslate nohighlight">\(G\)</span> is the Universal Gravitational Constant; <span class="math notranslate nohighlight">\(r\)</span> is the radius of the cylinder; <span class="math notranslate nohighlight">\(\Delta\rho\)</span> is
 the density contrast between the cylinder and the surrounding material; and <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(z\)</span> are the horizontal
 and vertical distances from the observation point, <span class="math notranslate nohighlight">\(P\)</span>, to the centre axis of the cylinder respectively. The
 geometry of this parametrisation is shown in <a class="reference internal" href="#grav-cylinder"><span class="std std-numref">Figure 2</span></a>.</p>
-<p>Using the Bott (1969) <a class="reference internal" href="z_bibliography.html#bott1969" id="id9">[1]</a> algorithm, the cylinder must be estimated using a series of discrete nodal
+<p>Using the Bott (1969) <span id="id9">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span> algorithm, the cylinder must be estimated using a series of discrete nodal
 points, <span class="math notranslate nohighlight">\(N\)</span>. A range of values for <span class="math notranslate nohighlight">\(N\)</span> were tested, starting from <span class="math notranslate nohighlight">\(N = 360\)</span> (i.e., one node every
 1 degree) and then halving the number of nodes for each new test until <span class="math notranslate nohighlight">\(N = 22\)</span> (i.e., one node every
 <span class="math notranslate nohighlight">\(\sim\)</span> 16 degrees). For the <span class="math notranslate nohighlight">\(N = 360\)</span> case, the predicted anomaly is also calculated using the Talwani et
-al., (1959) <a class="reference internal" href="z_bibliography.html#talwani1959" id="id10">[9]</a> method for comparison. This method uses a slightly different trigonometric
+al., (1959) <span id="id10">[<a class="reference internal" href="z_bibliography.html#id3" title="Manik Talwani, J. Lamar Worzel, and Mark Landisman. Rapid Gravity Computations for Two-Dimensional Bodies with Application to the Mendocino Submarine Fracture Zone. Journal of Geophysical Research, 64(1):49–59, 1959. doi:10.1029/JZ064i001p00049.">9</a>]</span> method for comparison. This method uses a slightly different trigonometric
 parametrisation.</p>
-<p>As can be seen in <a class="reference internal" href="#gravity-anomaly-comparison"><span class="std std-numref">Figure 3</span></a>, both the Bott (1969) <a class="reference internal" href="z_bibliography.html#bott1969" id="id11">[1]</a> and
-Talwani et al., (1959) <a class="reference internal" href="z_bibliography.html#talwani1959" id="id12">[9]</a> methods produce almost identical anomalies, with the slight
+<p>As can be seen in <a class="reference internal" href="#gravity-anomaly-comparison"><span class="std std-numref">Figure 3</span></a>, both the Bott (1969) <span id="id11">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span> and
+Talwani et al., (1959) <span id="id12">[<a class="reference internal" href="z_bibliography.html#id3" title="Manik Talwani, J. Lamar Worzel, and Mark Landisman. Rapid Gravity Computations for Two-Dimensional Bodies with Application to the Mendocino Submarine Fracture Zone. Journal of Geophysical Research, 64(1):49–59, 1959. doi:10.1029/JZ064i001p00049.">9</a>]</span> methods produce almost identical anomalies, with the slight
 ( <span class="math notranslate nohighlight">\(2.9 \times 10^{-6}\)</span> ) mismatch resulting from the difference between the sum of precision error, due to the
 different trigonometric functions that are solved by each algorithm. When <span class="math notranslate nohighlight">\(N = 360\)</span>, both methods reproduce the
 analytic anomaly to within an RMS misfit <span class="math notranslate nohighlight">\(9.0 \times 10^{-4}\)</span> mGal. For the <span class="math notranslate nohighlight">\(N = 22\)</span> case the  Bott (1969)
-<a class="reference internal" href="z_bibliography.html#bott1969" id="id13">[1]</a> method predicts the analytic solution to within 0.25 mGal. This level of accuracy is adequate for
+<span id="id13">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span> method predicts the analytic solution to within 0.25 mGal. This level of accuracy is adequate for
 modelling large scale features, for example, sedimentary basins and lithospheric gravity anomalies and demonstrates
 that bodies constructed using simplified geometries with relatively few nodes, are sufficient for modelling of such
 features. However, for some applications, such as microgravity surveys, much higher accuracy is required and detailed
 polygons with many nodes may be necessary.</p>
-<div class="figure align-center" id="gravity-anomaly-comparison">
+<figure class="align-default" id="gravity-anomaly-comparison">
 <img alt="_images/gravity_anomaly_comparison.png" src="_images/gravity_anomaly_comparison.png" />
-<p class="caption"><span class="caption-number">Figure 3 </span><span class="caption-text">a) Gravity anomaly calculated for the cylinder shown in (b) using an exact analytical solution and by the
-line-integral methods of Talwani et al., (1959) <a class="reference internal" href="z_bibliography.html#talwani1959" id="id14">[9]</a> and Bott (1969) <a class="reference internal" href="z_bibliography.html#bott1969" id="id15">[1]</a>. b) Model
+<figcaption>
+<p><span class="caption-number">Figure 3 </span><span class="caption-text">a) Gravity anomaly calculated for the cylinder shown in (b) using an exact analytical solution and by the
+line-integral methods of Talwani et al., (1959) <span id="id14">[<a class="reference internal" href="z_bibliography.html#id3" title="Manik Talwani, J. Lamar Worzel, and Mark Landisman. Rapid Gravity Computations for Two-Dimensional Bodies with Application to the Mendocino Submarine Fracture Zone. Journal of Geophysical Research, 64(1):49–59, 1959. doi:10.1029/JZ064i001p00049.">9</a>]</span> and Bott (1969) <span id="id15">[<a class="reference internal" href="z_bibliography.html#id2" title="M H P Bott. GRAVN. Durham geophysical computer specification, 1969.">1</a>]</span>. b) Model
 cylinder defined using 360 nodes, a radius of 5 <span class="math notranslate nohighlight">\(km\)</span> and a density contrast of
-<span class="math notranslate nohighlight">\(250\)</span> <cite>kg</cite> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</span><a class="headerlink" href="#gravity-anomaly-comparison" title="Permalink to this image">¶</a></p>
-</div>
-</div>
-</div>
+<span class="math notranslate nohighlight">\(250\)</span> <cite>kg</cite> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</span><a class="headerlink" href="#gravity-anomaly-comparison" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="manual_magnetic_algorithm.html" class="btn btn-neutral float-right" title="A2 Talwani and Heirtzler (1964) magnetic algorithm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="manual_python_console.html" class="btn btn-neutral float-left" title="10.0 Python console" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="manual_python_console.html" class="btn btn-neutral float-left" title="10.0 Python console" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manual_magnetic_algorithm.html" class="btn btn-neutral float-right" title="A2 Talwani and Heirtzler (1964) magnetic algorithm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2014-2019, B. Tozer
-      <span class="lastupdated">
-        Last updated on Aug 13, 2019.
-      </span>
-
-    </p>
+    <p>&#169; Copyright 2014-2023, B. Tozer.
+      <span class="lastupdated">Last updated on May 19, 2023.
+      </span></p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
