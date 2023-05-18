@@ -13,16 +13,23 @@ GMG is an open-source Graphical User Interface (GUI) designed principally for mo
 2D potential field (gravity and magnetic) profiles. GMG is written in python 3.7 and uses
 wxPython for GUI implementation.
 
-GMG makes use of several other open-source python packages to preform various tasks
+GMG makes use of several other open-source python packages to preform various tasks including:
+
+* Fatiando a Terra
+* Matplotlib
+* SciPy
+* NumPy
+* ObsPy
+
 (see `References <references.html>`_ for a detailed listing).
 
 The project was instigated after failing to find an adequate open-source package (in which
 the source code can be viewed and modified by the user) for performing 2D geophysical
 modeling tasks. Inspiration came from fatiando a terra and GMT.
 
-It is anticipated that GMG will also be useful for teaching purposes.
+It is anticipated that GMG will also be useful for undergraduate geophysics courses.
 
-**NB: GMG is currently in development. Some documentation is incomplete and some features may not work as expected.**
+**NB: GMG is currently in development and a work in progress. As such, some documentation may be incomplete and some features may not work as expected. If you have issues, please reach out so these can be corrected or the documentation modified.**
 
 Key features
 ------------
@@ -77,7 +84,6 @@ Notices:
 --------
 
 If you would like to make a comment, create a feature request or report a bug please use the github page.
-Alternatively, you can send an e-mail to: btozer@ucsd.edu
 
 Citing:
 -------
