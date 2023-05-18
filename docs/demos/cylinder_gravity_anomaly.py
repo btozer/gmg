@@ -52,7 +52,7 @@ def analytic_solution(r, x1, y1, rho_D):
 if __name__ == '__main__':
 
     ## PROGRAM PARAMETERS
-    parser = argparse.ArgumentParser(description='reate a 2D circle cross-section through a cylinder and calculate the '
+    parser = argparse.ArgumentParser(description='create a 2D circle cross-section through a cylinder and calculate the '
                                                  '2D gravity anomaly',
                                      usage='#####################################################\n'
                                            '                %(prog)s -r -x -y -n -d                    \n'

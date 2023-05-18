@@ -6,12 +6,12 @@
 
 As we are interested in modelling the structure of the Weardale granite, important preprocessing steps 
 prior to forward modelling the gravity and magnetic anomalies is to consider other factors contributing to 
-the total feild anomalies.
+the total field anomalies.
 
-One common preprocessing step when modelling near surface strcuture using potential feild data, is to preform a separation of the "regional" component of the anoamly 
-from the total anomaly in order to remove the contribution from the longer wavelength regional signal (which may be sourced, for example, from the juxerposition of 
-different basement terranes). Becuase these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced 
-by our target strucuture, which resides in the upper crust.
+One common preprocessing step when modelling near surface structure using potential field data, is to preform a separation of the "regional" component of the anomaly 
+from the total anomaly in order to remove the contribution from the longer wavelength regional signal (which may be sourced, for example, from the juxtaposition of 
+different basement terranes). Because these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced 
+by our target structured, which resides in the upper crust.
 
 ==============================
 *2.1 Residual gravity anomaly*
@@ -21,8 +21,8 @@ There are several different strategies for calculating regional anomalies. For t
 as determined by :cite:`Kimbell2011` as shown in :numref:`regional_gravity_map`. As can be seen in this figure, there is a long
 wavelength positive anomaly in this region with amplitudes ranging :math:`\sim` :math:`14-21` :math:`mGal`.
 
-We will simply substract this long wavelength component from the total anoamly, to produce the residual Bouguer anomaly as shown 
-in :numref:`residual_gravity_map`. We will model this resiudal signal to estimate the subsurface structure of the Weardale granite.
+We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown 
+in :numref:`residual_gravity_map`. We will model this residual signal to estimate the subsurface structure of the Weardale granite.
 
 .. figure:: _static/regional_anomaly.png
     :name: regional_gravity_map
@@ -38,6 +38,12 @@ in :numref:`residual_gravity_map`. We will model this resiudal signal to estimat
     red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
     (yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].
 
-===============================
-*2.1 Residual magnetic anomaly*
-===============================
+=======================================================
+*2.1 Continuous Reduction To the Pole magnetic anomaly*
+=======================================================
+
+In order to model the magnetic anomaly, we'll first convert apply a Continuous Reduction To the 
+Pole (RTP) operation on the grid. The purpose of this is to simplify the interpretation of the anomaly by
+transforming the anomaly so that it appears as if it were observed at the geomagnetic pole, such that 
+the subsurface bodies are magnetized vertically see, for example, . 
+

@@ -1,1 +1,7 @@
 theme: jekyll-theme-slate
+
+bibtex_bibfiles:
+  - _sources/manual.bib
+sphinx:
+  config:
+    bibtex_reference_style: author_year  # or label, super, \supercite
