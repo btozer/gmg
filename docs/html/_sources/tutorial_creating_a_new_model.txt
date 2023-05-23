@@ -1,9 +1,17 @@
 .. _creating_a_new_model:
 
-
-
 **3.0 Creating a new model**
 ----------------------------
+
+**3.1 Defining the model profile**
+
+Our model profile runs south to north from A-A* with a total length of 52 km. The profile start and end coordinates (in British
+National Grid format; EPSG code: 27700) are::
+
+    X  = 393956 E 521000 N
+    X' = 393956 E 571000 N
+
+**3.2 Initiating a new model**
 
 Once you have opened GMG (follow the instructions on the :ref:`installation` page if this is your first
 time using the software) you can create a new model by navigating to the Menubar and selecting::
@@ -11,16 +19,19 @@ time using the software) you can create a new model by navigating to the Menubar
     File -> New model...
 
 A window for setting the model dimensions will appear. Here we wil assign the model X and Z dimensions in
-kilometers, as well as the increment at which the predicted gravity and magnetic anomalies will be calculated at.
-In this example our model profile is 50 km long, so lets set the X-coordinates as 0 and 50 km. We will be modelling the
-upper crustal structure, so lets set the Z-coordinates as 0 and 10 km and the calculation increment as 0.5 km.
+kilometers, as well as the increment at which the predicted gravity and magnetic anomalies will be calculated.
+
+In this example our model profile is 52 km long spanning x=0 to x=52. We'll set the X window dimensions to slightly exceed these
+bounds, as this will make it easier to view the entire model. So, go ahead and set X1=-5 and X2=55 km. We will be modelling the
+upper crustal structure, so lets set the Z window dimensions as -1 and 10 km and the calculation increment as 0.1 km. 
+
+Then click `Create Model` to initiate the model.
 
 .. note::
 
-    you can always change the model dimensions and increment at a later time. For example, you may start out by
-    modelling with a coarse spacing to ensure GMG runs smoothly. Then, once you are satisfied with your starting model
-    and are ready to make smaller, fine scale changes towards completion of your model you might then lower the
-    calculation interval.
+    You can always change the model dimensions and calculation increment at a later time. For example, you may start out by
+    modelling with a coarse spacing to ensure GMG runs quickly. Then, once you are satisfied with your starting model
+    and are ready to make fine scale adjustments to your model, you might then reduce the calculation interval.
 
     To modify the model dimensions at anytime, navigate to::
 

@@ -62,11 +62,14 @@
 <li class="toctree-l1 current"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="tutorial_introduction.html"><strong>1.0 Introduction</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>2.0 Pre-modelling data processing and considerations</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#residual-gravity-anomaly"><em>2.1 Residual gravity anomaly</em></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#continuous-reduction-to-the-pole-magnetic-anomaly"><em>2.1 Continuous Reduction To the Pole magnetic anomaly</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gravity-anomaly-regional-residual-separation"><em>2.1 Gravity anomaly: regional/residual separation</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#magnetic-anomaly-reduction-to-the-pole"><em>2.2 Magnetic anomaly: Reduction To the Pole</em></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#regional-residual-separation"><em>2.3 Regional/Residual Separation</em></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>9.0 Adding XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>8.0 Adding Outcrop data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>0.0 Seismic data</strong></a></li>
@@ -117,36 +120,74 @@ from the total anomaly in order to remove the contribution from the longer wavel
 different basement terranes). Because these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced
 by our target structured, which resides in the upper crust.</p>
 </section>
-<section id="residual-gravity-anomaly">
-<h1><em>2.1 Residual gravity anomaly</em><a class="headerlink" href="#residual-gravity-anomaly" title="Permalink to this heading"></a></h1>
+<section id="gravity-anomaly-regional-residual-separation">
+<h1><em>2.1 Gravity anomaly: regional/residual separation</em><a class="headerlink" href="#gravity-anomaly-regional-residual-separation" title="Permalink to this heading"></a></h1>
 <p>There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity feild
-as determined by <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 9</span></a>. As can be seen in this figure, there is a long
+as determined by <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 10</span></a>. As can be seen in this figure, there is a long
 wavelength positive anomaly in this region with amplitudes ranging <span class="math notranslate nohighlight">\(\sim\)</span> <span class="math notranslate nohighlight">\(14-21\)</span> <span class="math notranslate nohighlight">\(mGal\)</span>.</p>
 <p>We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown
-in <a class="reference internal" href="#residual-gravity-map"><span class="std std-numref">Figure 10</span></a>. We will model this residual signal to estimate the subsurface structure of the Weardale granite.</p>
+in <a class="reference internal" href="#residual-gravity-map"><span class="std std-numref">Figure 11</span></a>. We will model this residual signal to estimate the subsurface structure of the Weardale granite.</p>
 <figure class="align-default" id="regional-gravity-map">
-<img alt="_images/regional_anomaly.png" src="_images/regional_anomaly.png" />
+<a class="reference internal image-reference" href="_images/regional_anomaly.png"><img alt="_images/regional_anomaly.png" src="_images/regional_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
 <figcaption>
-<p><span class="caption-number">Figure 9 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies from <span id="id2">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>. The
-red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
-(yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].</span><a class="headerlink" href="#regional-gravity-map" title="Permalink to this image"></a></p>
+<p><span class="caption-number">Figure 10 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies (as published by <span id="id2">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>).
+Note, the regional felid is positive, whereas the Waredale granite is expected to produce a negative
+anomaly relative to the surrounding basement rock.</span><a class="headerlink" href="#regional-gravity-map" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-default" id="residual-gravity-map">
-<img alt="_images/residual_bouguer_anomaly.png" src="_images/residual_bouguer_anomaly.png" />
+<a class="reference internal image-reference" href="_images/residual_bouguer_anomaly.png"><img alt="_images/residual_bouguer_anomaly.png" src="_images/residual_bouguer_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
 <figcaption>
-<p><span class="caption-number">Figure 10 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies from <span id="id3">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>. The
-red line A-A* shows the profile we will model in this tutorial and is chosen to intersect the Rookhope well
-(yellow circle). Note map coordinates are British National Grid Projection [EPSG code: 27700].</span><a class="headerlink" href="#residual-gravity-map" title="Permalink to this image"></a></p>
+<p><span class="caption-number">Figure 11 </span><span class="caption-text">Residual gravity anomaly derived by subtracting the regional anomaly from the total. This reflects the
+anomaly caused upper crustal features (i.e., the Weardale granite). Note, the central low, related to the
+granite, now has a larger amplitude.</span><a class="headerlink" href="#residual-gravity-map" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>
-<section id="continuous-reduction-to-the-pole-magnetic-anomaly">
-<h1><em>2.1 Continuous Reduction To the Pole magnetic anomaly</em><a class="headerlink" href="#continuous-reduction-to-the-pole-magnetic-anomaly" title="Permalink to this heading"></a></h1>
-<p>In order to model the magnetic anomaly, we’ll first convert apply a Continuous Reduction To the
-Pole (RTP) operation on the grid. The purpose of this is to simplify the interpretation of the anomaly by
-transforming the anomaly so that it appears as if it were observed at the geomagnetic pole, such that
-the subsurface bodies are magnetized vertically see, for example, .</p>
+<section id="magnetic-anomaly-reduction-to-the-pole">
+<h1><em>2.2 Magnetic anomaly: Reduction To the Pole</em><a class="headerlink" href="#magnetic-anomaly-reduction-to-the-pole" title="Permalink to this heading"></a></h1>
+<p>In order to model the magnetic anomaly, we’ll apply a Reduction To the
+Pole (RTP) operation on the grid. We do this to simplify the interpretation of the anomaly as
+the resulting anomaly appears as if  it were observed at the geomagnetic pole, such that,
+the subsurface bodies are magnetized vertically. This removes skewness of the anomaly introduced as the observation
+latitude increases. Here, we assume the magnetic sources share the same inclination and declination as the Earth field.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Processing of the magnetic anomaly data was conducted using the python implementation of the Generic Mapping Tools
+<a class="reference external" href="https://www.pygmt.org/latest/index.html">PyGMT</a>. For those interested readers, the Jupyter Notebook containing the
+processing recipe can be found in the docs/ directory.</p>
+</div>
+<figure class="align-default" id="magnetic-map-rtp">
+<a class="reference internal image-reference" href="_images/rtp_magnetic_anomaly.png"><img alt="_images/rtp_magnetic_anomaly.png" src="_images/rtp_magnetic_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 12 </span><span class="caption-text">Reduced To Pole magnetic anomaly. The reduction is calculated using the 1964 (when the survey was acquired)
+inclination and declination of <span class="math notranslate nohighlight">\(9.1\)</span> degrees, and a magnetic declination of <span class="math notranslate nohighlight">\(68.6\)</span> degrees.</span><a class="headerlink" href="#magnetic-map-rtp" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="regional-residual-separation">
+<h1><em>2.3 Regional/Residual Separation</em><a class="headerlink" href="#regional-residual-separation" title="Permalink to this heading"></a></h1>
+<p>Similarly to the gravity grid, we will also produce a regional-residual long wavelength regional field that we
+will remove from the total field to produce a residual anomaly that we will use to model
+the structure of the Weardale granite.</p>
+<p>To produce the regional grid we will apply a 2000 m upward continuation operation on the anomaly to
+transfer the observation elevation from 305 m (the aeromagnetic survey flight height) to 2305 m.
+This attenuates short wavelengths signals (generated by relatively shallower sources), with the
+longer wavelength regional field remaining.</p>
+<figure class="align-default" id="regional-magnetic-map">
+<a class="reference internal image-reference" href="_images/rtp_regional_magnetic_anomaly.png"><img alt="_images/rtp_regional_magnetic_anomaly.png" src="_images/rtp_regional_magnetic_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 13 </span><span class="caption-text">Regional magnetic anomaly derived by upward continuing the observed anomaly to 2700 m.</span><a class="headerlink" href="#regional-magnetic-map" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="residual-magnetic-map">
+<a class="reference internal image-reference" href="_images/rtp_residual_magnetic_anomaly.png"><img alt="_images/rtp_residual_magnetic_anomaly.png" src="_images/rtp_residual_magnetic_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<figcaption>
+<p><span class="caption-number">Figure 14 </span><span class="caption-text">Residual RTP anomaly derived by subtracting the regional anomaly from the Reduced
+To Pole anomaly. Note, this grid reveals many linear anomalies, related to fault traces,
+mineral veins, dykes and sills (<span id="id3">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>).</span><a class="headerlink" href="#residual-magnetic-map" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
 </section>
 
 
@@ -161,7 +202,7 @@ the subsurface bodies are magnetized vertically see, for example, .</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 19, 2023.
+      <span class="lastupdated">Last updated on May 23, 2023.
       </span></p>
   </div>
 

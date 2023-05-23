@@ -9,13 +9,19 @@ we can model its gravity effect. We will also assign a ``background density`` us
 rock. The difference between these two values represents the ``density contrast`` used for calculating the gravity
 effect of the granite.
 
-Kimbell et al., (2011) :cite:`Kimbell2011` suggest that 2.78 :math:`g cm^{-3}` is a reasonable bulk density for the
-Lower Palaeozoic rocks of the ``Alston Block``, within which the Weardale granite was emplaced. While measurements made
+Kimbell et al., (2011) :cite:`Kimbell2011` suggest that 2780 :math:`kg` :math:`m^{-3}` is a reasonable bulk density for the
+Lower Palaeozoic rocks of the `Alston Block`, within which the Weardale granite was emplaced. While measurements made
 on rock fragments of the granite itself, recovered from the Rookhope borehole, suggest its bulk density is close to
-2.63 :math:`g cm^{-3}` (Bott, 1967) :cite:`bott1967`.
+2630 :math:`kg` :math:`m^{-3}` (Bott, 1967) :cite:`bott1967`.
 
 Lets use these values to begin our modelling. To set the bulk density of the granite::
 
     First, select the ``Weardale`` layer under the menu by double clicking on its name. We can now set the bulk density
     and reference density values under the ``Layer Attributes`` top left control panel. Once you have assigned the
     values click ``Set layer attributes`` to make the changes.
+
+.. important::
+
+    Layer densities are entered using :math:`g` :math:`cm^{-3}` so for the reference and bulk densities we will use :math:`2.78` 
+    and :math:`2.63` respectively.
+

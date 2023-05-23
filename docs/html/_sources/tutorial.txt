@@ -11,6 +11,8 @@
    tutorial_creating_a_new_model
    tutorial_loading_observed_profile_data
    tutorial_loading_well_data
+   tutorial_loading_xy_data
+   tutorial_loading_outcrop_data
    tutorial_creating_a_model_layer
    tutorial_setting_layer_attributes
    tutorial_seismic_data
