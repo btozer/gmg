@@ -1892,8 +1892,8 @@ class Gmg(wx.Frame):
         TO ADD NEW OBJECTS ADD THE OBJECT NAME TO BOTH THE header AND model_params.
         THEN MODIFY THE load_model FUNCTION TO ALSO INLCUDE THE NEW ITEMS
         """
-        save_file_dialog = wx.FileDialog(self, "Save model file", "", "", "Model files (*.model)|*.model", wx.FD_SAVE
-                                         | wx.FD_OVERWRITE_PROMPT)
+        save_file_dialog = wx.FileDialog(self, "Save model file", "", "", "Model files (*.model)|*.model", 
+                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # USER CHANGED THEIR MIND
 
@@ -1996,34 +1996,47 @@ class Gmg(wx.Frame):
 
             # ----------------------------------------------------------------------------------------------------------
             # SET VARIABLE VALUES FROM LOADED DATA - USING LAYER 1
-            self.currently_active_layer_id = 1
-            self.total_layer_count = len(self.layer_list) - 1
-
             # SET LAYER ATTRIBUTES SIDE BAR
-            self.density_input.SetValue(0.001 * self.layer_list[1].density)
-            self.ref_density_input.SetValue(0.001 * self.layer_list[1].reference_density)
-            self.current_x_nodes = self.layer_list[1].x_nodes
-            self.current_y_nodes = self.layer_list[1].y_nodes
+            if len(self.layer_list) > 1:
+                self.currently_active_layer_id = 1
+                self.total_layer_count = len(self.layer_list) - 1
+                self.density_input.SetValue(0.001 * self.layer_list[1].density)
+                self.ref_density_input.SetValue(0.001 * self.layer_list[1].reference_density)
+                self.current_x_nodes = self.layer_list[1].x_nodes
+                self.current_y_nodes = self.layer_list[1].y_nodes
+            else:
+                self.currently_active_layer_id = 0
+                self.total_layer_count = 0
+                self.density_input.SetValue(0.0)
+                self.ref_density_input.SetValue(0.0)
+                self.current_x_nodes = self.layer_list[0].x_nodes
+                self.current_y_nodes = self.layer_list[0].y_nodes   
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
             # CREATE LAYERS
-            for l in range(0, self.total_layer_count + 1):
-                self.layer_list[l].node_mpl_actor = self.model_frame.plot(self.layer_list[l].x_nodes,
-                                                                          self.layer_list[l].y_nodes, color='blue',
-                                                                          linewidth=1.0, alpha=1.0)
-                # CREATE LAYER POLYGON FILL
-                self.layer_list[l].polygon_mpl_actor = self.model_frame.fill(self.layer_list[l].x_nodes,
-                                                                             self.layer_list[l].y_nodes, color='blue',
-                                                                             alpha=self.layer_transparency,
-                                                                             closed=True, linewidth=None, ec=None)
+            if len(self.layer_list) > 1:
+                for l in range(0, self.total_layer_count + 1):
+                    self.layer_list[l].node_mpl_actor = self.model_frame.plot(self.layer_list[l].x_nodes,
+                                                                            self.layer_list[l].y_nodes, color='blue',
+                                                                            linewidth=1.0, alpha=1.0)
+                    # CREATE LAYER POLYGON FILL
+                    self.layer_list[l].polygon_mpl_actor = self.model_frame.fill(self.layer_list[l].x_nodes,
+                                                                                self.layer_list[l].y_nodes, color='blue',
+                                                                                alpha=self.layer_transparency,
+                                                                                closed=True, linewidth=None, ec=None)
 
-            self.currently_active_layer, = self.model_frame.plot(self.current_x_nodes, self.current_y_nodes, marker='o',
-                                                                 color=self.layer_list[
-                                                                     self.currently_active_layer_id].color,
-                                                                 linewidth=1.0,
-                                                                 alpha=0.5)
-
+                self.currently_active_layer, = self.model_frame.plot(self.current_x_nodes, self.current_y_nodes, marker='o',
+                                                                    color=self.layer_list[
+                                                                        self.currently_active_layer_id].color,
+                                                                    linewidth=1.0,
+                                                                    alpha=0.5)
+            else:
+                self.currently_active_layer, = self.model_frame.plot(self.current_x_nodes, self.current_y_nodes, marker='o',
+                                                                    color=self.layer_list[0].color,
+                                                                    linewidth=1.0,
+                                                                    alpha=0.5)
+                
             # SET CURRENT NODE AS A OFF STAGE (PLACE HOLDER)
             self.current_node = self.model_frame.scatter(-40000., 0., marker='o', color='r', zorder=10)
             # ----------------------------------------------------------------------------------------------------------
@@ -2096,15 +2109,18 @@ class Gmg(wx.Frame):
 
             # UPDATE LAYER DATA AND PLOT
             self.draw()
-            self.update_layer_data()
+            if 1 in self.layer_list:
+                self.update_layer_data()  # IF THE MODEL INCLUDES LAYERS THEN UPDATE
             self.run_algorithms()
             self.draw()
             self.Restore()  # FIX'S DISPLAY ISSUE
             self.fold_panel_two.SetSize(200, 300)
             self.fold_panel_three.SetSize(200, 300)
+
+
             # ----------------------------------------------------------------------------------------------------------
 
-        # LOAD ERRORS
+        # HANDLE MODEL LOAD ERRORS
         except IOError:
             error_message = "IO ERROR IN LOADING PROCESS - MODEL NOT LOADED"
             MessageDialog(self, -1, error_message, "Load Error")
@@ -2113,10 +2129,11 @@ class Gmg(wx.Frame):
             error_message = "INDEX ERROR IN LOADING PROCESS - MODEL NOT LOADED"
             MessageDialog(self, -1, error_message, "Load Error")
             raise
-
+        
         # MAXIMIZE FRAME
         self.Maximize(True)
-
+        self.update_layer_data()  # UPDATE LAYER DATA
+    
     def replot_observed_xy_data(self):
         """ADD LOADED OBSERVED XY DATA TO THE MODEL FRAME"""
         for x in range(len(self.observed_xy_data_list)):
@@ -2799,7 +2816,7 @@ class Gmg(wx.Frame):
         """POPOUT BOX TO LET USER DEFINE MAGNETIC FIELD VALUES"""
 
         # CREATE POPOUT MENU
-        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.mag_observation_elv, self.model_azimuth,
+        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.mag_observation_elv, 
                             self.earth_field)
         answer = mag_box.ShowModal()
 
@@ -5294,7 +5311,6 @@ class Gmg(wx.Frame):
                                          angle_c_to_use, earth_field_to_use):
                 mag_input_polygons.append(Polygon(1000. * np.array(p), {'susceptibility': s, 'angle_a': a,
                                                                         'angle_b': b, 'angle_c': c, 'f': f}))
-
             # SET THE PREDICTED VALUES AS THE TALWANI & HEIRTZLER OUTPUT
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
             self.predicted_nt = talwani_and_heirtzler.nt(self.xp, self.mag_observation_elv, mag_input_polygons) * -1
