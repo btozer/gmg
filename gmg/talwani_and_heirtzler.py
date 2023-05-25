@@ -44,21 +44,21 @@ def nt(xp, zp, polygons):
 
     * angle_a : float
         The vertical magnetisation vector angle, measured in the vertical plane from zero at the horizontal and positive
-        downwards, in degrees. Will equal I (the inclination of earth's field) if magnetisation is induced only.
-        Range 0->90.0 degrees.
+        downwards, in degrees. This will equal I (the inclination of Earth's field) if magnetisation is induced only.
+        Range -90.0->90.0 degrees.
 
     * angle_b : float
         The angle between the horizontal projection of magnetisation vector and geographic north, measured in the
         horizontal plane, in a positive clockwise direction from geographic north, in degrees. Will equal D (the
-        declination of earth's field) if magnetisation is induced only.
+        declination of Earth's field) if magnetisation is induced only.
 
 
     * angle_c : float
         The angle between the positive x axis and geographic north, measured clockwise from geographic north, in
-        degrees.
+        degrees. Range 0.0->360.0 degrees.
 
     * observation_elv : float
-        The elevation at which to calculate the predicted magnetic anomaly. Zero is default (For data reduced to MSL).
+        The elevation in km at which to calculate the predicted magnetic anomaly. Zero is default (For data reduced to MSL).
         Elevations may be positive for areomagnetic surveys.
 
     .. note:: The y coordinate of the polygons is used as z!
@@ -88,6 +88,7 @@ def nt(xp, zp, polygons):
         else:
             f = polygon.props['f']  # EARTHS FIELD (nT)
             k = polygon.props['susceptibility']  # POLYGON
+            k = k * (1/(4.0 * m.pi))
 
             # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
             x = polygon.x
@@ -153,5 +154,5 @@ def nt(xp, zp, polygons):
             HASUM = HASUM + 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
 
         # CALCULATE TOTAL FIELD ANOMALY
-        n_t = (1./(4.0 * m.pi)) * (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
+        n_t = (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
     return n_t
