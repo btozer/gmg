@@ -45,11 +45,13 @@ def nt(xp, zp, polygons):
     * angle_a : float
         The vertical magnetisation vector angle, measured in the vertical plane from zero at the horizontal and positive
         downwards, in degrees. Will equal I (the inclination of earth's field) if magnetisation is induced only.
+        Range 0->90.0 degrees.
 
     * angle_b : float
         The angle between the horizontal projection of magnetisation vector and geographic north, measured in the
         horizontal plane, in a positive clockwise direction from geographic north, in degrees. Will equal D (the
         declination of earth's field) if magnetisation is induced only.
+
 
     * angle_c : float
         The angle between the positive x axis and geographic north, measured clockwise from geographic north, in
@@ -86,10 +88,7 @@ def nt(xp, zp, polygons):
         else:
             f = polygon.props['f']  # EARTHS FIELD (nT)
             k = polygon.props['susceptibility']  # POLYGON
-            # if f != 1.0:
-                # IF MAGNETIZATION IS INDUCED ONLY (f > 1.0) THEN CONVERT TO e.m.u UNITS; ELSE INPUT IS IN (A m^-1)
-                # k = k / (4.0 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
-                
+
             # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
             x = polygon.x
             z = polygon.y
