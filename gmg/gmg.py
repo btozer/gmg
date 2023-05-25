@@ -917,14 +917,14 @@ class Gmg(wx.Frame):
 
         # MAKE ANGLE B SPINNER
         self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label="Angle B (Dec):", style=wx.ALIGN_LEFT)
-        self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=180.0, increment=1.0, value=0.0,
+        self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-360.0, max_val=360.0, increment=1.0, value=0.0,
                                           style=wx.ALIGN_RIGHT)
         self.angle_b_input.SetFormat("%f")
         self.angle_b_input.SetDigits(1)
 
         # MAKE ANGLE C SPINNER
         self.angle_c_text = wx.StaticText(self.fold_panel_one, -1, label="Angle C (Azm):", style=wx.ALIGN_LEFT)
-        self.angle_c_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-180.0, max_val=180.0, increment=1.0,
+        self.angle_c_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-360.0, max_val=360.0, increment=1.0,
                                           value=0.0, style=wx.ALIGN_RIGHT)
         self.angle_c_input.SetFormat("%f")
         self.angle_c_input.SetDigits(1)
@@ -2816,8 +2816,7 @@ class Gmg(wx.Frame):
         """POPOUT BOX TO LET USER DEFINE MAGNETIC FIELD VALUES"""
 
         # CREATE POPOUT MENU
-        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.mag_observation_elv, 
-                            self.earth_field)
+        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.mag_observation_elv)
         answer = mag_box.ShowModal()
 
         # UPDATE MAGNETIC OBSERVATION ELEVATION

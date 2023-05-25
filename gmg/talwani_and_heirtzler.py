@@ -56,14 +56,14 @@ def nt(xp, zp, polygons):
         degrees.
 
     * observation_elv : float
-        The elevation at which to calculate the predeicted magnetic anomaly. Zero is default (For data reduced to MSL).
+        The elevation at which to calculate the predicted magnetic anomaly. Zero is default (For data reduced to MSL).
         Elevations may be positive for areomagnetic surveys.
 
     .. note:: The y coordinate of the polygons is used as z!
 
     .. note:: Data are numpy arrays
 
-    .. note:: The algorithm uses numpy arrays to calculate magnetic anomly for each node pairing at all xp observation
+    .. note:: The algorithm uses numpy arrays to calculate magnetic anomaly for each node pairing at all xp observation
               points simultaneously
 
     Returns:
@@ -73,26 +73,23 @@ def nt(xp, zp, polygons):
     """
 
     # INITIALISE TOTAL ANOMALY OUTPUT ARRAYS
-    VASUM = np.zeros_like(xp)
-    HASUM = np.zeros_like(xp)
-    n_t = np.zeros_like(xp)
+    VASUM = np.zeros_like(xp)  # VERTICAL 
+    HASUM = np.zeros_like(xp)  # HORIZONTAL
+    n_t = np.zeros_like(xp)    # TOTAL 
 
     # LOOP THROUGH THE MODEL POLYGONS
     for polygon in polygons:
 
         # CHECK IF THE CURRENT LAYER HAS A SUSCEPTIBILITY CONTRAST SET. SKIP LAYER IF FALSE
         if polygon is None or polygon.props['susceptibility'] == 0.0:
-            continue
+            continue  # SKIP THIS POLYGON
         else:
-            f = polygon.props['f']
-            k = polygon.props['susceptibility']
-            if f != 1.0:
+            f = polygon.props['f']  # EARTHS FIELD (nT)
+            k = polygon.props['susceptibility']  # POLYGON
+            # if f != 1.0:
                 # IF MAGNETIZATION IS INDUCED ONLY (f > 1.0) THEN CONVERT TO e.m.u UNITS; ELSE INPUT IS IN (A m^-1)
-                k = k / (4 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
-
-            # SET EARTH FIELD
-            f = polygon.props['f']
-
+                # k = k / (4.0 * m.pi)  # CONVERT FROM SI UNITS TO e.m.u (USED IN ORIGINAL CODE)
+                
             # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
             x = polygon.x
             z = polygon.y
@@ -157,5 +154,5 @@ def nt(xp, zp, polygons):
             HASUM = HASUM + 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
 
         # CALCULATE TOTAL FIELD ANOMALY
-        n_t = (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
+        n_t = (1./(4.0 * m.pi)) * (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
     return n_t
