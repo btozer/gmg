@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='gmg',
-      version='1.0',
+      version='1.0.0',
       description='An open source geophysical modelling GUI',
       url='https://github.com/btozer/gmg.git',
       author='Brook Tozer',
