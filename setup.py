@@ -16,7 +16,7 @@ setup(name='gmg',
        "Intended Audience :: Developers",
        "Intended Audience :: Education",
        "Environment :: Console",
-       "Programming Language :: Python :: 2.7",
+       "Programming Language :: Python :: 3.8.6",
        "License :: OSI Approved :: BSD License",
        "Natural Language :: English"],
       install_requires=[
