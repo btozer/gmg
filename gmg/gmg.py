@@ -689,18 +689,18 @@ class Gmg(wx.Frame):
         # INITIALISE MODEL FRAME ATTRIBUTES
         self.nodes = True  # SWITCH FOR NODE EDITING MODE
         self.zoom_on = False  # SWITCH FOR ZOOM MODE
-        self.pan_on = False  # SWTICH PANNING MODE
+        self.pan_on = False  # SWITCH PANNING MODE
         self.pinch_switch = False  # SWITCH FOR NODE PINCHING MODE
         self.pinch_count = 0
-        self.didnt_get_node = False  # SWTICH FOR MOSUE CLICK (EITHER CLICKED A NODE OR DIDN'T)
-        self.node_click_limit = 0.4  # CONTROLS HOW CLOSE A MOUSE CLICK MUST BE TO ACTIVATE A NODE
+        self.didnt_get_node = False  # SWITCH FOR MOUSE CLICK (EITHER CLICKED A NODE OR DIDN'T)
+        self.node_click_limit = 1  # CONTROLS HOW CLOSE A MOUSE CLICK MUST BE TO ACTIVATE A NODE
         self.index_node = None  # THE ACTIVE NODE
         self.select_new_layer_nodes = False  # SWITCH TO TURN ON WHEN MOUSE CLICK IS TO BE CAPTURED FOR A NEW LAYER
         self.currently_active_layer_id = 0  # LAYER COUNTER
         self.pred_topo = None  # FUTURE - PREDICTED TOPOGRAPHY FROM MOHO (ISOSTATIC FUNC)
         self.predicted_gravity = None  # THE CALCULATED GRAVITY RESPONSE
         self.predicted_nt = None  # THE CALCULATED MAGNETIC RESPONSE
-        self.calc_padding = 5000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
+        self.calc_padding = 50000.  # PADDING FOR POTENTIAL FIELD CALCULATION POINTS
         self.padding = 50000.  # PADDING FOR LAYERS
         self.mag_observation_elv = 0.  # OBSERVATION LEVEL FOR MAGNETIC DATA
         self.gravity_observation_elv = 0.  # OBSERVATION LEVEL FOR GRAVITY DATA
@@ -859,7 +859,7 @@ class Gmg(wx.Frame):
             layer0 = Layer()
             layer0.type = str('fixed')
             # CREATE THE XY NODES
-            layer0.x_nodes = [-(float(self.padding)), 0., self.x2, self.x2 + (float(self.padding))]
+            layer0.x_nodes = [self.x1 - (float(self.padding)), self.x1, self.x2, self.x2 + (float(self.padding))]
             layer0.y_nodes = [0.001, 0.001, 0.001, 0.001]
 
             # SET CURRENT NODES
@@ -1660,19 +1660,18 @@ class Gmg(wx.Frame):
         """SET COLOUR FOR LAYER"""
 
         # CREATE DIALOG
-        dlg = wx.ColourDialog(self)
+        starting_color = wx.ColourData()
+        starting_color.SetColour('white')
+        dlg = wx.ColourDialog(self, starting_color)
 
         # ENSURE THE FULL COLOUR DIALOG IS DISPLAYED, NOT THE ABBREVIATED VERSION
         dlg.GetColourData().SetChooseFull(True)
-
+    
         # WHAT TO DO WHEN THE DIALOG IS CLOSED
         if dlg.ShowModal() == wx.ID_OK:
             rgb = dlg.GetColourData().GetColour().Get()
             rgb = rgb[0:3]
-            print(rgb)
-            html = struct.pack('BBB', *rgb).encode('hex')
-
-            # html = rgb2hex(struct.pack('BBB', *rgb))
+            html = bytes.hex(struct.pack('BBB',*rgb))
 
             # SET FAULT OR LAYER COLOR
             if self.fault_picking_switch == True:
@@ -4431,9 +4430,9 @@ class Gmg(wx.Frame):
         # OPEN NEW LAYER DIALOG AND LET USER CHOSE BETWEEN FIXED AND FLOATING LAYER
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer', 'load')
         answer = new_layer_dialogbox.ShowModal()
-        # # IF THE USER CHANGES THERE MIND, THEN CLOSE THE DIALOG BOX AND RETURN TO MODELLNG
-        # if new_layer_dialogbox.ShowModal() == wx.ID_CANCEL:
-        #     return  # THE USER CHANGED THERE MIND
+        # IF THE USER CHANGES THERE MIND, THEN CLOSE THE DIALOG BOX AND RETURN TO MODELLNG
+        if new_layer_dialogbox.ShowModal() == wx.ID_CANCEL:
+            return  # THE USER CHANGED THERE MIND
 
         # 1. IF THE USER CHOOSES TO LOAD A NEW FIXED LAYER
         if new_layer_dialogbox.fixed:
@@ -4484,10 +4483,11 @@ class Gmg(wx.Frame):
         elif not new_layer_dialogbox.fixed:
 
             # # BEGIN LOADING LAYER
-            # open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
-            #                                  wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-            #
-            # file_in = open_file_dialog.GetPath()
+            open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.*)|*.*",
+                                             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            answer = open_file_dialog.ShowModal()
+            
+            file_in = open_file_dialog.GetPath()
             new_layer_nodes = np.genfromtxt(file_in, autostrip=True, delimiter=' ', dtype=float)
 
             # INCREMENT THE LAYER COUNT

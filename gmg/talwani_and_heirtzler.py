@@ -88,7 +88,7 @@ def nt(xp, zp, polygons):
         else:
             f = polygon.props['f']  # EARTHS FIELD (nT)
             k = polygon.props['susceptibility']  # POLYGON
-            k = k * (1/(4.0 * m.pi))
+            #k = k *  # CONVERT FROM SI TO E.M.U
 
             # SET X AND Y NODES AND THE NUMBER OF VERTICES IN THE CURRENT LAYER
             x = polygon.x
@@ -150,9 +150,9 @@ def nt(xp, zp, polygons):
                 QSUM = Q + QSUM
 
             # ADD CURRENT POLYGON ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
-            VASUM = VASUM + 2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM))
-            HASUM = HASUM + 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
+            VASUM = VASUM + (2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM)))
+            HASUM = HASUM + (2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM)))
 
         # CALCULATE TOTAL FIELD ANOMALY
-        n_t = (HASUM * CDIPD * SDD) + (VASUM * SDIPD)
+        n_t = (1/(4.0 * m.pi)) * ((HASUM * CDIPD * SDD) + (VASUM * SDIPD))
     return n_t

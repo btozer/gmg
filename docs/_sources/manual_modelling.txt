@@ -61,7 +61,7 @@ gmg models are saved as *Pickle* files and must have a ".model" suffix, for exam
 
     It is recommended that the user incrementally saves updated models using a incremented suffix such as:
 
-    model_1.model
+    model_01.model
 
     model_02.model
 
