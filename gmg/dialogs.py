@@ -1,5 +1,7 @@
 """
 GMG EXTERNAL DIALOG BOXES GO HERE
+
+EACH DIALOG BOX IS DEFINED AS A CLASS
 """
 
 import wx
@@ -608,8 +610,9 @@ class HorizontalDerivative(wx.Dialog):
         self.obs_to_filter_name = str(self.obs_combo_list.GetValue())
 
         for i in range(len(self.observed_list)):
-            if self.observed_list[i].name == self.obs_to_filter_name:
-                self.obs_to_filter = self.observed_list[i].data
+            if self.observed_list[i] is not None:
+                if self.observed_list[i].name == str(self.obs_to_filter_name):
+                    self.obs_to_filter = self.observed_list[i].data
 
         self.filter_length = int(self.filter_window_text.GetValue())
         self.x_inc = float(self.x_increment_text.GetValue())

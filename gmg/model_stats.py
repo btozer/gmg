@@ -1,5 +1,7 @@
 """
-CALCULATE RMS AND CHI-SQUARED VALUES FOR OBSERVED VS CALCULATED VALUES
+CALCULATE MODEL MISFIT STATISTICS  VALUES FOR OBSERVED VS CALCULATED VALUES
+    1. RMS 
+    2. CHI-SQUARE
 """
 
 from scipy import interpolate
@@ -29,6 +31,6 @@ def rms(obs_x, obs_y, calc_x, calc_y):
     return rms_misfit, residuals
 
 
-def chi_squared(x, calc):
-    """CALCULATE CHI-SQUARED MISFIT BETWEEN OBSERVED AND CALCULATED VALUES"""
+def chi_square(x, calc):
+    """CALCULATE CHI-SQUARE MISFIT BETWEEN OBSERVED AND CALCULATED VALUES"""
     pass

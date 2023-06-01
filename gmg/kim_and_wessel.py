@@ -16,7 +16,7 @@ Python package for modeling and inversion in geophysics. figshare. doi:10.6084/m
 """
 
 import numpy as np
-from numpy import arctan2, sin, cos, log
+from numpy import arctan2, sin, log
 
 # CONSTANTS
 SI_TO_EOTVOS = 1.0e9  # Conversion factor from SI units to EOTVOS :math: `(m/s^2)/m = 1e9`
@@ -36,9 +36,9 @@ def gz(xp, zp, polygons):
     * xp : array
         The x coordinates of the computation points.
 
-    * zp : array
-        The z coordinates of the computation points. (Equals gmg.gravity_observation_elv)
-
+    * zp : float
+       The z elevation of the computation points (Equals gmg.vgg_observation_elv)
+    
     * polygons : list of :func:`~fatiando.mesher.Polygon`
         Polygons must have the property ``'density'``. Polygons that don't have this property will be ignored in the
         computations. Elements of*polygons* that are None will also be ignored.
@@ -106,5 +106,5 @@ def gz(xp, zp, polygons):
             # ADD CURRENT LAYER ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
             g_z = g_z + current_layer_anomaly * density * -G * SI_TO_EOTVOS
 
-    # CONVERT TO EOTVOS AND RETURN ARRAY
+    # RETURN ANOMALY IN EOTVOS
     return g_z

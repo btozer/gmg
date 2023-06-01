@@ -35,8 +35,8 @@ def gz(xp, zp, polygons):
     * xp : array
         The x coordinates of the computation points.
 
-    * zp : array
-        The z coordinates of the computation points. (Equals gmg.gravity_observation_elv)
+    * zp : float
+        The z elevation of the computation points (Equals gmg.gravity_observation_elv).
 
     * polygons : list of :func:`~fatiando.mesher.Polygon`
         Polygons must have the property ``'density'``. Polygons that don't have this property will be ignored in the
@@ -53,7 +53,7 @@ def gz(xp, zp, polygons):
     * g_z : array
         The :math:`g_z` component calculated on the computation points
     """
-
+    print(zp)
     # INITIALIZE OUTPUT ARRAY
     g_z = np.zeros_like(xp)
 

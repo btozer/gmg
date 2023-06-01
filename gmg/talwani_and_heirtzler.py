@@ -32,8 +32,8 @@ def nt(xp, zp, polygons):
     * xp : array
         The x coordinates of the computation points.
 
-    * zp : array
-        The z coordinates of the computation points.
+    * zp : float
+        The z elevation of the computation points (Equals gmg.mag_observation_elv)
 
     * polygons : list of :func:`~fatiando.mesher.Polygon`
         Polygons must have the property ``'susceptibility'``. Polygons that don't have

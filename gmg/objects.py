@@ -5,12 +5,10 @@ GMG OBJECT CLASSES GO HERE
 import matplotlib
 matplotlib.use('WXAgg')
 import matplotlib.cm as cm
-from frames import *
-from dialogs import *
 
 
 class Layer:
-    """GENERIC MODEL LAYER (POLYGON) OBJECT. THE LAYER WILL BE STORED IN THE gmg.layer_list LIST"""
+    """GENERIC LAYER (POLYGON) OBJECT. THE LAYER WILL BE STORED IN THE gmg.layer_list LIST"""
 
     def __init__(self):
         self.id = None  # THE LAYER NUMBER
@@ -37,7 +35,7 @@ class Layer:
 
 
 class Fault:
-    """GENERIC MODEL FAULT OBJECT. THE FAULT WILL BE STORED IN THE gmg.fault_list LIST"""
+    """GENERIC FAULT OBJECT. THE FAULT WILL BE STORED IN THE gmg.fault_list LIST"""
 
     def __init__(self):
         self.id = None  # THE FAULTS NUMBER
@@ -50,7 +48,8 @@ class Fault:
 
 class ObservedData:
     def __init__(self):
-        """GENERIC OBSERVATIONAL DATA OBJECT"""
+        """GENERIC OBSERVATION DATA OBJECT"""
+
         self.id = None  # OBJECT ID VALUE FOR wx
         self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
         self.color = None  # THE COLOR USED FOR PLOTTING THE DATA (str)
@@ -60,7 +59,7 @@ class ObservedData:
 
 
 class ObservedOutcropData:
-    """GENERIC OBSERVATIONAL OUTCROP DATA OBJECT"""
+    """GENERIC GEOLOGICAL OUTCROP DATA OBJECT"""
 
     def __init__(self):
         self.id = None
@@ -74,13 +73,13 @@ class SegyData:
     """GENERIC SEGY DATA OBJECT"""
 
     def __init__(self):
-        self.file = None  # THE FULL FILE PATH TO THE SEGY DATA
-        self.name = None  # THE NAME ASSIGNED TO THE DATA (str)
-        self.dimensions = None
+        self.file = None  # THE FULL FILE PATH TO THE SEGY DATA : str
+        self.name = None  # THE NAME ASSIGNED TO THE DATA : str
+        self.dimensions = None # LIST CONTAINING x1 x2 z1 z2
         self.mpl_actor = None  # THE MPL ACTOR ELEMENT (PLOTTING OBJECT)
-        self.axis = None  # THE X AND Z AXIS LIMITS = X1, X2, Z1, Z2
+        self.axis = None  # THE X AND Z AXIS LIMITS = X1, X2, Z1, Z2 : list : float
         self.color_map = cm.gray  # THE COLOR SCALE USED TO PLOT THE DATA
-        self.data = None  # THE XY DATA LOADED FROM INPUT FILE (numpy array)
+        self.data = None  # THE XY DATA LOADED FROM INPUT FILE : numpy array : float
         self.gain_positive = 4.0
         self.gain_neg = -self.gain_positive
         self.segy_show = False

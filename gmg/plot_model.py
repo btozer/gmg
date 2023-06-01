@@ -130,15 +130,16 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
         # PLOT TOPO DATA
         if observed_topography_list is not None:
             for i in range(0, len(observed_topography_list)):
-                ax1.scatter(observed_topography_list[i].x_nodes, observed_topography_list[i].y_nodes, marker='o',
-                            color=observed_topography_list[i].color, s=ps)
+                if observed_topography_list[i] is not None:
+                    ax1.scatter(observed_topography_list[i].data[:, 0], observed_topography_list[i].data[:, 1],
+                                marker='o', color=observed_topography_list[i].color, s=ps)
 
-            # SET AXIS POSTIONS
-            ax1.spines['right'].set_color('none')
-            ax1.spines['bottom'].set_position('center')
-            ax1.spines['top'].set_position('center')
-            ax1.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
-            ax1.tick_params(axis='y', which='both', left='on', right='off', labelright='off')
+                # SET AXIS POSTIONS
+                ax1.spines['right'].set_color('none')
+                ax1.spines['bottom'].set_position('center')
+                ax1.spines['top'].set_position('center')
+                ax1.tick_params(axis='x', which='both', labelbottom='off', labeltop='off')
+                ax1.tick_params(axis='y', which='both', left='on', right='off', labelright='off')
     # ------------------------------------------------------------------------------------------------------------------
 
     # ------------------------------------------------------------------------------------------------------------------
@@ -156,12 +157,13 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
         # PLOT OBSERVED GRAVITY DATA
         if observed_gravity_list is not None:
             for i in range(0, len(observed_gravity_list)):
-                ax2.scatter(observed_gravity_list[i].x_nodes, observed_gravity_list[i].y_nodes, marker='o',
-                            color=observed_gravity_list[i].color, s=ps)
+                if observed_gravity_list[i] is not None:
+                    ax2.scatter(observed_gravity_list[i].data[:, 0], observed_gravity_list[i].data[:, 1], marker='o',
+                        color=observed_gravity_list[i].color, s=ps)
 
         # PLOT PREDICTED GRAVITY ANOMALY
         if predicted_gravity is not None:
-            ax2.plot(xp*0.001, predicted_gravity, color='r', linewidth=calc_line_width)
+            ax2.plot(xp*0.001, predicted_gravity, color='r', alpha=0.25, linewidth=calc_line_width)
 
         # PLOT RMS VALUE
         if gravity_rms_value is not None:
@@ -189,9 +191,11 @@ def plot_fig(file_path, file_type, use_tight_layout, fs, aspect_ratio, ps, calc_
         ax3.set_xticks([])
 
         # PLOT OBSERVED MAGNETIC DATA
-        for i in range(0, len(observed_gravity_list)):
-            ax2.scatter(observed_gravity_list[i].x_nodes, observed_gravity_list[i].y_nodes, marker='o',
-                        color=observed_gravity_list[i].color, s=ps)
+        if observed_magnetic_list is not None:
+            for i in range(0, len(observed_magnetic_list)):
+                if observed_magnetic_list[i] is not None:
+                    ax2.scatter(observed_magnetic_list[i].data[:, 0], observed_magnetic_list[i].data[:, 0], marker='o',
+                        color=observed_magnetic_list[i].color, s=ps)
 
         # PLOT PREDICTED MAGNETIC ANOMALY
         if predicted_nt is not None:
