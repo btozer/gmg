@@ -1,11 +1,12 @@
 """
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-GUI application for forward modelling 2D potential field profiles with adidtional geophysical data.
-Written by Brook Tozer, University of Oxford 2015-17; SIO 2018-19; GNS Science 2020-Present.
-Includes ability to import seismic reflection, well, surface outcrop and xy points into the model frame.
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+GMG is a GUI application for forward modelling 2D potential field profiles with 
+additional geophysical data. Written by Brook Tozer, University of Oxford 
+2015-17; SIO 2018-19; GNS Science 2020-Present. Includes ability to import 
+seismic reflection, well, surface outcrop and xy points into the model frame.
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **Dependencies**
 
 SciPy
@@ -15,38 +16,50 @@ pylab
 pickle
 obspy
 wxpython
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 **References**
 
 ***
 polygons from Fatiando a Terra.
 
-Uieda, L., V. C. Oliveira Jr and V. C. F. Barbosa (2013), Modeling the Earth with Fatiando a Terra, Proceedings
-of the 12th Python in Science Conference
+Uieda, L., V. C. Oliveira Jr and V. C. F. Barbosa (2013), Modeling the Earth 
+with Fatiando a Terra, Proceedings of the 12th Python in Science Conference
 
 www.fatiando.org/
 ***
 
 ***
-Gravity algorithm written using NumPy by Brook Tozer (2015) (Modified from the Fatiando a Terra 2D gravity code).
+Gravity algorithm written using NumPy by Brook Tozer (2015) (Modified from the 
+Fatiando a Terra 2D gravity code).
 
-CODE MODIFIED FROM: bott, M. H. P. (1969). GRAVN. Durham geophysical computer specification No. 1.
+ALGORITHM FROM: bott, M. H. P. (1969). GRAVN. Durham geophysical computer 
+specification No. 1.
 ***
 
 ***
 Magnetic algorithm written using NumPy by Brook Tozer (2015)
 
-CODE MODIFIED FROM: Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused by two dimensional
-structures of arbitrary shape, in Parks, G. A., Ed., Computers in the mineral industries, Part 1: Stanford Univ. Publ.,
-Geological Sciences, 9, 464-480.
+ALGORITHM FROM: Talwani, M., & Heirtzler, J. R. (1964). Computation of 
+magnetic anomalies caused by two dimensional structures of arbitrary shape, in 
+Parks, G. A., Ed., Computers in the mineral industries, Part 1: Stanford Univ. 
+Publ., Geological Sciences, 9, 464-480.
+***
+
+***
+VGG algorithm written using NumPy by Brook Tozer (2018)
+
+ALGORITHM FROM: Kim, S. S., & Wessel, P. (2016). New analytic solutions 
+for modeling vertical gravity gradient anomalies. Geochemistry, Geophysics, 
+Geosystems, 17(5), 1915–1924. https://doi.org/10.1002/2016GC006263
 ***
 
 ***
 SEGY plotting is preformed using ObsPy.
 
-ObsPy; a python toolbox for seismology Seismological Research Letters(May 2010), 81(3):530-533
+ObsPy; a python toolbox for seismology Seismological Research Letters
+(May 2010), 81(3):530-533
 
 obspy.org
 ***
@@ -64,11 +77,13 @@ Color: 3498db
 
 ***
 Documentation is created using Sphinx.
+
+https://www.sphinx-doc.org/en/master/
 ***
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-NB. If you created a seperate conda env for gmg you must activate it before launching gmg. e.g.::
+NB. If you created a separate conda env for gmg you must activate it before launching gmg. e.g.::
 
     source activate py3-gmg
 
@@ -135,7 +150,7 @@ class Gmg(wx.Frame):
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
-        # DEFIND ICONS DIRECTORY
+        # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
 
         # SET AND SHOW SPLASH SCREEN
@@ -252,13 +267,13 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.gravity_button)
 
         # VGG TOGGLE BUTTON
-        self.vgg_button = GenBitmapButton(self.statusbar, 604, wx.Bitmap(self.gui_icons_dir + 'M_16.png'),
+        self.vgg_button = GenBitmapButton(self.statusbar, 605, wx.Bitmap(self.gui_icons_dir + 'V_16.png'),
                                                pos=(96, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.vgg_button)
 
         # MAGNETIC TOGGLE BUTTON
         self.magnetic_button = GenBitmapButton(self.statusbar, 603, wx.Bitmap(self.gui_icons_dir + 'M_16.png'),
-                                               pos=(96, -4), style=wx.NO_BORDER)
+                                               pos=(120, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
         self.status_text = " "
@@ -310,8 +325,9 @@ class Gmg(wx.Frame):
         model_view_file.AppendSeparator()
 
         # PROGRAM FRAME WINDOW SWITCHES
-        self.topo_frame_switch = True
+        self.topography_frame_switch = True
         self.gravity_frame_switch = True
+        self.vertical_gg_frame_switch = True
         self.magnetic_frame_switch = True
         self.m_model_frames_submenu = wx.Menu()
         model_view_file.AppendSubMenu(self.m_model_frames_submenu, "Toggle Model Frames")
@@ -319,8 +335,8 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.frame_adjustment, id=601)
         self.m_model_frames_submenu.Append(602, 'Gravity')
         self.Bind(wx.EVT_MENU, self.frame_adjustment, id=602)
-        self.m_model_frames_submenu.Append(604, 'VGG')
-        self.Bind(wx.EVT_MENU, self.frame_adjustment, id=604)
+        self.m_model_frames_submenu.Append(605, 'VGG')
+        self.Bind(wx.EVT_MENU, self.frame_adjustment, id=605)
         self.m_model_frames_submenu.Append(603, 'Magnetics')
         self.Bind(wx.EVT_MENU, self.frame_adjustment, id=603)
         model_view_file.AppendSeparator()
@@ -794,7 +810,7 @@ class Gmg(wx.Frame):
         self.outcrop_data_list = []
         self.outcrop_data_count = 0
 
-        # INITIALISE Well ATTRIBUTES
+        # INITIALISE WELL ATTRIBUTES
         self.well_data_list = []
         self.well_counter = 0
 
@@ -818,29 +834,31 @@ class Gmg(wx.Frame):
 
     def draw_main_frame(self):
         """
-        DRAW THE GUI FRAMES ( 1. TOPO; 2. GRAVITY; 3. MAGNETICS; 4. MODEL)
+        DRAW THE GUI FRAMES ( 1. TOPO; 2. GRAVITY; 3. VGG 4. MAGNETICS; 5. MODEL)
         docs: https://matplotlib.org/api/axes_api.html
         """
         self.columns = 87  # NUMBER OF COLUMNS THE MODEL FRAMES WILL TAKE UP (I.E. 87/100)
         self.x_orig = 10  # X ORIGIN OF MODEL FRAMES (RELATIVE TO 0 AT LEFT MARGIN)
-
+        self.data_row_span = 3
         # TOPOGRAPHY CANVAS -------------------------------------------------------------------------------
-        self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
-        self.topo_frame.set_ylabel("Topo (km)")
-        self.topo_frame.set_navigate(False)
-        self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.topo_frame.grid()
-        self.topo_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.topography_frame = plt.subplot2grid((26, 100), (0, self.x_orig), 
+                                           rowspan=self.data_row_span, colspan=self.columns)
+        self.topography_frame.set_ylabel("Topo (km)")
+        self.topography_frame.set_navigate(False)
+        self.topography_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.topography_frame.grid()
+        self.topography_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-        self.topo_d_frame = self.topo_frame.twinx()
-        self.topo_d_frame.set_navigate(False)
-        self.topo_d_frame.set_ylabel("dt/dx")
-        self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.topography_d_frame = self.topography_frame.twinx()
+        self.topography_d_frame.set_navigate(False)
+        self.topography_d_frame.set_ylabel("dt/dx")
+        self.topography_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.topography_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         # -------------------------------------------------------------------------------------------------
 
         # GRAVITY CANVAS ----------------------------------------------------------------------------------
-        self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
+        self.gravity_frame = plt.subplot2grid((26, 100), (3, self.x_orig), 
+                                              rowspan=self.data_row_span, colspan=self.columns)
         self.gravity_frame.set_navigate(False)
         self.gravity_frame.set_ylabel("Grav (mGal)")
         self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -855,22 +873,24 @@ class Gmg(wx.Frame):
         # --------------------------------------------------------------------------------------------------
 
         # VGG CANVAS ---------------------------------------------------------------------------------------
-        self.vgg_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-        self.vgg_frame.set_navigate(False)
-        self.vgg_frame.set_ylabel("Grav (mGal)")
-        self.vgg_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.vgg_frame.grid()
-        self.vgg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.vertical_gg_frame = plt.subplot2grid((26, 100), (6, self.x_orig), 
+                                          rowspan=self.data_row_span, colspan=self.columns)
+        self.vertical_gg_frame.set_navigate(False)
+        self.vertical_gg_frame.set_ylabel("Grav (mGal)")
+        self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.vertical_gg_frame.grid()
+        self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-        self.vgg_d_frame = self.vgg_frame.twinx()
-        self.vgg_d_frame.set_navigate(False)
-        self.vgg_d_frame.set_ylabel("dg/dx")
-        self.vgg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.vgg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.vertical_gg_d_frame = self.vertical_gg_frame.twinx()
+        self.vertical_gg_d_frame.set_navigate(False)
+        self.vertical_gg_d_frame.set_ylabel("dg/dx")
+        self.vertical_gg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.vertical_gg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         #---------------------------------------------------------------------------------------------------
 
         # MAGNETIC CANVAS ----------------------------------------------------------------------------------
-        self.magnetic_frame = plt.subplot2grid((26, 100), (5, self.x_orig), rowspan=3, colspan=self.columns)
+        self.magnetic_frame = plt.subplot2grid((26, 100), (9, self.x_orig), 
+                                               rowspan=self.data_row_span, colspan=self.columns)
         self.magnetic_frame.set_ylabel("Mag (nT)")
         self.magnetic_frame.set_navigate(False)
         self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
@@ -885,7 +905,8 @@ class Gmg(wx.Frame):
         # ---------------------------------------------------------------------------------------------------
 
         # MODEL CANVAS
-        self.model_frame = plt.subplot2grid((26, 100), (8, self.x_orig), rowspan=17, colspan=self.columns)
+        self.model_frame = plt.subplot2grid((26, 100), (12, self.x_orig), 
+                                            rowspan=17, colspan=self.columns)
         self.model_frame.set_ylabel("Depth (km)")
         self.model_frame.set_xlabel("x (km)")
 
@@ -898,20 +919,22 @@ class Gmg(wx.Frame):
         self.model_frame.set_xlim(self.x1, self.x2)
         self.model_frame.set_ylim(self.z2, self.z1)
         self.model_frame.grid()
-        self.topo_frame.set_xlim(self.model_frame.get_xlim())
+        self.topography_frame.set_xlim(self.model_frame.get_xlim())
         self.gravity_frame.set_xlim(self.model_frame.get_xlim())
-        self.vgg_frame.set_xlim(self.model_frame.get_xlim())
+        self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
         self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02,
                                  hspace=1.5)
 
         # ADD FIRST LAYER
         if self.newmodel:
-            # CREATE LAYER 0 - THIS IS A PLACE HOLDER FOR THE TOP OF THE MODEL AND NOT ACCESSIBLE BY USER
+            # CREATE LAYER 0 - THIS IS A PLACE HOLDER FOR THE TOP OF THE 
+            # MODEL AND NOT ACCESSIBLE BY USER
             layer0 = Layer()
             layer0.type = str('fixed')
             # CREATE THE XY NODES
-            layer0.x_nodes = [self.x1 - (float(self.padding)), self.x1, self.x2, self.x2 + (float(self.padding))]
+            layer0.x_nodes = [self.x1 - (float(self.padding)), self.x1, 
+                              self.x2, self.x2 + (float(self.padding))]
             layer0.y_nodes = [0.001, 0.001, 0.001, 0.001]
 
             # SET CURRENT NODES
@@ -919,8 +942,9 @@ class Gmg(wx.Frame):
             self.current_y_nodes = layer0.y_nodes
 
             # DRAW THE CURRENTLY ACTIVE LAYER (THE NODES THAT CAN BE INTERACTED WITH)
-            self.currently_active_layer, = self.model_frame.plot(layer0.x_nodes, layer0.y_nodes, marker='o', color='k',
-                                                                 linewidth=1.0, alpha=0.5, picker=True)
+            self.currently_active_layer, = self.model_frame.plot(
+                layer0.x_nodes, layer0.y_nodes, marker='o', color='k',
+                linewidth=1.0, alpha=0.5, picker=True)
             # ADD THE LAYER LINE TO THE PLOT
             layer0.node_mpl_actor = self.model_frame.plot(layer0.x_nodes, layer0.y_nodes, color='black', linewidth=1.0,
                                                           alpha=1.0)
@@ -1061,7 +1085,7 @@ class Gmg(wx.Frame):
         r = 1  # CURRENT ROW
         c = 0  # CURRENT COLUMN
 
-        # LINE SEPx
+        # LINE SEP
         line = wx.StaticLine(self.fold_panel_one)
         self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.EXPAND, border=5)
 
@@ -1245,23 +1269,81 @@ class Gmg(wx.Frame):
         self.rightPanel.SetSize(self.GetSize())
         # --------------------------------------------------------------------------------------------------------------
 
+    def topo_frame_params(self, span_size):
+        # TOPO CANVAS
+        self.topography_frame = plt.subplot2grid((26, 100), (0, self.x_orig), 
+                                           rowspan=span_size, colspan=self.columns)
+        self.topography_frame.set_ylabel("(m)")
+        self.topography_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.topography_frame.grid()
+        self.topography_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+        self.topography_d_frame = self.topography_frame.twinx()
+        self.topography_d_frame.set_ylabel("dt/dx")
+        self.topography_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.topography_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+
+    def grav_frame_params(self, span_size, z_orig):  
+        # GRAV CANVAS
+        self.gravity_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
+                                              rowspan=span_size, colspan=self.columns)
+        self.gravity_frame.set_ylabel("(mGal)")
+        self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.gravity_frame.grid()
+        self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+        self.gravity_d_frame = self.gravity_frame.twinx()
+        self.gravity_d_frame.set_ylabel("dg/dx")
+        self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+    def vgg_frame_params(self, span_size, z_orig):
+        # VGG CANVAS
+        self.vertical_gg_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
+                                          rowspan=span_size, colspan=self.columns)
+        self.vertical_gg_frame.set_ylabel("(Eotvos)")
+        self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.vertical_gg_frame.grid()
+        self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+        self.vertical_gg_frame = self.vertical_gg_frame.twinx()
+        self.vertical_gg_frame.set_ylabel("dg/dx")
+        self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+    def mag_frame_params(self, span_size, z_orig):
+        # MAG CANVAS
+        self.magnetic_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
+                                               rowspan=span_size, colspan=self.columns)
+        self.magnetic_frame.set_ylabel("Mag (nT)")
+        self.magnetic_frame.set_navigate(False)
+        self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.magnetic_frame.grid()
+        self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
+        self.magnetic_d_frame = self.magnetic_frame.twinx()
+        self.magnetic_d_frame.set_ylabel("dnt/dx")
+        self.magnetic_d_frame.set_navigate(False)
+        self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+
     def frame_adjustment(self, event):
         """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
-
         # GET CURRENT FRAME X LIMITS
         self.current_xlim = self.model_frame.get_xlim()
         self.current_ylim = self.model_frame.get_ylim()
 
         # SWITCH CALLBACKS
         if event.Id == 601:
-            if self.topo_frame_switch is True:
-                self.topo_frame.set_visible(False)
-                self.topo_d_frame.set_visible(False)
-                self.topo_frame_switch = False
+            if self.topography_frame_switch is True:
+                self.topography_frame.set_visible(False)
+                self.topography_d_frame.set_visible(False)
+                self.topography_frame_switch = False
             else:
-                self.topo_frame_switch = True
-                self.topo_frame.set_visible(True)
-                self.topo_d_frame.set_visible(True)
+                self.topography_frame_switch = True
+                self.topography_frame.set_visible(True)
+                self.topography_d_frame.set_visible(True)
         
         if event.Id == 602:
             if self.gravity_frame_switch is True:
@@ -1273,15 +1355,15 @@ class Gmg(wx.Frame):
                 self.gravity_frame.set_visible(True)
                 self.gravity_d_frame.set_visible(True)
         
-        if event.Id == 604:
-            if self.vgg_frame_switch is True:
-                self.vgg_frame.set_visible(False)
-                self.vgg_d_frame.set_visible(False)
-                self.vgg_frame_switch = False
+        if event.Id == 605:
+            if self.vertical_gg_frame_switch is True:
+                self.vertical_gg_frame.set_visible(False)
+                self.vertical_gg_d_frame.set_visible(False)
+                self.vertical_gg_frame_switch = False
             else:
-                self.vgg_frame_switch = True
-                self.vgg_frame.set_visible(True)
-                self.vgg_d_frame.set_visible(True)
+                self.vertical_gg_frame_switch = True
+                self.vertical_gg_frame.set_visible(True)
+                self.vertical_gg_d_frame.set_visible(True)
         
         if event.Id == 603:
             if self.magnetic_frame_switch is True:
@@ -1294,306 +1376,182 @@ class Gmg(wx.Frame):
                 self.magnetic_d_frame.set_visible(True)
 
 
-        # ADJUST FRAME SIZING AND SET PROGRAM WINDOW ---------------------------------------------------------
-        if self.topo_frame_switch is True and self.gravity_frame_switch is True and \
-            self.vgg_frame_switch is True and self.magnetic_frame_switch is True:
-            # TRUE TRUE TRUE TRUE
+        # ADJUST FRAME SIZING AND SET PROGRAM WINDOW --------------------------------
+        
+        # 1 TRUE TRUE TRUE TRUE -----------------------------------------------------
+        if self.topography_frame_switch is True and self.gravity_frame_switch is True and \
+            self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is True:
 
-            # TOPO CANVAS
-            self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
-            self.topo_frame.set_ylabel("(m)")
-            self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_frame.grid()
-            self.topo_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+            self.topo_frame_params(3)
+            self.grav_frame_params(3, 3)
+            self.vgg_frame_params(3, 6)
+            self.mag_frame_params(3, 9)
+        # -----------------------------------------------------------------------------
 
-            self.topo_d_frame = self.topo_frame.twinx()
-            self.topo_d_frame.set_ylabel("dt/dx")
-            self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # GRAV CANVAS
-            self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-            self.gravity_frame.set_ylabel("(mGal)")
-            self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_frame.grid()
-            self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.gravity_d_frame = self.gravity_frame.twinx()
-            self.gravity_d_frame.set_ylabel("dg/dx")
-            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # VGG CANVAS
-            self.vgg_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-            self.vgg_frame.set_ylabel("(Eotvos)")
-            self.vgg_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_frame.grid()
-            self.vgg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.vgg_d_frame = self.vgg_frame.twinx()
-            self.vgg_d_frame.set_ylabel("dg/dx")
-            self.vgg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # MAG CANVAS
-            self.magnetic_frame = plt.subplot2grid((26, 100), (5, self.x_orig), rowspan=3, colspan=self.columns)
-            self.magnetic_frame.set_ylabel("(nT)")
-            self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_frame.grid()
-            self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.magnetic_d_frame = self.magnetic_frame.twinx()
-            self.magnetic_d_frame.set_ylabel("dnt/dx")
-            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        #  ------------------------------------------------------------------------------------------------------
-
-        # FALSE TRUE TRUE TRUE ----------------------------------------------------------------------------------
-        elif self.topo_frame_switch is False and self.gravity_frame_switch is True \
-            and self.vgg_frame_switch is True and self.magnetic_frame_switch is True:
-
+        # 2 FALSE TRUE TRUE TRUE ----------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is True:
+            
             # TOPO CANVAS - HIDDEN
+            self.grav_frame_params(4, 0)
+            self.vgg_frame_params(4, 4)
+            self.mag_frame_params(4, 8)
+        # ----------------------------------------------------------------------------
 
-            # GRAV CANVAS
-            self.gravity_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=4, colspan=self.columns)
-            self.gravity_frame.set_ylabel("(mGal)")
-            self.gravity_frame.grid()
-            self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.gravity_d_frame = self.gravity_frame.twinx()
-            self.gravity_d_frame.set_ylabel("dg/dx")
-            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # VGG CANVAS
-            self.vgg_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-            self.vgg_frame.set_ylabel("(Eotvos)")
-            self.vgg_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_frame.grid()
-            self.vgg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.vgg_d_frame = self.vgg_frame.twinx()
-            self.vgg_d_frame.set_ylabel("dg/dx")
-            self.vgg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # MAG CANVAS
-            self.magnetic_frame = plt.subplot2grid((26, 100), (4, self.x_orig), rowspan=4, colspan=self.columns)
-            self.magnetic_frame.set_ylabel("(nT)")
-            self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_frame.grid()
-            self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.magnetic_d_frame = self.magnetic_frame.twinx()
-            self.magnetic_d_frame.set_ylabel("dnt/dx")
-            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-        # TRUE FALSE TRUE TRUE
-        elif self.topo_frame_switch is True and self.gravity_frame_switch is False \
-            and self.vgg_frame_switch is True and self.magnetic_frame_switch is True:
-
-            # TOPO CANVAS
-            self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
-            self.topo_frame.set_ylabel("(m)")
-            self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_frame.grid()
-
-            self.topo_d_frame = self.topo_frame.twinx()
-            self.topo_d_frame.set_ylabel("dt/dx")
-            self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
+        # 3 TRUE FALSE TRUE TRUE -----------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is False \
+            and self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is True:
+            
+            self.topo_frame_params(4)
             # GRAV CANVAS - HIDDEN
-
-            # VGG CANVAS
-            self.vgg_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-            self.vgg_frame.set_ylabel("(Eotvos)")
-            self.vgg_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_frame.grid()
-            self.vgg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.vgg_d_frame = self.vgg_frame.twinx()
-            self.vgg_d_frame.set_ylabel("dg/dx")
-            self.vgg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # MAG CANVAS
-            self.magnetic_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=6, colspan=self.columns)
-            self.magnetic_frame.set_ylabel("(nT)")
-            self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_frame.grid()
-            self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.magnetic_d_frame = self.magnetic_frame.twinx()
-            self.magnetic_d_frame.set_ylabel("dnt/dx")
-            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        # ---------------------------------------------------------------------
+            self.vgg_frame_params(4, 4)
+            self.mag_frame_params(4, 8)
+        # -----------------------------------------------------------------------------
         
-        # TRUE TRUE FALSE TRUE -----------------------------------------------
-        elif self.topo_frame_switch is True and self.gravity_frame_switch is True \
-            and self.vgg_frame_switch is False and self.magnetic_frame_switch is True:
- 
-            # TOPO CANVAS
-            self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
-            self.topo_frame.set_ylabel("(m)")
-            self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_frame.grid()
-
-            self.topo_d_frame = self.topo_frame.twinx()
-            self.topo_d_frame.set_ylabel("dt/dx")
-            self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # GRAV CANVAS
-            self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=6, colspan=self.columns)
-            self.gravity_frame.set_ylabel("(mGal)")
-            self.gravity_frame.grid()
-            self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.gravity_d_frame = self.gravity_frame.twinx()
-            self.gravity_d_frame.set_ylabel("dg/dx")
-            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        
+        # 4 TRUE TRUE FALSE TRUE ------------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is True:
+            
+            self.topo_frame_params(4)
+            self.grav_frame_params(4, 4)
             # VGG CANVAS - HIDDEN
+            self.mag_frame_params(4, 8)
+        # ------------------------------------------------------------------------------
 
-            # MAG CANVAS
-            self.magnetic_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=6, colspan=self.columns)
-            self.magnetic_frame.set_ylabel("(nT)")
-            self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_frame.grid()
-            self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.magnetic_d_frame = self.magnetic_frame.twinx()
-            self.magnetic_d_frame.set_ylabel("dnt/dx")
-            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-        # -----------------------------------------------------------------------------------------------
-
-        # TRUE TRUE TRUE FALSE ------------------------------------------------
-        elif self.topo_frame_switch is True and self.gravity_frame_switch is True and \
-                self.vgg_frame_switch is True and self.magnetic_frame_switch is False:
-
-            # TOPO CANVAS
-            self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=2, colspan=self.columns)
-            self.topo_frame.set_ylabel("(m)")
-            self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_frame.grid()
-            self.topo_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.topo_d_frame = self.topo_frame.twinx()
-            self.topo_d_frame.set_ylabel("dt/dx")
-            self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # GRAV CANVAS
-            self.gravity_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-            self.gravity_frame.set_ylabel("(mGal)")
-            self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_frame.grid()
-            self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.gravity_d_frame = self.gravity_frame.twinx()
-            self.gravity_d_frame.set_ylabel("dg/dx")
-            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # VGG CANVAS
-            self.vgg_frame = plt.subplot2grid((26, 100), (2, self.x_orig), rowspan=3, colspan=self.columns)
-            self.vgg_frame.set_ylabel("(Eotvos)")
-            self.vgg_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_frame.grid()
-            self.vgg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.vgg_d_frame = self.vgg_frame.twinx()
-            self.vgg_d_frame.set_ylabel("dg/dx")
-            self.vgg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.vgg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
+        # 5 TRUE TRUE TRUE FALSE -------------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is False:
+            
+            self.topo_frame_params(4)
+            self.grav_frame_params(4, 4)
+            self.vgg_frame_params(4, 8)
             # MAG CANVAS - HIDDEN
-        # -----------------------------------------------------------------------------------------------
+        # -----------------------------------------------------------------------------
 
-        # 
-        elif self.topo_frame_switch is False and self.gravity_frame_switch is False and \
-                self.magnetic_frame_switch is True:
+        # 6 TRUE TRUE FALSE FALSE -------------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is False:
+
+            self.topo_frame_params(6)
+            self.grav_frame_params(6, 6)
+            # VGG CANVAS - HIDDEN
+            # MAG CANVAS - HIDDEN
+        # --------------------------------------------------------------------------------
+
+        # 7 TRUE FALSE TRUE FALSE --------------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is False\
+            and self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is False:
+
+            self.topo_frame_params(6)
+            # GRAV CANVAS - HIDDEN
+            self.vgg_frame_params(6, 6)
+            # MAG CANVAS - HIDDEN
+        # -----------------------------------------------------------------------------
+
+        # 8 FALSE TRUE TRUE FALSE ---------------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is False:
 
             # TOPO CANVAS - HIDDEN
-
-            # GRAV CANVAS - HIDDEN
-
-            # MAG CANVAS'
-            self.magnetic_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=8, colspan=self.columns)
-            self.magnetic_frame.set_ylabel("(nT)")
-            self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_frame.grid()
-            self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.magnetic_d_frame = self.magnetic_frame.twinx()
-            self.magnetic_d_frame.set_ylabel("dnt/dx")
-            self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-        elif self.topo_frame_switch is False and self.gravity_frame_switch is True and \
-                self.magnetic_frame_switch is False:
-            # FALSE TRUE FALSE
-
-            # TOPO CANVAS - HIDDEN
-
-            # GRAV CANVAS
-            self.gravity_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=8, colspan=self.columns)
-            self.gravity_frame.set_ylabel("(mGal)")
-            self.gravity_frame.grid()
-            self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            self.gravity_d_frame = self.gravity_frame.twinx()
-            self.gravity_d_frame.set_ylabel("dg/dx")
-            self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # MAG CANVAS -HIDDEN
-
-        elif self.topo_frame_switch is True and self.gravity_frame_switch is False and \
-                self.magnetic_frame_switch is False:
-            # TRUE FALSE FALSE
-
-            # TOPO CANVAS
-            self.topo_frame = plt.subplot2grid((26, 100), (0, self.x_orig), rowspan=8, colspan=self.columns)
-            self.topo_frame.set_ylabel("(m)")
-            self.topo_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_frame.grid()
-
-            self.topo_d_frame = self.topo_frame.twinx()
-            self.topo_d_frame.set_ylabel("dt/dx")
-            self.topo_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
-            self.topo_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-
-            # GRAV CANVAS - HIDDEN
-
+            self.grav_frame_params(6, 0)
+            self.vgg_frame_params(6, 6)
             # MAG CANVAS - HIDDEN
+        # -----------------------------------------------------------------------------
 
-        elif self.topo_frame_switch is False and self.gravity_frame_switch is False and \
-                self.magnetic_frame_switch is False:
+        # 9 TRUE FALSE FALSE TRUE ----------------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is False and \
+                self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is True:
+            
+            self.topo_frame_params(6)
+            # GRAV CANVAS - HIDDEN
+            # VGG CANVAS - HIDDEN
+            self.mag_frame_params(6, 6)
+
+        # 10 FALSE TRUE FALSE TRUE ---------------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is True:
+            
+            # TOPO CANVAS - HIDDEN
+            self.grav_frame_params(6, 0)
+            # VGG CANVAS - HIDDEN
+            self.mag_frame_params(6, 6)
+        # -----------------------------------------------------------------------------
+
+        # 11 FALSE FALSE TRUE TRUE ---------------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is False \
+            and self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is True:
+            
+            # TOPO CANVAS - HIDDEN
+            # GRAV CANVAS - HIDDEN
+            self.vgg_frame_params(6, 0)
+            self.mag_frame_params(6, 6)
+        # -----------------------------------------------------------------------------
+
+        # 12 TRUE FALSE FALSE FALSE --------------------------------------------------------
+        elif self.topography_frame_switch is True and self.gravity_frame_switch is False and \
+                self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is False:
+            
+            self.topo_frame_params(12)
+            # GRAV CANVAS - HIDDEN
+            # VGG CANVAS - HIDDEN
+            # MAG CANVAS - HIDDEN  
+        # -----------------------------------------------------------------------------
+
+        # 13 FALSE TRUE FALSE FALSE --------------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is True \
+            and self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is False:
+            
+            # TOPO CANVAS - HIDDEN
+            self.grav_frame_params(12, 0)
+            # VGG CANVAS - HIDDEN
+            # MAG CANVAS - HIDDEN  
+        # -----------------------------------------------------------------------------
+
+        # 14 FALSE FALSE TRUE FALSE -------------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is False and \
+                self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is False:
+            
+            # TOPO CANVAS - HIDDEN
+            # GRAV CANVAS - HIDDEN
+            self.vgg_frame_params(12, 0)
+            # MAG CANVAS - HIDDEN  
+        # -----------------------------------------------------------------------------
+
+        # 15 FALSE FALSE FALSE TRUE ------------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is False \
+            and self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is True:
+            
+            # TOPO CANVAS - HIDDEN
+            # GRAV CANVAS - HIDDEN
+            # VGG CANVAS - HIDDEN
+            self.mag_frame_params(12, 0)
+        # -----------------------------------------------------------------------------
+
+        # 16 FALSE FALSE FALSE FALSE --------------------------------------------------
+        elif self.topography_frame_switch is False and self.gravity_frame_switch is False \
+            and self.vertical_gg_frame_switch is False and self.magnetic_frame_switch is False:
+            
+            # TOPO CANVAS - HIDDEN
+            # GRAV CANVAS - HIDDEN
+            # VGG CANVAS - HIDDEN
+            # MAG CANVAS - HIDDEN
             pass
-            # FALSE FALSE FALSE
-            # TOPO CANVAS - HIDDEN
-            # GRAV CANVAS - HIDDEN
-            # MAG CANVAS - HIDDEN
-
+        # -----------------------------------------------------------------------------
+        # -----------------------------------------------------------------------------
+        
         # SET CANVAS LIMITS
         self.model_frame.set_xlim(self.current_xlim)
         self.model_frame.set_ylim(self.current_ylim)
         self.model_frame.grid()
-        if self.topo_frame is not None:
-            self.topo_frame.set_xlim(self.model_frame.get_xlim())
-            self.topo_d_frame.set_xlim(self.model_frame.get_xlim())
+        if self.topography_frame is not None:
+            self.topography_frame.set_xlim(self.model_frame.get_xlim())
+            self.topography_d_frame.set_xlim(self.model_frame.get_xlim())
         if self.gravity_frame is not None:
             self.gravity_frame.set_xlim(self.model_frame.get_xlim())
             self.gravity_d_frame.set_xlim(self.model_frame.get_xlim())
-        if self.vgg_frame is not None:
-            self.vgg_frame.set_xlim(self.model_frame.get_xlim())
-            self.vgg_d_frame.set_xlim(self.model_frame.get_xlim())
+        if self.vertical_gg_frame is not None:
+            self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
+            self.vertical_gg_d_frame.set_xlim(self.model_frame.get_xlim())
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
             self.magnetic_d_frame.set_xlim(self.model_frame.get_xlim())
@@ -1603,7 +1561,8 @@ class Gmg(wx.Frame):
         if self.gravity_frame is not None:
             self.pred_gravity_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
             self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
-
+        
+        if self.vertical_gg_frame is not None:
             self.pred_vgg_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
             self.vgg_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
@@ -1612,20 +1571,20 @@ class Gmg(wx.Frame):
             self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
         # PLOT OBSERVED TOPO DATA
-        if self.topo_frame is not None:
+        if self.topography_frame is not None:
             # REPLOT OBSERVED TOPOGRAPHY DATA
             for x in range(len(self.observed_topography_list)):
                 if self.observed_topography_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
                     if self.observed_topography_list[x].type != "derivative":
-                        self.observed_topography_list[x].mpl_actor = self.topo_frame.scatter(
+                        self.observed_topography_list[x].mpl_actor = self.topography_frame.scatter(
                             self.observed_topography_list[x].data[:, 0],
                             self.observed_topography_list[x].data[:, 1],
                             marker='o', s=5,
                             color=self.observed_topography_list[x].color,
                             gid=self.observed_topography_list[x].id)
                     else:
-                        self.observed_topography_list[x].mpl_actor = self.topo_d_frame.scatter(
+                        self.observed_topography_list[x].mpl_actor = self.topography_d_frame.scatter(
                             self.observed_topography_list[x].data[:, 0],
                             self.observed_topography_list[x].data[:, 1],
                             marker='o', s=5,
@@ -1653,26 +1612,26 @@ class Gmg(wx.Frame):
                             color=self.observed_gravity_list[x].color,
                             gid=11000 + self.observed_gravity_list[x].id)
 
-        # PLOT OBSERVED GRAVITY DATA
-        if self.vgg_frame is not None:
-            # REPLOT OBSERVED GRAVITY DATA
+        # PLOT OBSERVED VGG DATA
+        if self.vertical_gg_frame is not None:
+            # REPLOT OBSERVED VGG DATA
             for x in range(len(self.observed_vgg_list)):
                 if self.observed_vgg_list[x] is not None:
                     # DRAW DATA IN MODEL FRAME
                     if self.observed_vgg_list[x].type != "derivative":
-                        self.observed_vgg_list[x].mpl_actor = self.vgg_frame.scatter(
+                        self.observed_vgg_list[x].mpl_actor = self.vertical_gg_frame.scatter(
                             self.observed_vgg_list[x].data[:, 0],
                             self.observed_vgg_list[x].data[:, 1],
                             marker='o', s=5,
                             color=self.observed_vgg_list[x].color,
-                            gid=11000 + self.observed_vgg_list[x].id)
+                            gid=20000 + self.observed_vgg_list[x].id)
                     else:
-                        self.observed_vgg_list[x].mpl_actor = self.vgg_d_frame.scatter(
+                        self.observed_vgg_list[x].mpl_actor = self.vertical_gg_d_frame.scatter(
                             self.observed_vgg_list[x].data[:, 0],
                             self.observed_vgg_list[x].data[:, 1],
                             marker='o', s=5,
                             color=self.observed_vgg_list[x].color,
-                            gid=11000 + self.observed_vgg_list[x].id)
+                            gid=20000 + self.observed_vgg_list[x].id)
                         
         # PLOT OBSERVED MAGNETIC DATA
         if self.magnetic_frame is not None:
@@ -1962,8 +1921,8 @@ class Gmg(wx.Frame):
 
     def full_extent_adjustment(self):
         """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
-        if not self.topo_frame.get_visible():
-            self.topo_frame.set_visible(True)
+        if not self.topographyframe.get_visible():
+            self.topography_frame.set_visible(True)
         if not self.gravity_frame.get_visible():
             self.gravity_frame.set_visible(True)
         if not self.magnetic_frame.get_visible():
@@ -1973,8 +1932,8 @@ class Gmg(wx.Frame):
         self.model_frame.set_xlim(self.x1, self.x2)
         self.model_frame.set_ylim(self.z2, self.z1)
         self.model_aspect = 1
-        if self.topo_frame is not None:
-            self.topo_frame.set_xlim(self.model_frame.get_xlim())
+        if self.topography_frame is not None:
+            self.topography_frame.set_xlim(self.model_frame.get_xlim())
         if self.gravity_frame is not None:
             self.gravity_frame.set_xlim(self.model_frame.get_xlim())
         if self.magnetic_frame is not None:
@@ -1982,8 +1941,8 @@ class Gmg(wx.Frame):
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
 
         'ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
-        if self.topo_frame is False:
-            self.topo_frame.set_visible(False)
+        if self.topography_frame is False:
+            self.topography_frame.set_visible(False)
         if self.gravity_frame is False:
             self.gravity_frame.set_visible(False)
         if self.magnetic_frame is False:
@@ -2379,7 +2338,7 @@ class Gmg(wx.Frame):
         for x in range(len(self.observed_topography_list)):
             if self.observed_topography_list[x] is not None:
                 # DRAW DATA IN MODEL FRAME
-                self.observed_topography_list[x].mpl_actor = self.topo_frame.scatter(
+                self.observed_topography_list[x].mpl_actor = self.topography_frame.scatter(
                     self.observed_topography_list[x].data[:, 0], self.observed_topography_list[x].data[:, 1],
                     marker='o', color=self.observed_topography_list[x].color, s=5,
                     gid=self.observed_topography_list[x].id)
@@ -2654,7 +2613,7 @@ class Gmg(wx.Frame):
         observed_topography.name = self.load_window.observed_name
         observed_topography.color = self.load_window.color_picked
         observed_topography.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
-        observed_topography.mpl_actor = self.topo_frame.scatter(observed_topography.data[:, 0],
+        observed_topography.mpl_actor = self.topography_frame.scatter(observed_topography.data[:, 0],
                                                                 observed_topography.data[:, 1], marker='o',
                                                                 color=observed_topography.color, s=5,
                                                                 gid=observed_topography.id)
@@ -2713,7 +2672,7 @@ class Gmg(wx.Frame):
         observed.name = median_filter_box.output_name
         observed.color = median_filter_box.output_color
         observed.data = median_filter_box.filtered_output
-        observed.mpl_actor = self.topo_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
+        observed.mpl_actor = self.topography_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
                                                      color=observed.color, s=5, gid=observed.id)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
@@ -2755,7 +2714,7 @@ class Gmg(wx.Frame):
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 10000 + self.observed_topography_counter
         new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.topo_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+        new_derivative.mpl_actor = self.topography_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                              marker='o', color=new_derivative.color, s=5,
                                                              gid=10000 + self.observed_topography_counter)
 
@@ -5349,9 +5308,9 @@ class Gmg(wx.Frame):
 
         # UPDATE FRAME LIMITS
         xmin, xmax = self.model_frame.get_xlim()
-        if self.topo_frame:
-            self.topo_frame.set_xlim(xmin, xmax)
-            self.topo_d_frame.set_xlim(xmin, xmax)
+        if self.topography_frame:
+            self.topography_frame.set_xlim(xmin, xmax)
+            self.topography_d_frame.set_xlim(xmin, xmax)
         if self.gravity_frame:
             self.gravity_frame.set_xlim(xmin, xmax)
             self.gravity_d_frame.set_xlim(xmin, xmax)
@@ -5679,7 +5638,6 @@ class Gmg(wx.Frame):
                 ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 0.1)
         if self.gravity_frame is not None:
             self.gravity_d_frame.set_ylim(min(ymin_list), max(ymax_list))
-
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
@@ -5777,8 +5735,8 @@ class Gmg(wx.Frame):
 
         self.font_type = self.set_values.font_type_text.GetValue()
 
-        self.topo_frame_min = self.set_values.topo_min_text.GetValue()
-        self.topo_frame_max = self.set_values.topo_max_text.GetValue()
+        self.topography_frame_min = self.set_values.topo_min_text.GetValue()
+        self.topography_frame_max = self.set_values.topo_max_text.GetValue()
         self.grav_frame_min = self.set_values.grav_min_text.GetValue()
         self.grav_frame_max = self.set_values.grav_max_text.GetValue()
         self.mag_frame_min = self.set_values.mag_min_text.GetValue()
@@ -5818,7 +5776,7 @@ class Gmg(wx.Frame):
         # # RUN PLOT MODEL CODE
         fig_plot = plot_model.plot_fig(self.file_path, self.file_type, self.use_tight_layout, self.fs,
                                        self.aspect_ratio, self.ps, self.calc_line_width, self.font_type,
-                                       self.topo_frame_min, self.topo_frame_max, self.grav_frame_min,
+                                       self.topography_frame_min, self.topography_frame_max, self.grav_frame_min,
                                        self.grav_frame_max, self.mag_frame_min, self.mag_frame_max,
                                        self.draw_polygons, self.polygon_alpha, self.draw_fixed_layers,
                                        self.layer_line_width, self.draw_floating_layers, self.layer_line_alpha,
@@ -5829,7 +5787,7 @@ class Gmg(wx.Frame):
                                        self.layer_list, self.fault_list, self.observed_topography_list,
                                        self.observed_gravity_list, self.observed_magnetic_list,
                                        self.outcrop_data_list, self.well_data_list, self.segy_data_list,
-                                       self.topo_frame, self.gravity_frame, self.magnetic_frame, self.predicted_gravity,
+                                       self.topography_frame, self.gravity_frame, self.magnetic_frame, self.predicted_gravity,
                                        self.gravity_rms_value, self.predicted_nt, self.magnetic_rms_value, self.area,
                                        self.xp)
         del fig_plot
@@ -5891,7 +5849,7 @@ class Gmg(wx.Frame):
 
     def legal(self, event):
         """ SHOW LICENCE"""
-        licence = ["Copyright 2015-2020 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
+        licence = ["Copyright 2015-2023 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
                    "without modification, are permitted provided that the following conditions are met: \n \n"
                    "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
                    "and the following disclaimer. \n\n2. Redistributions in binary form must reproduce the above "
