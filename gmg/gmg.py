@@ -2143,10 +2143,12 @@ class Gmg(wx.Frame):
     def undo(self, event):
         print("current ", self.model_state_count)  
         if self.model_state_count == 0:
-            self.model_state_count = 17 
+            self.revent_to = 18
+        elif self.model_state_count == 1:
+            self.revent_to = 19
         else:
-            self.model_state_count = self.model_state_count-3
-        print("using ", self.model_state_count)
+            self.revent_to = self.model_state_count-2
+        print("using ", self.revent_to)
 
         # REMVOE CURRENTLY ACTIVE LAYER DRAWING FROM MODEL FRAME
         self.currently_active_layer.set_visible(False)        
@@ -2159,8 +2161,8 @@ class Gmg(wx.Frame):
         
         # RELOAD DATA INTO MODEL FROM PREVIOUS MODEL STATE
         for i in range(0, self.total_layer_count + 1):
-            self.layer_list[i].x_nodes = self.model_state_list[self.model_state_count]['state_layer_list'][i].x_nodes
-            self.layer_list[i].y_nodes = self.model_state_list[self.model_state_count]['state_layer_list'][i].y_nodes
+            self.layer_list[i].x_nodes = self.model_state_list[self.revent_to]['state_layer_list'][i].x_nodes
+            self.layer_list[i].y_nodes = self.model_state_list[self.revent_to]['state_layer_list'][i].y_nodes
 
         # SET CURRENTLY ACTIVE LAYER NODES
         self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
