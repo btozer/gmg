@@ -126,6 +126,9 @@ import model_stats
 import struct
 import gc
 import webbrowser
+import copy
+from types import MappingProxyType
+from frozendict import frozendict
 
 # FUTURE
 # from wx.lib.agw import floatspin as fs
@@ -379,6 +382,36 @@ class Gmg(wx.Frame):
         self.menubar.Append(self.gravity_data, "&Gravity")
         # --------------------------------------------------------------------------------------------------------------
 
+        # VGG DATA MENU --------------------------------------------------------------------------------------------
+        self.vgg_data = wx.Menu()
+        # LOAD OBSERVED vgg DATA
+        m_load_obs_vgg = self.vgg_data.Append(-1, "&Load VGG Anomaly...", "Load Observed VGG Data...")
+        self.Bind(wx.EVT_MENU, self.load_obs_vgg, m_load_obs_vgg)
+        # EDIT
+        self.m_obs_vgg_submenu = wx.Menu()
+        self.vgg_data.AppendSubMenu(self.m_obs_vgg_submenu, "VGG Data...")
+        # FILTER MENU
+        vgg_m_filter_observed = self.vgg_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        self.Bind(wx.EVT_MENU, self.filter_observed_vgg, vgg_m_filter_observed)
+        # HORIZONTAL DERIVATIVE
+        vgg_m_horizontal_derivative = self.vgg_data.Append(-1, "Take Horizontal Derivative...",
+                                                                "Take Horizontal Derivative")
+        self.Bind(wx.EVT_MENU, self.take_vgg_horizontal_derivative, vgg_m_horizontal_derivative)
+        # SET RMS OBS ARRAYS
+        vgg_m_set_rms = self.vgg_data.Append(-1, "Set RMS Input...", "Set RMS Input...")
+        self.Bind(wx.EVT_MENU, self.set_obs_vgg_rms, vgg_m_set_rms)
+        # SET ELEVATION FOR CALCULATIONS
+        m_set_vgg_elv = self.vgg_data.Append(-1, "&Set Calculation Elevation...",
+                                                  "Set Calculation Elevation...")
+        self.Bind(wx.EVT_MENU, self.set_vgg_elv, m_set_vgg_elv)
+        # SAVE PREDICTED ANOMALY TO DISC
+        m_save_vgg_submenu = self.vgg_data.Append(-1, "&Save Predicted Anomaly...",
+                                                    "Save Predicted Anomaly to Disc...")
+        self.Bind(wx.EVT_MENU, self.save_modelled_vgg, m_save_vgg_submenu)
+        # DRAW MENU
+        self.menubar.Append(self.vgg_data, "&VGG")
+        # --------------------------------------------------------------------------------------------------------------
+
         # MAGNETIC DATA MENU -------------------------------------------------------------------------------------------
         self.magnetic_data = wx.Menu()
         # LOAD OBSERVED MAGNETIC DATA
@@ -569,21 +602,21 @@ class Gmg(wx.Frame):
                                                      bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
                                                      shortHelp="Calculate gravity anomaly",
                                                      longHelp="", clientData=None)
-        self.Bind(wx.EVT_TOOL, self.calc_grav_switch, self.t_calc_grav)
+        self.Bind(wx.EVT_TOOL, self.calc_grav_switch_callback, self.t_calc_grav)
 
         self.t_calc_vgg = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="vgg",
                                                      bitmap1=wx.Bitmap(self.gui_icons_dir + 'V_24.png'),
                                                      bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'V_24.png'),
                                                      shortHelp="Calculate vertical gravity gradient",
                                                      longHelp="", clientData=None)
-        self.Bind(wx.EVT_TOOL, self.calc_vgg_switch, self.t_calc_vgg)
+        self.Bind(wx.EVT_TOOL, self.calc_vgg_switch_callback, self.t_calc_vgg)
 
         self.t_calc_mag = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="mag",
                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
                                                     shortHelp="Calculate magnetic anomaly",
                                                     longHelp="", clientData=None)
-        self.Bind(wx.EVT_TOOL, self.calc_mag_switch, self.t_calc_mag)
+        self.Bind(wx.EVT_TOOL, self.calc_mag_switch_callback, self.t_calc_mag)
 
         self.t_capture_coordinates = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Capture coordinates",
                                                                bitmap1=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
@@ -674,6 +707,18 @@ class Gmg(wx.Frame):
                                                  shortHelp="Fault picker")
         self.Bind(wx.EVT_TOOL, self.pick_new_fault, self.t_fault_pick)
 
+        # UNDO ICON
+        self.t_undo = self.toolbar.AddTool(wx.ID_ANY, "Undo",
+                                                 bitmap=wx.Bitmap(self.gui_icons_dir + 'undo_24.png'),
+                                                 shortHelp="Undo")
+        self.Bind(wx.EVT_TOOL, self.undo, self.t_undo)
+
+        # REDO ICON
+        # self.t_redo = self.toolbar.AddTool(wx.ID_ANY, "Redo",
+        #                                          bitmap=wx.Bitmap(self.gui_icons_dir + 'redo_24.png'),
+        #                                          shortHelp="Redo")
+        # self.Bind(wx.EVT_TOOL, self.redo, self.t_redo)
+
         # CREATE TOOLBAR
         self.toolbar.Realize()
         self.toolbar.SetSize((1790, 36))
@@ -720,7 +765,7 @@ class Gmg(wx.Frame):
         """INITIALISE OBSERVED DATA AND LAYERS"""
 
         # INITIALISE MODEL FRAME ATTRIBUTES
-        self.nodes = True  # SWITCH FOR NODE EDITING MODE
+        self.nodes = True  # SWITCH FOR NODE EDITING MODE (LAYER NODES CAN BE CLICKED)
         self.zoom_on = False  # SWITCH FOR ZOOM MODE
         self.pan_on = False  # SWITCH PANNING MODE
         self.pinch_switch = False  # SWITCH FOR NODE PINCHING MODE
@@ -739,7 +784,8 @@ class Gmg(wx.Frame):
         self.gravity_observation_elv = 0.  # OBSERVATION LEVEL FOR GRAVITY DATA
         self.vgg_observation_elv = 0.  # OBSERVATION LEVEL FOR GRAVITY DATA
         self.mag_observation_elv = 0.  # OBSERVATION LEVEL FOR MAGNETIC DATA
-       
+        self.model_state_count = 0
+        self.model_state_list = [[]] * 20
 
         # INITIALISE LAYER LIST
         self.layer_list = []  # LIST HOLDING ALL OF THE LAYER OBJECTS
@@ -851,7 +897,7 @@ class Gmg(wx.Frame):
 
         self.topography_d_frame = self.topography_frame.twinx()
         self.topography_d_frame.set_navigate(False)
-        self.topography_d_frame.set_ylabel("dt/dx")
+        self.topography_d_frame.set_ylabel("d/dx")
         self.topography_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topography_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         # -------------------------------------------------------------------------------------------------
@@ -867,7 +913,7 @@ class Gmg(wx.Frame):
 
         self.gravity_d_frame = self.gravity_frame.twinx()
         self.gravity_d_frame.set_navigate(False)
-        self.gravity_d_frame.set_ylabel("dg/dx")
+        self.gravity_d_frame.set_ylabel("d/dx")
         self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         # --------------------------------------------------------------------------------------------------
@@ -876,14 +922,14 @@ class Gmg(wx.Frame):
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (6, self.x_orig), 
                                           rowspan=self.data_row_span, colspan=self.columns)
         self.vertical_gg_frame.set_navigate(False)
-        self.vertical_gg_frame.set_ylabel("Grav (mGal)")
+        self.vertical_gg_frame.set_ylabel("VGG (Eotvos)")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.vertical_gg_d_frame = self.vertical_gg_frame.twinx()
         self.vertical_gg_d_frame.set_navigate(False)
-        self.vertical_gg_d_frame.set_ylabel("dg/dx")
+        self.vertical_gg_d_frame.set_ylabel("d/dx")
         self.vertical_gg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         #---------------------------------------------------------------------------------------------------
@@ -898,7 +944,7 @@ class Gmg(wx.Frame):
         self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.magnetic_d_frame = self.magnetic_frame.twinx()
-        self.magnetic_d_frame.set_ylabel("dnt/dx")
+        self.magnetic_d_frame.set_ylabel("d/dx")
         self.magnetic_d_frame.set_navigate(False)
         self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1279,7 +1325,7 @@ class Gmg(wx.Frame):
         self.topography_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.topography_d_frame = self.topography_frame.twinx()
-        self.topography_d_frame.set_ylabel("dt/dx")
+        self.topography_d_frame.set_ylabel("d/dx")
         self.topography_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topography_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
@@ -1294,7 +1340,7 @@ class Gmg(wx.Frame):
         self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.gravity_d_frame = self.gravity_frame.twinx()
-        self.gravity_d_frame.set_ylabel("dg/dx")
+        self.gravity_d_frame.set_ylabel("d/dx")
         self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
@@ -1302,13 +1348,13 @@ class Gmg(wx.Frame):
         # VGG CANVAS
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
                                           rowspan=span_size, colspan=self.columns)
-        self.vertical_gg_frame.set_ylabel("(Eotvos)")
+        self.vertical_gg_frame.set_ylabel("VGG (Eotvos)")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.vertical_gg_frame = self.vertical_gg_frame.twinx()
-        self.vertical_gg_frame.set_ylabel("dg/dx")
+        self.vertical_gg_frame.set_ylabel("d/dx")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
@@ -1323,7 +1369,7 @@ class Gmg(wx.Frame):
         self.magnetic_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
         self.magnetic_d_frame = self.magnetic_frame.twinx()
-        self.magnetic_d_frame.set_ylabel("dnt/dx")
+        self.magnetic_d_frame.set_ylabel("d/dx")
         self.magnetic_d_frame.set_navigate(False)
         self.magnetic_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1559,15 +1605,15 @@ class Gmg(wx.Frame):
 
         # INITALISE CALCULATED P.F. LINES
         if self.gravity_frame is not None:
-            self.pred_gravity_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
+            self.pred_gravity_plot, = self.gravity_frame.plot([], [], 'red', linewidth=2, alpha=0.5)
             self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
         
         if self.vertical_gg_frame is not None:
-            self.pred_vgg_plot, = self.gravity_frame.plot([], [], '-r', linewidth=2, alpha=0.5)
-            self.vgg_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'yellow', linewidth=2, alpha=0.5)
+            self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
         if self.magnetic_frame is not None:
-            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], '-g', linewidth=2, alpha=0.5)
+            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], 'green', linewidth=2, alpha=0.5)
             self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
         # PLOT OBSERVED TOPO DATA
@@ -1925,6 +1971,8 @@ class Gmg(wx.Frame):
             self.topography_frame.set_visible(True)
         if not self.gravity_frame.get_visible():
             self.gravity_frame.set_visible(True)
+        if not self.vertical_gg_frame.get_visible():
+            self.vertical_gg_frame.set_visible(True)    
         if not self.magnetic_frame.get_visible():
             self.magnetic_frame.set_visible(True)
 
@@ -1936,6 +1984,8 @@ class Gmg(wx.Frame):
             self.topography_frame.set_xlim(self.model_frame.get_xlim())
         if self.gravity_frame is not None:
             self.gravity_frame.set_xlim(self.model_frame.get_xlim())
+        if self.vertical_gg_frame is not None:
+            self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
         self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
@@ -1945,6 +1995,8 @@ class Gmg(wx.Frame):
             self.topography_frame.set_visible(False)
         if self.gravity_frame is False:
             self.gravity_frame.set_visible(False)
+        if self.vertical_gg_frame is False:
+            self.vertical_gg_frame.set_visible(False)
         if self.magnetic_frame is False:
             self.magnetic_frame.set_visible(False)
 
@@ -1960,7 +2012,7 @@ class Gmg(wx.Frame):
         self.run_algorithms()
         self.draw()
 
-    def calc_grav_switch(self, event):
+    def calc_grav_switch_callback(self, event):
         """PREDICTED ANOMALY CALCULATION SWITCH: ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_grav_switch is True:
             self.calc_grav_switch = False
@@ -1975,7 +2027,7 @@ class Gmg(wx.Frame):
         self.run_algorithms()
         self.draw()
 
-    def calc_vgg_switch(self, event):
+    def calc_vgg_switch_callback(self, event):
         """PREDICTED ANOMALY CALCULATION SWITCH: ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_vgg_switch is True:
             self.calc_vgg_switch = False
@@ -1989,7 +2041,7 @@ class Gmg(wx.Frame):
         self.run_algorithms()
         self.draw()
 
-    def calc_mag_switch(self, event):
+    def calc_mag_switch_callback(self, event):
         """PREDICTED ANOMALY CALCULATION SWITCH: ON/OFF (SPEEDS UP PROGRAM WHEN OFF)"""
         if self.calc_mag_switch is True:
             self.calc_mag_switch = False
@@ -2059,6 +2111,78 @@ class Gmg(wx.Frame):
         self.draw()
 
     # SAVE/LOAD MODEL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def store_model_state(self):
+        # CREATE SAVE DICTIONARY
+        state_dict = {}
+        
+        # COPY LAYER X AND Y NODES
+        layer_list_copy = [[]] * len(self.layer_list)
+        for i in range(0, self.total_layer_count + 1):
+            placeholder_layer = Layer()
+            placeholder_layer.x_nodes = copy.deepcopy(self.layer_list[i].x_nodes)
+            placeholder_layer.y_nodes = copy.deepcopy(self.layer_list[i].y_nodes)
+
+            layer_list_copy[i] =  placeholder_layer
+        
+        # CREATE DICT WITH CURRENT MODEL STATE
+        header = ['state_layer_list']
+        model_params = [layer_list_copy]
+        for i in range(0, len(model_params)):
+            state_dict[header[i]] = model_params[i]    
+        
+        # STORE 
+        print("Model state count = ", self.model_state_count)
+        self.model_state_list[self.model_state_count] = state_dict
+
+        # INCREAMENT UNDO/REDO COUNTER (MAX 20)
+        if self.model_state_count < 19:
+            self.model_state_count += 1
+        else:
+            self.model_state_count = 0 
+
+    def undo(self, event):
+        print("current ", self.model_state_count)  
+        if self.model_state_count == 0:
+            self.model_state_count = 17 
+        else:
+            self.model_state_count = self.model_state_count-3
+        print("using ", self.model_state_count)
+
+        # REMVOE CURRENTLY ACTIVE LAYER DRAWING FROM MODEL FRAME
+        self.currently_active_layer.set_visible(False)        
+        self.draw() 
+
+        # REMOVE ALL LAYER DRAWINGS FROM MODEL FRAME
+        for i in range(0, self.total_layer_count + 1):
+            self.layer_list[i].polygon_mpl_actor[0].set_visible(False)
+            self.layer_list[i].node_mpl_actor[0].set_visible(False)
+        
+        # RELOAD DATA INTO MODEL FROM PREVIOUS MODEL STATE
+        for i in range(0, self.total_layer_count + 1):
+            self.layer_list[i].x_nodes = self.model_state_list[self.model_state_count]['state_layer_list'][i].x_nodes
+            self.layer_list[i].y_nodes = self.model_state_list[self.model_state_count]['state_layer_list'][i].y_nodes
+
+        # SET CURRENTLY ACTIVE LAYER NODES
+        self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
+        self.current_y_nodes = self.layer_list[self.currently_active_layer_id].y_nodes
+
+        # SET CURRENTLY ACTIVE NODE RED HIGHLIGHTER
+        self.current_node.set_offsets([self.layer_list[self.currently_active_layer_id].x_nodes[0], 
+                                       self.layer_list[self.currently_active_layer_id].y_nodes[0]])
+
+        # UPDATE LAYER DATA AND PLOT
+        self.update_layer_data()
+        for i in range(0, self.total_layer_count + 1):
+            self.layer_list[i].node_mpl_actor[0].set_visible(True)  
+            self.layer_list[i].polygon_mpl_actor[0].set_visible(True)    
+        self.currently_active_layer.set_visible(True)
+        self.run_algorithms()
+        self.draw()  
+    # ------------------------------------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------------------------------------
+
+    def redo(self):
+        pass
 
     def save_model(self, event):
         """
@@ -2082,6 +2206,7 @@ class Gmg(wx.Frame):
                   'fault_list',
                   'observed_xy_data_list',
                   'observed_gravity_list',
+                  'observed_vgg_list',
                   'observed_magnetic_list',
                   'observed_topography_list',
                   'well_data_list',
@@ -2163,6 +2288,10 @@ class Gmg(wx.Frame):
             # LOAD OBSERVED GRAVITY DATA
             if len(self.observed_gravity_list) > 0:
                 self.replot_observed_gravity_data()
+
+            # LOAD OBSERVED VGG DATA
+            if len(self.observed_vgg_list) > 0:
+                self.replot_observed_vgg_data()
 
             # LOAD OBSERVED MAGNETIC DATA
             if len(self.observed_magnetic_list) > 0:
@@ -2354,7 +2483,7 @@ class Gmg(wx.Frame):
                 # TURN ON OBSERVED GRAVITY SWITCH
                 self.observed_topography_switch = True
 
-        # SET GRAVITY COUNTER
+        # SET TOPOGRAPHY COUNTER
         self.observed_topography_counter = len(self.observed_topography_list)
 
     def replot_observed_gravity_data(self):
@@ -2380,6 +2509,29 @@ class Gmg(wx.Frame):
         # SET GRAVITY COUNTER
         self.observed_gravity_counter = len(self.observed_gravity_list)
 
+    def replot_observed_vgg_data(self):
+        """ADD LOADED OBSERVED VGG TO THE MODEL FRAME"""
+        for x in range(len(self.observed_vgg_list)):
+            if self.observed_vgg_list[x] is not None:
+                # DRAW DATA IN MODEL FRAME
+                self.observed_vgg_list[x].mpl_actor = self.vertical_gg_frame.scatter(
+                    self.observed_vgg_list[x].data[:, 0], self.observed_vgg_list[x].data[:, 1], marker='o',
+                    color=self.observed_vgg_list[x].color, s=5, gid=self.observed_vgg_list[x].id)
+
+                # ADD OBJECT TO MENUVAR
+                self.obs_submenu = wx.Menu()
+                self.m_obs_vgg_submenu.Append(15000 + self.observed_vgg_list[x].id,
+                                            self.observed_vgg_list[x].name,
+                                            self.obs_submenu)
+                self.obs_submenu.Append(15000 + self.observed_vgg_list[x].id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=15000 + self.observed_vgg_list[x].id)
+
+                # TURN ON OBSERVED vgg SWITCH
+                self.observed_vgg_switch = True
+
+        # SET vgg COUNTER
+        self.observed_vgg_counter = len(self.observed_vgg_list)
+
     def replot_observed_magnetic_data(self):
         """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
         for x in range(len(self.observed_magnetic_list)):
@@ -2400,7 +2552,7 @@ class Gmg(wx.Frame):
                 self.mag_submenu.Append(12000 + self.observed_magnetic_list[x].id, 'delete observed data')
                 self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000 + self.observed_magnetic_list[x].id)
 
-                # TURN ON OBSERVED GRAVITY SWITCH
+                # TURN ON OBSERVED MAGNETIC SWITCH
                 self.observed_magnetic_switch = True
 
         # SET MAGNETIC COUNTER
@@ -2585,8 +2737,6 @@ class Gmg(wx.Frame):
 
             # INCREMENT COUNTER
             self.segy_counter = len(self.segy_data_list)
-
-            # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -2912,6 +3062,185 @@ class Gmg(wx.Frame):
 
         # INCREMENT GRAV DERIV COUNTER
         self.observed_gravity_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.draw()
+
+   # VGG DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def load_obs_vgg(self, event):
+        self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'vgg')
+        self.load_window.Show(True)
+
+    def open_obs_vgg(self):
+        """
+        LOAD OBSERVE vgg DATA.
+        DATA ARE STORED IN gmg.observed_vgg_list as a ObservedData object.
+        object IDs start at 15000.
+        """
+
+        # PARSE USER INPUT FILE
+        input_file = self.load_window.file_path
+
+        # CREATE NEW OBSERVED vgg OBJECT
+        observed_vgg = ObservedData()
+
+        # SET ATTRIBUTES
+        observed_vgg.id = int(self.observed_vgg_counter)
+        observed_vgg.type = str('observed')
+        observed_vgg.name = self.load_window.observed_name
+        observed_vgg.color = self.load_window.color_picked
+        observed_vgg.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+        observed_vgg.mpl_actor = self.vertical_gg_frame.scatter(observed_vgg.data[:, 0],
+                                                                observed_vgg.data[:, 1], marker='o',
+                                                                color=observed_vgg.color, s=5,
+                                                                gid=observed_vgg.id)
+
+        # APPEND NEW DATA TO THE OBSERVED vgg GMG LIST
+        self.observed_vgg_list.append(observed_vgg)
+
+        # TURN ON OBSERVED vgg SWITCH
+        self.observed_vgg_switch = True
+
+        # APPEND NEW DATA MENU TO 'vgg data MENU'
+        self.vgg_submenu = wx.Menu()
+        self.m_obs_vgg_submenu.Append(15000 + observed_vgg.id, observed_vgg.name, self.vgg_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.vgg_submenu.Append(15000 + observed_vgg.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED vgg FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + observed_vgg.id)
+
+        # INCREMENT OBSERVED vgg COUNTER
+        self.observed_vgg_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def delete_obs_vgg(self, event):
+        # DESTROY MENUBAR
+        self.m_obs_vgg_submenu.DestroyItem(event.Id)
+
+        # REMOVE OBJECT AND MPL ACTOR
+        obj_id = event.Id - 15000
+        self.observed_vgg_list[obj_id].mpl_actor.set_visible(False)
+        self.observed_vgg_list[obj_id] = None
+
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def set_vgg_elv(self, event):
+        """POPOUT BOX TO LET USER DEFINE THE ELEVATION AT WHICH TO CALCULATE THE vgg ANOMALY"""
+
+        # CREATE THE POPOUT BOX FOR USER UNPUT
+        vgg_box = GravDialog(self, -1, 'VGG elevation', self.gravity_observation_elv)
+        answer = vgg_box.ShowModal()
+
+        # SET THE NEW CALCULATION ELEVATION
+        self.vgg_observation_elv = vgg_box.vgg_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
+
+        # UPDATE GMG
+        self.run_algorithms()
+        self.draw()
+
+    def save_modelled_vgg(self, event):
+        """SAVE PREDICTED vgg TO EXTERNAL ASCII FILE"""
+        save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
+                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+            return  # THE USER CHANGED THEIR MIND
+        # SAVE TO DISC
+        outputfile = save_file_dialog.GetPath()
+        np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_vgg)), delimiter=' ', fmt='%.6f %.6f')
+
+    def filter_observed_vgg(self, event):
+        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+
+        # RUN FILTER
+        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_vgg_list)
+        answer = median_filter_box.ShowModal()
+
+        # CREATE NEW OBSERVED vgg OBJECT
+        observed = ObservedData()
+
+        # SET ATTRIBUTES
+        observed.id = int(self.observed_vgg_counter)
+        observed.type = str('filtered')
+        observed.name = median_filter_box.output_name
+        observed.color = median_filter_box.output_color
+        observed.data = median_filter_box.filtered_output
+        observed.mpl_actor = self.vgg_frame.scatter(
+                            observed.data[:, 0],
+                            observed.data[:, 1], marker='o',
+                            color=observed.color, s=5,
+                            gid=observed.id)
+
+        # APPEND NEW DATA TO THE OBSERVED vgg GMG LIST
+        self.observed_vgg_list.append(observed)
+
+        # TURN ON OBSERVED vgg SWITCH
+        self.observed_vgg_switch = True
+
+        # APPEND NEW DATA MENU TO 'vgg data MENU'
+        self.vgg_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(15000 + observed.id, observed.name, self.vgg_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.vgg_submenu.Append(15000 + observed.id, 'delete observed data')
+
+        # BIND TO DELETE OBSERVED vgg FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + observed.id)
+
+        # INCREMENT OBSERVED vgg COUNTER
+        self.observed_vgg_counter += 1
+
+        # UPDATE GMG GUI
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
+    def take_vgg_horizontal_derivative(self, event):
+        """
+        TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
+        CALLS class HorizontalDerivative
+        """
+
+        # OPEN THE HORIZONTAL DERIVATIVE INPUT WINDOW
+        horizontal_derivative_box = HorizontalDerivative(self, -1, 'Horizontal derivative', self.observed_vgg_list)
+        answer = horizontal_derivative_box.ShowModal()
+
+        # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        new_derivative = ObservedData()
+        new_derivative.data = horizontal_derivative_box.deriv
+        new_derivative.name = horizontal_derivative_box.output_name
+        new_derivative.color = horizontal_derivative_box.output_color
+        new_derivative.id = 15000 + self.observed_vgg_counter
+        new_derivative.type = str('derivative')
+        new_derivative.mpl_actor = self.vgg_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                                marker='o', color=new_derivative.color, s=5,
+                                                                gid=15000 + self.observed_vgg_counter)
+
+        # APPEND NEW DATA TO THE OBSERVED vgg GMG LIST
+        self.observed_vgg_list.append(new_derivative)
+
+        #  APPEND NEW MENUBAR TO THE vgg MENUBAR
+        self.vgg_submenu = wx.Menu()
+        self.m_obs_g_submenu.Append(15000 + self.observed_vgg_counter, new_derivative.name, self.vgg_submenu)
+
+        # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
+        self.vgg_submenu.Append(15000 + self.observed_vgg_counter, 'delete observed data')
+
+        # BIND TO DEL FUNC
+        self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + self.observed_vgg_counter)
+
+        # INCREMENT vgg DERIV COUNTER
+        self.observed_vgg_counter += 1
 
         # UPDATE GMG GUI
         self.update_layer_data()
@@ -3672,7 +4001,8 @@ class Gmg(wx.Frame):
 
                 # NOW RETURN:
                 # 1) THE INDEX VALUE OF THE NODE CLICKED.
-                # 2) A LIST OF INDEX VALUES FOR NODES PINCHED TO INDEX_ARG (NONE IF THE NODE ISN'T PINCHED).
+                # 2) A LIST OF INDEX VALUES FOR NODES PINCHED TO 
+                #    INDEX_ARG (NONE IF THE NODE ISN'T PINCHED).
                 return self.index_arg, self.pinched_index_arg_list
         else:
             # GMG IS IN PINCH MODE - SO JUST RETURN THE INDEX OF THE NODE
@@ -3695,7 +4025,11 @@ class Gmg(wx.Frame):
                 return self.index_arg, None
 
     def get_fault_node_under_point(self, event):
-        """GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK"""
+        """
+        GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS 
+        IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
+        """
+        
         # RESET NODE SWITCH
         self.didnt_get_node = False
 
@@ -3717,7 +4051,6 @@ class Gmg(wx.Frame):
 
     def button_press(self, event):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
-        # print("clicked")
         if event.inaxes is None:
             return  # CLICK IS OUTSIDE MODEL FRAME SO RETURN
         if event.button != 1:
@@ -3725,7 +4058,6 @@ class Gmg(wx.Frame):
 
         if self.fault_picking_switch is False and self.capture is False and self.select_new_layer_nodes is False:
             # THEN GMG IS IN LAYER MODE
-            # print("layer_mode")
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
             self.index_node, self.pinched_index_arg_list = self.get_node_under_point(event)
             if self.index_node is None:
@@ -3978,7 +4310,7 @@ class Gmg(wx.Frame):
         
     def button_release(self, event):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS RELEASED"""
-
+        self.store_model_state()
         if event.inaxes is None:
             # CLICK WAS OUTSIDE THE MODEL FRAME
             return
@@ -5222,6 +5554,16 @@ class Gmg(wx.Frame):
             if self.observed_gravity_list[i] is not None:
                 if self.observed_gravity_list[i].name == selection.obs_name:
                     self.obs_gravity_data_for_rms = self.observed_gravity_list[i].data
+
+    def set_obs_vgg_rms(self, value):
+        """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
+        selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_vgg_list)
+        answer = selection.ShowModal()
+        for i in range(0, len(self.observed_vgg_list)):
+
+            if self.observed_vgg_list[i] is not None:
+                if self.observed_vgg_list[i].name == selection.obs_name:
+                    self.obs_vgg_data_for_rms = self.observed_vgg_list[i].data
 
     def set_obs_mag_rms(self, value):
         """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
