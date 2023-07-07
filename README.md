@@ -7,6 +7,8 @@
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
 
 
+![alt-text](https://github.com/btozer/gmg/blob/add_vgg/gmg_demo.gif)
+
 Statement of need
 =================
 
