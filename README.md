@@ -1,4 +1,4 @@
-![alt text](https://github.com/btozer/gmg/blob/master/docs/_sources/_static/gmg_logo_white.png)
+![alt text](https://github.com/btozer/gmg/blob/add_vgg/docs/_sources/_static/gmg_logo_white.png)
 
 ---
 [Visit the GMG documentation page](https://btozer.github.io/gmg/)
