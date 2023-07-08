@@ -361,7 +361,7 @@ class Gmg(wx.Frame):
         self.m_obs_g_submenu = wx.Menu()
         self.gravity_data.AppendSubMenu(self.m_obs_g_submenu, "Gravity Data...")
         # FILTER MENU
-        grav_m_filter_observed = self.gravity_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        grav_m_filter_observed = self.gravity_data.Append(-1, "Gaussian Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_gravity, grav_m_filter_observed)
         # HORIZONTAL DERIVATIVE
         grav_m_horizontal_derivative = self.gravity_data.Append(-1, "Take Horizontal Derivative...",
@@ -391,7 +391,7 @@ class Gmg(wx.Frame):
         self.m_obs_vgg_submenu = wx.Menu()
         self.vgg_data.AppendSubMenu(self.m_obs_vgg_submenu, "VGG Data...")
         # FILTER MENU
-        vgg_m_filter_observed = self.vgg_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        vgg_m_filter_observed = self.vgg_data.Append(-1, "Gaussian Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_vgg, vgg_m_filter_observed)
         # HORIZONTAL DERIVATIVE
         vgg_m_horizontal_derivative = self.vgg_data.Append(-1, "Take Horizontal Derivative...",
@@ -422,7 +422,7 @@ class Gmg(wx.Frame):
         self.m_obs_mag_submenu = wx.Menu()
         self.magnetic_data.AppendSubMenu(self.m_obs_mag_submenu, "Magnetic Anomalies...")
         # FILTER MENU
-        mag_m_filter_observed = self.magnetic_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        mag_m_filter_observed = self.magnetic_data.Append(-1, "Gaussian Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_magnetic, mag_m_filter_observed)
         # HORIZONTAL DERIVATIVE
         mag_m_horizontal_derivative = self.magnetic_data.Append(-1, "Take Horizontal Derivative...",
@@ -452,7 +452,7 @@ class Gmg(wx.Frame):
         self.m_topo_submenu = wx.Menu()
         self.topography_data.AppendSubMenu(self.m_topo_submenu, "Topography Data")
         # FILTER MENU
-        topo_m_filter_observed = self.topography_data.Append(-1, "Median Filter...", "Filter Observed Anomaly")
+        topo_m_filter_observed = self.topography_data.Append(-1, "Gaussian Filter...", "Filter Observed Anomaly")
         self.Bind(wx.EVT_MENU, self.filter_observed_topography, topo_m_filter_observed)
         # HORIZONTAL DERIVATIVE
         topo_m_horizontal_derivative = self.topography_data.Append(-1, "Take Horizontal Derivative...",
@@ -765,9 +765,6 @@ class Gmg(wx.Frame):
         """INITIALISE OBSERVED DATA AND LAYERS"""
 
         # INITIALISE MODEL FRAME ATTRIBUTES
-        self.nodes = True  # SWITCH FOR NODE EDITING MODE (LAYER NODES CAN BE CLICKED)
-        self.zoom_on = False  # SWITCH FOR ZOOM MODE
-        self.pan_on = False  # SWITCH PANNING MODE
         self.pinch_switch = False  # SWITCH FOR NODE PINCHING MODE
         self.pinch_count = 0
         self.didnt_get_node = False  # SWITCH FOR MOUSE CLICK (EITHER CLICKED A NODE OR DIDN'T)
@@ -1344,7 +1341,7 @@ class Gmg(wx.Frame):
         self.gravity_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.gravity_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-    def vgg_frame_params(self, span_size, z_orig):
+    def vertical_gg_frame_params(self, span_size, z_orig):
         # VGG CANVAS
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
                                           rowspan=span_size, colspan=self.columns)
@@ -1430,7 +1427,7 @@ class Gmg(wx.Frame):
 
             self.topo_frame_params(3)
             self.grav_frame_params(3, 3)
-            self.vgg_frame_params(3, 6)
+            self.vertical_gg_frame_params(3, 6)
             self.mag_frame_params(3, 9)
         # -----------------------------------------------------------------------------
 
@@ -1440,7 +1437,7 @@ class Gmg(wx.Frame):
             
             # TOPO CANVAS - HIDDEN
             self.grav_frame_params(4, 0)
-            self.vgg_frame_params(4, 4)
+            self.vertical_gg_frame_params(4, 4)
             self.mag_frame_params(4, 8)
         # ----------------------------------------------------------------------------
 
@@ -1450,7 +1447,7 @@ class Gmg(wx.Frame):
             
             self.topo_frame_params(4)
             # GRAV CANVAS - HIDDEN
-            self.vgg_frame_params(4, 4)
+            self.vertical_gg_frame_params(4, 4)
             self.mag_frame_params(4, 8)
         # -----------------------------------------------------------------------------
         
@@ -1470,7 +1467,7 @@ class Gmg(wx.Frame):
             
             self.topo_frame_params(4)
             self.grav_frame_params(4, 4)
-            self.vgg_frame_params(4, 8)
+            self.vertical_gg_frame_params(4, 8)
             # MAG CANVAS - HIDDEN
         # -----------------------------------------------------------------------------
 
@@ -1490,7 +1487,7 @@ class Gmg(wx.Frame):
 
             self.topo_frame_params(6)
             # GRAV CANVAS - HIDDEN
-            self.vgg_frame_params(6, 6)
+            self.vertical_gg_frame_params(6, 6)
             # MAG CANVAS - HIDDEN
         # -----------------------------------------------------------------------------
 
@@ -1500,7 +1497,7 @@ class Gmg(wx.Frame):
 
             # TOPO CANVAS - HIDDEN
             self.grav_frame_params(6, 0)
-            self.vgg_frame_params(6, 6)
+            self.vertical_gg_frame_params(6, 6)
             # MAG CANVAS - HIDDEN
         # -----------------------------------------------------------------------------
 
@@ -1529,7 +1526,7 @@ class Gmg(wx.Frame):
             
             # TOPO CANVAS - HIDDEN
             # GRAV CANVAS - HIDDEN
-            self.vgg_frame_params(6, 0)
+            self.vertical_gg_frame_params(6, 0)
             self.mag_frame_params(6, 6)
         # -----------------------------------------------------------------------------
 
@@ -1559,7 +1556,7 @@ class Gmg(wx.Frame):
             
             # TOPO CANVAS - HIDDEN
             # GRAV CANVAS - HIDDEN
-            self.vgg_frame_params(12, 0)
+            self.vertical_gg_frame_params(12, 0)
             # MAG CANVAS - HIDDEN  
         # -----------------------------------------------------------------------------
 
@@ -1942,14 +1939,7 @@ class Gmg(wx.Frame):
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def zoom(self, event):
-        if self.zoom_on is True:
-            self.zoom_on = False
-            self.nodes = True
-            self.nav_toolbar.zoom()
-        else:
-            self.zoom_on = True
-            self.nodes = False
-            self.nav_toolbar.zoom()
+        self.nav_toolbar.zoom()
         # REDRAW
         self.draw()
 
@@ -1967,7 +1957,7 @@ class Gmg(wx.Frame):
 
     def full_extent_adjustment(self):
         """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
-        if not self.topographyframe.get_visible():
+        if not self.topography_frame.get_visible():
             self.topography_frame.set_visible(True)
         if not self.gravity_frame.get_visible():
             self.gravity_frame.set_visible(True)
@@ -2002,14 +1992,7 @@ class Gmg(wx.Frame):
 
     def pan(self, event):
         """PAN MODEL VIEW USING MOUSE DRAG"""
-        if self.nodes:
-            self.nodes = False
-            self.nav_toolbar.pan()
-        else:
-            self.nodes = True
-            self.nav_toolbar.pan()
-        self.update_layer_data()
-        self.run_algorithms()
+        self.nav_toolbar.pan()
         self.draw()
 
     def calc_grav_switch_callback(self, event):
@@ -2131,7 +2114,7 @@ class Gmg(wx.Frame):
             state_dict[header[i]] = model_params[i]    
         
         # STORE 
-        print("Model state count = ", self.model_state_count)
+        # print("Model state count = ", self.model_state_count)
         self.model_state_list[self.model_state_count] = state_dict
 
         # INCREAMENT UNDO/REDO COUNTER (MAX 20)
@@ -2141,14 +2124,14 @@ class Gmg(wx.Frame):
             self.model_state_count = 0 
 
     def undo(self, event):
-        print("current ", self.model_state_count)  
+        # print("current ", self.model_state_count)  
         if self.model_state_count == 0:
             self.revent_to = 18
         elif self.model_state_count == 1:
             self.revent_to = 19
         else:
             self.revent_to = self.model_state_count-2
-        print("using ", self.revent_to)
+        # print("using ", self.revent_to)
 
         # REMVOE CURRENTLY ACTIVE LAYER DRAWING FROM MODEL FRAME
         self.currently_active_layer.set_visible(False)        
@@ -2809,21 +2792,21 @@ class Gmg(wx.Frame):
         self.draw()
 
     def filter_observed_topography(self, event):
-        """FILTER OBSERVED TOPOGRAPHY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+        """FILTER OBSERVED TOPOGRAPHY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
 
         # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_topography_list)
-        answer = median_filter_box.ShowModal()
+        gaussian_filter_box = GaussianFilterDialog(self, -1, 'gaussian filter', self.observed_topography_list)
+        answer = gaussian_filter_box.ShowModal()
 
-        # CREATE NEW OBSERVED GRAVITY OBJECT
+        # CREATE NEW OBSERVED TOPO OBJECT
         observed = ObservedData()
 
         # SET ATTRIBUTES
         observed.id = int(self.observed_topography_counter)
         observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
+        observed.name = gaussian_filter_box.output_name
+        observed.color = gaussian_filter_box.output_color
+        observed.data = gaussian_filter_box.filtered_output
         observed.mpl_actor = self.topography_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
                                                      color=observed.color, s=5, gid=observed.id)
 
@@ -2984,11 +2967,11 @@ class Gmg(wx.Frame):
         np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_gravity)), delimiter=' ', fmt='%.6f %.6f')
 
     def filter_observed_gravity(self, event):
-        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
 
         # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_gravity_list)
-        answer = median_filter_box.ShowModal()
+        gaussian_filter_box = GaussianFilterDialog(self, -1, 'gaussian filter', self.observed_gravity_list)
+        answer = gaussian_filter_box.ShowModal()
 
         # CREATE NEW OBSERVED GRAVITY OBJECT
         observed = ObservedData()
@@ -2996,9 +2979,9 @@ class Gmg(wx.Frame):
         # SET ATTRIBUTES
         observed.id = int(self.observed_gravity_counter)
         observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
+        observed.name = gaussian_filter_box.output_name
+        observed.color = gaussian_filter_box.output_color
+        observed.data = gaussian_filter_box.filtered_output
         observed.mpl_actor = self.gravity_frame.scatter(observed.data[:, 0],
                                                         observed.data[:, 1], marker='o',
                                                         color=observed.color, s=5,
@@ -3162,11 +3145,11 @@ class Gmg(wx.Frame):
         np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_vgg)), delimiter=' ', fmt='%.6f %.6f')
 
     def filter_observed_vgg(self, event):
-        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+        """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
 
         # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_vgg_list)
-        answer = median_filter_box.ShowModal()
+        gaussian_filter_box = GaussianFilterDialog(self, -1, 'gaussian filter', self.observed_vgg_list)
+        answer = gaussian_filter_box.ShowModal()
 
         # CREATE NEW OBSERVED vgg OBJECT
         observed = ObservedData()
@@ -3174,10 +3157,10 @@ class Gmg(wx.Frame):
         # SET ATTRIBUTES
         observed.id = int(self.observed_vgg_counter)
         observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
-        observed.mpl_actor = self.vgg_frame.scatter(
+        observed.name = gaussian_filter_box.output_name
+        observed.color = gaussian_filter_box.output_color
+        observed.data = gaussian_filter_box.filtered_output
+        observed.mpl_actor = self.vertical_gg_frame.scatter(
                             observed.data[:, 0],
                             observed.data[:, 1], marker='o',
                             color=observed.color, s=5,
@@ -3224,7 +3207,7 @@ class Gmg(wx.Frame):
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 15000 + self.observed_vgg_counter
         new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.vgg_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+        new_derivative.mpl_actor = self.vertical_gg_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                                 marker='o', color=new_derivative.color, s=5,
                                                                 gid=15000 + self.observed_vgg_counter)
 
@@ -3345,11 +3328,11 @@ class Gmg(wx.Frame):
         np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_nt)), delimiter=' ', fmt='%.6f %.6f')
 
     def filter_observed_magnetic(self, event):
-        """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class MedianFilterDialog"""
+        """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
 
         # RUN FILTER
-        median_filter_box = MedianFilterDialog(self, -1, 'median filter', self.observed_magnetic_list)
-        answer = median_filter_box.ShowModal()
+        gaussian_filter_box = GaussianFilterDialog(self, -1, 'gaussian filter', self.observed_magnetic_list)
+        answer = gaussian_filter_box.ShowModal()
 
         # CREATE NEW OBSERVED GRAVITY OBJECT
         observed = ObservedData()
@@ -3357,9 +3340,9 @@ class Gmg(wx.Frame):
         # SET ATTRIBUTES
         observed.id = int(self.observed_magnetic_counter)
         observed.type = str('filtered')
-        observed.name = median_filter_box.output_name
-        observed.color = median_filter_box.output_color
-        observed.data = median_filter_box.filtered_output
+        observed.name = gaussian_filter_box.output_name
+        observed.color = gaussian_filter_box.output_color
+        observed.data = gaussian_filter_box.filtered_output
         observed.mpl_actor = self.magnetic_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
                                                          color=observed.color, s=5, gid=observed.id)
 
@@ -3489,7 +3472,7 @@ class Gmg(wx.Frame):
             # INCREMENT COUNTER
             self.segy_counter += 1
 
-        except AttributeEditor:
+        except Exception:
             load_error = MessageDialog(self, -1, "SEGY LOAD ERROR", "segy load error")
 
         # REPLOT MODEL
@@ -3959,6 +3942,9 @@ class Gmg(wx.Frame):
         """
         GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
+        if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM':
+            return
+        
         # RESET NODE SWITCH
         self.didnt_get_node = False
 
@@ -4053,11 +4039,12 @@ class Gmg(wx.Frame):
 
     def button_press(self, event):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS PRESSED"""
+        if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM':
+            return
         if event.inaxes is None:
             return  # CLICK IS OUTSIDE MODEL FRAME SO RETURN
         if event.button != 1:
             return
-
         if self.fault_picking_switch is False and self.capture is False and self.select_new_layer_nodes is False:
             # THEN GMG IS IN LAYER MODE
             # GET THE NODE CLOSEST TO THE CLICK AND ANY PINCHED NODES
@@ -4160,6 +4147,9 @@ class Gmg(wx.Frame):
     def move(self, event):
         """WHAT HAPPEN WHEN THE LEFT MOUSE BUTTON IS HELD AND THE MOUSE IS MOVED"""
 
+        if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM':
+            return
+        
         if self.index_node is None and self.selected_node is None:
             # NO NODE WAS FOUND NEAR THE CLICK
             return
@@ -4170,12 +4160,6 @@ class Gmg(wx.Frame):
             return
         if self.pinch_switch is True:
             # PINCH MODE IS ON
-            return
-        if self.pan_on is True:
-            # PAN MODE IS ON
-            return
-        if self.zoom_on is True:
-            # ZOOM MODE IS ON
             return
         if self.select_new_layer_nodes is True:
             # CURRENTLY CREATING A NEW LAYER
@@ -4312,6 +4296,8 @@ class Gmg(wx.Frame):
         
     def button_release(self, event):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS RELEASED"""
+        if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM':
+            return
         self.store_model_state()
         if event.inaxes is None:
             # CLICK WAS OUTSIDE THE MODEL FRAME
@@ -4496,10 +4482,6 @@ class Gmg(wx.Frame):
             self.update_layer_data()
             self.run_algorithms()
             self.draw()
-
-        # q = BEAT THE ZOOM BUG
-        if event.key == 'q':
-            self.nodes = True
 
         # n = CREATE NEW LAYER AT MOUSE POINT
         if event.key == 'n':
@@ -4783,7 +4765,9 @@ class Gmg(wx.Frame):
     def new_layer(self, event):
         new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer', 'new')
         answer = new_layer_dialogbox.ShowModal()
-
+        # if new_layer_dialogbox.ShowModal() == wx.ID_CANCEL:
+        #     return  # THE USER CHANGED THERE MIND
+        
         if new_layer_dialogbox.fixed:
             # CREATING A NEW FIXED LAYER
 
@@ -4938,11 +4922,12 @@ class Gmg(wx.Frame):
         """LOAD A NEW FLOATING LAYER FROM A SPACE DELIMITED XY TEXT FILE"""
 
         # OPEN NEW LAYER DIALOG AND LET USER CHOSE BETWEEN FIXED AND FLOATING LAYER
-        new_layer_dialogbox = NewLayerDialog(self, -1, 'Create New Layer', 'load')
+        new_layer_dialogbox = NewLayerDialog(self, -1, 'Load Layer XY', 'load layer')
+        # if new_layer_dialogbox.ShowModal() == wx.ID_CANCEL:
+        #     return  # THE USER CHANGED THERE MIND
         answer = new_layer_dialogbox.ShowModal()
         # IF THE USER CHANGES THERE MIND, THEN CLOSE THE DIALOG BOX AND RETURN TO MODELLNG
-        if new_layer_dialogbox.ShowModal() == wx.ID_CANCEL:
-            return  # THE USER CHANGED THERE MIND
+
 
         # 1. IF THE USER CHOOSES TO LOAD A NEW FIXED LAYER
         if new_layer_dialogbox.fixed:
@@ -5167,6 +5152,8 @@ class Gmg(wx.Frame):
                 pass
 
     def write_c_xy(self, event):
+        """OUTPUT A c.in FILE FOR INPUT TO rayinvr C2V"""
+        
         # CREATE OUTPUT FILE
         save_file_dialog = wx.FileDialog(self, "Save c.in RayInvr file", "", "", "in files (*.in)|*.in",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
@@ -5175,10 +5162,10 @@ class Gmg(wx.Frame):
 
         # NOW WRITE OUT THE DATA
         output_stream = save_file_dialog.GetPath()
-        with open(output_stream, 'wb') as f:
+        with open(output_stream, 'w') as f:
             # LAYER NODES
             for i in range(0, self.total_layer_count + 1):
-                f.write('B  {0}\n'.format(i + 1))
+                f.write(str('B  '+str(i+1)+'\n'))
 
                 # DEFINE THE LAYER NODES (REMOVE FIXED LAYER PADDING NODES)
                 if self.layer_list[i].type == 'fixed':
@@ -5212,7 +5199,7 @@ class Gmg(wx.Frame):
                     y_nodes = self.layer_list[i].y_nodes
 
                 # FORMAT c.in FILE
-                f.write('B  {0}\n'.format(i))
+                f.write(str('V  '+str(i+1)+'\n'))
                 data = list(zip(x_nodes, np.linspace(velocity, velocity, len(y_nodes)), np.ones(len(x_nodes)),
                                 np.linspace(velocity, velocity, len(x_nodes)), np.ones(len(x_nodes))))
 
@@ -5912,7 +5899,7 @@ class Gmg(wx.Frame):
         self.draw()
 
     def set_frame_limits(self):
-        """SET FRAME X AND Y LIMITS"""
+        """SET FRAME X AND Y LIMITS AFTE MODEL UPDATES"""
         # --------------------------------------------------------------------------------------------------------------
         # SET GRAVITY DISPLAY BOX LIMITS
         if self.observed_gravity_switch is True and self.grav_residuals != []:
@@ -5945,7 +5932,8 @@ class Gmg(wx.Frame):
 
             # APPEND OBSERVED MIN AND MAX
             for i in range(len(self.observed_gravity_list)):
-                if self.observed_gravity_list[i] is not None:
+                if self.observed_gravity_list[i] is not None and \
+                self.observed_gravity_list[i].type != str('derivative'):
                     ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 2.0)
                     ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 2.0)
 
@@ -5958,17 +5946,13 @@ class Gmg(wx.Frame):
             ymin = min(ymin_list)
             ymax = max(ymax_list)
 
-        elif self.predicted_gravity is not None:
+        elif self.predicted_gravity is not None and self.observed_gravity_switch is False:
             ymin = self.predicted_gravity.min() - 2.0
             ymax = self.predicted_gravity.max() + 2.0
         else:
             pass
 
         if self.gravity_frame is not None:
-            # print('')
-            # print(ymin)
-            # print(ymax)
-            # print('')
             self.gravity_frame.set_ylim(ymin, ymax)
         # --------------------------------------------------------------------------------------------------------------
         # SET DERIVATIVE Y-AXIS LIMITS
@@ -5977,11 +5961,84 @@ class Gmg(wx.Frame):
         ymin_list = [-1]
         ymax_list = [1]
         for i in range(len(self.observed_gravity_list)):
-            if self.observed_gravity_list[i] == str('derivative'):
-                ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 0.1)
-                ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 0.1)
+            if self.observed_gravity_list[i] is not None and \
+                self.observed_gravity_list[i].type == str('derivative'):
+                ymin_list.append(self.observed_gravity_list[i].data[:, 1].min() - 0.2)
+                ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 0.2)
         if self.gravity_frame is not None:
             self.gravity_d_frame.set_ylim(min(ymin_list), max(ymax_list))
+        # --------------------------------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------------------------------
+
+        # --------------------------------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------------------------------------------------
+        # SET VGG DISPLAY BOX LIMITS
+        if self.observed_vgg_switch is True and self.vgg_residuals != []:
+            # CREATE EMPTY LIST
+            ymin_list = []
+            ymax_list = []
+
+            # APPEND OBSERVED MIN AND MAX
+            for i in range(len(self.observed_vgg_list)):
+                if self.observed_vgg_list[i] is not None and \
+                self.observed_vgg_list[i].type != str('derivative'):
+                    ymin_list.append(self.observed_vgg_list[i].data[:, 1].min() - 2.0)
+                    ymax_list.append(self.observed_vgg_list[i].data[:, 1].max() + 2.0)
+
+            # APPEND PREDICTED GRAVITY ANOMALY
+            ymin_list.append(self.predicted_vgg.min())
+            ymax_list.append(self.predicted_vgg.max())
+
+            # # APPEND RMS GRAVITY ANOMALY
+            # ymin_list.append(self.grav_residuals.min() - 2.0)
+            # ymax_list.append(self.grav_residuals.max() + 2.0)
+
+            # SET YMIN AND YMAX
+            ymin = min(ymin_list)
+            ymax = max(ymax_list)
+
+        elif self.observed_vgg_switch is True:
+            # CREATE EMPTY LIST
+            ymin_list = []
+            ymax_list = []
+
+            # APPEND OBSERVED MIN AND MAX
+            for i in range(len(self.observed_vgg_list)):
+                if self.observed_vgg_list[i] is not None and \
+                self.observed_vgg_list[i].type != str('derivative'):
+                    ymin_list.append(self.observed_vgg_list[i].data[:, 1].min() - 2.0)
+                    ymax_list.append(self.observed_vgg_list[i].data[:, 1].max() + 2.0)
+
+            # APPEND PREDICTED VGG ANOMALY
+            if self.predicted_vgg is not None:
+                ymin_list.append(self.predicted_vgg.min() - 2.0)
+                ymax_list.append(self.predicted_vgg.max() + 2.0)
+
+            # SET YMIN AND YMAX
+            ymin = min(ymin_list)
+            ymax = max(ymax_list)
+
+        elif self.predicted_vgg is not None:
+            ymin = self.predicted_vgg.min() - 2.0
+            ymax = self.predicted_vgg.max() + 2.0
+        else:
+            pass
+
+        if self.vertical_gg_frame is not None:
+            self.vertical_gg_frame.set_ylim(ymin, ymax)
+        # --------------------------------------------------------------------------------------------------------------
+        # SET DERIVATIVE Y-AXIS LIMITS
+
+        # CREATE EMPTY LIST
+        ymin_list = [-1]
+        ymax_list = [1]
+        for i in range(len(self.observed_vgg_list)):
+            if self.observed_vgg_list[i] is not None and \
+                self.observed_vgg_list[i].type == str('derivative'):
+                ymin_list.append(self.observed_vgg_list[i].data[:, 1].min() - 0.2)
+                ymax_list.append(self.observed_vgg_list[i].data[:, 1].max() + 0.2)
+        if self.vertical_gg_frame is not None:
+            self.vertical_gg_d_frame.set_ylim(min(ymin_list), max(ymax_list))
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
@@ -5995,7 +6052,8 @@ class Gmg(wx.Frame):
 
             # APPEND OBSERVED MIN AND MAX
             for i in range(len(self.observed_magnetic_list)):
-                if self.observed_magnetic_list[i] is not None:
+                if self.observed_magnetic_list[i] is not None and \
+                self.observed_magnetic_list[i].type != str('derivative'):
                     ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 2.0)
                     ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 2.0)
 
@@ -6046,9 +6104,10 @@ class Gmg(wx.Frame):
         ymin_list = []
         ymax_list = []
         for i in range(len(self.observed_magnetic_list)):
-            if self.observed_magnetic_list[i].type == str('derivative'):
-                ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 0.1)
-                ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 0.1)
+            if self.observed_magnetic_list[i] is not None and \
+                self.observed_magnetic_list[i].type == str('derivative'):
+                ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 0.2)
+                ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 0.2)
         self.magnetic_d_frame.set_ylim(ymin, ymax)
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
@@ -6178,8 +6237,8 @@ class Gmg(wx.Frame):
             "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
             "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
             "seismic reflection SEGY data and exploration well horizons. The software therefore provides an "
-            "integrated geological/geophysical interpretation package. It is anticipated that GMG will also be "
-            "useful for teaching purposes. \n \n"
+            "integrated geological/geophysical interpretation package. It is anticipated that GMG will be "
+            "useful for undergraduate teaching purposes. \n \n"
             "Data I/O is made as simple as possible using space delimited ASCII text files. \n \n"
             "The project was instigated after failing to find an adequate open source option (in which the source "
             "code can be viewed and modified by the user) for performing 2D geophysical modeling tasks.           "
