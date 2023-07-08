@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>5.0 SEGY data &mdash; GMG: An open source geophysical modelling GUI</title>
@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="6.0 Well data" href="manual_wells.html" />
+    <link rel="next" title="6.0 Well Data" href="manual_wells.html" />
     <link rel="prev" title="4.0 Potential field data" href="manual_PF.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
@@ -60,7 +60,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 GMG Models</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
@@ -70,12 +70,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#deleting-segy-data">5.3 Deleting SEGY data</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well Data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>7.0 XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -88,7 +89,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -134,8 +135,8 @@ seismic survey lines.</p></li>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values.
-Hence, you may need fill these headers using seismic processing software or ObsPy if they are not already present in
-your data.</p>
+Hence, you may need fill these headers with dummy values using seismic processing software or ObsPy if
+they are not already present in your data.</p>
 </div>
 </section>
 <section id="segy-options">
@@ -176,14 +177,14 @@ Menubar and then select <em>‘Segy Data’</em> and then <em>‘Delete’</em> 
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="manual_PF.html" class="btn btn-neutral float-left" title="4.0 Potential field data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="manual_wells.html" class="btn btn-neutral float-right" title="6.0 Well data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="manual_wells.html" class="btn btn-neutral float-right" title="6.0 Well Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

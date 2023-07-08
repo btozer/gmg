@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2.0 Pre-modelling data processing and considerations &mdash; GMG: An open source geophysical modelling GUI</title>
@@ -82,7 +82,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -115,14 +115,17 @@
 <p>As we are interested in modelling the structure of the Weardale granite, important preprocessing steps
 prior to forward modelling the gravity and magnetic anomalies is to consider other factors contributing to
 the total field anomalies.</p>
-<p>One common preprocessing step when modelling near surface structure using potential field data, is to preform a separation of the “regional” component of the anomaly
-from the total anomaly in order to remove the contribution from the longer wavelength regional signal (which may be sourced, for example, from the juxtaposition of
-different basement terranes). Because these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced
-by our target structured, which resides in the upper crust.</p>
+<p>One common preprocessing step when working with potential field data for near-surface structure modeling is to separate the
+“regional” component of the anomaly from the overall anomaly. This separation helps eliminate the contribution from the
+longer wavelength regional signal, which can originate from the juxtaposition of different basement terranes, for instance.
+These regional anomalies, resulting from deep sources, possess much longer wavelengths compared to the anomalies associated
+with our target structure, which resides in the upper crust.</p>
+<p>By performing this separation, we can focus specifically on the anomalies produced by our target structure,
+which will aid in generating a more accurate model.</p>
 </section>
 <section id="gravity-anomaly-regional-residual-separation">
 <h1><em>2.1 Gravity anomaly: regional/residual separation</em><a class="headerlink" href="#gravity-anomaly-regional-residual-separation" title="Permalink to this heading"></a></h1>
-<p>There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity feild
+<p>There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity field
 as determined by <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 10</span></a>. As can be seen in this figure, there is a long
 wavelength positive anomaly in this region with amplitudes ranging <span class="math notranslate nohighlight">\(\sim\)</span> <span class="math notranslate nohighlight">\(14-21\)</span> <span class="math notranslate nohighlight">\(mGal\)</span>.</p>
 <p>We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown
@@ -148,8 +151,8 @@ granite, now has a larger amplitude.</span><a class="headerlink" href="#residual
 <h1><em>2.2 Magnetic anomaly: Reduction To the Pole</em><a class="headerlink" href="#magnetic-anomaly-reduction-to-the-pole" title="Permalink to this heading"></a></h1>
 <p>In order to model the magnetic anomaly, we’ll apply a Reduction To the
 Pole (RTP) operation on the grid. We do this to simplify the interpretation of the anomaly as
-the resulting anomaly appears as if  it were observed at the geomagnetic pole, such that,
-the subsurface bodies are magnetized vertically. This removes skewness of the anomaly introduced as the observation
+the resulting anomaly appears as if it were observed at the geomagnetic pole, such that,
+the subsurface bodies are magnetized vertically. This removes the skewness introduced to the observed anomaly as observation
 latitude increases. Here, we assume the magnetic sources share the same inclination and declination as the Earth field.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -167,9 +170,9 @@ inclination and declination of <span class="math notranslate nohighlight">\(9.1\
 </section>
 <section id="regional-residual-separation">
 <h1><em>2.3 Regional/Residual Separation</em><a class="headerlink" href="#regional-residual-separation" title="Permalink to this heading"></a></h1>
-<p>Similarly to the gravity grid, we will also produce a regional-residual long wavelength regional field that we
-will remove from the total field to produce a residual anomaly that we will use to model
-the structure of the Weardale granite.</p>
+<p>Similarly to the gravity grid, we will also perform a regional-residual seperation to extract a
+long wavelength regional field. We then remove regional field from the total field to produce a
+residual anomaly that reflects near surface sources.</p>
 <p>To produce the regional grid we will apply a 2000 m upward continuation operation on the anomaly to
 transfer the observation elevation from 305 m (the aeromagnetic survey flight height) to 2305 m.
 This attenuates short wavelengths signals (generated by relatively shallower sources), with the
@@ -202,7 +205,7 @@ mineral veins, dykes and sills (<span id="id3">[<a class="reference internal" hr
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

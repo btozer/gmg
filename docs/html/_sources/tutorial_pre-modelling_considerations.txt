@@ -8,16 +8,20 @@ As we are interested in modelling the structure of the Weardale granite, importa
 prior to forward modelling the gravity and magnetic anomalies is to consider other factors contributing to 
 the total field anomalies.
 
-One common preprocessing step when modelling near surface structure using potential field data, is to preform a separation of the "regional" component of the anomaly 
-from the total anomaly in order to remove the contribution from the longer wavelength regional signal (which may be sourced, for example, from the juxtaposition of 
-different basement terranes). Because these anomalies are generated from deep sources, they are of much longer wavelength than the anomaly produced 
-by our target structured, which resides in the upper crust.
+One common preprocessing step when working with potential field data for near-surface structure modeling is to separate the 
+"regional" component of the anomaly from the overall anomaly. This separation helps eliminate the contribution from the 
+longer wavelength regional signal, which can originate from the juxtaposition of different basement terranes, for instance. 
+These regional anomalies, resulting from deep sources, possess much longer wavelengths compared to the anomalies associated 
+with our target structure, which resides in the upper crust.
+
+By performing this separation, we can focus specifically on the anomalies produced by our target structure, 
+which will aid in generating a more accurate model.
 
 ===================================================
 *2.1 Gravity anomaly: regional/residual separation*
 ===================================================
 
-There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity feild 
+There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity field 
 as determined by :cite:`Kimbell2011` as shown in :numref:`regional_gravity_map`. As can be seen in this figure, there is a long
 wavelength positive anomaly in this region with amplitudes ranging :math:`\sim` :math:`14-21` :math:`mGal`.
 
@@ -46,8 +50,8 @@ in :numref:`residual_gravity_map`. We will model this residual signal to estimat
 
 In order to model the magnetic anomaly, we'll apply a Reduction To the 
 Pole (RTP) operation on the grid. We do this to simplify the interpretation of the anomaly as 
-the resulting anomaly appears as if  it were observed at the geomagnetic pole, such that, 
-the subsurface bodies are magnetized vertically. This removes skewness of the anomaly introduced as the observation 
+the resulting anomaly appears as if it were observed at the geomagnetic pole, such that, 
+the subsurface bodies are magnetized vertically. This removes the skewness introduced to the observed anomaly as observation 
 latitude increases. Here, we assume the magnetic sources share the same inclination and declination as the Earth field.
 
 .. note::
@@ -67,9 +71,9 @@ latitude increases. Here, we assume the magnetic sources share the same inclinat
 *2.3 Regional/Residual Separation*
 ==================================
 
-Similarly to the gravity grid, we will also produce a regional-residual long wavelength regional field that we
-will remove from the total field to produce a residual anomaly that we will use to model
-the structure of the Weardale granite.
+Similarly to the gravity grid, we will also perform a regional-residual seperation to extract a 
+long wavelength regional field. We then remove regional field from the total field to produce a 
+residual anomaly that reflects near surface sources. 
 
 To produce the regional grid we will apply a 2000 m upward continuation operation on the anomaly to 
 transfer the observation elevation from 305 m (the aeromagnetic survey flight height) to 2305 m. 

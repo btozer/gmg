@@ -24,6 +24,7 @@
 .. |fig19| image:: _images/well_24.png
 .. |fig20| image:: _images/F_24.png
 .. |fig21| image:: _images/faultline_24.png
+.. |fig22| image:: _images/undo_24.png
 
 Menubar shortcuts
 -----------------
@@ -49,22 +50,24 @@ Menubar shortcuts
 +-------------------------------------+-------------------------------------+
 | |fig19| Load well data              | |fig20| Toggle Fault mode           |
 +-------------------------------------+-------------------------------------+
-| |fig21| Start fault picking         |                                     |
+| |fig21| Start fault picking         | |fig22| Undo last model update      |
 +-------------------------------------+-------------------------------------+
 
-.. |fig22| image:: _images/large_up_24.png
-.. |fig23| image:: _images/python_24.png
-.. |fig24| image:: _images/T_24.png
-.. |fig25| image:: _images/G_24.png
-.. |fig26| image:: _images/M_24.png
+.. |fig23| image:: _images/large_up_24.png
+.. |fig24| image:: _images/python_24.png
+.. |fig25| image:: _images/T_24.png
+.. |fig26| image:: _images/G_24.png
+.. |fig27| image:: _images/M_24.png
+.. |fig28| image:: _images/V_24.png
+
 
 Controlbar shortcuts
 --------------------
 
 +-----------------------------------+---------------------------------+
-| |fig22| Toggle controls frame     | |fig23| Toggle python console   |
+| |fig23| Toggle controls frame     | |fig24| Toggle python console   |
 +-----------------------------------+---------------------------------+
-| |fig24| Toggle topography profile | |fig25| Toggle  gravity profile |
+| |fig25| Toggle topography frame   | |fig26| Toggle  gravity frame   |
 +-----------------------------------+---------------------------------+
-| |fig26| Toggle magnetic profile   |                                 |
+| |fig27| Toggle magnetic frame     | |fig28| Toggle VGG frame        |
 +-----------------------------------+---------------------------------+

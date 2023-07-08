@@ -6,35 +6,40 @@ Installation
 Pre-Installation
 ----------------
 
-**Step 1: Install an Anaconda python distribution**
+.. note::
 
-The simplest way to install GMG is to first install an Anaconda Python distribution: www.anaconda.com/download
+    GMG is written in Python 3. 
+
+**Step 1: Install Miniforge**
+
+The simplest way to install GMG is to first install Miniforge (a minimal installer for `Conda <http://docs.conda.io/en/latest/>`_
+specifically for `conda-forge <http://conda-forge.org>`_).
 
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
-package manager. GMG is written in python3 so you will need the python3 version of Anaconda.
+package manager.
 
 **Step 2: Create a new python environment for gmg**
 
-It may be useful to create a new conda environment to use when running gmg. This will avoid any potential conflicts 
-with your current system configuration. e.g.:
+It may be useful to create a new conda environment to use when running GMG. This will avoid any potential conflicts 
+with your current system configuration. e.g.::
 
-    conda create -n gmg-env python=3.7 anaconda
+    conda create -n gmg
 
 Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
 but the documentation will use the name gmg-env).
 
 On macOS and Linux this environment can then be activated using::
 
-    source activate gmg-env
+    conda activate gmg
 
 Or on Windows use::
 
-    activate gmg-env
+    activate gmg
 
 Once the environment is activated any call to python will only "see" the packages install within the gmg-env
 environment. To deactivate the environment either close the terminal window or on macOS and Linux run::
 
-    source deactivate
+    conda deactivate
 
 Or on Windows use::
 
@@ -42,7 +47,7 @@ Or on Windows use::
 
 **OS Support:**
 
-GMG is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems. It is possible
+GMG is (for the time being) only tested on macOS Monterey and Ubuntu 22.04 Linux operating systems. It is possible
 that issues may arise when trying to install on other distributions. Please raise any information regarding
 installation problems on github.
 
@@ -59,22 +64,7 @@ Or on Windows use::
 
     activate gmg-env
 
-**Step 2: Install dependencies**
-
-GMG depends on several other packages to run. These are:
-
-* `wxpython <http://wiki.wxpython.org/>`_
-* `numpy <http://www.numpy.org>`_
-* `scipy <http://scipy.org/>`_
-* `matplotlib <http://matplotlib.sourceforge.net/>`_
-* `ObsPy <http://docs.obspy.org/>`_
-
-These dependencies can be installed in your gmg-env environment using the command::
-
-    conda install wxpython numpy scipy matplotlib obspy
-
-
-**Step 3: Get gmg**
+**Step 2: Download gmg**
 
 Download or "git clone" the gmg github repository.
 
@@ -95,7 +85,7 @@ If you have git installed, simply use git on the command line::
 
 This will create a copy of the GMG repository in the current working directory.
 
-**Step 4: Install  gmg**
+**Step 3: Install  gmg**
 
 Run the following command in the gmg/ root directory (which contains the script **setup.py**)::
 
@@ -130,3 +120,7 @@ Now, in a fresh terminal, simple type "gmg" on the command line to launch the so
 
     gmg
 
+The splash screen and model shell should appear as shown below:
+
+.. figure:: _static/gmg_splash_screen.png
+    :name: gmg_splash_screen

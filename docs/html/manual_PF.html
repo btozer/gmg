@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>4.0 Potential field data &mdash; GMG: An open source geophysical modelling GUI</title>
@@ -60,21 +60,23 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 GMG Models</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>4.0 Potential field data</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#potential-field-calculations"><strong>4.1 Potential field calculations</strong></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loading-observed-potential-field-data"><strong>4.2 Loading observed potential field data</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loading-observed-potential-field-data"><strong>4.1 Loading observed potential field data</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#calculating-predicted-potential-field-anomalies"><strong>4.2 Calculating predicted potential field anomalies</strong></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#potential-field-operations"><strong>4.3 Potential field operations</strong></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well Data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>7.0 XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -87,7 +89,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -117,42 +119,69 @@
              
   <section id="potential-field-data">
 <span id="pf"></span><h1><strong>4.0 Potential field data</strong><a class="headerlink" href="#potential-field-data" title="Permalink to this heading"></a></h1>
-<section id="potential-field-calculations">
-<h2><strong>4.1 Potential field calculations</strong><a class="headerlink" href="#potential-field-calculations" title="Permalink to this heading"></a></h2>
-<p>The Menubar contains buttons <strong>G</strong> and <strong>M</strong>.
-These are used as switches for turning potential field calculations for the gravity and magnetic anomalies on and off.</p>
-<div class="admonition hint">
-<p class="admonition-title">Hint</p>
-<p>If the model becomes complex (i.e. contains many layers and nodes), turing off the predicted anomalies can help
-speed up the GUI response time.</p>
+<section id="loading-observed-potential-field-data">
+<h2><strong>4.1 Loading observed potential field data</strong><a class="headerlink" href="#loading-observed-potential-field-data" title="Permalink to this heading"></a></h2>
+<p>To load observed potential field data click on the relevant menu in the Menubar (e.g., <em>Gravity</em>)
+and select <em>Load Gravity Anomaly</em>. Next Navigate to the file you want to load and select it:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Load Gravity Anomaly
+</pre></div>
 </div>
+<p>Provided the file is a simple space delimited ASCII text file and the X-coordinates match the model,
+the file will then be loaded into the model canvas</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>You must set the magnetic inclination and Earth Field values under the <em>Magnetic Field</em> Menu before
-the predicted magnetic anomaly can be calculated.</p>
+<p>These files should be ASCII text files with X values in the first column (in unit km) and the
+anomaly value (units: mGal, Eotvos, nT, m) in the second column. These files may have any suffix
+e.g., .txt or .xa (short for x-coordinate anomaly).</p>
 </div>
-<div class="admonition important">
-<p class="admonition-title">Important</p>
-<p><em>Strike</em> is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
-(the angle is positive when measured counterclockwise). See <a class="reference internal" href="manual_magnetic_algorithm.html#magnetic-algorithm"><span class="std std-ref">A2</span></a> for further details.
-The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).</p>
-</div>
-<div class="admonition-example admonition">
-<p class="admonition-title">Example</p>
-<p>If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.</p>
-<p>If the model was orientated North-South the angle would be 68 deg.</p>
+<p>If you later wish to delete an observed data record from the modelling frame, navigate to, for
+example:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Gravity Data -&gt; data name -&gt; delete observed data
+</pre></div>
 </div>
 </section>
-<section id="loading-observed-potential-field-data">
-<h2><strong>4.2 Loading observed potential field data</strong><a class="headerlink" href="#loading-observed-potential-field-data" title="Permalink to this heading"></a></h2>
-<p>To load observed potential field data click on the <em>Observed</em> menu in the Menubar and select either
-<em>Load observed Gravity anomaly</em> or <em>Load observed Magnetic anomaly</em>.
-Next Navigate to the file you want to load and select it.
-The file will automatically be loaded into the canvas.</p>
+<section id="calculating-predicted-potential-field-anomalies">
+<h2><strong>4.2 Calculating predicted potential field anomalies</strong><a class="headerlink" href="#calculating-predicted-potential-field-anomalies" title="Permalink to this heading"></a></h2>
+<p>The Menubar contains buttons <strong>G</strong>, <strong>V</strong> and <strong>M</strong>. These are switches for turning on/off
+the potential field calculations for the gravity, VGG and magnetic anomalies.</p>
+<p>If the model becomes complex (i.e. contains many layers and nodes), turing off the
+calculation of the predicted anomalies can help speed up the GUI response time.</p>
+</section>
+<section id="potential-field-operations">
+<h2><strong>4.3 Potential field operations</strong><a class="headerlink" href="#potential-field-operations" title="Permalink to this heading"></a></h2>
+<p><strong>4.3.1 Gaussian smoothing filter</strong></p>
+<p>A 1D Gaussian filter can be applied to any potential field data that has been
+loaded into a model by, for example, navigating to <em>Gravity</em> in the menubar
+and then selecting <em>Gaussian Filter</em>. This function uses the Scipy
+<a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter1d.html#scipy-ndimage-gaussian-filter1d">gaussian_filter1d</a>
+operation, where sigma is the standard deviation of the Gaussian kernel.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These files should be ASCII text files with X values in the first column and the anomaly value
-in the second column. These files may have any suffix.</p>
+<p>The Gaussian filter takes the potential field data as input and applies a mathematical
+operation called a Gaussian kernel to it. This kernel represents a bell-shaped curve,
+with the width of the curve determined by the user defined standard deviation parameter (sigma).</p>
+<p>When the Gaussian filter is applied, it replaces each data point with a weighted
+average of itself and the neighboring points. The weights are determined by the values of the
+Gaussian kernel at those positions. This process effectively smooths out any sudden or sharp changes
+in the data, making it appear more gradual and continuous. This may be useful if data are
+particularly noisy or you are interested in modelling long wavelength features.</p>
+</div>
+<p><strong>4.3.2 Horizontal derivative</strong></p>
+<p>The horizontal derivative of any potential field data that has been
+loaded into a model can be calculated by, for example, navigating to <em>Gravity</em> in the menubar
+and then selecting <em>Take Horizontal Derivative</em>. This uses a finite difference
+approach to estimate the horizontal gradient and reveals inflection points along the profile.
+These inflection points may delineate for example, layer edges or the location of faults.
+See, for example, Kearey et al., (2002) Pgs. 141-142 for more information.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The horizontal derivative application requires an evenly spaced X coordinate increment,
+This is defined by the <em>X increment</em> parameter. If your data is not evenly spaced, it will
+first be interpolated evenly at the specified <em>X increment</em>.</p>
+<p>The Filter Length parameter determines the length of the preconditioning median filter.
+By default, this value is set to 1, treating the input data in its raw state. Increasing this value
+applies smoothing to the data before calculating the gradient, which can be beneficial for noisy data.
+NB. This value must be an odd number.</p>
 </div>
 </section>
 </section>
@@ -169,7 +198,7 @@ in the second column. These files may have any suffix.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

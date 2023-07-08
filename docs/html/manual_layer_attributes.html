@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3.0 Layer attributes &mdash; GMG: An open source geophysical modelling GUI</title>
@@ -61,7 +61,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 GMG Models</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>3.0 Layer attributes</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#bulk-density">3.1 Bulk density</a></li>
@@ -69,19 +69,21 @@
 <li class="toctree-l3"><a class="reference internal" href="#magnetisation-vector">3.3 Magnetisation Vector</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#angle-a">Angle A</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#angle-b">Angle B</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#angle-c">Angle C</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#remenant-magnetism">3.3 Remenant Magnetism</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#remnant-magnetism">3.3 Remnant Magnetism</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well Data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>7.0 XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -94,7 +96,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -132,6 +134,7 @@ the predicted gravity and magnetic anomalies. Each layer contains five attribute
 <li><p>Layer susceptibility contrast</p></li>
 <li><p>Magnetic field vector angle A (Equal to the inclination of Earth’s field if magnetisation is induced only)</p></li>
 <li><p>Magnetic field vector angle B (Equal to the declination of Earth’s field if magnetisation is induced only)</p></li>
+<li><p>Magnetic field vector angle C (Angle between model profile positive X-axis and geographic north)</p></li>
 </ul>
 <p>Layer attributes are set using the <strong>Attributes</strong> sidebar within the modelling window or from the
 <strong>Attribute Table</strong> which can be accessed from the top menubar. GMG is designed such that attributes can be
@@ -152,11 +155,12 @@ Inclination and Declination.</p>
 <li><p>A reference density</p></li>
 </ol>
 <p>GMG defaults to a reference density of 0 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>. In this case, densities should be input as
-<strong>density contrasts</strong> e.g. 0.2 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
+density contrasts e.g., 200 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
 <p>If you would prefer to use absolute values, then you can set the reference density to your chosen value and gmg will
 determine the density contrast to use when calculating the gravity anomaly.
 For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>
-depending on the particular geology in the region of interest. Set the paper by Hinze (2003) for more details.</p>
+depending on the particular geology in the region of interest. See Hinze et al., (2003) for more details regarding
+the choice of reference density.</p>
 <p>You can als use a different reference density for different layers. This is useful if you wish to model
 crustal structure and relative to, for example, an upper crust of 2670 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>, lower crust
 2900 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> and upper mantle of 3330 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
@@ -199,19 +203,28 @@ magnetising force, <span class="math notranslate nohighlight">\(H\)</span> by:</
 <h2>3.3 Magnetisation Vector<a class="headerlink" href="#magnetisation-vector" title="Permalink to this heading"></a></h2>
 <section id="angle-a">
 <h3>Angle A<a class="headerlink" href="#angle-a" title="Permalink to this heading"></a></h3>
-<p>For induced magnetisation, Angle A is equal to the inclination of Earth’s field. If magnetistion is remenant or a mix of
-remenant and induced, then the direction of magnetisation will likely differ from Earth’s inclination and Angle A must
+<p>For induced magnetisation, Angle A is equal to the inclination of Earth’s field. If magnetistion is remnant or a mix of
+remnant and induced, then the direction of magnetisation will likely differ from Earth’s inclination and Angle A must
 be  calculated outside of GMG.</p>
 </section>
 <section id="angle-b">
 <h3>Angle B<a class="headerlink" href="#angle-b" title="Permalink to this heading"></a></h3>
-<p>For induced magnetisation, Angle B is equal to the declination of Earth’s field. If magnetistion is remenant or a mix of
-remenant and induced, then the direction of magnetisation will likely differ from Earth’s declination and Angle B must
+<p>For induced magnetisation, Angle B is equal to the declination of Earth’s field. If magnetisation is remnant or a mix of
+remnant and induced, then the direction of magnetisation will likely differ from Earth’s declination and Angle B must
 be calculated outside of GMG.</p>
 </section>
+<section id="angle-c">
+<h3>Angle C<a class="headerlink" href="#angle-c" title="Permalink to this heading"></a></h3>
+<p><em>Angle C (Azimuth)</em> is the angle (in degrees) that the strike of the model profile with respect to geographic north
+(the angle is positive when measured clockwise). See <a class="reference internal" href="manual_magnetic_algorithm.html#magnetic-algorithm"><span class="std std-ref">A2</span></a> for further details.
+The strike of the polygon (geological feature/layer) is assumed to be orthogonal to the model profile. For example,
+if the model is orientated West-East Angle C will equal 90.</p>
 </section>
-<section id="remenant-magnetism">
-<h2>3.3 Remenant Magnetism<a class="headerlink" href="#remenant-magnetism" title="Permalink to this heading"></a></h2>
+</section>
+<section id="remnant-magnetism">
+<h2>3.3 Remnant Magnetism<a class="headerlink" href="#remnant-magnetism" title="Permalink to this heading"></a></h2>
+<p>Currently, modelling of remnant magnetism  is not explicitly included within GMG. THis could, however, be achieved using
+user defined combinations of Angles A, B and C.</p>
 </section>
 </section>
 
@@ -227,7 +240,7 @@ be calculated outside of GMG.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>9.0 XY Data &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>7.0 XY data &mdash; GMG: An open source geophysical modelling GUI</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="7.0 Geologic data" href="manual_geology.html" />
-    <link rel="prev" title="6.0 Well data" href="manual_wells.html" />
+    <link rel="next" title="8.0 Geologic data" href="manual_geology.html" />
+    <link rel="prev" title="6.0 Well Data" href="manual_wells.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -60,17 +60,18 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 GMG Models</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>9.0 XY Data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well Data</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>7.0 XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -83,7 +84,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -101,7 +102,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="manual.html"><strong>Manual</strong></a></li>
-      <li class="breadcrumb-item active"><strong>9.0 XY Data</strong></li>
+      <li class="breadcrumb-item active"><strong>7.0 XY data</strong></li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_XY_data.txt" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -112,22 +113,37 @@
            <div itemprop="articleBody">
              
   <section id="xy-data">
-<h1><strong>9.0 XY Data</strong><a class="headerlink" href="#xy-data" title="Permalink to this heading"></a></h1>
+<h1><strong>7.0 XY data</strong><a class="headerlink" href="#xy-data" title="Permalink to this heading"></a></h1>
+<p>XY data refers to any auxiliary point data the user may wish to load into the model frame.
+For example, earthquake hypocenters. To load XY data navigate to XY Data -&gt; Load XY Points…
+Then, navigate to the file containing the XY data to load.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These files should be ASCII text files space delimited with X coordinates in column 1 and
+Y coordinates in column 2. As shown in the example below file.</p>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>6.357526 7.208064
+7.985463 7.114145
+10.646513 6.926306
+13.182337 7.270677
+15.185951 7.427209
+</pre></div>
+</div>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="manual_wells.html" class="btn btn-neutral float-left" title="6.0 Well data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="manual_geology.html" class="btn btn-neutral float-right" title="7.0 Geologic data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="manual_wells.html" class="btn btn-neutral float-left" title="6.0 Well Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manual_geology.html" class="btn btn-neutral float-right" title="8.0 Geologic data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

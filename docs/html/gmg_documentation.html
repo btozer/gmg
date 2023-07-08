@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Overview &mdash; GMG: An open source geophysical modelling GUI</title>
@@ -64,7 +64,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -96,9 +96,10 @@
     <a href="http://www.github.com/btozer/gmg">Visit the GMG github repository</a>
 </div><section id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this heading"></a></h1>
-<p>GMG is an open-source Graphical User Interface (GUI) designed principally for modelling
-2D potential field (gravity and magnetic) profiles. GMG is written in python 3.7 and uses
-wxPython for GUI implementation.</p>
+<p>GMG is an open-source Graphical User Interface (GUI) written in python 3, leveraging wxPython for GUI implementation.</p>
+<p>GMG is designed primarily for the integrated geophysical modelling of 2D potential field (gravity, vertical gravity
+gradient and magnetic) anomaly data. The package also allows the user to load and display seismic reflection data,
+well horizon tops, geological data and XY data (e.g., earthquake hypocenters).</p>
 <p>GMG makes use of several other open-source python packages to preform various tasks including:</p>
 <ul class="simple">
 <li><p>Fatiando a Terra</p></li>
@@ -111,26 +112,30 @@ wxPython for GUI implementation.</p>
 <p>The project was instigated after failing to find an adequate open-source package (in which
 the source code can be viewed and modified by the user) for performing 2D geophysical
 modeling tasks. Inspiration came from fatiando a terra and GMT.</p>
-<p>It is anticipated that GMG will also be useful for undergraduate geophysics courses.</p>
-<p><strong>NB: GMG is currently in development and a work in progress. As such, some documentation may be incomplete and some features may not work as expected. If you have issues, please reach out so these can be corrected or the documentation modified.</strong></p>
+<p>In addition to profile modelling, it is anticipated that GMG will also be valuable resource for
+undergraduate geophysics courses, aiding students in their exploration and understanding of
+geophysical concepts and python implementation of geophysical problems.</p>
 </section>
 <section id="key-features">
 <h1>Key features<a class="headerlink" href="#key-features" title="Permalink to this heading"></a></h1>
 <ul class="simple">
-<li><p>Data I/O is made as simple as possible using space delimited ASCII text files.</p></li>
-<li><p>Import and display observed topography, gravity and magnetic data.</p></li>
-<li><p>Apply filters to observed data.</p></li>
+<li><p>Data I/O is designed to be as simple as possible using space delimited ASCII text files.</p></li>
+<li><p>Import and display observed topography, gravity, vertical gravity gradient and magnetic data.</p></li>
+<li><p>Ability to apply filters to observed data within the modelling environment.</p></li>
 <li><p>Import and display seismic reflection data.</p></li>
-<li><p>Add and manipulate model layers (subsurface bodies) using a simple interactive interface.</p></li>
+<li><p>Add and manipulate model layers (subsurface bodies) using a simple, responsive interactive interface.</p></li>
 <li><p>“Pinch out/snap” layers against adjacent layers.</p></li>
-<li><p>Calculate the predicted gravity anomaly produced by any combination of model layers.</p></li>
-<li><p>Calculate the predicted magnetic anomaly produced by any combination of model layers.</p></li>
-<li><p>Model magnetic anomalies using induced and/or remanent magnetism.</p></li>
+<li><p>Calculate the predicted potential field anomalies produced by any combination of model layers (i.e., quickly include/exclude selected layers).</p></li>
 <li><p>Display well horizon tops.</p></li>
 <li><p>Display XY data (e.g., earthquake hypocenters or geological surface contacts).</p></li>
 <li><p>Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.</p></li>
 <li><p>Save model figures as vector graphics in Portable Document Format (PDF) file.</p></li>
+<li><p>Access to an on-the-fly python terminal for access to all underlying python objects.</p></li>
+<li><p><strong>The ability to modify the software in any way the user wishes.</strong></p></li>
 </ul>
+<p><strong>NB: GMG is currently in development and a work in progress. As such, some documentation may be
+incomplete and some features may not work as expected. If you have issues, please reach
+out so these can be corrected or the documentation modified.</strong></p>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
@@ -141,7 +146,7 @@ modeling tasks. Inspiration came from fatiando a terra and GMT.</p>
 <section id="release-notes">
 <h1>Release Notes<a class="headerlink" href="#release-notes" title="Permalink to this heading"></a></h1>
 <p>Version: 1.0.0</p>
-<p>Last updated: May 23, 2023</p>
+<p>Last updated: Jul 06, 2023</p>
 </section>
 <section id="notices">
 <h1>Notices:<a class="headerlink" href="#notices" title="Permalink to this heading"></a></h1>
@@ -163,7 +168,7 @@ modeling tasks. Inspiration came from fatiando a terra and GMT.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

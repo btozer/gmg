@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>1.0 Modelling &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>1.0 GMG Models &mdash; GMG: An open source geophysical modelling GUI</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -60,7 +60,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>1.0 Modelling</strong></a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>1.0 GMG Models</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#creating-a-new-model">1.1 Creating a New Model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#saving-a-model">1.2 Saving a Model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#loading-a-model">1.3 Loading a Model</a></li>
@@ -70,12 +70,13 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well Data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>7.0 XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -88,7 +89,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -106,7 +107,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="manual.html"><strong>Manual</strong></a></li>
-      <li class="breadcrumb-item active"><strong>1.0 Modelling</strong></li>
+      <li class="breadcrumb-item active"><strong>1.0 GMG Models</strong></li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_modelling.txt" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -116,8 +117,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="modelling">
-<span id="id1"></span><h1><strong>1.0 Modelling</strong><a class="headerlink" href="#modelling" title="Permalink to this heading"></a></h1>
+  <section id="gmg-models">
+<span id="modelling"></span><h1><strong>1.0 GMG Models</strong><a class="headerlink" href="#gmg-models" title="Permalink to this heading"></a></h1>
 <section id="creating-a-new-model">
 <h2>1.1 Creating a New Model<a class="headerlink" href="#creating-a-new-model" title="Permalink to this heading"></a></h2>
 <p>Before creating a new model, it is recommended that you create a project directory structure in which you will store
@@ -171,7 +172,7 @@ For example: gmg_testing/MODELS/</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>It is recommended that the user incrementally saves updated models using a incremented suffix such as:</p>
-<p>model_1.model</p>
+<p>model_01.model</p>
 <p>model_02.model</p>
 <p>…etc</p>
 </div>
@@ -199,7 +200,7 @@ For example: gmg_testing/MODELS/</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

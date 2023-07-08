@@ -1,0 +1,18 @@
+**11.0 Coordinate capture**
+===========================
+
+The coordinate capture function allows you to easily capture the XY coordinates of the GUI model frame.
+This feature can be useful if you wish to quickly export the XY geometry of a feature of interest within your model.
+
+To use the coordinate capture function, follow these steps
+
+.. parsed-literal::
+
+    1. Launch coordinate capture mode by selecting the **C** icon in the menubar. This will 
+       open a coordinate capture window.
+
+    2. Interact with the GUI model frame by clicking the desired location that you 
+       want to capture the coordinates of.
+
+    3. Click the **export** button at the bottom of the coordinate capture window to save 
+       the coordinates to an ASCII text file.

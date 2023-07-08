@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installation &mdash; GMG: An open source geophysical modelling GUI</title>
@@ -70,7 +70,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -101,29 +101,34 @@
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
 <section id="pre-installation">
 <h2>Pre-Installation<a class="headerlink" href="#pre-installation" title="Permalink to this heading"></a></h2>
-<p><strong>Step 1: Install an Anaconda python distribution</strong></p>
-<p>The simplest way to install GMG is to first install an Anaconda Python distribution: www.anaconda.com/download</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>GMG is written in Python 3.</p>
+</div>
+<p><strong>Step 1: Install Miniforge</strong></p>
+<p>The simplest way to install GMG is to first install Miniforge (a minimal installer for <a class="reference external" href="http://docs.conda.io/en/latest/">Conda</a>
+specifically for <a class="reference external" href="http://conda-forge.org">conda-forge</a>).</p>
 <p>This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
-package manager. GMG is written in python3 so you will need the python3 version of Anaconda.</p>
+package manager.</p>
 <p><strong>Step 2: Create a new python environment for gmg</strong></p>
-<p>It may be useful to create a new conda environment to use when running gmg. This will avoid any potential conflicts
+<p>It may be useful to create a new conda environment to use when running GMG. This will avoid any potential conflicts
 with your current system configuration. e.g.:</p>
-<blockquote>
-<div><p>conda create -n gmg-env python=3.7 anaconda</p>
-</div></blockquote>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda create -n gmg
+</pre></div>
+</div>
 <p>Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
 but the documentation will use the name gmg-env).</p>
 <p>On macOS and Linux this environment can then be activated using:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source activate gmg-env
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda activate gmg
 </pre></div>
 </div>
 <p>Or on Windows use:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate gmg-env
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate gmg
 </pre></div>
 </div>
 <p>Once the environment is activated any call to python will only “see” the packages install within the gmg-env
 environment. To deactivate the environment either close the terminal window or on macOS and Linux run:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>source deactivate
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda deactivate
 </pre></div>
 </div>
 <p>Or on Windows use:</p>
@@ -131,7 +136,7 @@ environment. To deactivate the environment either close the terminal window or o
 </pre></div>
 </div>
 <p><strong>OS Support:</strong></p>
-<p>GMG is (for the time being) only tested on Ubuntu 14.04 Linux and macOS High Sierra operating systems. It is possible
+<p>GMG is (for the time being) only tested on macOS Monterey and Ubuntu 22.04 Linux operating systems. It is possible
 that issues may arise when trying to install on other distributions. Please raise any information regarding
 installation problems on github.</p>
 </section>
@@ -146,20 +151,7 @@ installation problems on github.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>activate gmg-env
 </pre></div>
 </div>
-<p><strong>Step 2: Install dependencies</strong></p>
-<p>GMG depends on several other packages to run. These are:</p>
-<ul class="simple">
-<li><p><a class="reference external" href="http://wiki.wxpython.org/">wxpython</a></p></li>
-<li><p><a class="reference external" href="http://www.numpy.org">numpy</a></p></li>
-<li><p><a class="reference external" href="http://scipy.org/">scipy</a></p></li>
-<li><p><a class="reference external" href="http://matplotlib.sourceforge.net/">matplotlib</a></p></li>
-<li><p><a class="reference external" href="http://docs.obspy.org/">ObsPy</a></p></li>
-</ul>
-<p>These dependencies can be installed in your gmg-env environment using the command:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>conda install wxpython numpy scipy matplotlib obspy
-</pre></div>
-</div>
-<p><strong>Step 3: Get gmg</strong></p>
+<p><strong>Step 2: Download gmg</strong></p>
 <p>Download or “git clone” the gmg github repository.</p>
 <p><em>Option 1. Download:</em></p>
 <p>In your browser, navigate to:</p>
@@ -174,7 +166,7 @@ directory.</p>
 </pre></div>
 </div>
 <p>This will create a copy of the GMG repository in the current working directory.</p>
-<p><strong>Step 4: Install  gmg</strong></p>
+<p><strong>Step 3: Install  gmg</strong></p>
 <p>Run the following command in the gmg/ root directory (which contains the script <strong>setup.py</strong>):</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install .
 </pre></div>
@@ -206,6 +198,10 @@ on the main display of your Mac.
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gmg
 </pre></div>
 </div>
+<p>The splash screen and model shell should appear as shown below:</p>
+<figure class="align-default" id="gmg-splash-screen">
+<img alt="_images/gmg_splash_screen.png" src="_images/gmg_splash_screen.png" />
+</figure>
 </section>
 </section>
 
@@ -221,7 +217,7 @@ on the main display of your Mac.
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

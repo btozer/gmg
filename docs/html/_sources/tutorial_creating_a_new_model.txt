@@ -3,18 +3,22 @@
 **3.0 Creating a new model**
 ----------------------------
 
+.. important::
+    
+    If you have not yet installed GMG, please first follow the instructions on the :ref:`installation` page before continuing with the tutorial.
+
 **3.1 Defining the model profile**
 
-Our model profile runs south to north from A-A* with a total length of 52 km. The profile start and end coordinates (in British
-National Grid format; EPSG code: 27700) are::
+Our model profile runs south to north from X-X' with a total length of 52 km. The profile start and end coordinates in British
+National Grid format (EPSG code: 27700) are::
 
     X  = 393956 E 521000 N
     X' = 393956 E 571000 N
 
+
 **3.2 Initiating a new model**
 
-Once you have opened GMG (follow the instructions on the :ref:`installation` page if this is your first
-time using the software) you can create a new model by navigating to the Menubar and selecting::
+Once you have opened GMG you can create a new model by navigating to the Menubar and selecting::
 
     File -> New model...
 

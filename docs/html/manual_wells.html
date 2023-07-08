@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>6.0 Well data &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>6.0 Well Data &mdash; GMG: An open source geophysical modelling GUI</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="9.0 XY Data" href="manual_XY_data.html" />
+    <link rel="next" title="7.0 XY data" href="manual_XY_data.html" />
     <link rel="prev" title="5.0 SEGY data" href="manual_segy.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
@@ -60,20 +60,21 @@
 <li class="toctree-l1 current"><a class="reference internal" href="manual.html"><strong>Manual</strong></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="manual_icons.html"><strong>Icon Shortcuts</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_keyboard_shortcuts.html"><strong>Keyboard Shortcuts</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 Modelling</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_modelling.html"><strong>1.0 GMG Models</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_model_layers.html"><strong>2.0 Model Layers</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>6.0 Well data</strong></a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>6.0 Well Data</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#loading-well-data"><strong>6.1 Loading well data</strong></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>9.0 XY Data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>7.0 Geologic data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>8.0 Export Figure</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>7.0 XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -86,7 +87,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="references.html"><strong>References</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="related_software.html"><strong>Related software</strong></a></li>
-<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licencing</strong></a></li>
+<li class="toctree-l1"><a class="reference internal" href="licence.html"><strong>Licensing</strong></a></li>
 </ul>
 
         </div>
@@ -104,7 +105,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="manual.html"><strong>Manual</strong></a></li>
-      <li class="breadcrumb-item active"><strong>6.0 Well data</strong></li>
+      <li class="breadcrumb-item active"><strong>6.0 Well Data</strong></li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_wells.txt" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -115,24 +116,27 @@
            <div itemprop="articleBody">
              
   <section id="well-data">
-<h1><strong>6.0 Well data</strong><a class="headerlink" href="#well-data" title="Permalink to this heading"></a></h1>
+<h1><strong>6.0 Well Data</strong><a class="headerlink" href="#well-data" title="Permalink to this heading"></a></h1>
 <section id="loading-well-data">
 <h2><strong>6.1 Loading well data</strong><a class="headerlink" href="#loading-well-data" title="Permalink to this heading"></a></h2>
-<p>To load observed Well horizons select the <em>Well</em> menu in the Menubar and select <em>Load..*</em>. Or select the load well icon.
-Navigate to the file you wish to load.</p>
+<p>To load a well (borehole) record select the <em>Well</em> menu in the Menubar and select <em>Load…*</em> Or select the load well icon.
+Then, navigate to the file containing the well record to load.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>These files should be ASCII text files formatted as shown in the example below file.</p>
+<p>These files should be ASCII text files formatted as shown in the example below file. The header
+can contain any user defined metadata. This example includes the well coordinates and elevation.
+The record then contains the elevation of the well top, X position in model coordinates and then
+the horizon names and depths. Note the unit used for elevation and horizon depths must be km
+(same as the model frame).</p>
 </div>
-<dl class="simple">
-<dt>code-block:: text</dt><dd><p>#HEADER: easting=393756 northing=542789 elevation(Ordance Datum)=1058.92ft =322.758816m
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># HEADER: easting=393756 northing=542789 elevation(Ordnance Datum)=1058.92ft=322.758816m
 elevation: -0.32276
 x_position: 21.789
 Granite 0.06724
-Well_Bottom 0.48525</p>
-</dd>
-</dl>
-<p>Once well horizons are loaded into your model, you can increase and decrease the label text size using the slider in the
+Well_Bottom 0.48525
+</pre></div>
+</div>
+<p>Once the well record is load into the model, you can increase and decrease the label text size using the slider in the
 left hand menu. Each well can be hidden/shown by selecting the well name under <em>Well…</em> in the <em>Wells</em> menu.</p>
 </section>
 </section>
@@ -142,14 +146,14 @@ left hand menu. Each well can be hidden/shown by selecting the well name under <
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="manual_segy.html" class="btn btn-neutral float-left" title="5.0 SEGY data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="manual_XY_data.html" class="btn btn-neutral float-right" title="9.0 XY Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="manual_XY_data.html" class="btn btn-neutral float-right" title="7.0 XY data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on May 23, 2023.
+      <span class="lastupdated">Last updated on Jul 06, 2023.
       </span></p>
   </div>
 

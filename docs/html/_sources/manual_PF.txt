@@ -4,44 +4,80 @@
 **4.0 Potential field data**
 ============================
 
-------------------------------------
-**4.1 Potential field calculations**
-------------------------------------
-The Menubar contains buttons **G** and **M**.
-These are used as switches for turning potential field calculations for the gravity and magnetic anomalies on and off.
+---------------------------------------------
+**4.1 Loading observed potential field data**
+---------------------------------------------
+To load observed potential field data click on the relevant menu in the Menubar (e.g., *Gravity*) 
+and select *Load Gravity Anomaly*. Next Navigate to the file you want to load and select it::
 
-.. hint::
+    Gravity -> Load Gravity Anomaly
 
-    If the model becomes complex (i.e. contains many layers and nodes), turing off the predicted anomalies can help
-    speed up the GUI response time.
+Provided the file is a simple space delimited ASCII text file and the X-coordinates match the model, 
+the file will then be loaded into the model canvas
 
 .. note::
 
-    You must set the magnetic inclination and Earth Field values under the *Magnetic Field* Menu before
-    the predicted magnetic anomaly can be calculated.
+    These files should be ASCII text files with X values in the first column (in unit km) and the 
+    anomaly value (units: mGal, Eotvos, nT, m) in the second column. These files may have any suffix 
+    e.g., .txt or .xa (short for x-coordinate anomaly). 
 
-.. Important::
-    *Strike* is the angle (in degrees) that the strike of the unit in map view makes with respect to magnetic north
-    (the angle is positive when measured counterclockwise). See :ref:`A2 <magnetic_algorithm>` for further details.
-    The strike of the unit is assumed to be orthogonal to the model transect (striking into and out of the screen).
+If you later wish to delete an observed data record from the modelling frame, navigate to, for 
+example::   
 
-.. admonition:: Example
-
-    If the model is orientated West-East and magnetic north is -22 deg the strike of the unit is -22 deg.
-
-    If the model was orientated North-South the angle would be 68 deg.
+    Gravity -> Gravity Data -> data name -> delete observed data 
 
 
----------------------------------------------
-**4.2 Loading observed potential field data**
----------------------------------------------
-To load observed potential field data click on the *Observed* menu in the Menubar and select either
-*Load observed Gravity anomaly* or *Load observed Magnetic anomaly*.
-Next Navigate to the file you want to load and select it.
-The file will automatically be loaded into the canvas.
+
+-------------------------------------------------------
+**4.2 Calculating predicted potential field anomalies**
+-------------------------------------------------------
+The Menubar contains buttons **G**, **V** and **M**. These are switches for turning on/off 
+the potential field calculations for the gravity, VGG and magnetic anomalies.
+
+If the model becomes complex (i.e. contains many layers and nodes), turing off the 
+calculation of the predicted anomalies can help speed up the GUI response time.
+
+----------------------------------
+**4.3 Potential field operations**
+----------------------------------
+
+**4.3.1 Gaussian smoothing filter**
+
+A 1D Gaussian filter can be applied to any potential field data that has been
+loaded into a model by, for example, navigating to *Gravity* in the menubar
+and then selecting *Gaussian Filter*. This function uses the Scipy 
+`gaussian_filter1d <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.gaussian_filter1d.html#scipy-ndimage-gaussian-filter1d>`_ 
+operation, where sigma is the standard deviation of the Gaussian kernel. 
+
+.. note::
+    
+    The Gaussian filter takes the potential field data as input and applies a mathematical 
+    operation called a Gaussian kernel to it. This kernel represents a bell-shaped curve, 
+    with the width of the curve determined by the user defined standard deviation parameter (sigma).
+
+    When the Gaussian filter is applied, it replaces each data point with a weighted 
+    average of itself and the neighboring points. The weights are determined by the values of the 
+    Gaussian kernel at those positions. This process effectively smooths out any sudden or sharp changes 
+    in the data, making it appear more gradual and continuous. This may be useful if data are 
+    particularly noisy or you are interested in modelling long wavelength features.
+
+
+**4.3.2 Horizontal derivative**
+
+The horizontal derivative of any potential field data that has been
+loaded into a model can be calculated by, for example, navigating to *Gravity* in the menubar
+and then selecting *Take Horizontal Derivative*. This uses a finite difference
+approach to estimate the horizontal gradient and reveals inflection points along the profile.
+These inflection points may delineate for example, layer edges or the location of faults.
+See, for example, Kearey et al., (2002) Pgs. 141-142 for more information. 
 
 .. note::
 
-    These files should be ASCII text files with X values in the first column and the anomaly value
-    in the second column. These files may have any suffix.
+    The horizontal derivative application requires an evenly spaced X coordinate increment, 
+    This is defined by the *X increment* parameter. If your data is not evenly spaced, it will
+    first be interpolated evenly at the specified *X increment*.
 
+    The Filter Length parameter determines the length of the preconditioning median filter. 
+    By default, this value is set to 1, treating the input data in its raw state. Increasing this value 
+    applies smoothing to the data before calculating the gradient, which can be beneficial for noisy data.
+    NB. This value must be an odd number.    
