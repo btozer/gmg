@@ -1,2 +1,18 @@
-**9.0 XY Data**
+**7.0 XY data**
 ===============
+
+XY data refers to any auxiliary point data the user may wish to load into the model frame.
+For example, earthquake hypocenters. To load XY data navigate to XY Data -> Load XY Points...
+Then, navigate to the file containing the XY data to load. 
+
+.. note::
+    These files should be ASCII text files space delimited with X coordinates in column 1 and 
+    Y coordinates in column 2. As shown in the example below file. 
+
+::
+
+    6.357526 7.208064
+    7.985463 7.114145
+    10.646513 6.926306
+    13.182337 7.270677
+    15.185951 7.427209

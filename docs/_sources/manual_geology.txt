@@ -1,14 +1,24 @@
-**7.0 Geologic data**
+**8.0 Geologic data**
 =====================
 
-**7.1 Loading geologic data**
+Geologic data refers to locations of geological surface features such as 
+outcrops, unit boundaries or faults.
+
+**8.1 Loading geologic data**
 -----------------------------
+To load a geologic record select the *Outcrop Data* menu in the Menubar and select *Load Outcrop Data...**
+Then, navigate to the file containing the geologic record to load.  
 
-
+.. note::
+    These files should be ASCII text files formatted as shown in the example below file. The header
+    line can be labelled however the users wishes but the columns must be formatted as following:
+    Column 1:X coordinate; Column 2:Z coordinate for the top of the feature icon; 
+    Column 3:Z coordinate for the base of the feature icon; Column 4: Label to display above icon.
+    All coordinates are in km (same as the model frame). 
 
 Example file containing the locations where fault traces intersect the model profile::
 
-   #X(km)   Y1(km)  Y1(km)  NAME
+   #X(km)   Z1(km)  Z2(km)  NAME
     1.910   0.00    0.50    Staindrop
    40.355   0.00    0.50    Stublick
    41.394   0.00    0.50    Stublick_splay

@@ -3,11 +3,21 @@
 **Related software**
 ====================
 
-HYPERMAG - Saltus, R. W., & Blakely, R. J. (1993). An Interactive, 2-and 2 1/2-Dimensional Gravity and Magnetic
- Modeling Program: Version 3.5. In US Geological Survey Open-file Report (p. 41).
+Software packages offering similar/related functionality included (but are by no means limited to)::
 
-Fatiando a Terra - Uieda, L., V. C. Oliveira Jr, and V. C. F. Barbosa (2013), Modeling the Earth with Fatiando a Terra,
-Proceedings of the 12th Python in Science Conference, pp. 91 - 98.
+    *HYPERMAG*
+    
+    Saltus, R. W., & Blakely, R. J. (1993). An Interactive, 2-and 2 1/2-Dimensional Gravity 
+    and Magnetic Modeling Program: Version 3.5. In US Geological Survey Open-file Report (p. 41).
 
-Gmod - Dabek, Z. K. & Williamson, J. P., 1999. Forward and inverse wavenumber formulae for the gravity and
-magnetic responses of layered models. British Geological Survey technical report, WK/99/03C.
+    *Fatiando a Terra*
+    
+    Uieda, L., V. C. Oliveira Jr, and V. C. F. Barbosa (2013), Modeling the Earth with Fatiando 
+    a Terra, Proceedings of the 12th Python in Science Conference, pp. 91 - 98.
+
+    *Gmod*
+    
+    Dabek, Z. K. & Williamson, J. P., 1999. Forward and inverse wavenumber formulae for the gravity 
+    and magnetic responses of layered models. British Geological Survey technical report, WK/99/03C.
+
+We highly encourage any user to edit this list on github to include any other additional packages.

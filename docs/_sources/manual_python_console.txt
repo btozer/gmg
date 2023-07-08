@@ -1,3 +1,21 @@
 =======================
 **10.0 Python console**
 =======================
+
+A python console can be accessed from within GMG and allows users to access the underlying objects
+from within the modelling environment. To open the python console select the python icon from the
+controlbar in the bottom left of the GUI. 
+
+The user can then follow the instructions listed at the top of the terminal to access GMG. Ie.,
+
+.. code-block:: python
+
+    import sys
+    gmg = sys.gmg
+
+Objects can then be accessed via python. For example, to return the location of the x nodes for
+layer 1 the user could use the following:
+
+.. code-block:: python
+
+    gmg.layer_list[1].x_nodes

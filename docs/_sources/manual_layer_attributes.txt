@@ -10,6 +10,8 @@ the predicted gravity and magnetic anomalies. Each layer contains five attribute
 * Layer susceptibility contrast
 * Magnetic field vector angle A (Equal to the inclination of Earth's field if magnetisation is induced only)
 * Magnetic field vector angle B (Equal to the declination of Earth's field if magnetisation is induced only)
+* Magnetic field vector angle C (Angle between model profile positive X-axis and geographic north)
+
 
 Layer attributes are set using the **Attributes** sidebar within the modelling window or from the
 **Attribute Table** which can be accessed from the top menubar. GMG is designed such that attributes can be
@@ -33,12 +35,13 @@ Each layer requires:
 2. A reference density
 
 GMG defaults to a reference density of 0 :math:`kg` :math:`m^{-3}`. In this case, densities should be input as
-**density contrasts** e.g. 0.2 :math:`kg` :math:`m^{-3}`.
+density contrasts e.g., 200 :math:`kg` :math:`m^{-3}`.
 
 If you would prefer to use absolute values, then you can set the reference density to your chosen value and gmg will
 determine the density contrast to use when calculating the gravity anomaly.
 For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 :math:`kg` :math:`m^{-3}`
-depending on the particular geology in the region of interest. Set the paper by Hinze (2003) for more details.
+depending on the particular geology in the region of interest. See Hinze et al., (2003) for more details regarding
+the choice of reference density.
 
 You can als use a different reference density for different layers. This is useful if you wish to model
 crustal structure and relative to, for example, an upper crust of 2670 :math:`kg` :math:`m^{-3}`, lower crust
@@ -86,19 +89,28 @@ As both :math:`J_{i}` and :math:`H` have SI units :math:`A m^{-1}`, magnetic sus
 Angle A
 -------
 
-For induced magnetisation, Angle A is equal to the inclination of Earth's field. If magnetistion is remenant or a mix of
-remenant and induced, then the direction of magnetisation will likely differ from Earth's inclination and Angle A must
+For induced magnetisation, Angle A is equal to the inclination of Earth's field. If magnetistion is remnant or a mix of
+remnant and induced, then the direction of magnetisation will likely differ from Earth's inclination and Angle A must
 be  calculated outside of GMG.
 
 Angle B
 -------
 
-For induced magnetisation, Angle B is equal to the declination of Earth's field. If magnetistion is remenant or a mix of
-remenant and induced, then the direction of magnetisation will likely differ from Earth's declination and Angle B must
+For induced magnetisation, Angle B is equal to the declination of Earth's field. If magnetisation is remnant or a mix of
+remnant and induced, then the direction of magnetisation will likely differ from Earth's declination and Angle B must
 be calculated outside of GMG.
 
+Angle C
+-------
 
-----------------------
-3.3 Remenant Magnetism
-----------------------
+*Angle C (Azimuth)* is the angle (in degrees) that the strike of the model profile with respect to geographic north
+(the angle is positive when measured clockwise). See :ref:`A2 <magnetic_algorithm>` for further details.
+The strike of the polygon (geological feature/layer) is assumed to be orthogonal to the model profile. For example, 
+if the model is orientated West-East Angle C will equal 90. 
 
+---------------------
+3.3 Remnant Magnetism
+---------------------
+
+Currently, modelling of remnant magnetism  is not explicitly included within GMG. THis could, however, be achieved using
+user defined combinations of Angles A, B and C. 

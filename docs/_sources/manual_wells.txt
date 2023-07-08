@@ -1,23 +1,28 @@
-**6.0 Well data**
+**6.0 Well Data**
 =================
 
 **6.1 Loading well data**
 -------------------------
 
-To load observed Well horizons select the *Well* menu in the Menubar and select *Load..**. Or select the load well icon.
-Navigate to the file you wish to load.
+To load a well (borehole) record select the *Well* menu in the Menubar and select *Load...** Or select the load well icon.
+Then, navigate to the file containing the well record to load.
 
 .. note::
-    These files should be ASCII text files formatted as shown in the example below file.
+    These files should be ASCII text files formatted as shown in the example below file. The header
+    can contain any user defined metadata. This example includes the well coordinates and elevation.
+    The record then contains the elevation of the well top, X position in model coordinates and then
+    the horizon names and depths. Note the unit used for elevation and horizon depths must be km 
+    (same as the model frame).
 
-code-block:: text
-    #HEADER: easting=393756 northing=542789 elevation(Ordance Datum)=1058.92ft =322.758816m
+::
+
+    # HEADER: easting=393756 northing=542789 elevation(Ordnance Datum)=1058.92ft=322.758816m
     elevation: -0.32276
     x_position: 21.789
     Granite 0.06724
     Well_Bottom 0.48525
 
 
-Once well horizons are loaded into your model, you can increase and decrease the label text size using the slider in the
+Once the well record is load into the model, you can increase and decrease the label text size using the slider in the
 left hand menu. Each well can be hidden/shown by selecting the well name under *Well...* in the *Wells* menu.
 

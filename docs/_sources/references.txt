@@ -43,6 +43,12 @@ Talwani, M., & Heirtzler, J. R. (1964). Computation of magnetic anomalies caused
 arbitrary shape, in Parks, G. A., Ed., Computers in the mineral industries, Part 1: Stanford Univ. Publ., Geological
 Sciences, 9, 464-480.
 
-**Icons**
+**Vertical Gravity Gradient Algorithm**
 
+Kim, S. S., & Wessel, P. (2016). New analytic solutions for modeling vertical gravity gradient anomalies.
+Geochemistry, Geophysics, Geosystems, 17(5), 1915–1924. https://doi.org/10.1002/2016GC006263
+
+**Software Icons**
+
+icons8.com: https://icons8.com/icon/set/circle/all
 Icons designed using: https://freeiconmaker.com/

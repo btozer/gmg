@@ -3,6 +3,62 @@
 **Contribute**
 ==============
 
+**Contributor's Guide**
+
+Thank you for your interest in contributing to GMG! Any contribution big or small are very welcome are much appreciated. 
+Below is a simple guide for how you many consider contributing to the project.
+
+**Ways to Contribute**
+
+There are several ways you can contribute to the project:
+
+1. **Documentation**: You can help improve the project's documentation by fixing errors, clarifying instructions, or adding new sections.
+
+2. **Bug Reports**: If you encounter a bug while using the software, please report it. Be sure to include all relevant details and steps to reproduce the issue.
+
+3. **Code Contributions**: Please feel free to modify GMG in anyway you wish, be that optimising existing code, fixing bugs, or adding new features.
+
+4. **Feature Requests**: If you have ideas for new features or improvements, share them by submitting a feature request. Provide a clear description of the proposed feature and its potential benefits.
+
+5. **Testing**: Help us ensure the quality of the software by testing it thoroughly and reporting any issues you encounter.
+
+**Getting Started**
+
+To start contributing, follow these steps:
+
+1. **Fork the Repository**: Fork the project repository on `GitHub <https://github.com/btozer/gmg>`_ by clicking on the "Fork" button. 
+This will create a copy of the project in your own GitHub account.
+
+2. **Clone the Repository**: Clone the forked repository to your local machine using Git::
+
+    git clone https://github.com/btozer/gmg.git
+
+3. **Create a New Branch**: Create a new branch for your contribution. Use a descriptive name that reflects the nature of your work::
+
+    git checkout -b branch-name
+
+4. **Make Changes**: Make the necessary changes or additions to the code, documentation, or other relevant files.
+|
+
+5. **Commit Changes**: Commit your changes with a clear and concise commit message that describes the purpose of your modifications::
+
+    git commit -m "Your commit message"
+
+6. **Push Changes**: Push your local branch to your forked repository on GitHub::
+
+    git push origin branch-name
+
+7. **Submit a Pull Request**: Go to the original repository on GitHub and click on the "New Pull Request" button. 
+Fill out the pull request template with details about your contribution.
+
+**Communication**
+
+Please feel free to reach out by opening an issue on the project's GitHub repository if you have any questions or need assistance.
+
+**Acknowledgment**
+
+Thank you for considering contributing to GMG. Any contribution big or small are very welcome are much appreciated. 
+
 Software Architecture
 ---------------------
 

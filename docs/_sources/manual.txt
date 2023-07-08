@@ -16,9 +16,10 @@
    manual_wells
    manual_XY_data
    manual_geology
-   manual_export_figure
    manual_attribute_table
    manual_python_console
+   manual_coordinate_capture
+   manual_export_figure
    manual_gravity_algorithm
    manual_magnetic_algorithm
    z_bibliography

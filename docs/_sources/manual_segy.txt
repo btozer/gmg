@@ -17,8 +17,8 @@ the SEGY data. The data will then be loaded into the model canvas using these di
 
 .. caution::
     SEGY data is loaded using the obspy.SEGY.core routine. This requires that all time/date SEGY headers have values.
-    Hence, you may need fill these headers using seismic processing software or ObsPy if they are not already present in
-    your data.
+    Hence, you may need fill these headers with dummy values using seismic processing software or ObsPy if 
+    they are not already present in your data.
 
 ----------------
 5.2 SEGY options
