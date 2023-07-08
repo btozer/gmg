@@ -10,7 +10,7 @@ matplotlib.use('WXAgg')
 import numpy as np
 from scipy import signal
 from scipy import interpolate as ip
-
+from scipy.ndimage import gaussian_filter1d
 
 class NewModelDialog(wx.Dialog):
     """
@@ -54,24 +54,24 @@ class NewModelDialog(wx.Dialog):
 
         self.x_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.x_Text = wx.StaticText(self.floating_panel, -1, "X1, X2 (km)      ")
-        self.new_x1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
-        self.new_x2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
+        self.new_x1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
+        self.new_x2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.x_sizer.AddMany([self.x_Text, self.new_x1, self.new_x2])
         self.z_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.z_Text = wx.StaticText(self.floating_panel, -1, "Z1, Z2 (km)      ")
-        self.new_z1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
-        self.new_z2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
+        self.new_z1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
+        self.new_z2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.z_sizer.AddMany([self.z_Text, self.new_z1, self.new_z2])
         self.xp1_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.xp1_text = wx.StaticText(self.floating_panel, -1, "Calculation\nIncrement (km)")
-        self.xp1_inc = wx.TextCtrl(self.floating_panel, -1, "0", size=(100, -1))
+        self.xp1_text = wx.StaticText(self.floating_panel, -1, "Calculation       \nSpacing (km)  ")
+        self.xp1_inc = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.xp1_sizer.AddMany([self.xp1_text, self.xp1_inc])
 
         self.line2 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
 
         self.create_button_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.spacing = wx.StaticText(self.floating_panel, -1, "                           ")
-        self.b_create_button = wx.Button(self.floating_panel, -1, "Create Model")
+        self.b_create_button = wx.Button(self.floating_panel, -1, "Create New Model")
         self.Bind(wx.EVT_BUTTON, self.create_button, self.b_create_button)
         self.create_button_sizer.AddMany([self.spacing, self.b_create_button])
 
@@ -493,7 +493,7 @@ class DepinchDialog(wx.Dialog):
         self.EndModal(1)
 
 
-class MedianFilterDialog(wx.Dialog):
+class GaussianFilterDialog(wx.Dialog):
     """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
 
     def __init__(self, parent, id, title, observed_list):
@@ -512,8 +512,8 @@ class MedianFilterDialog(wx.Dialog):
                 self.obs_combo_list.Append(observed_list[i].name)
 
         # DEFINE FILTER LENGTH
-        self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
-        self.filter_window_text = wx.TextCtrl(input_panel, -1, "9")
+        self.filter_window = wx.StaticText(input_panel, -1, "Sigma")
+        self.filter_window_text = wx.TextCtrl(input_panel, -1, "2")
 
         # DEFINE OUTPUT NAME
         self.output_name = wx.StaticText(input_panel, -1, "OUTPUT DATA NAME:")
@@ -527,7 +527,7 @@ class MedianFilterDialog(wx.Dialog):
 
         # DEFINE SET BUTTON
         self.b_apply_filter = wx.Button(input_panel, -1, "Apply")
-        self.Bind(wx.EVT_BUTTON, self.median_pass, self.b_apply_filter)
+        self.Bind(wx.EVT_BUTTON, self.gaussian_pass, self.b_apply_filter)
 
         # DEFINE SIZER'
         sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
@@ -537,7 +537,7 @@ class MedianFilterDialog(wx.Dialog):
         input_panel.SetSizerAndFit(sizer)
         sizer.Fit(self)
 
-    def median_pass(self, event):
+    def gaussian_pass(self, event):
         """APPLY A MEDIAN FILTER TO OBSERVED DATA"""
         self.obs_to_filter_name = str(self.obs_combo_list.GetValue())
         self.filter_length = int(self.filter_window_text.GetValue())
@@ -550,7 +550,7 @@ class MedianFilterDialog(wx.Dialog):
 
                 self.filtered_output = np.zeros(shape=(len(self.filter_input), 2))
                 self.filtered_output[:, 0] = self.filter_input[:, 0]
-                self.filtered_output[:, 1] = signal.medfilt(self.filter_input[:, 1], self.filter_length)
+                self.filtered_output[:, 1] = gaussian_filter1d(self.filter_input[:, 1], self.filter_length)
                 self.EndModal(1)
 
 
@@ -575,7 +575,7 @@ class HorizontalDerivative(wx.Dialog):
 
         # DEFINE PREPROCESSING MEDIAN FILTER LENGTH
         self.filter_window = wx.StaticText(input_panel, -1, "Filter Length (odd):")
-        self.filter_window_text = wx.TextCtrl(input_panel, -1, "3")
+        self.filter_window_text = wx.TextCtrl(input_panel, -1, "1")
 
         # DEFINE PREPROCESSING MEDIAN FILTER LENGTH
         self.x_increment = wx.StaticText(input_panel, -1, "X increment (km):")
@@ -609,6 +609,7 @@ class HorizontalDerivative(wx.Dialog):
         # 0. PARSE THE USER DEFINED PARAMETERS
         self.obs_to_filter_name = str(self.obs_combo_list.GetValue())
 
+        # GET DATA TO FILTER
         for i in range(len(self.observed_list)):
             if self.observed_list[i] is not None:
                 if self.observed_list[i].name == str(self.obs_to_filter_name):
@@ -636,8 +637,7 @@ class HorizontalDerivative(wx.Dialog):
         self.filtered_output[:, 1] = signal.medfilt(input_interpolated[:, 1], self.filter_length)
 
         # 3. TAKE THE HORIZONTAL DERIVATIVE
-        N = len(input_interpolated)
-        self.deriv = np.zeros(shape=((len(input_interpolated) - 1), 2))
+        self.deriv = np.zeros(shape=((len(input_interpolated) - 1), 2))  # INITIALISE OUTPUT ARRAY
 
         for i in range(1, len(input_interpolated) - 1):
             self.deriv[i, 0] = input_interpolated[i, 0]
@@ -776,7 +776,7 @@ class NewLayerDialog(wx.Dialog):
                                                           | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
         self.input_panel = wx.Panel(self, -1)
 
-        self.kind = str(kind)
+        self.kind = str(kind)  ## IS THE LAYER USER DEFINED OR LOADED FROM FILE?
 
         # CREATE FIXED LAYER BUTTON
         self.b_fixed = wx.Button(self.input_panel, -1, "New fixed layer")
@@ -793,10 +793,6 @@ class NewLayerDialog(wx.Dialog):
     def set_fixed(self, event):
         """ APPEND NEW LAYER BELOW LATEST FIXED LAYER"""
         self.fixed = True
-        print("here")
-        print(self.kind)
-        if self.kind == str('load'):
-            print("type = load")
         if self.kind == str('new'):
             floating_dialogbox = self.SetNewThickness(self, -1, "Set new layer thickness")
             answer = floating_dialogbox.ShowModal()
