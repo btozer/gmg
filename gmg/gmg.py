@@ -3942,7 +3942,8 @@ class Gmg(wx.Frame):
         """
         GET THE INDEX VALUE OF THE NODE UNDER POINT, AS LONG AS IT IS WITHIN NODE_CLICK_LIMIT TOLERANCE OF CLICK
         """
-        if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM':
+        if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM' or \
+            self.capture == True:
             return
         
         # RESET NODE SWITCH
@@ -5152,7 +5153,10 @@ class Gmg(wx.Frame):
                 pass
 
     def write_c_xy(self, event):
-        """OUTPUT A c.in FILE FOR INPUT TO rayinvr C2V"""
+        """
+        OUTPUT A c.in FILE FOR INPUT TO rayinvr C2V
+        http://www.soest.hawaii.edu/users/bzelt/v2c/v2c.html
+        """
         
         # CREATE OUTPUT FILE
         save_file_dialog = wx.FileDialog(self, "Save c.in RayInvr file", "", "", "in files (*.in)|*.in",
@@ -5207,8 +5211,13 @@ class Gmg(wx.Frame):
                 np.savetxt(f, data, delimiter=' ', fmt='%6.02f %3.02f %1d %3.02f %1d')
 
     def capture_coordinates(self, event):
-        if self.capture is False:
-            self.capture = True
+        """TURN ON COORDINATE CAPTURE MODE"""
+        if self.capture is True:
+            self.capture = False  # INTERNAL SWITCH
+        else:
+            self.capture = True   # INTERNAL SWITCH
+            self.index_node = None  # RELEASE CURRENTLY SELECTED NODE
+            self.current_node.set_offsets([-99999999.0, -99999999.0])
 
             # CREATE INSTANCE OF CAPTURE COORDINATES
             self.capture_window = CaptureCoordinates(self, -1, 'Capture Coordinates')

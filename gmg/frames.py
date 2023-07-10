@@ -64,6 +64,7 @@ class CaptureCoordinates(wx.Frame):
 
     def on_close_button(self, event):
         self.parent.capture = False
+        self.parent.toolbar.ToggleTool(self.parent.t_capture_coordinates.GetId(), False)
         self.Destroy()
 
 
