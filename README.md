@@ -8,7 +8,7 @@
 <p align="center">
 <a href="https://pypi.python.org/pypi/gmgpy">
 <img
-src="http://img.shields.io/pypi/v/gmg.svg?style=flat-square"
+src="http://img.shields.io/pypi/v/gmgpy.svg?style=flat-square"
 alt="Latest version on PyPI"
 />
 </a>
