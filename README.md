@@ -6,7 +6,7 @@
 
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
 <p align="center">
-<a href="https://pypi.python.org/pypi/gmg">
+<a href="https://pypi.python.org/pypi/gmgpy">
 <img
 src="http://img.shields.io/pypi/v/gmg.svg?style=flat-square"
 alt="Latest version on PyPI"
