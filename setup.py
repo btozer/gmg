@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(name='gmg',
-      version='1.0.0',
+      version='0.1.0',
       description='An open source geophysical modelling GUI',
       url='https://github.com/btozer/gmg.git',
       author='Brook Tozer',
-      author_email='btozer@ucsd.edu',
+      author_email='b.tozer@gns.cri.nz',
       license='BSD-3-Clause',
       packages=['gmg'],
       platforms = "Any",

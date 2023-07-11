@@ -3,7 +3,7 @@ Calculate the magnetic anomaly caused by a 2D infinite cylinder.
 
 **references**
 
-Lowrie, W. Fundamental of Geophysics pg. 330 eq. 5.54
+Lowrie, W. Fundamentals of Geophysics pg. 330 eq. 5.54
 Sleep & Fujita 1997. Pg. 223 eq. 6.45
 
 """

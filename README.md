@@ -5,6 +5,19 @@
 ---
 
 |PyPI| |Affiliated package| |Coverage Status| |Build status|
+<p align="center">
+<a href="https://pypi.python.org/pypi/gmg">
+<img
+src="http://img.shields.io/pypi/v/gmg.svg?style=flat-square"
+alt="Latest version on PyPI"
+/>
+</a>
+<a href="https://github.com/conda-forge/gmg-feedstock">
+<img
+src="https://img.shields.io/conda/vn/conda-forge/gmg.svg?style=flat-square"
+alt="Latest version on conda-forge"
+/>
+</a>
 
 
 ![alt-text](https://github.com/btozer/gmg/blob/add_vgg/gmg_demo.gif)
