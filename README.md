@@ -12,9 +12,9 @@ src="http://img.shields.io/pypi/v/gmgpy.svg?style=flat-square"
 alt="Latest version on PyPI"
 />
 </a>
-<a href="https://github.com/conda-forge/gmg-feedstock">
+<a href="https://github.com/conda-forge/pygmg-feedstock">
 <img
-src="https://img.shields.io/conda/vn/conda-forge/gmg.svg?style=flat-square"
+src="https://img.shields.io/conda/vn/conda-forge/pygmg.svg?style=flat-square"
 alt="Latest version on conda-forge"
 />
 </a>
@@ -220,8 +220,6 @@ Please see the documentation for details.
 **Suggestions & bug reporting**
 
 The best way to open a bug report is to raise an issue on Github.
-
-If you don't use Github, you can send a bug report to: btozer@ucsd.edu
 
 Please use the subject line:
     
