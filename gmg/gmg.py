@@ -128,7 +128,6 @@ import gc
 import webbrowser
 import copy
 from types import MappingProxyType
-from frozendict import frozendict
 
 # FUTURE
 # from wx.lib.agw import floatspin as fs
