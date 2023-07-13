@@ -1,5 +1,5 @@
 """
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 GMG is a GUI application for forward modelling 2D potential field profiles with 
 additional geophysical data. Written by Brook Tozer, University of Oxford 
 2015-17; SIO 2018-19; GNS Science 2020-Present. Includes ability to import 
@@ -80,16 +80,10 @@ Documentation is created using Sphinx.
 
 https://www.sphinx-doc.org/en/master/
 ***
-
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-NB. If you created a separate conda env for gmg you must activate it before launching gmg. e.g.::
-
-    source activate py3-gmg
-
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
-# IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
 
@@ -138,7 +132,7 @@ from types import MappingProxyType
 # from colormap import rgb2hex
 # import wx.lib.agw.ribbon as RB
 # import wx.EnhancedStatusBar as ESB
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 class Gmg(wx.Frame):
@@ -150,15 +144,18 @@ class Gmg(wx.Frame):
     """
 
     def __init__(self, *args, **kwds):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
+        wx.Frame.__init__(self, None, wx.ID_ANY, 
+                          'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
 
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
 
         # SET AND SHOW SPLASH SCREEN
         bitmap = wx.Bitmap(self.gui_icons_dir + "gmg_logo_scaled.png")
-        splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000,
-                                     self, id=wx.ID_ANY, size=(1, 1), style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
+        splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | 
+                                     wx.adv.SPLASH_TIMEOUT, 3000,
+                                     self, id=wx.ID_ANY, size=(1, 1),
+                                     style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
         splash.Show()
         self.Show()
 
@@ -176,69 +173,57 @@ class Gmg(wx.Frame):
         images.Add(bottom)
 
         # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL
-        self.leftPanel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 400), style=wx.SP_NOBORDER)
-        self.leftPanel_b = wx.SplitterWindow(self.leftPanel, wx.ID_ANY, size=(200, 600),
-                                             style=wx.SP_NOBORDER)
-        # self.leftPanel.SetMinimumPaneSize(1)
-        # self.leftPanel_b.SetMinimumPaneSize(1)
+        self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1000), style=wx.SP_NOBORDER)
 
-        # FIRST PANE; LEFT PANEL (=ATTRIBUTES) ---------------------------------------------------------
-        self.splitter_left_panel_one = wx.ScrolledWindow(self.leftPanel, wx.ID_ANY, size=(200, 400),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
-        self.controls_panel_bar_one = fpb.FoldPanelBar(self.splitter_left_panel_one, 1, size=(200, 400),
+        # CREATE FOLDPANELBAR FOR ATTRIBUTE CONTROLS
+        self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, size=(200, 1000),
                                                        agwStyle=fpb.FPB_VERTICAL)
-        self.fold_panel_one = self.controls_panel_bar_one.AddFoldPanel("Layer Attributes", collapsed=True,
-                                                                       foldIcons=images)
-        self.controls_panel_bar_one.Expand(self.fold_panel_one)  # ENSURES FOLD PANEL IS VISIBLE
 
-        # PLACE IN SIZER
-        self.splitter_left_panel_one_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.splitter_left_panel_one.SetSizer(self.splitter_left_panel_one_sizer)
+        # FIRST FOLD PANEL (=ATTRIBUTES) ---------------------------------------------------------
+        self.scrolled_window_item1 = wx.ScrolledWindow(self.controls_fold_panel, wx.ID_ANY, 
+                                                         size=(200, 400),
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
 
+        self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel("Layer Attributes", 
+                                                                   collapsed=True,
+                                                                   foldIcons=images)
+        
+        self.fold_panel_item1.AddWindow(self.scrolled_window_item1, 1, wx.EXPAND | wx.ALL, 0)
         # ----------------------------------------------------------------------------------------------
 
        # SECOND PANE; LEFT PANEL (=LAYERS) ------------------------------------------------------------
         # GREY wx PANEL
-        self.splitter_left_panel_two = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 300),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
-        # self.splitter_left_panel_two.SetBackgroundColour(wx.YELLOW)
-        # THE LAYER TREE SCROLL BAR GOES IN HERE
-        self.controls_panel_bar_two = fpb.FoldPanelBar(self.splitter_left_panel_two, 1, size=(200, 300),
-                                                       agwStyle=fpb.FPB_VERTICAL)
-        # self.controls_panel_bar_two.SetBackgroundColour(wx.GREEN)
-        self.fold_panel_two = self.controls_panel_bar_two.AddFoldPanel("Layers", collapsed=True, foldIcons=images)
-        self.controls_panel_bar_two.Expand(self.fold_panel_two)  # ENSURES FOLD PANEL IS VISIBLE
-
-        # PLACE IN SIZER
-        # self.splitter_left_panel_two_sizer = wx.BoxSizer(wx.VERTICAL)
-        # self.splitter_left_panel_two.SetSizer(self.splitter_left_panel_two_sizer)
+        self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(200, 300),
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
+                                                         wx.EXPAND)
+        
+        self.fold_panel_item2 = self.controls_fold_panel.AddFoldPanel("Layers", 
+                                                                        collapsed=True, 
+                                                                        foldIcons=images)
+        
+        self.fold_panel_item2.AddWindow(self.scrolled_window_item2, 1, wx.EXPAND | wx.ALL, 0)
 
         # ----------------------------------------------------------------------------------------------
 
         # THIRD PANE; LEFT PANEL (=FAULTS) -------------------------------------------------------------
         # GREY wx PANEL
-        self.splitter_left_panel_three = wx.ScrolledWindow(self.leftPanel_b, wx.ID_ANY, size=(200, 300),
-                                                           style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
-        # THE FAULT TREE SCROLL BAR GOES IN HERE
-        self.controls_panel_bar_three = fpb.FoldPanelBar(self.splitter_left_panel_three, 1, size=(200, 300),
-                                                         agwStyle=fpb.FPB_VERTICAL)
-        self.fold_panel_three = self.controls_panel_bar_three.AddFoldPanel("Faults", collapsed=True, foldIcons=images)
-        self.controls_panel_bar_three.Expand(self.fold_panel_three)  # ENSURES FOLD PANEL IS VISIBLE
-
-        # PLACE IN SIZER
-        # self.splitter_left_panel_three_sizer = wx.BoxSizer(wx.VERTICAL)
-        # self.splitter_left_panel_three.SetSizer(self.splitter_left_panel_three_sizer)
+        self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(200, 300),
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
+                                                         wx.EXPAND)
+        
+        self.fold_panel_item3 = self.controls_fold_panel.AddFoldPanel("Faults", 
+                                                                        collapsed=True, 
+                                                                        foldIcons=images)
+        
+        self.fold_panel_item3.AddWindow(self.scrolled_window_item3, 1, wx.EXPAND | wx.ALL, 0)
         # ----------------------------------------------------------------------------------------------
 
         # SET SPLITTERS
-        self.leftPanel_b.SplitHorizontally(self.splitter_left_panel_two, self.splitter_left_panel_three)
-        self.leftPanel.SplitHorizontally(self.splitter_left_panel_one, self.leftPanel_b)
-
-        self.splitter_left_panel_sizer = wx.BoxSizer(wx.VERTICAL)
-        self.splitter_left_panel_sizer.Add(self.leftPanel, 1, wx.EXPAND)
-        self.splitter_left_panel_one.SetScrollbar(1, 1, 10, 10)
-        self.splitter_left_panel_two.SetScrollbar(1, 1, 10, 10)
-        self.splitter_left_panel_three.SetScrollbar(1, 1, 10, 10)
+        self.left_panel_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.left_panel_sizer.Add(self.left_panel, 1, wx.EXPAND)
+        self.scrolled_window_item1.SetScrollbar(1, 1, 10, 10)
+        self.scrolled_window_item2.SetScrollbar(1, 1, 10, 10)
+        self.scrolled_window_item3.SetScrollbar(1, 1, 10, 10)
 
         # CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)
         self.rightPanel = wx.Panel(self, -1, size=(1700, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
@@ -254,7 +239,7 @@ class Gmg(wx.Frame):
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
 
         # ADD THE PANES TO THE AUI MANAGER
-        self.mgr.AddPane(self.leftPanel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
+        self.mgr.AddPane(self.left_panel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
         self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
         self.mgr.GetPaneByName('console').Hide()  # HIDE PYTHON CONSOLE BY DEFAULT
@@ -1027,75 +1012,75 @@ class Gmg(wx.Frame):
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
 
         # MAKE DENSITY SPINNER
-        self.density_text = wx.StaticText(self.fold_panel_one, -1, label=" Density:         ", style=wx.ALIGN_LEFT)
-        self.density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
+        self.density_text = wx.StaticText(self.fold_panel_item1, -1, label=" Density:         ", style=wx.ALIGN_LEFT)
+        self.density_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-5, max_val=5, increment=0.001, value=0.00)
         self.density_input.SetFormat("%f")
         self.density_input.SetDigits(4)
 
         # MAKE REFERNECE DENSITY SPINNER
-        self.ref_density_text = wx.StaticText(self.fold_panel_one, -1, label=" Reference:     \n Density",
+        self.ref_density_text = wx.StaticText(self.fold_panel_item1, -1, label=" Reference:     \n Density",
                                               style=wx.ALIGN_LEFT)
-        self.ref_density_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-5, max_val=5, increment=0.001,
+        self.ref_density_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-5, max_val=5, increment=0.001,
                                               value=0.00)
         self.ref_density_input.SetFormat("%f")
         self.ref_density_input.SetDigits(4)
 
         # MAKE SUSCEPTIBILITY SPINNER
-        self.susceptibility_text = wx.StaticText(self.fold_panel_one, -1, label=" Susceptibility:", style=wx.ALIGN_LEFT)
-        self.susceptibility_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-2.0, max_val=1000000.0,
+        self.susceptibility_text = wx.StaticText(self.fold_panel_item1, -1, label=" Susceptibility:", style=wx.ALIGN_LEFT)
+        self.susceptibility_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-2.0, max_val=1000000.0,
                                                  increment=0.00001, value=0.00, style=wx.ALIGN_RIGHT)
         self.susceptibility_input.SetFormat("%f")
         self.susceptibility_input.SetDigits(6)
 
         # MAKE ANGLE A SPINNER
-        self.angle_a_text = wx.StaticText(self.fold_panel_one, -1, label=" Angle A (Inc): ", style=wx.ALIGN_LEFT)
-        self.angle_a_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-90.0, max_val=90.0, increment=1.0,
+        self.angle_a_text = wx.StaticText(self.fold_panel_item1, -1, label=" Angle A (Inc): ", style=wx.ALIGN_LEFT)
+        self.angle_a_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-90.0, max_val=90.0, increment=1.0,
                                           value=0.0, style=wx.ALIGN_RIGHT)
         self.angle_a_input.SetFormat("%f")
         self.angle_a_input.SetDigits(1)
 
         # MAKE ANGLE B SPINNER
-        self.angle_b_text = wx.StaticText(self.fold_panel_one, -1, label=" Angle B (Dec):", style=wx.ALIGN_LEFT)
-        self.angle_b_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-360.0, max_val=360.0, increment=1.0, value=0.0,
+        self.angle_b_text = wx.StaticText(self.fold_panel_item1, -1, label=" Angle B (Dec):", style=wx.ALIGN_LEFT)
+        self.angle_b_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-360.0, max_val=360.0, increment=1.0, value=0.0,
                                           style=wx.ALIGN_RIGHT)
         self.angle_b_input.SetFormat("%f")
         self.angle_b_input.SetDigits(1)
 
         # MAKE ANGLE C SPINNER
-        self.angle_c_text = wx.StaticText(self.fold_panel_one, -1, label=" Angle C (Azm):", style=wx.ALIGN_LEFT)
-        self.angle_c_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=-360.0, max_val=360.0, increment=1.0,
+        self.angle_c_text = wx.StaticText(self.fold_panel_item1, -1, label=" Angle C (Azm):", style=wx.ALIGN_LEFT)
+        self.angle_c_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-360.0, max_val=360.0, increment=1.0,
                                           value=0.0, style=wx.ALIGN_RIGHT)
         self.angle_c_input.SetFormat("%f")
         self.angle_c_input.SetDigits(1)
 
         # MAKE EARTH FIELD SPINNER
-        self.earth_field_text = wx.StaticText(self.fold_panel_one, -1, label=" F:", style=wx.ALIGN_LEFT)
-        self.earth_field_input = fs.FloatSpin(self.fold_panel_one, -1, min_val=0.0, max_val=1000000.0, increment=1.0,
+        self.earth_field_text = wx.StaticText(self.fold_panel_item1, -1, label=" F:", style=wx.ALIGN_LEFT)
+        self.earth_field_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=0.0, max_val=1000000.0, increment=1.0,
                                               value=0.0, style=wx.ALIGN_RIGHT)
         self.earth_field_input.SetFormat("%f")
         self.earth_field_input.SetDigits(1)
 
         # MAKE NODE X Y LABEL
-        self.node_text = wx.StaticText(self.fold_panel_one, -1, label=" Node Position:", style=wx.ALIGN_LEFT)
+        self.node_text = wx.StaticText(self.fold_panel_item1, -1, label=" Node Position:", style=wx.ALIGN_LEFT)
 
         # MAKE NODE XY SPINNERS
-        self.x_text = wx.StaticText(self.fold_panel_one, -1, label=" X Value:")
-        self.x_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
+        self.x_text = wx.StaticText(self.fold_panel_item1, -1, label=" X Value:")
+        self.x_input = fs.FloatSpin(self.fold_panel_item1, -1, increment=0.001, value=0.00)
         self.x_input.SetDigits(4)
-        self.y_text = wx.StaticText(self.fold_panel_one, -1, label=" Y Value:")
-        self.y_input = fs.FloatSpin(self.fold_panel_one, -1, increment=0.001, value=0.00)
+        self.y_text = wx.StaticText(self.fold_panel_item1, -1, label=" Y Value:")
+        self.y_input = fs.FloatSpin(self.fold_panel_item1, -1, increment=0.001, value=0.00)
         self.y_input.SetDigits(4)
 
         # Make Set button
-        self.node_set_button = wx.Button(self.fold_panel_one, -1, "Set")
+        self.node_set_button = wx.Button(self.fold_panel_item1, -1, "Set")
         
         # MAKE WELL TEXT SIZE SLIDER
-        self.text_size_text = wx.StaticText(self.fold_panel_one, -1, label="Label Text Size:")
-        self.text_size_input = wx.Slider(self.fold_panel_one, value=1, minValue=1, maxValue=20, size=(175, -1),
+        self.text_size_text = wx.StaticText(self.fold_panel_item1, -1, label="Label Text Size:")
+        self.text_size_input = wx.Slider(self.fold_panel_item1, value=1, minValue=1, maxValue=20, size=(175, -1),
                                          style=wx.SL_HORIZONTAL)
 
         # MAKE LAYER TREE
-        self.tree = ct.CustomTreeCtrl(self.fold_panel_two, -1, size=(200, 280),
+        self.tree = ct.CustomTreeCtrl(self.fold_panel_item2, -1, size=(200, 280),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_ROW_LINES |
                                       wx.TR_HIDE_ROOT | wx.EXPAND | wx.ALL | wx.ALIGN_LEFT)
         self.tree.SetIndent(0.0)
@@ -1109,7 +1094,7 @@ class Gmg(wx.Frame):
         self.Bind(ct.EVT_TREE_ITEM_CHECKED, self.item_checked, self.tree)
 
         # MAKE FAULT TREE
-        self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_three, -1, size=(200, 280),
+        self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_item3, -1, size=(200, 280),
                                             agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_ROW_LINES |
                                               wx.TR_HIDE_ROOT | wx.EXPAND | wx.ALL | wx.ALIGN_LEFT)
         self.fault_tree.SetIndent(0.0)
@@ -1126,7 +1111,7 @@ class Gmg(wx.Frame):
         # MAKE DENSITY CONTRAST SCALEBAR
         # colormap = matplotlib.cm.coolwarm
         # cnorm = colors.Normalize(vmin=-0.8, vmax=0.8)
-        # self.cb1 = matplotlib.colorbar.ColorbarBase(self.fold_panel_one, cmap=colormap, norm=cnorm,
+        # self.cb1 = matplotlib.colorbar.ColorbarBase(self.fold_panel_item1, cmap=colormap, norm=cnorm,
         #                                             orientation='horizontal')
         # self.cb1.ax.tick_params(labelsize=6)
         # self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=6)
@@ -1147,148 +1132,149 @@ class Gmg(wx.Frame):
         c = 0  # CURRENT COLUMN
 
         # LINE SEP
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # DENSITY
         r += 1
-        self.attributes_box.Add(self.density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=5)
+        self.attributes_box.Add(self.density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
         c += 1
-        self.attributes_box.Add(self.density_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND, border=5)
+        self.attributes_box.Add(self.density_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # LINE SEP
         r += 1
         c += 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # REFERENCE DENSITY
         r += 1
         c = 0
-        self.attributes_box.Add(self.ref_density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT, border=5)
+        self.attributes_box.Add(self.ref_density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
         c += 1
-        self.attributes_box.Add(self.ref_density_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND, border=5)
+        self.attributes_box.Add(self.ref_density_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # LINE SEP
         r += 1
         c = 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # SUSCEPTIBILITY
         r += 1
         c = 0
-        self.attributes_box.Add(self.susceptibility_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.susceptibility_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c += 1
-        self.attributes_box.Add(self.susceptibility_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.susceptibility_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
 
         # ANGLE A
         r += 1
         c = 0
-        self.attributes_box.Add(self.angle_a_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.angle_a_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c += 1
-        self.attributes_box.Add(self.angle_a_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.angle_a_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
 
         # ANGLE B
         r += 1
         c = 0
-        self.attributes_box.Add(self.angle_b_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.angle_b_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c += 1
-        self.attributes_box.Add(self.angle_b_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.angle_b_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
 
         # Angle C
         r += 1
         c = 0
-        self.attributes_box.Add(self.angle_c_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.angle_c_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c += 1
-        self.attributes_box.Add(self.angle_c_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.angle_c_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
 
         # Earth Field
         r += 1
         c = 0
-        self.attributes_box.Add(self.earth_field_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.earth_field_text, pos=(r, c), span=(1, 1),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c += 1
-        self.attributes_box.Add(self.earth_field_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.earth_field_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
 
         # LINE SEP
         r += 1
         c = 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # XY NODES
         r += 1
         c = 0
-        self.attributes_box.Add(self.node_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.node_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
 
         # LINE SEP
         r += 1
         c = 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # X NODE
         r += 1
         c = 0
-        self.attributes_box.Add(self.x_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.x_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c = + 1
-        self.attributes_box.Add(self.x_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.x_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND | wx.ALL,
                                 border=5)
 
         # Y NODE
         r += 1
         c = 0
-        self.attributes_box.Add(self.y_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT,
+        self.attributes_box.Add(self.y_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=5)
         c = + 1
-        self.attributes_box.Add(self.y_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND,
+        self.attributes_box.Add(self.y_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND | wx.ALL,
                                 border=5)
 
         # LINE SEP
         r += 1
         c = 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # SET BUTTON
         r += 1
         c = 0
-        self.attributes_box.Add(self.node_set_button, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND,
-                                border=5)
+        self.attributes_box.Add(self.node_set_button, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | 
+                                wx.EXPAND | wx.ALL, border=5)
 
         # LINE SEP
         r += 1
         c = 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND |
+                                wx.ALL, border=5)
 
         # LABEL TEXT SIZE
         r += 1
         c = 0
-        self.attributes_box.Add(self.text_size_text, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER,
-                                border=5)
+        self.attributes_box.Add(self.text_size_text, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER |
+                                wx.EXPAND | wx.ALL, border=5)
         r += 1
         c = 0
-        self.attributes_box.Add(self.text_size_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER,
-                                border=5)
+        self.attributes_box.Add(self.text_size_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER |
+                                wx.EXPAND | wx.ALL, border=5)
 
         # LINE SEP
         r += 1
         c = 0
-        line = wx.StaticLine(self.fold_panel_one)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND, border=5)
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
 
         # DENSITY SCALE BAR
         # self.attr_box.Add(self.cb1, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
@@ -1303,7 +1289,7 @@ class Gmg(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
         # CREATE FAULT TREE BOX
         self.fault_tree_box = wx.BoxSizer(wx.VERTICAL)
-        self.fault_tree_box.Add(self.fault_tree, 1, wx.EXPAND|wx.ALL|wx.ALIGN_LEFT, border=20)
+        self.fault_tree_box.Add(self.fault_tree, 1, wx.EXPAND | wx.ALL | wx.ALIGN_LEFT, border=20)
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
@@ -1315,19 +1301,22 @@ class Gmg(wx.Frame):
 
         # --------------------------------------------------------------------------------------------------------------
         # PLACE BOX SIZERS IN CORRECT PANELS
-        self.fold_panel_one.SetSizerAndFit(self.attributes_box)
-        self.fold_panel_two.SetSizerAndFit(self.tree_box)
-        self.fold_panel_three.SetSizerAndFit(self.fault_tree_box)
-        self.leftPanel.SetSizer(self.splitter_left_panel_sizer)
-        self.fold_panel_one.Collapse()
-        self.fold_panel_one.Expand()
-        self.fold_panel_two.Collapse()
-        self.fold_panel_two.Expand()
-        self.fold_panel_three.Collapse()
-        self.fold_panel_three.Expand()
+        # SETUP LEFT PANEL
+        self.fold_panel_item1.SetSizerAndFit(self.attributes_box)
+        self.fold_panel_item2.SetSizerAndFit(self.tree_box)
+        self.fold_panel_item3.SetSizerAndFit(self.fault_tree_box)
+        self.left_panel.SetSizer(self.left_panel_sizer)
+        
+        # COLLAPSE/EXPAND ENSURES SIZERS INITALISE CORRECTLY
+        self.fold_panel_item3.Collapse()
+        self.fold_panel_item2.Collapse()
+        self.fold_panel_item1.Collapse()
 
+        # SETUP RIGHT PANEL
         self.rightPanel.SetSizerAndFit(self.canvas_box)
         self.rightPanel.SetSize(self.GetSize())
+
+        
         # --------------------------------------------------------------------------------------------------------------
 
     def topo_frame_params(self, span_size):
@@ -1749,9 +1738,9 @@ class Gmg(wx.Frame):
             self.initalize_model()
 
             'ENSURES FOLD PANELS ARE VISIBLE'
-            self.controls_panel_bar_one.Expand(self.fold_panel_one)
-            self.controls_panel_bar_two.Expand(self.fold_panel_two)
-            self.controls_panel_bar_three.Expand(self.fold_panel_three)
+            # self.controls_fold_panel.Expand(self.fold_panel_item1)
+            # self.controls_panel_bar_two.Expand(self.fold_panel_item2)
+            # self.controls_panel_bar_three.Expand(self.fold_panel_item3)
 
             'CREATE MODEL'
             self.model_aspect = 1.
@@ -2421,8 +2410,8 @@ class Gmg(wx.Frame):
             self.run_algorithms()
             self.draw()
             self.Restore()  # FIX'S DISPLAY ISSUE
-            self.fold_panel_two.SetSize(200, 300)
-            self.fold_panel_three.SetSize(200, 300)
+            self.fold_panel_item2.SetSize(200, 300)
+            self.fold_panel_item3.SetSize(200, 300)
 
 
             # ----------------------------------------------------------------------------------------------------------
@@ -5309,8 +5298,8 @@ class Gmg(wx.Frame):
 
         self.fault_tree.SetSpacing(40)
 
-        # self.fold_panel_three.Collapse()
-        # self.fold_panel_three.Expand()
+        # self.fold_panel_item3.Collapse()
+        # self.fold_panel_item3.Expand()
 
         # UPDATE CURRENT PLOT GRAPHICS
         self.currently_active_fault.set_data(new_fault.x_nodes, new_fault.y_nodes)
