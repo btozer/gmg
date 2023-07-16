@@ -167,8 +167,10 @@ class Gmg(wx.Frame):
 
         # SET AUI ICON SIZING AND STYLES (ARROWS)
         images = wx.ImageList(16, 16)
-        top = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16, 16))
-        bottom = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16, 16))
+        # top = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16, 16))
+        # bottom = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16, 16))
+        top =  wx.Bitmap(self.gui_icons_dir + 'large_up_16.png')
+        bottom =  wx.Bitmap(self.gui_icons_dir + 'large_down_16.png')
         images.Add(top)
         images.Add(bottom)
 
