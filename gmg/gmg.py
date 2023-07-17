@@ -145,7 +145,8 @@ class Gmg(wx.Frame):
 
     def __init__(self, *args, **kwds):
         wx.Frame.__init__(self, None, wx.ID_ANY, 
-                          'gmg: 2D Geophysical Modelling GUI', size=(1800, 1050))
+                          'gmg: 2D Geophysical Modelling GUI', 
+                          size=(1800, 1050))
 
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
@@ -167,31 +168,32 @@ class Gmg(wx.Frame):
 
         # SET AUI ICON SIZING AND STYLES (ARROWS)
         images = wx.ImageList(16, 16)
-        # top = wx.ArtProvider.GetBitmap(wx.ART_GO_UP, wx.ART_MENU, (16, 16))
-        # bottom = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_MENU, (16, 16))
         top =  wx.Bitmap(self.gui_icons_dir + 'large_up_16.png')
         bottom =  wx.Bitmap(self.gui_icons_dir + 'large_down_16.png')
         images.Add(top)
         images.Add(bottom)
 
-        # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND FAULT TREE CONTROL
-        self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, size=(200, 1000), style=wx.SP_NOBORDER)
+        # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND 
+        # FAULT TREE CONTROL
+        self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, 
+                                            size=(200, 1000), 
+                                            style=wx.SP_NOBORDER)
 
         # CREATE FOLDPANELBAR FOR ATTRIBUTE CONTROLS
-        self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, size=(200, 1000),
-                                                       agwStyle=fpb.FPB_VERTICAL)
+        self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, 
+                                                    size=(200, 1000),
+                                                    agwStyle=fpb.FPB_VERTICAL)
 
-        # FIRST FOLD PANEL (=ATTRIBUTES) ---------------------------------------------------------
-        self.scrolled_window_item1 = wx.ScrolledWindow(self.controls_fold_panel, wx.ID_ANY, 
-                                                         size=(200, 400),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
+        # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
+        self.scrolled_window_item1 = wx.ScrolledWindow(
+            self.controls_fold_panel, wx.ID_ANY, size=(200, 400), 
+            style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
 
-        self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel("Layer Attributes", 
-                                                                   collapsed=True,
-                                                                   foldIcons=images)
+        self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel(
+            "Layer Attributes", collapsed=True, foldIcons=images)
         
         self.fold_panel_item1.AddWindow(self.scrolled_window_item1, 1, wx.EXPAND | wx.ALL, 0)
-        # ----------------------------------------------------------------------------------------------
+        # --------------------------------------------------------------------
 
        # SECOND PANE; LEFT PANEL (=LAYERS) ------------------------------------------------------------
         # GREY wx PANEL
@@ -1303,22 +1305,20 @@ class Gmg(wx.Frame):
 
         # --------------------------------------------------------------------------------------------------------------
         # PLACE BOX SIZERS IN CORRECT PANELS
-        # SETUP LEFT PANEL
-        self.fold_panel_item1.SetSizerAndFit(self.attributes_box)
-        self.fold_panel_item2.SetSizerAndFit(self.tree_box)
+        # SETUP LEFT PANEL        
         self.fold_panel_item3.SetSizerAndFit(self.fault_tree_box)
-        self.left_panel.SetSizer(self.left_panel_sizer)
+        self.fold_panel_item2.SetSizerAndFit(self.tree_box)
+        self.fold_panel_item1.SetSizerAndFit(self.attributes_box)
+        self.left_panel.SetSizerAndFit(self.left_panel_sizer)
         
         # COLLAPSE/EXPAND ENSURES SIZERS INITALISE CORRECTLY
-        self.fold_panel_item3.Collapse()
-        self.fold_panel_item2.Collapse()
-        self.fold_panel_item1.Collapse()
+        self.controls_fold_panel.Expand(self.fold_panel_item1)
+        self.controls_fold_panel.Expand(self.fold_panel_item2)
+        self.controls_fold_panel.Expand(self.fold_panel_item3)
 
         # SETUP RIGHT PANEL
         self.rightPanel.SetSizerAndFit(self.canvas_box)
         self.rightPanel.SetSize(self.GetSize())
-
-        
         # --------------------------------------------------------------------------------------------------------------
 
     def topo_frame_params(self, span_size):
