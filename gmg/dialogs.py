@@ -44,24 +44,22 @@ class NewModelDialog(wx.Dialog):
 
         self.main_box = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.title_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.title_text = wx.StaticText(self.floating_panel, -1, "Enter the region boundary for the new model\n"
                                                                  "and the x-increment for anomaly calculations:",
                                         style=wx.ALIGN_CENTRE_HORIZONTAL)
-        self.title_sizer.Add(self.title_text)
-
         self.line1 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
-
         self.x_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.x_Text = wx.StaticText(self.floating_panel, -1, "X1, X2 (km)      ")
         self.new_x1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.new_x2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.x_sizer.AddMany([self.x_Text, self.new_x1, self.new_x2])
+       
         self.z_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.z_Text = wx.StaticText(self.floating_panel, -1, "Z1, Z2 (km)      ")
         self.new_z1 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.new_z2 = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
         self.z_sizer.AddMany([self.z_Text, self.new_z1, self.new_z2])
+       
         self.xp1_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.xp1_text = wx.StaticText(self.floating_panel, -1, "Calculation       \nSpacing (km)  ")
         self.xp1_inc = wx.TextCtrl(self.floating_panel, -1, "0", size=(80, -1))
@@ -77,12 +75,10 @@ class NewModelDialog(wx.Dialog):
 
         self.line3 = (wx.StaticLine(self.floating_panel), 0, wx.ALL | wx.EXPAND, 5)
 
-        self.footer_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.footer_text = wx.StaticText(self.floating_panel, -1,
                                          "NB. these values can be modified during modelling,\n"
                                          "it may be beneficial to begin with a coarse spacing.")
-        self.footer_sizer.Add(self.footer_text)
-
+       
         #  POPULATE BOX WITH EXISTING VALUES
         if m_x1:
             self.new_x1.SetValue(str(m_x1))
@@ -100,6 +96,7 @@ class NewModelDialog(wx.Dialog):
         self.main_box.Add(self.sizer, proportion=1, flag=wx.ALL | wx.EXPAND, border=10)
         self.floating_panel.SetSizerAndFit(self.main_box)
         self.main_box.Fit(self)
+
 
     def create_button(self, event):
         """WHEN THE "Create Model" BUTTON IS PRESSED"""

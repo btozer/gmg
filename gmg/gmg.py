@@ -1008,8 +1008,8 @@ class Gmg(wx.Frame):
         # INITALISE CALCULATED ANOMALY LINES
         self.pred_gravity_plot, = self.gravity_frame.plot([], [], 'red', linewidth=2, alpha=0.5)
         self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
-        self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'pink', linewidth=2, alpha=0.5)
-        self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='yellow', linewidth=1.5, alpha=0.5)
+        self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'gold', linewidth=2, alpha=0.5)
+        self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='pink', linewidth=1.5, alpha=0.5)
         self.predicted_nt_plot, = self.magnetic_frame.plot([], [], 'green', linewidth=2, alpha=0.5)
         self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
 
@@ -1137,148 +1137,148 @@ class Gmg(wx.Frame):
 
         # LINE SEP
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # DENSITY
         r += 1
-        self.attributes_box.Add(self.density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(self.density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
         c += 1
-        self.attributes_box.Add(self.density_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(self.density_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c += 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # REFERENCE DENSITY
         r += 1
         c = 0
-        self.attributes_box.Add(self.ref_density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(self.ref_density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
         c += 1
-        self.attributes_box.Add(self.ref_density_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(self.ref_density_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # SUSCEPTIBILITY
         r += 1
         c = 0
         self.attributes_box.Add(self.susceptibility_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c += 1
         self.attributes_box.Add(self.susceptibility_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # ANGLE A
         r += 1
         c = 0
         self.attributes_box.Add(self.angle_a_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c += 1
         self.attributes_box.Add(self.angle_a_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # ANGLE B
         r += 1
         c = 0
         self.attributes_box.Add(self.angle_b_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c += 1
         self.attributes_box.Add(self.angle_b_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # Angle C
         r += 1
         c = 0
         self.attributes_box.Add(self.angle_c_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c += 1
         self.attributes_box.Add(self.angle_c_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # Earth Field
         r += 1
         c = 0
         self.attributes_box.Add(self.earth_field_text, pos=(r, c), span=(1, 1),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c += 1
         self.attributes_box.Add(self.earth_field_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # XY NODES
         r += 1
         c = 0
         self.attributes_box.Add(self.node_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # X NODE
         r += 1
         c = 0
         self.attributes_box.Add(self.x_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c = + 1
         self.attributes_box.Add(self.x_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # Y NODE
         r += 1
         c = 0
         self.attributes_box.Add(self.y_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
         c = + 1
         self.attributes_box.Add(self.y_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND | wx.ALL,
-                                border=5)
+                                border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # SET BUTTON
         r += 1
         c = 0
         self.attributes_box.Add(self.node_set_button, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | 
-                                wx.EXPAND | wx.ALL, border=5)
+                                wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
         self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND |
-                                wx.ALL, border=5)
+                                wx.ALL, border=1)
 
         # LABEL TEXT SIZE
         r += 1
         c = 0
         self.attributes_box.Add(self.text_size_text, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER |
-                                wx.EXPAND | wx.ALL, border=5)
+                                wx.EXPAND | wx.ALL, border=1)
         r += 1
         c = 0
         self.attributes_box.Add(self.text_size_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER |
-                                wx.EXPAND | wx.ALL, border=5)
+                                wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=5)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # DENSITY SCALE BAR
         # self.attr_box.Add(self.cb1, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
