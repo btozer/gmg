@@ -176,17 +176,17 @@ class Gmg(wx.Frame):
         # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND 
         # FAULT TREE CONTROL
         self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, 
-                                            size=(200, 1000), 
+                                            size=(225, 1000), 
                                             style=wx.SP_NOBORDER)
 
         # CREATE FOLDPANELBAR FOR ATTRIBUTE CONTROLS
         self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, 
-                                                    size=(200, 1000),
+                                                    size=(225, 1000),
                                                     agwStyle=fpb.FPB_VERTICAL)
 
         # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
         self.scrolled_window_item1 = wx.ScrolledWindow(
-            self.controls_fold_panel, wx.ID_ANY, size=(200, 400), 
+            self.controls_fold_panel, wx.ID_ANY, size=(225, 400), 
             style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
 
         self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel(
@@ -197,7 +197,7 @@ class Gmg(wx.Frame):
 
        # SECOND PANE; LEFT PANEL (=LAYERS) ------------------------------------------------------------
         # GREY wx PANEL
-        self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(200, 300),
+        self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(225, 300),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
                                                          wx.EXPAND)
         
@@ -211,7 +211,7 @@ class Gmg(wx.Frame):
 
         # THIRD PANE; LEFT PANEL (=FAULTS) -------------------------------------------------------------
         # GREY wx PANEL
-        self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(200, 300),
+        self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(225, 300),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
                                                          wx.EXPAND)
         
@@ -230,10 +230,10 @@ class Gmg(wx.Frame):
         self.scrolled_window_item3.SetScrollbar(1, 1, 10, 10)
 
         # CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)
-        self.rightPanel = wx.Panel(self, -1, size=(1700, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
+        self.rightPanel = wx.Panel(self, -1, size=(1600, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
 
         # CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)
-        self.ConsolePanel = wx.Panel(self, -1, size=(1700, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
+        self.ConsolePanel = wx.Panel(self, -1, size=(1600, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
         intro = "###############################################################\r" \
                 "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
                 "ctrl+up FOR COMMAND HISTORY                                    \r" \
@@ -1137,32 +1137,32 @@ class Gmg(wx.Frame):
 
         # LINE SEP
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # DENSITY
         r += 1
         self.attributes_box.Add(self.density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
         c += 1
-        self.attributes_box.Add(self.density_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(self.density_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c += 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # REFERENCE DENSITY
         r += 1
         c = 0
         self.attributes_box.Add(self.ref_density_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
         c += 1
-        self.attributes_box.Add(self.ref_density_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(self.ref_density_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # SUSCEPTIBILITY
         r += 1
@@ -1170,7 +1170,7 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.susceptibility_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c += 1
-        self.attributes_box.Add(self.susceptibility_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.susceptibility_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
 
         # ANGLE A
@@ -1179,7 +1179,7 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.angle_a_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c += 1
-        self.attributes_box.Add(self.angle_a_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.angle_a_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
 
         # ANGLE B
@@ -1188,7 +1188,7 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.angle_b_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c += 1
-        self.attributes_box.Add(self.angle_b_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.angle_b_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
 
         # Angle C
@@ -1197,7 +1197,7 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.angle_c_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c += 1
-        self.attributes_box.Add(self.angle_c_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.angle_c_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
 
         # Earth Field
@@ -1206,14 +1206,14 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.earth_field_text, pos=(r, c), span=(1, 1),flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c += 1
-        self.attributes_box.Add(self.earth_field_input, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.earth_field_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # XY NODES
         r += 1
@@ -1225,7 +1225,7 @@ class Gmg(wx.Frame):
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # X NODE
         r += 1
@@ -1233,7 +1233,7 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.x_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c = + 1
-        self.attributes_box.Add(self.x_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.x_input, pos=(r, c), span=(1, 5), flag=wx.EXPAND | wx.ALL,
                                 border=1)
 
         # Y NODE
@@ -1242,43 +1242,43 @@ class Gmg(wx.Frame):
         self.attributes_box.Add(self.y_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
         c = + 1
-        self.attributes_box.Add(self.y_input, pos=(r, c), span=(1, 1), flag=wx.EXPAND | wx.ALL,
+        self.attributes_box.Add(self.y_input, pos=(r, c), span=(1, 5), flag=wx.EXPAND | wx.ALL,
                                 border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # SET BUTTON
         r += 1
         c = 0
-        self.attributes_box.Add(self.node_set_button, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | 
+        self.attributes_box.Add(self.node_set_button, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | 
                                 wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND |
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND |
                                 wx.ALL, border=1)
 
         # LABEL TEXT SIZE
         r += 1
         c = 0
-        self.attributes_box.Add(self.text_size_text, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER |
+        self.attributes_box.Add(self.text_size_text, pos=(r, c), span=(1, 5), flag=wx.ALIGN_CENTER |
                                 wx.EXPAND | wx.ALL, border=1)
         r += 1
         c = 0
-        self.attributes_box.Add(self.text_size_input, pos=(r, c), span=(1, 2), flag=wx.ALIGN_CENTER |
+        self.attributes_box.Add(self.text_size_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_CENTER |
                                 wx.EXPAND | wx.ALL, border=1)
 
         # LINE SEP
         r += 1
         c = 0
         line = wx.StaticLine(self.fold_panel_item1)
-        self.attributes_box.Add(line, pos=(r, c), span=(1, 2), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
 
         # DENSITY SCALE BAR
         # self.attr_box.Add(self.cb1, 0, wx.ALL | wx.LEFT | wx.EXPAND, 5)
