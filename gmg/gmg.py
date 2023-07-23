@@ -176,17 +176,17 @@ class Gmg(wx.Frame):
         # CREATE PANELS TO FILL WITH ATTRIBUTE CONTROLS, LAYER TREE CONTROL AND 
         # FAULT TREE CONTROL
         self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, 
-                                            size=(225, 1000), 
+                                            size=(235, 1000), 
                                             style=wx.SP_NOBORDER)
 
         # CREATE FOLDPANELBAR FOR ATTRIBUTE CONTROLS
         self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, 
-                                                    size=(225, 1000),
+                                                    size=(235, 1000),
                                                     agwStyle=fpb.FPB_VERTICAL)
 
         # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
         self.scrolled_window_item1 = wx.ScrolledWindow(
-            self.controls_fold_panel, wx.ID_ANY, size=(225, 400), 
+            self.controls_fold_panel, wx.ID_ANY, size=(235, 400), 
             style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
 
         self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel(
@@ -197,7 +197,7 @@ class Gmg(wx.Frame):
 
        # SECOND PANE; LEFT PANEL (=LAYERS) ------------------------------------------------------------
         # GREY wx PANEL
-        self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(225, 300),
+        self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(235, 300),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
                                                          wx.EXPAND)
         
@@ -211,7 +211,7 @@ class Gmg(wx.Frame):
 
         # THIRD PANE; LEFT PANEL (=FAULTS) -------------------------------------------------------------
         # GREY wx PANEL
-        self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(225, 300),
+        self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(235, 300),
                                                          style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
                                                          wx.EXPAND)
         
