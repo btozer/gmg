@@ -647,7 +647,7 @@ class AttributeEditor(wx.Frame):
     """OPENS A TABLE FOR VIEWING AND EDITING LABEL ATTRIBUTES"""
 
     def __init__(self, parent, id, title, tree_items, layer_list):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 'Attribute editor', size=(720, 500))
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'Attribute editor', size=(900, 500))
         self.input_panel = wx.Panel(self)
 
         # CREATE INSTANCE OF MAIN FRAME CLASS TO RECEIVE NEW ATTRIBUTES
@@ -658,7 +658,7 @@ class AttributeEditor(wx.Frame):
         self.layer_list = layer_list
 
         # DEFINE ATTRIBUTE GRID
-        self.attr_grid = gridlib.Grid(self.input_panel, -1, size=(719, 499))
+        self.attr_grid = gridlib.Grid(self.input_panel, -1, size=(800, 500))
         self.attr_grid.CreateGrid(len(self.tree_items) - 1, 9)
         self.attr_grid.SetColLabelValue(0, 'Layer Name')
         self.attr_grid.SetColLabelValue(1, 'Density')
