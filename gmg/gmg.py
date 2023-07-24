@@ -1087,7 +1087,7 @@ class Gmg(wx.Frame):
         self.tree = ct.CustomTreeCtrl(self.fold_panel_item2, -1, size=(200, 280),
                                       agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_ROW_LINES |
                                       wx.TR_HIDE_ROOT | wx.EXPAND | wx.ALL | wx.ALIGN_LEFT)
-        self.tree.SetIndent(0.0)
+        self.tree.SetIndent(0)
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_layer_activated, self.tree)
         self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.on_tree_right_click_down, self.tree)
 
@@ -1101,7 +1101,7 @@ class Gmg(wx.Frame):
         self.fault_tree = ct.CustomTreeCtrl(self.fold_panel_item3, -1, size=(200, 280),
                                             agwStyle=wx.TR_DEFAULT_STYLE | wx.TR_ROW_LINES |
                                               wx.TR_HIDE_ROOT | wx.EXPAND | wx.ALL | wx.ALIGN_LEFT)
-        self.fault_tree.SetIndent(0.0)
+        self.fault_tree.SetIndent(0)
         self.fault_tree.SetPosition([0, 20])
         self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.on_fault_activated, self.fault_tree)
         self.Bind(wx.EVT_TREE_ITEM_RIGHT_CLICK, self.on_fault_tree_right_click_down, self.fault_tree)
@@ -1750,6 +1750,12 @@ class Gmg(wx.Frame):
             xp = np.arange(new_x1 - self.calc_padding, new_x2 + self.calc_padding, xp_inc)
             zp = np.zeros_like(xp)
             self.start(area, xp, zp)
+
+            ## UPDATE LEFT PANEL (TO INIT ON LINUX)
+            self.mgr.GetPaneByName('left').Hide()
+            self.mgr.Update()
+            self.mgr.GetPaneByName('left').Show()
+            self.mgr.Update()
         else:
             self.newmodel = False
             return  # THE USER CHANGED THERE MIND
