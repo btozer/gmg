@@ -44,7 +44,6 @@ Key features
 
 * Import and display observed topography, gravity and magnetic 2D profile data.
 * Apply filters to observed data.
-* Import and display seismic reflection data.
 * Add and manipulate model layers (subsurface bodies) using a simple interactive interface.
 * “Pinch out/snap” layers against adjacent layers.
 * Calculate the predicted gravity anomaly produced by any combination of model layers.
@@ -52,6 +51,7 @@ Key features
 * Model magnetic anomalies using induced and/or remanent magnetism.
 * Display well horizon tops.
 * Display XY data (e.g., earthquake hypocenters, geological surface contacts or rays from a auxiliary velocity model).
+* Import and display seismic reflection data.
 * Export model data (e.g., predicted anomalies and layer geometries) as ASCII text files.
 * Save model figures as vector or raster graphics in various formats (.png .ps .eps .pdf).
 
