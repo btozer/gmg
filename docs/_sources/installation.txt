@@ -8,33 +8,36 @@ Pre-Installation
 
 .. note::
 
-    GMG is written in Python 3. 
+    gmg is written in Python 3 and can be installing using common python package managers 
+    conda (highly recommended) or pip. Installation and launching of the software involves 
+    use of a command line terminal, but this is minimal and should be manageable for a non-expert
+    by following the instructions below. 
 
 **Step 1: Install Miniforge**
 
-The simplest way to install GMG is to first install Miniforge (a minimal installer for `Conda <http://docs.conda.io/en/latest/>`_
+If you don't aleady use miniforge or anaconda for managing and installing python packages, then 
+the simplest way to install gmg is to first install Miniforge (a minimal installer for `Conda <http://docs.conda.io/en/latest/>`_
 specifically for `conda-forge <http://conda-forge.org>`_).
 
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
 package manager.
 
-**Step 2: Create a new python environment for gmg**
+**Step 2: Create a new conda environment for gmg**
 
-It may be useful to create a new conda environment to use when running GMG. This will avoid any potential conflicts 
-with your current system configuration. e.g.::
+It's best to create a new conda environment to use when running GMG. This will avoid any potential conflicts. e.g.::
 
-    conda create -n gmg
+    conda create -n gmgpy
 
 Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
 but the documentation will use the name gmg-env).
 
 On macOS and Linux this environment can then be activated using::
 
-    conda activate gmg
+    conda activate gmgpy
 
 Or on Windows use::
 
-    activate gmg
+    activate gmgpy
 
 Once the environment is activated any call to python will only "see" the packages install within the gmg-env
 environment. To deactivate the environment either close the terminal window or on macOS and Linux run::
@@ -47,80 +50,54 @@ Or on Windows use::
 
 **OS Support:**
 
-GMG is currently only tested on macOS Monterey and Ubuntu 22.04 Linux operating systems. It is possible
+GMG is currently only tested on macOS Monterey, Ubuntu 22.04 Linux and Windows 11 operating systems. It is possible
 that issues may arise when trying to install on other distributions. Please raise any information regarding
 installation problems on github.
 
 Installing gmg
 --------------
 
-**Step 1:**
+THe gmg package is hosted on both conda-forge and PyPi (pip). It is highly recommended that
+you install gmg in a standalone conda environment using option 1 below. This is ensure
+you do not create any dependencies issues that may arise if you install system-wide using pip.
 
-Ensure your gmg-env environment is active, on macOS or Linux use::
+First, ensure your gmgpy conda environment is active. On macOS or Linux use::
 
-    source activate gmg-env
+    source activate gmgpy
 
 Or on Windows use::
 
-    activate gmg-env
+    activate gmgpy
 
-**Step 2: Download gmg**
+**Installation option 1: using conda (highly recommended)**
 
-Download or "git clone" the gmg github repository.
+    conda install gmgpy
 
-*Option 1. Download:*
+**Installation option 2: using pip**
 
-In your browser, navigate to::
-
-    https://github.com/btozer/gmg
-
-Use the green **clone or download** button on the right hand side of the page to download a .zip of gmg. Unzip this
-directory.
-
-*Option 2. git clone:*
-
-If you have git installed, simply use git on the command line::
-
-    git clone https://github.com/btozer/gmg.git
-
-This will create a copy of the GMG repository in the current working directory.
-
-**Step 3: Install  gmg**
-
-Run the following command in the gmg/ root directory (which contains the script **setup.py**)::
-
-    pip install .
-
-This will install gmg within your local anaconda python site-packages dir.
-
+    pip install gmgpy
 
 Launching gmg
 -------------
 
-To start gmg, the best way is to create an alias within your .bashrc or equivalent file
-(e.g. .bash_profile, .bashrc, .zshrc or .cshrc) e.g.::
+after installation, make sure you are using a terminal with your gmgpy environment active 
+(i.e., conda activate gmgpy), then, gmg can be launched from your terminal command line using::
 
-    vi .bashrc
-
-and then add the line::
-
-    alias gmg='python ~/anaconda3/envs/gmg-env/lib/python3.7/site-packages/gmg/gmg.py'
-
-NB. for macOS users you may need to invoke pythonw instead of python if you receive the message::
-
-    This program needs access to the screen. Please run with a
-    Framework build of python, and only when you are logged in
-    on the main display of your Mac.
-
-i.e.::
-
-    alias gmg='pythonw ~/anaconda3/envs/gmg-env/lib/python3.7/site-packages/gmg/gmg.py'
-
-Now, in a fresh terminal, simple type "gmg" on the command line to launch the software::
-
-    gmg
-
+    gmgpy
+ 
 The splash screen and model shell should appear as shown below:
 
 .. figure:: _static/gmg_splash_screen.png
     :name: gmg_splash_screen
+
+Tutorial and demo data
+----------------------
+
+Gmg ships with a tutorial dataset and benchmark demo models. If you installed gmg using the recommended miniforge 
+approach as outlined above, then the gmg package directory is likely located in a path similar to::
+
+    /Users/**username**/miniforge3/envs/gmgpy/lib/python3.**X**/site-packages/gmgpy
+
+Within this directory are the two subdirectories demos/ and tutorial/. These can be copied or moved to another
+location on your system or accessed from gmgpy directory when required. 
+
