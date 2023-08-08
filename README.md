@@ -69,7 +69,7 @@ by following the instructions below.
 **Step 1: Install Miniforge**
 
 If you don't aleady use miniforge or anaconda for managing and installing python packages, then 
-the simplest way to install gmg is to first install Miniforge (a minimal installer for [Conda](<http://docs.conda.io/en/latest/)
+the simplest way to install gmg is to first install Miniforge (a minimal installer for [Conda](http://docs.conda.io/en/latest/)
 specifically for [conda-forge](http://conda-forge.org).
 
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
