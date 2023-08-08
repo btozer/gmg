@@ -4,7 +4,7 @@
 [Visit the GMG documentation page](https://btozer.github.io/gmg/)
 ---
 <p align="center">
-<a href="https://pypi.python.org/pypi/gmgpy">
+<a href="https://test.pypi.org/project/gmgpy/">
 <img
 src="http://img.shields.io/pypi/v/gmgpy.svg?style=flat-square"
 alt="Latest version on PyPI"
