@@ -145,8 +145,9 @@ Tutorial and demo data
 
 Gmg ships with a tutorial dataset and benchmark demo models. If you installed gmg using the recommended miniforge 
 approach as outlined above, then the gmg package directory is likely located in a path similar to::
-
-    /Users/<username>/miniforge3/envs/gmgpy/lib/python3.<X>/site-packages/gmgpy
+    <pre>
+    /Users/<strong>username</strong>/miniforge3/envs/gmgpy/lib/python3.<strong>X</strong>/site-packages/gmgpy
+    </pre>
 
 Within this directory are the two subdirectories demos/ and tutorial/. These can be copied or moved to another
 location on your system or accessed from gmgpy directory when required. 
@@ -154,14 +155,10 @@ location on your system or accessed from gmgpy directory when required.
 Getting started
 ---------------
 
-The best way to get started is to read through the Manual and then work your way through the Tutorial. 
-These can be found by launching gmg and then navigating to:
+The best way to get started is to read through the [Manual](https://btozer.github.io/gmg/html/manual.html) and then work your way through the [Tutorial](https://btozer.github.io/gmg/html/tutorial.html). 
+These can also be found by launching gmg and then navigating to:
 
     Help -> Documentation
-
-or by opening:
-    
-    "PATH_TO_GMG"/gmg/docs/_build/html/gmg_documentation.html
 
 Contributing
 ------------
@@ -172,22 +169,22 @@ Any contribution, big or small is welcome. Examples include:
 2. Improving the user interface.
 3. Submitting bug reports and spelling corrections.
 
-They are all helpful.
+They are all helpful!
 
 **Becoming a developer**
 
-The best way to become a developer is to create a folk of the github repository.
-Please see the documentation for details.
+The best way to become a developer is to create a folk of the github repository. You can then send a pull request once you are satisfied you want to share your modifications.
 
 **Suggestions & bug reporting**
 
-The best way to open a bug report is to raise an issue on Github.
+The best way to make a suggestion or open a bug report is to raise an issue on Github.
 
 Please use the subject line:
     
+    GMG suggestion: "short suggestion description"
     GMG bug report: "short bug description"
 
-and include as much detail as possible when describing the bug.
+Please include as much detail as possible when describing the bug.
 
 Citing:
 -------
