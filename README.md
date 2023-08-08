@@ -3,8 +3,6 @@
 ---
 [Visit the GMG documentation page](https://btozer.github.io/gmg/)
 ---
-
-|PyPI| |Affiliated package| |Coverage Status| |Build status|
 <p align="center">
 <a href="https://pypi.python.org/pypi/gmgpy">
 <img
@@ -12,9 +10,9 @@ src="http://img.shields.io/pypi/v/gmgpy.svg?style=flat-square"
 alt="Latest version on PyPI"
 />
 </a>
-<a href="https://github.com/conda-forge/pygmg-feedstock">
+<a href="https://github.com/conda-forge/gmgpy-feedstock">
 <img
-src="https://img.shields.io/conda/vn/conda-forge/pygmg.svg?style=flat-square"
+src="https://img.shields.io/conda/vn/conda-forge/gmgpy.svg?style=flat-square"
 alt="Latest version on conda-forge"
 />
 </a>
@@ -71,8 +69,8 @@ by following the instructions below.
 **Step 1: Install Miniforge**
 
 If you don't aleady use miniforge or anaconda for managing and installing python packages, then 
-the simplest way to install gmg is to first install Miniforge (a minimal installer for `Conda <http://docs.conda.io/en/latest/>`_
-specifically for `conda-forge <http://conda-forge.org>`_).
+the simplest way to install gmg is to first install Miniforge (a minimal installer for [Conda](<http://docs.conda.io/en/latest/)
+specifically for [conda-forge](http://conda-forge.org).
 
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
 package manager.
@@ -140,10 +138,7 @@ after installation, make sure you are using a terminal with your gmgpy environme
 
     gmgpy
  
-The splash screen and model shell should appear as shown below:
-
-.. figure:: _static/gmg_splash_screen.png
-    :name: gmg_splash_screen
+The splash screen and gmg model shell should appear. YOu can now begin using the software.
 
 Tutorial and demo data
 ----------------------
@@ -151,7 +146,7 @@ Tutorial and demo data
 Gmg ships with a tutorial dataset and benchmark demo models. If you installed gmg using the recommended miniforge 
 approach as outlined above, then the gmg package directory is likely located in a path similar to::
 
-    /Users/**username**/miniforge3/envs/gmgpy/lib/python3.**X**/site-packages/gmgpy
+    /Users/<username>/miniforge3/envs/gmgpy/lib/python3.<X>/site-packages/gmgpy
 
 Within this directory are the two subdirectories demos/ and tutorial/. These can be copied or moved to another
 location on your system or accessed from gmgpy directory when required. 
