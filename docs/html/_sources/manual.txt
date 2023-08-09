@@ -20,6 +20,7 @@
    manual_python_console
    manual_coordinate_capture
    manual_export_figure
+   manual_benchmark_examples
    manual_gravity_algorithm
    manual_magnetic_algorithm
    z_bibliography

@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>6.0 Well Data &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>13.0 Benchmark examples &mdash; GMG: An open source geophysical modelling GUI</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -21,8 +21,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="7.0 XY data" href="manual_XY_data.html" />
-    <link rel="prev" title="5.0 SEGY data" href="manual_segy.html" />
+    <link rel="next" title="A1 Bott (1969) 2D gravity algorithm" href="manual_gravity_algorithm.html" />
+    <link rel="prev" title="12.0 Export figure" href="manual_export_figure.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -65,17 +65,18 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_layer_attributes.html"><strong>3.0 Layer attributes</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_PF.html"><strong>4.0 Potential field data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_segy.html"><strong>5.0 SEGY data</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>6.0 Well Data</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#loading-well-data"><strong>6.1 Loading well data</strong></a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="manual_wells.html"><strong>6.0 Well Data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_XY_data.html"><strong>7.0 XY data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_geology.html"><strong>8.0 Geologic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_attribute_table.html"><strong>9.0 Attribute table</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="manual_benchmark_examples.html"><strong>13.0 Benchmark examples</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>13.0 Benchmark examples</strong></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gravity-benchmark">13.1 Gravity benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#magnetic-benchmark">13.2 Magnetic benchmark</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_magnetic_algorithm.html"><strong>A2 Talwani and Heirtzler (1964) magnetic algorithm</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
@@ -106,9 +107,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="manual.html"><strong>Manual</strong></a></li>
-      <li class="breadcrumb-item active"><strong>6.0 Well Data</strong></li>
+      <li class="breadcrumb-item active"><strong>13.0 Benchmark examples</strong></li>
       <li class="wy-breadcrumbs-aside">
-              <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_wells.txt" class="fa fa-github"> Edit on GitHub</a>
+              <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_benchmark_examples.txt" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -116,29 +117,24 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="well-data">
-<h1><strong>6.0 Well Data</strong><a class="headerlink" href="#well-data" title="Permalink to this heading"></a></h1>
-<section id="loading-well-data">
-<h2><strong>6.1 Loading well data</strong><a class="headerlink" href="#loading-well-data" title="Permalink to this heading"></a></h2>
-<p>To load a well (borehole) record select the <em>Well</em> menu in the Menubar and select <em>Load…*</em> Or select the load well icon.
-Then, navigate to the file containing the well record to load.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>These files should be ASCII text files formatted as shown in the example below file. The header
-can contain any user defined metadata. This example includes the well coordinates and elevation.
-The record then contains the elevation of the well top, X position in model coordinates and then
-the horizon names and depths. Note the unit used for elevation and horizon depths must be km
-(same as the model frame).</p>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span># HEADER: easting=393756 northing=542789 elevation(Ordnance Datum)=1058.92ft=322.758816m
-elevation: -0.32276
-x_position: 21.789
-Granite 0.06724
-Well_Bottom 0.48525
+  <section id="benchmark-examples">
+<span id="manual-benchmark-examples"></span><h1><strong>13.0 Benchmark examples</strong><a class="headerlink" href="#benchmark-examples" title="Permalink to this heading"></a></h1>
+<p>To test the potential field algorithms employed within gmg, two benchmark models are
+provided for comparison with the analytical solutions for simple two dimensional shapes.</p>
+<section id="gravity-benchmark">
+<h2>13.1 Gravity benchmark<a class="headerlink" href="#gravity-benchmark" title="Permalink to this heading"></a></h2>
+<p>Please see <a class="reference internal" href="manual_gravity_algorithm.html"><span class="doc">A1</span></a> for details regarding the 2D gravity anomaly algorithm
+used within gmg. The example shown in this description can be replicated by the user using
+the files:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>grav_cylinder_node.txt  - Nodes representing the diameter of a buried cylinder
+grav_cylinder_analytical_anomaly.xa   - THe predicted anomaly from this cylinder, given a density contrast of 250 kg m^-3
 </pre></div>
 </div>
-<p>Once the well record is load into the model, you can increase and decrease the label text size using the slider in the
-left hand menu. Each well can be hidden/shown by selecting the well name under <em>Well…</em> in the <em>Wells</em> menu.</p>
+</section>
+<section id="magnetic-benchmark">
+<h2>13.2 Magnetic benchmark<a class="headerlink" href="#magnetic-benchmark" title="Permalink to this heading"></a></h2>
+<p>magnetic_cylinder_node.txt
+magnetic_cylinder_analytical_anomaly.xa</p>
 </section>
 </section>
 
@@ -146,8 +142,8 @@ left hand menu. Each well can be hidden/shown by selecting the well name under <
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="manual_segy.html" class="btn btn-neutral float-left" title="5.0 SEGY data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="manual_XY_data.html" class="btn btn-neutral float-right" title="7.0 XY data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="manual_export_figure.html" class="btn btn-neutral float-left" title="12.0 Export figure" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manual_gravity_algorithm.html" class="btn btn-neutral float-right" title="A1 Bott (1969) 2D gravity algorithm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

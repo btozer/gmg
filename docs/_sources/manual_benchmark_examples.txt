@@ -1,0 +1,23 @@
+.. _manual_benchmark_examples:
+
+**13.0 Benchmark examples**
+===========================
+
+To test the potential field algorithms employed within gmg, two benchmark models are 
+provided for comparison with the analytical solutions for simple two dimensional shapes.
+
+13.1 Gravity benchmark
+----------------------
+
+Please see :doc:`A1 <manual_gravity_algorithm>` for details regarding the 2D gravity anomaly algorithm
+used within gmg. The example shown in this description can be replicated by the user using
+the files::
+
+    grav_cylinder_node.txt  - Nodes representing the diameter of a buried cylinder
+    grav_cylinder_analytical_anomaly.xa   - THe predicted anomaly from this cylinder, given a density contrast of 250 kg m^-3
+
+13.2 Magnetic benchmark
+-----------------------
+
+magnetic_cylinder_node.txt
+magnetic_cylinder_analytical_anomaly.xa

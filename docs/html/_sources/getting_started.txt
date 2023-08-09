@@ -3,5 +3,14 @@
 **Getting Started**
 ====================
 
+Gmg ships with a tutorial dataset and benchmark demo models. If you installed gmg using the recommended miniforge 
+approach as outlined above, then the gmg package directory is likely located in a path similar to::
+
+    /Users/**username**/miniforge3/envs/gmgpy/lib/python3.**X**/site-packages/gmgpy
+
+Within this directory are the two subdirectories demos/ and tutorial/. These can be copied or moved to another
+location on your system or accessed from gmgpy directory when required. 
+
+
 The best way to get started is to read through the :ref:`Manual <manual>` and then work your way through the
 :ref:`Tutorial <tutorial>`.
