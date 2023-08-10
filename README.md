@@ -33,9 +33,9 @@ Data I/O is made as simple as possible using space delimited ASCII text files.
 
 The project was instigated after failing to find an adequate open-source option
 (in which the source code can be viewed and modified by the user) for performing 2D 
-geophysical modeling tasks. Inspiration came from fatiando a terra and GMT.
+geophysical modeling tasks. Inspiration came from [Fatiando a Terra](https://www.fatiando.org/) and [GMT](https://www.generic-mapping-tools.org/).
 
-**NB: GMG is in development. Some documentation is incomplete and some features may not work as expected.**
+**NB: GMG is in development. Some documentation is incomplete and some features may not work as expected. If you experience any issues, please feel free to raise these on the issue tracker.**
 
 Key features
 ------------
@@ -70,21 +70,21 @@ by following the instructions below.
 
 If you don't aleady use miniforge or anaconda for managing and installing python packages, then 
 the simplest way to install gmg is to first install Miniforge (a minimal installer for [Conda](http://docs.conda.io/en/latest/)
-specifically for [conda-forge](http://conda-forge.org).
+specifically for [conda-forge](http://conda-forge.org)).
 
 This should ensure you can install all the dependencies required on any platform (Linux, Mac, Windows) using the Conda
 package manager.
 
 **Step 2: Create a new conda environment for gmg**
 
-It's best to create a new conda environment to use when running GMG. This will avoid any potential conflicts. e.g.::
+It's best to create a new conda environment to use when running GMG. This will avoid any potential conflicts. e.g.:
 
     conda create -n gmgpy
 
 Where the -n flag dictates what you want to name the new environment (you can call the environment whatever you like
 but the documentation will use the name gmg-env).
 
-On macOS and Linux this environment can then be activated using::
+On macOS and Linux this environment can then be activated using:
 
     conda activate gmgpy
 
@@ -93,11 +93,11 @@ Or on Windows use::
     activate gmgpy
 
 Once the environment is activated any call to python will only "see" the packages install within the gmg-env
-environment. To deactivate the environment either close the terminal window or on macOS and Linux run::
+environment. To deactivate the environment either close the terminal window or on macOS and Linux run:
 
     conda deactivate
 
-Or on Windows use::
+Or on Windows use:
 
     deactivate
 
@@ -110,15 +110,17 @@ installation problems on github.
 Installing gmg
 --------------
 
+**NB: conda-forge and pip packages are currently in development**
+
 THe gmg package is hosted on both conda-forge and PyPi (pip). It is highly recommended that
 you install gmg in a standalone conda environment using option 1 below. This is ensure
 you do not create any dependencies issues that may arise if you install system-wide using pip.
 
-First, ensure your gmgpy conda environment is active. On macOS or Linux use::
+First, ensure your gmgpy conda environment is active. On macOS or Linux use:
 
     source activate gmgpy
 
-Or on Windows use::
+Or on Windows use:
 
     activate gmgpy
 
@@ -134,7 +136,7 @@ Launching gmg
 -------------
 
 after installation, make sure you are using a terminal with your gmgpy environment active 
-(i.e., conda activate gmgpy), then, gmg can be launched from your terminal command line using::
+(i.e., conda activate gmgpy), then, gmg can be launched from your terminal command line using:
 
     gmgpy
  
@@ -144,7 +146,7 @@ Tutorial and demo data
 ----------------------
 
 Gmg ships with a tutorial dataset and benchmark demo models. If you installed gmg using the recommended miniforge 
-approach as outlined above, then the gmg package directory is likely located in a path similar to::
+approach as outlined above, then the gmg package directory is likely located in a path similar to:
     <pre>
     /Users/<strong>username</strong>/miniforge3/envs/gmgpy/lib/python3.<strong>X</strong>/site-packages/gmgpy
     </pre>
@@ -155,7 +157,7 @@ location on your system or accessed from gmgpy directory when required.
 Getting started
 ---------------
 
-The best way to get started is to read through the [Manual](https://btozer.github.io/gmg/html/manual.html) and then work your way through the [Tutorial](https://btozer.github.io/gmg/html/tutorial.html). 
+The best way to get started is to read through the [Documentation](https://btozer.github.io/gmg/) starting with the [Manual](https://btozer.github.io/gmg/html/manual.html) and then work your way through the [Tutorial](https://btozer.github.io/gmg/html/tutorial.html). 
 These can also be found by launching gmg and then navigating to:
 
     Help -> Documentation
@@ -186,7 +188,7 @@ Please use the subject line:
 
 Please include as much detail as possible when describing the bug.
 
-Citing:
--------
+Citing
+------
 
 If you use GMG, please cite this github repository.
