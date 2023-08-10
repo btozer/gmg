@@ -4,18 +4,18 @@
 **2.0 Pre-modelling data processing and considerations**
 ========================================================
 
-As we are interested in modelling the structure of the Weardale granite, important preprocessing steps 
-prior to forward modelling the gravity and magnetic anomalies is to consider other factors contributing to 
-the total field anomalies.
+As we are interested in modelling the structure of the Weardale granite, there are some important pre-modelling steps that
+we need to consider prior to forward modelling the gravity and magnetic anomalies. These relate to how we deal with 
+other factors (other than the granite) that are contributing to the observed total field anomalies.
 
-One common preprocessing step when working with potential field data for near-surface structure modeling is to separate the 
-"regional" component of the anomaly from the overall anomaly. This separation helps eliminate the contribution from the 
-longer wavelength regional signal, which can originate from the juxtaposition of different basement terranes, for instance. 
-These regional anomalies, resulting from deep sources, possess much longer wavelengths compared to the anomalies associated 
-with our target structure, which resides in the upper crust.
+A preprocessing step that is commonly applied when focused on modelling near-surface structure, is to separate the 
+"regional" component of the anomaly from the total anomaly. This separation aims to eliminate the contribution from the 
+longer wavelength, regional signal, which can originate, for example, from the juxtaposition of different basement terranes. 
+Typically, these regional anomalies, caused by deep sources, produce much longer wavelength anomalies compared to those associated 
+with near-surface features.
 
-By performing this separation, we can focus specifically on the anomalies produced by our target structure, 
-which will aid in generating a more accurate model.
+By performing a regional-residual separation, we can focus specifically on the anomalies produced by our target structure. This 
+will aid in generating a more accurate model.
 
 ===================================================
 *2.1 Gravity anomaly: regional/residual separation*
