@@ -110,9 +110,9 @@ installation problems on github.
 Installing gmg
 --------------
 
-**NB: conda-forge and pip packages are currently in development**
+**NB: conda-forge and pip packages are currently in development and not yet deployed**
 
-THe gmg package is hosted on both conda-forge and PyPi (pip). It is highly recommended that
+The gmg package is hosted on both conda-forge and PyPi (pip). It is highly recommended that
 you install gmg in a standalone conda environment using option 1 below. This is ensure
 you do not create any dependencies issues that may arise if you install system-wide using pip.
 
