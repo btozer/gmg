@@ -5560,9 +5560,9 @@ class Gmg(wx.Frame):
                 if self.observed_gravity_list[i].name == selection.obs_name:
                     self.obs_gravity_data_for_rms = self.observed_gravity_list[i].data
 
-        # REFRESH THE MODEL
+        # UPDATE GMG
+        self.run_algorithms()
         self.update_layer_data()
-        self.draw()
 
     def set_obs_vgg_rms(self, value):
         """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
@@ -5574,6 +5574,10 @@ class Gmg(wx.Frame):
                 if self.observed_vgg_list[i].name == selection.obs_name:
                     self.obs_vgg_data_for_rms = self.observed_vgg_list[i].data
 
+        # UPDATE GMG
+        self.run_algorithms()
+        self.update_layer_data()
+
     def set_obs_mag_rms(self, value):
         """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
         selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_magnetic_list)
@@ -5583,6 +5587,10 @@ class Gmg(wx.Frame):
                 if self.observed_magnetic_list[i].name == selection.obs_name:
                     self.obs_mag_data_for_rms = self.observed_magnetic_list[i].data
 
+        # UPDATE GMG
+        self.run_algorithms()
+        self.update_layer_data()
+        
     def model_rms(self, xp):
         """CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
         # GRAVITY RMS
