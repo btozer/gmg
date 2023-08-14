@@ -5560,6 +5560,10 @@ class Gmg(wx.Frame):
                 if self.observed_gravity_list[i].name == selection.obs_name:
                     self.obs_gravity_data_for_rms = self.observed_gravity_list[i].data
 
+        # REFRESH THE MODEL
+        self.update_layer_data()
+        self.draw()
+
     def set_obs_vgg_rms(self, value):
         """SET THE DATA TO BE USED FOR CALCULATING THE RMS MISTFIT"""
         selection = SetObsRmsDialog(self, -1, 'Set RMS Input', self.observed_vgg_list)
