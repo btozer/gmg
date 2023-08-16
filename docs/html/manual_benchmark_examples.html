@@ -18,6 +18,7 @@
         <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -73,8 +74,9 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>13.0 Benchmark examples</strong></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#gravity-benchmark">13.1 Gravity benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#gravity-modelling-benchmark-buried-cylinder">13.1 Gravity modelling benchmark: Buried cylinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#magnetic-benchmark">13.2 Magnetic benchmark</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#summary">13.3 Summary</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="manual_gravity_algorithm.html"><strong>A1 Bott (1969) 2D gravity algorithm</strong></a></li>
@@ -121,20 +123,137 @@
 <span id="manual-benchmark-examples"></span><h1><strong>13.0 Benchmark examples</strong><a class="headerlink" href="#benchmark-examples" title="Permalink to this heading"></a></h1>
 <p>To test the potential field algorithms employed within gmg, two benchmark models are
 provided for comparison with the analytical solutions for simple two dimensional shapes.</p>
-<section id="gravity-benchmark">
-<h2>13.1 Gravity benchmark<a class="headerlink" href="#gravity-benchmark" title="Permalink to this heading"></a></h2>
+<section id="gravity-modelling-benchmark-buried-cylinder">
+<h2>13.1 Gravity modelling benchmark: Buried cylinder<a class="headerlink" href="#gravity-modelling-benchmark-buried-cylinder" title="Permalink to this heading"></a></h2>
 <p>Please see <a class="reference internal" href="manual_gravity_algorithm.html"><span class="doc">A1</span></a> for details regarding the 2D gravity anomaly algorithm
 used within gmg. The example shown in this description can be replicated by the user using
-the files:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>grav_cylinder_node.txt  - Nodes representing the diameter of a buried cylinder
-grav_cylinder_analytical_anomaly.xa   - THe predicted anomaly from this cylinder, given a density contrast of 250 kg m^-3
+the files stored in demos/GRAVITY:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>24_nodes_cylinder_layer.txt
+    - A layer with 24 nodes representing the circumference of a buried cylinder
+
+360_nodes_cylinder_layer.txt
+    - A layer with 24 nodes representing the circumference of a buried cylinder
+
+grav_cylinder_analytical_anomaly.xa
+    - The predicted anomaly from this cylinder (density contrast 250 kg m^-3)
 </pre></div>
 </div>
+<p><strong>Step 1: Create a new model</strong></p>
+<p>Once you have opened GMG create a new model by navigating to the Menubar and selecting:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>File -&gt; New model...
+</pre></div>
+</div>
+<p>In this example, we’ll create a spanning x=0 to x=50 km and z=0 to z=15 km
+and the calculation increment as 0.1 km.</p>
+<p><strong>Step 2: Load the observed gravity anomaly</strong></p>
+<p>Load the observed gravity anomaly. This was calculated using the analytical solution for a
+buried cylinder extending infinitely in the 3rd dimension (Heiland (1940) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id4" title="C.A. Heiland. Geophysical Exploration. Geology series / edited by Norman E.A. Hinds. Prentice-Hall, Incorporated, 1940.">4</a>]</span> Pg. 153).</p>
+<p>To load observed anomaly navigate to <em>Gravity</em> in the Menubar. Next, select <em>Load Gravity Anomaly</em>.
+Now, navigate to the file <em>grav_cylinder_analytical_anomaly.xa</em> and select it:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Load Gravity Anomaly -&gt; Select file to load
+</pre></div>
+</div>
+<p>Finally, give your observed anomaly a name, for example, <em>observed_anom</em>.</p>
+<p><strong>Step 3: Load a discretised representation of a buried cylinder</strong></p>
+<p>Now, load a gmg layer representation of the buried cyclinder used to calculate the observed anomaly.</p>
+<p>To load the layer, navigate to <em>Layers</em> in the Menubar. Next, select <em>Load Layer…</em>. Finally,
+navigate to the file <em>24_nodes_cylinder_layer.txt</em> and select it.</p>
+<p>The cylinder layer, consisting of 24 nodes, should appear in within your model.</p>
+<p><strong>Step 4: Set the density contrast</strong></p>
+<p>Under the right hand <em>Layer Attributes</em> window navigate to <em>density</em> and set the value as 0.25 (i.e., 250 <span class="math notranslate nohighlight">\(kg\ m^{-3}\)</span>).
+The click the <em>Set</em> button.</p>
+<p><strong>Step 5: Turn on the gravity calculator</strong></p>
+<p>In the Toolbar find the <em>G</em> button (third in from the left). This is used to switch the gravity response
+calculation on and off. Click the button and the calculated anomaly will appear in the gravity frame.</p>
+<p>Note there is a slight mismatch between the observed and calculated anomaly near the peak. This is due
+to the missing mass around the edge of the cylinder, given we have dicretised it with a series of straight lines.</p>
+<p><strong>Step 6: Calculate the root-mean-square misfit</strong></p>
+<p>In order to assess the goodness of fit between the observed and calculated anomaly, a simple root-mean-square (RMS)
+misfit may be calculated by navigating to:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Set RMS Input...
+</pre></div>
+</div>
+<p>Now, select your observed anomaly as the input file. You’ll see the RMS value, 0.1979 mGal, is now displayed in the <em>Statusbar</em>
+at the base of the modelling frame. The RMS as a function of distance along the transect will also be displayed as
+a purple line in the gravity data frame.</p>
+<p><strong>Step 7: Test the difference using a more accurate cylinder representation</strong></p>
+<p>Now, lets try loading the layer file <em>360_nodes_cylinder_layer.txt</em> in the same way we did in <strong>Step 3</strong>. Again,
+set the density contrast as 250 <span class="math notranslate nohighlight">\(kg\ m^{-3}\)</span>. Both cylinders will now be contributing to the calculated gravity
+response, so, the RMS value will be large. Try switching off the contribution from layer 1 by unchecking its tick box under the
+<em>Layers</em> window. We see now the RMS value decreases to 0.0007 mGal, much reduced relative to the previous value. This is
+because we have added most of the mass missing from the
+cylinder discretised with only 24 nodes.</p>
 </section>
 <section id="magnetic-benchmark">
 <h2>13.2 Magnetic benchmark<a class="headerlink" href="#magnetic-benchmark" title="Permalink to this heading"></a></h2>
-<p>magnetic_cylinder_node.txt
-magnetic_cylinder_analytical_anomaly.xa</p>
+<p>Please see <a class="reference internal" href="manual_magnetic_algorithm.html"><span class="doc">A2</span></a> for details regarding the 2D magnetic anomaly algorithm
+used within gmg.</p>
+<p>To benchmark the magnetic anomaly algorithm we can, similarly to as done above for the gravity algorithm, compare
+the anomaly produced by the algorithm with an analytical solution for a buried cylinder. In the case of a
+magnetic anomaly this solution is given by, for example, Sleep &amp; Fujita (1997) Pg. 223 eq. 6.45 <span id="id2">[]</span>.</p>
+<p>anomaly[i] = mc * (r**2) * ( (((x[i]-x1)**2) - z2) / (2 * ((((x[i]-x1)**2) + z2 )**2)) )  ## S&amp;F97</p>
+<div class="math notranslate nohighlight">
+\[\Delta T = \f \kappa r^2 (\x-\x+1)^2 - z^2)\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta T\)</span> is the magnetic anomaly, <span class="math notranslate nohighlight">\(r\)</span> is the radius of the cylinder, <span class="math notranslate nohighlight">\(\Delta \chi\)</span> is the</p>
+<p>The files for this comparison can be found in the directory demos/MAGNETICS. The files are as follows:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>magnetic_cylinder_analytical_anomaly.xa
+    - The predicted anomaly from this cylinder (magnetic susceptibility 0.001)
+</pre></div>
+</div>
+<p>In this example, the analytical solution was calculated using a magnetic susceptibility of 0.001.
+The Earth’s magnetic field was set as 50,000 nT, both
+magnetic declination and inclination were 0 degrees and the model profile was assumed to run North-south
+(i.e., angles A, B and C are all equal to zero).</p>
+<p><strong>Step 1: load the observed magnetic anomaly</strong></p>
+<p>We will continue with the model created for the gravity benchmark test as outlined above.</p>
+<p>To load observed magnetic anomaly, navigate to <em>Magnetics</em> in the Menubar. Next,
+select <em>Load Magnetic Anomaly…</em>.
+Now, navigate to the file <em>mag_cylinder_analytical_anomaly.xa</em> and select it:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Magnetics -&gt; Load MAgnetic Anomaly -&gt; Select file to load
+</pre></div>
+</div>
+<p>Finally, give your observed anomaly a name, for example, <em>observed_anom</em>.</p>
+<p><strong>Step 2: Set the magnetic properties for each layer</strong></p>
+<p>With layer 1 (i.e., the 24 node cylinder) selected, navigate to
+<em>Susceptibility</em> under the right hand <em>Layer Attributes</em> window and set the value as 0.001.
+Now, leave angles A, B and C as zero and set F (Earth’s field) as 50,000. Finally, click the <em>Set</em> button.</p>
+<p><strong>Step 3: Turn on the magnetic calculator</strong></p>
+<p>In the Toolbar find the <em>M</em> button (fifth in from the left). This is used to switch the magnetic response
+calculation on and off. Click the button and the calculated anomaly will appear in the magnetics frame.</p>
+<p>Note, similarly to the gravity anoamly there is a slight mismatch between the observed and calculated anomaly
+near the peak. Again, this is due to the missing mass around the edge of the cylinder,
+given we have dicretised it with a series of straight lines.</p>
+<p><strong>Step 4: Calculate the root-mean-square misfit</strong></p>
+<p>In order to assess the goodness of fit between the observed and calculated anomaly, a simple root-mean-square (RMS)
+misfit may be calculated by navigating to:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Magnetics -&gt; Set RMS Input...
+</pre></div>
+</div>
+<p>Now, select your observed anomaly as the input file. You’ll see the RMS value, 0.0445 nT, is now displayed in the <em>Statusbar</em>
+at the base of the modelling frame. The RMS as a function of distance along the transect will also be displayed as
+a purple line in the gravity data frame.</p>
+<p><strong>Step 5: Test the difference using a more accurate cylinder representation</strong></p>
+<p>Select layer 2 (i.e.,  the 360 node cylinder) and set it’s susceptibility to 0.001 and f to 50,000 nT.
+Now, switch off the contribution from layer 1 by unchecking its tick box under the <em>Layers</em> window.
+We see now the RMS value decreases to 0.0002 nT. As with the gravity anoamly, this much reduced relative
+to the previous value, as we have added most of the mass missing from the cylinder discretised with only 24 nodes.</p>
+</section>
+<section id="summary">
+<h2>13.3 Summary<a class="headerlink" href="#summary" title="Permalink to this heading"></a></h2>
+<p>These tests have demonstrated the accuracy of the gmg algorithms. The RMS values calculated for the
+gravity and magnetic anomalies are very small for the 24 node discretisation and negligible for the 360 node case.</p>
+<p>It is hoped that these tests have provided the user with a feel for the accuracy and limitations of
+the 2D algorithms incorporated within gmg (For example, the accuracy of the calculated anomaly is
+dependent on the number of nodes used) and provided a quick and easy introduction to key features within
+the software.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The algorithms used within gmg are currently 2D implementations. As such, the calculated anomalies
+assume all model layers extend infinitely in the 3rd dimension. This can result in an underestimation
+of, for example, a layers density contrast, as it’s infinite extent will result in a larger gravity
+response to that of a finite length body. Incorporating extent-limited (i.e., 2.5D) algorithms
+is a key focus of future development.</p>
+</div>
 </section>
 </section>
 
@@ -150,7 +269,7 @@ magnetic_cylinder_analytical_anomaly.xa</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on Aug 14, 2023.
+      <span class="lastupdated">Last updated on Aug 16, 2023.
       </span></p>
   </div>
 
