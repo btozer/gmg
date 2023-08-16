@@ -190,11 +190,13 @@ cylinder discretised with only 24 nodes.</p>
 used within gmg.</p>
 <p>To benchmark the magnetic anomaly algorithm we can, similarly to as done above for the gravity algorithm, compare
 the anomaly produced by the algorithm with an analytical solution for a buried cylinder. In the case of a
-magnetic anomaly this solution is given by, for example, Sleep &amp; Fujita (1997) Pg. 223 eq. 6.45 <span id="id2">[]</span>.</p>
-<p>anomaly[i] = mc * (r**2) * ( (((x[i]-x1)**2) - z2) / (2 * ((((x[i]-x1)**2) + z2 )**2)) )  ## S&amp;F97</p>
+magnetic anomaly this solution is given by, for example, Sleep &amp; Fujita (1997) Pg. 223 eq. 6.45 <span id="id2">[<a class="reference internal" href="z_bibliography.html#id12" title="N.H. Sleep and K. Fujita. Principles of Modern Geophysics. Blackwell Science, 1997. ISBN 9780865420755. URL: https://books.google.co.nz/books?id=sZ5BkgEACAAJ.">8</a>]</span>.</p>
 <div class="math notranslate nohighlight">
-\[\Delta T = \f \kappa r^2 (\x-\x+1)^2 - z^2)\]</div>
-<p>where <span class="math notranslate nohighlight">\(\Delta T\)</span> is the magnetic anomaly, <span class="math notranslate nohighlight">\(r\)</span> is the radius of the cylinder, <span class="math notranslate nohighlight">\(\Delta \chi\)</span> is the</p>
+\[\Delta T = f \kappa r^2 \frac{(x_{i}-x)^2 - z^2}{2((x_{i}-x)^2 + z^2)^2}\]</div>
+<p>where <span class="math notranslate nohighlight">\(\Delta T\)</span> is the magnetic anomaly, <span class="math notranslate nohighlight">\(r\)</span> is the radius of the cylinder,
+<span class="math notranslate nohighlight">\(f\)</span> is the inducing (Earth) field, <span class="math notranslate nohighlight">\(\kappa\)</span> is the magnetic susceptibility of the cylinder,
+<span class="math notranslate nohighlight">\(x_{i}\)</span> is the x-coordinate of the observation point and <span class="math notranslate nohighlight">\(x\)</span> and <span class="math notranslate nohighlight">\(z\)</span> are
+the x and z coordinates of the center of the cylinder, respectively.</p>
 <p>The files for this comparison can be found in the directory demos/MAGNETICS. The files are as follows:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>magnetic_cylinder_analytical_anomaly.xa
     - The predicted anomaly from this cylinder (magnetic susceptibility 0.001)

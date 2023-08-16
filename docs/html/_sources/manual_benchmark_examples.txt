@@ -96,13 +96,14 @@ To benchmark the magnetic anomaly algorithm we can, similarly to as done above f
 the anomaly produced by the algorithm with an analytical solution for a buried cylinder. In the case of a 
 magnetic anomaly this solution is given by, for example, Sleep & Fujita (1997) Pg. 223 eq. 6.45 :cite:`sleep1997`.
 
-anomaly[i] = mc * (r**2) * ( (((x[i]-x1)**2) - z2) / (2 * ((((x[i]-x1)**2) + z2 )**2)) )  ## S&F97
-
 .. math::
 
-    \Delta T = \f \kappa r^2 (\x-\x+1)^2 - z^2)
+    \Delta T = f \kappa r^2 \frac{(x_{i}-x)^2 - z^2}{2((x_{i}-x)^2 + z^2)^2}
 
-where :math:`\Delta T` is the magnetic anomaly, :math:`r` is the radius of the cylinder, :math:`\Delta \chi` is the
+where :math:`\Delta T` is the magnetic anomaly, :math:`r` is the radius of the cylinder, 
+:math:`f` is the inducing (Earth) field, :math:`\kappa` is the magnetic susceptibility of the cylinder,
+:math:`x_{i}` is the x-coordinate of the observation point and :math:`x` and :math:`z` are 
+the x and z coordinates of the center of the cylinder, respectively.
 
 The files for this comparison can be found in the directory demos/MAGNETICS. The files are as follows::
 
