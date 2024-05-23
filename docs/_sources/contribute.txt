@@ -57,7 +57,7 @@ Please feel free to reach out by opening an issue on the project's GitHub reposi
 
 **Acknowledgment**
 
-Thank you for considering contributing to GMG. Any contribution big or small are very welcome are much appreciated. 
+Thank you for considering contributing to GMG. Any contribution big or small are very welcome and are much appreciated. 
 
 Software Architecture
 ---------------------
