@@ -60,14 +60,14 @@ Pre-Installation
 
 **Note** 
 
-gmg is written in Python 3 and can be installing using common python package managers 
+gmg is written in Python 3 and can be installed using common python package managers 
 conda (from conda-forge) or pip. Installation and launching of the software involves 
 the use of a command line terminal, but this is minimal and should be manageable for a non-expert
 by following the instructions below. 
 
 **Step 1: Install Miniforge**
 
-If you don't aleady use miniforge or anaconda for managing and installing python packages, then 
+If you don't already use miniforge or anaconda for managing and installing python packages, then 
 the simplest way to install gmg is to first install Miniforge (a minimal installer for [Conda](http://docs.conda.io/en/latest/)
 specifically for [conda-forge](http://conda-forge.org)).
 
@@ -139,7 +139,7 @@ after installation, make sure you are using a terminal with your gmgpy environme
 
     gmgpy
  
-The splash screen and gmg model shell should appear. YOu can now begin using the software.
+The splash screen and gmg model shell should appear. You can now begin using the software.
 
 Tutorial and demo data
 ----------------------
