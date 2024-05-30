@@ -1,7 +1,7 @@
 .. seismic_data:
 
 ====================
-**0.0 Seismic data**
+**10.0 Seismic data**
 ====================
 
 Any 2D Seismic SEGY data can be loaded into GMG models, however, to be useful, it is highly recommended these data are

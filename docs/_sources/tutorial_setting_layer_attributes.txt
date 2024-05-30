@@ -1,7 +1,7 @@
 .. setting_layer_attributes:
 
 ================================
-**7.0 Setting layer attributes**
+**9.0 Setting layer attributes**
 ================================
 
 Now that we have created a new floating layer to represent the Weardale granite, lets assign it a bulk density so that

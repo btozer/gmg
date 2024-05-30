@@ -1,7 +1,8 @@
 .. creating_a_model_layer:
 
-**6.0 Creating a model layer**
-------------------------------
+==============================
+**8.0 Creating a model layer**
+==============================
 
 Now we have loaded our observed anomaly data into the model environment, we are ready to start constructing our model.
 

@@ -1,7 +1,7 @@
 .. add_outcrop_data:
 
 ===========================
-**8.0 Adding Outcrop data**
+**6.0 Adding Outcrop data**
 ===========================
 Now that we've created a floating layer to represent the Weardale granite, we are almost ready to begin
 forward modelling to recover its subsurface structure. But in order to further reduce ambiguity lets first add all
