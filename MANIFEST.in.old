@@ -1,0 +1,4 @@
+include README.md
+include src/gmgpy/icons/*.png
+recursive-include src/gmgpy/docs/tutorial/*/ *
+recursive-includes src/gmgpy/docs/demos/ *

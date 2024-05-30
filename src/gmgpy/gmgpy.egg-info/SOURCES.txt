@@ -1,0 +1,11 @@
+MANIFEST.in
+README.md
+pyproject.toml
+setup.cfg
+src/gmgpy.egg-info/PKG-INFO
+src/gmgpy.egg-info/SOURCES.txt
+src/gmgpy.egg-info/dependency_links.txt
+src/gmgpy.egg-info/requires.txt
+src/gmgpy.egg-info/top_level.txt
+src/gmgpy.egg-info/zip-safe
+src/icons/__init__.py

@@ -17,7 +17,7 @@ well horizon tops, geological data and XY data (e.g., earthquake hypocenters).
 
 GMG makes use of several other open-source python packages to preform various tasks including:
 
-* Fatiando a Terra
+* WxPython
 * Matplotlib
 * SciPy
 * NumPy
@@ -25,16 +25,23 @@ GMG makes use of several other open-source python packages to preform various ta
 
 (see `References <references.html>`_ for a detailed listing).
 
-The project was instigated after failing to find an adequate open-source package (in which
-the source code can be viewed and modified by the user) for performing 2D geophysical
-modeling tasks. Inspiration came from fatiando a terra and GMT.
+GMG is an open-source Graphical User Interface (GUI) designed principally for modelling
+2D potential field (gravity and magnetic) profiles. The software also includes 
+functions for loading XY data, seismic reflection SEGY data and exploration well horizons.
+The software therefore provides an integrated geological/geophysical interpretation
+package. It is anticipated that GMG will also be useful for teaching purposes.
 
-In addition to profile modelling, it is anticipated that GMG will also be valuable resource for 
-undergraduate geophysics courses, aiding students in their exploration and understanding of 
-geophysical concepts and python implementation of geophysical problems.
+Data I/O is made as simple as possible using space delimited ASCII text files.
+
+The project was instigated after failing to find an adequate open-source option
+(in which the source code can be viewed and modified by the user) for performing 2D 
+geophysical modeling tasks. Inspiration came from [Fatiando a Terra](https://www.fatiando.org/) and [GMT](https://www.generic-mapping-tools.org/).
+
+**NB: GMG is in development. Some documentation is incomplete and some features may not work as expected. If you experience any issues, please feel free to raise these on the issue tracker.**
 
 Key features
 ------------
+
 * Data I/O is designed to be as simple as possible using space delimited ASCII text files.
 * Import and display observed topography, gravity, vertical gravity gradient and magnetic data.
 * Ability to apply filters to observed data within the modelling environment.

@@ -1,0 +1,2 @@
+[console_scripts]
+gmgpy = gmgpy.launcher:launch

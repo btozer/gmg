@@ -10,7 +10,7 @@ environment. First, lets load the gravity data by navigating to::
     Gravity -> Load Gravity Anomaly...
 
 Now select the **File...** button and use the file explorer to navigate to and select the file
-**bott_Bouguer_gravity.xg**. This file is located in the directory::
+**bott_residual_bouguer.xg**. This file is located in the directory::
 
     gmg/docs/tutorial/GRAVITY_DATA
 

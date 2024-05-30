@@ -86,7 +86,6 @@ https://www.sphinx-doc.org/en/master/
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
-
 matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
@@ -109,7 +108,7 @@ from sys import platform
 from obspy import read
 import pickle as pickle
 from polygon import Polygon
-import plot_model
+import pygmt_plot_model as plot_model
 import bott
 import talwani_and_heirtzler
 import kim_and_wessel
@@ -735,6 +734,22 @@ class Gmg(wx.Frame):
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
         self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
+        plt.rcParams["keymap.fullscreen"] = ''
+        plt.rcParams["keymap.home"] = ''
+        plt.rcParams["keymap.pan"] = ''
+        plt.rcParams["keymap.back"] = ''
+        plt.rcParams["keymap.forward"] = ''
+        plt.rcParams["keymap.zoom"] = ''
+        plt.rcParams["keymap.save"] = ''
+        plt.rcParams["keymap.help"] = ''
+        plt.rcParams["keymap.quit"] = ''
+        plt.rcParams["keymap.quit_all"] = ''
+        plt.rcParams["keymap.grid"] = ''
+        plt.rcParams["keymap.grid_minor"] = ''
+        plt.rcParams["keymap.yscale"] = ''
+        plt.rcParams["keymap.xscale"] = ''
+        plt.rcParams["keymap.copy"] = ''
+
         # SET DRAW COMMAND WHICH CAN BE CALLED TO REDRAW THE FIGURE'
         self.draw = self.fig.canvas.draw
 
@@ -864,9 +879,12 @@ class Gmg(wx.Frame):
         # INITIALISE SEISMIC ATTRIBUTES
         self.segy_data_list = []
         self.segy_counter = 0
-        self.segy_color_map = cm.gray
-        self.segy_gain_neg = -4.0
-        self.segy_gain_pos = 4.0
+        # self.segy_color_map = cm.gray
+        self.segy_color_map = cm.jet
+        # self.segy_gain_neg = -4.0
+        # self.segy_gain_pos = 4.0
+        self.segy_gain_neg = 1500
+        self.segy_gain_pos = 6000
 
         # INITIALIZE COORDINATE CAPTURE
         self.capture = False
@@ -1939,6 +1957,7 @@ class Gmg(wx.Frame):
 
         # UPDATE MODEL
         self.run_algorithms()
+        self.update_layer_data()
         self.draw()
 
     def display_info(self):
@@ -2175,8 +2194,6 @@ class Gmg(wx.Frame):
         self.currently_active_layer.set_visible(True)
         self.run_algorithms()
         self.draw()  
-    # ------------------------------------------------------------------------------------------------------------
-    # ------------------------------------------------------------------------------------------------------------
 
     def redo(self):
         pass
@@ -3421,6 +3438,13 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
+
+
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
     # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def segy_input(self, event):
@@ -3451,19 +3475,13 @@ class Gmg(wx.Frame):
             segy.dimensions = self.d
 
             # LOAD SEGY DATA
-            section = read(file_in, unpack_trace_headers=False)
-            nsamples = len(section.traces[0].data)
-            ntraces = len(section.traces)
-            seis_data = plt.zeros((nsamples, ntraces))
-            for i, tr in enumerate(section.traces):
-                seis_data[:, i] = tr.data
-            del section
+            seis_data = np.genfromtxt(file_in, dtype=np.float32, delimiter=" ")
 
             # SET AXIS
             segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
 
             # PLOT SEGY DATA ON MODEL
-            segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
+            segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=1.5, vmax=6,
                                                      aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
                                                      alpha=0.75)
             # REMOVE SEGY DATA
@@ -3490,6 +3508,91 @@ class Gmg(wx.Frame):
         # REPLOT MODEL
         self.update_layer_data()
         self.draw()
+
+
+
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
+
+
+
+
+
+
+    # # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    # def segy_input(self, event):
+    #     seismic_data_box = SeisDialog(self, -1, 'Segy Dimensions', self.area)
+    #     answer = seismic_data_box.ShowModal()
+    #     self.d = seismic_data_box.dimensions
+    #     self.segy_name = seismic_data_box.segy_name_input
+    #     self.sx1, self.sx2, self.sz1, self.sz2 = self.d
+    #     self.load_segy(self)
+
+    # def load_segy(self, event):
+    #     try:
+    #         open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
+    #                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+    #         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
+    #             return  # THE USER CHANGED THEIR MIND
+
+    #         # PARSE INPUT FILE
+    #         file_in = open_file_dialog.GetPath()
+
+    #         # CREATE NEW SEGY OBJECT
+    #         segy = SegyData()
+
+    #         # ASSIGN ATTRIBUTES
+    #         segy.id = self.segy_counter
+    #         segy.file = file_in
+    #         segy.name = self.segy_name
+    #         segy.dimensions = self.d
+
+    #         # LOAD SEGY DATA
+    #         section = read(file_in, unpack_trace_headers=False)
+    #         nsamples = len(section.traces[0].data)
+    #         ntraces = len(section.traces)
+    #         seis_data = plt.zeros((nsamples, ntraces))
+    #         for i, tr in enumerate(section.traces):
+    #             seis_data[:, i] = tr.data
+    #         del section
+
+    #         # SET AXIS
+    #         segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
+
+    #         # PLOT SEGY DATA ON MODEL
+    #         segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
+    #                                                  aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
+    #                                                  alpha=0.75)
+    #         # REMOVE SEGY DATA
+    #         del seis_data
+
+    #         # SET SEGY ON SWTICH
+    #         self.segy_on = True
+
+    #         # APPEND NEW SEGY TO THE SEGY DATA LIST
+    #         self.segy_data_list.append(segy)
+
+    #         # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
+    #         self.segy_name_submenu = wx.Menu()
+    #         self.m_segy_submenu.Append(self.segy_counter + 1000, segy.name, self.segy_name_submenu)
+    #         self.segy_name_submenu.Append(self.segy_counter + 1000, 'delete segy')
+    #         self.Bind(wx.EVT_MENU, self.remove_segy, id=self.segy_counter + 1000)
+
+    #         # INCREMENT COUNTER
+    #         self.segy_counter += 1
+
+    #     except Exception:
+    #         load_error = MessageDialog(self, -1, "SEGY LOAD ERROR", "segy load error")
+
+    #     # REPLOT MODEL
+    #     self.update_layer_data()
+    #     self.draw()
 
     def remove_segy(self, event):
         """DELETE SEGY DATA. NB 1000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS"""
@@ -3886,10 +3989,7 @@ class Gmg(wx.Frame):
         """
         CHECK IF A NODE FROM THE CURRENT LAYER IS SELECTED; IF NOT, THEN SKIP THIS PART AND ONLY UPDATE ATTRIBUTES
         """
-
-        # self.index_node
-        # self.layer_list[self.currently_active_layer_id].type
-
+        
         # GET NEW XY POINT
         new_x = float(self.x_input.GetValue())
         new_y = float(self.y_input.GetValue())
@@ -3945,6 +4045,7 @@ class Gmg(wx.Frame):
         # UPDATE GMG
         self.update_layer_data()
         self.run_algorithms()
+        self.update_layer_data()
         self.draw()
 
     def get_node_under_point(self, event):
@@ -4942,7 +5043,7 @@ class Gmg(wx.Frame):
         if new_layer_dialogbox.fixed:
 
             # BEGIN LOADING LAYER
-            open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "Layer XY files (*.txt)|*.txt",
+            open_file_dialog = wx.FileDialog(self, "Open Layer", "", "", "All files (*.*)|*.*",
                                              wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
             answer = open_file_dialog.ShowModal()
 
@@ -6146,7 +6247,10 @@ class Gmg(wx.Frame):
     # EXTERNAL FIGURE CONSTRUCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def plot_model(self, event):
-        """CREATE EXTERNAL FIGURE OF MODEL USING INBUILT FIGURE CONSTRUCTION TOOL"""
+        """
+        CREATE AN EXTERNAL FIGURE OF THE CURRENT MODEL USING THE INBUILT 
+        FIGURE CONSTRUCTION TOOL. THIS USES pygmt TO CREATE THE FIGURE.
+        """
 
         # GET PLOTTING PARAMETERS FROM DIALOG BOX
         self.set_values = PlotSettingsDialog(self, -1, 'Set figure parameters', self.model_aspect,
@@ -6321,7 +6425,6 @@ class Gmg(wx.Frame):
         # self.error = value
         # self.update_layer_data()
         # self.run_algorithms()
-
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

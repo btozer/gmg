@@ -17,7 +17,6 @@ alt="Latest version on conda-forge"
 />
 </a>
 
-
 ![alt-text](https://github.com/btozer/gmg/blob/add_vgg/gmg_demo.gif)
 
 Statement of need
@@ -145,20 +144,28 @@ The splash screen and gmg model shell should appear. YOu can now begin using the
 Tutorial and demo data
 ----------------------
 
-Gmg ships with a tutorial dataset and benchmark demo models. If you installed gmg using the recommended miniforge 
-approach as outlined above, then the gmg package directory is likely located in a path similar to:
+GMG is packaged with a tutorial dataset and benchmark demos. If you installed gmg using the recommended miniforge 
+approach (as outlined above), then, the gmg package directory is likely located in a path similar to:
     <pre>
     /Users/<strong>username</strong>/miniforge3/envs/gmgpy/lib/python3.<strong>X</strong>/site-packages/gmgpy
     </pre>
 
-Within this directory are the two subdirectories demos/ and tutorial/. These can be copied or moved to another
-location on your system or accessed from gmgpy directory when required. 
+Within this directory are the two subdirectories:
+     
+     demos/
+     tutorial/ 
+     
+These can be copied or moved to another location on your system or accessed from gmgpy directory when required. 
+You can also download these directories from the gmg github docs/ directory. 
 
 Getting started
 ---------------
 
-The best way to get started is to read through the [Documentation](https://btozer.github.io/gmg/) starting with the [Manual](https://btozer.github.io/gmg/html/manual.html) and then work your way through the [Tutorial](https://btozer.github.io/gmg/html/tutorial.html). 
-These can also be found by launching gmg and then navigating to:
+The best way to get started is to read through the [Documentation](https://btozer.github.io/gmg/) starting with 
+the [Manual](https://btozer.github.io/gmg/html/manual.html) and 
+[Demos](https://btozer.github.io/gmg/html/manual_benchmark_examples.html) then
+work your way through the [Tutorial](https://btozer.github.io/gmg/html/tutorial.html). These can also be found 
+by launching gmg and then navigating to:
 
     Help -> Documentation
 

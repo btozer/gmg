@@ -1,0 +1,34 @@
+{% set name = "gmgpy" %}
+{% set version = "0.1.0" %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+  sha256: b97d0c74955da062a7d4ef92fadb583806a585b2ea81958a81bd72726cbb8e37
+
+build:
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - pip
+    - python
+  run:
+    - python
+
+about:
+  home: https://github.com/btozer/gmg
+  license: BSD 3-Clause License
+  license_family: BSD
+  license_file: "https://github.com/btozer/gmg/blob/master/LICENSE"
+  summary: "An open source geophysical forward modelling GUI"
+  doc_url: "https://btozer.github.io/gmg/html/gmg_documentation.html"
+  dev_url: "https://github.com/btozer/gmg"
+
+extra:
+  recipe-maintainers:
+    - btozer
