@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="References" href="references.html" />
-    <link rel="prev" title="0.0 Seismic data" href="tutorial_seismic_data.html" />
+    <link rel="prev" title="10.0 Seismic data" href="tutorial_seismic_data.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -59,7 +59,10 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="manual.html"><strong>Manual</strong></a></li>
 <li class="toctree-l1"><a class="reference internal" href="tutorial.html"><strong>Tutorial</strong></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><strong>Contribute</strong></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><strong>Contribute</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-architecture">Software Architecture</a></li>
+</ul>
+</li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Credits</span></p>
 <ul>
@@ -141,22 +144,41 @@ Fill out the pull request template with details about your contribution.</p>
 <p><strong>Communication</strong></p>
 <p>Please feel free to reach out by opening an issue on the project’s GitHub repository if you have any questions or need assistance.</p>
 <p><strong>Acknowledgment</strong></p>
-<p>Thank you for considering contributing to GMG. Any contribution big or small are very welcome are much appreciated.</p>
+<p>Thank you for considering contributing to GMG. Any contribution big or small are very welcome and are much appreciated.</p>
+<section id="software-architecture">
+<h2>Software Architecture<a class="headerlink" href="#software-architecture" title="Permalink to this heading"></a></h2>
+<p>GMG is arranged as a simple, multi-windowed graphical user interface as shown in <a class="reference internal" href="#gmg-software-map"><span class="std std-numref">Figure 15</span></a>.
+The software consists of two primary frames, the model frame and control frame. A third frame, containing an
+inbuilt python console may also be displayed and used to access and edit model data via the command line.
+Three control bars are used to access software features. The top menu bar contains a list of drop-down menus.
+These are organised under various headings, such as “gravity data”, each containing relevant functions. Below this
+menu bar is a shortcut button bar. At the base of the control frame, is a toggle bar. This contains five buttons that
+are used to hide/show model frame panels (topography, gravity and magnetics), the control frame and the python console
+frame. A “current status” bar is displayed at the base of the model frame, providing relevant information related to
+the current state of the model.</p>
+<figure class="align-default" id="gmg-software-map">
+<img alt="_images/gmg_software_map.png" src="_images/gmg_software_map.png" />
+<figcaption>
+<p><span class="caption-number">Figure 15 </span><span class="caption-text">a) gmg software layout. b) same as in (a) but with labels showing the key model frames (model frame = pink outline;
+control frame = red outline), panels and bars.</span><a class="headerlink" href="#gmg-software-map" title="Permalink to this image"></a></p>
+</figcaption>
+</figure>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tutorial_seismic_data.html" class="btn btn-neutral float-left" title="0.0 Seismic data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial_seismic_data.html" class="btn btn-neutral float-left" title="10.0 Seismic data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="references.html" class="btn btn-neutral float-right" title="References" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on Aug 16, 2023.
+    <p>&#169; Copyright 2014-2024, B. Tozer.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

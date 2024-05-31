@@ -1,8 +1,8 @@
 .. seismic_data:
 
-====================
-**0.0 Seismic data**
-====================
+=====================
+**10.0 Seismic data**
+=====================
 
 Any 2D Seismic SEGY data can be loaded into GMG models, however, to be useful, it is highly recommended these data are
 pre-processed in the depth domain.
@@ -28,7 +28,7 @@ Once you have downloaded the directory SEAM_Interpretation_Challenge_1_Depth/ mo
 Now, to plot a profile with GMG lets extract a 2D profile from the 3D volume using an ObsPy routine.
 
 A script is provided with this tutorial to preform the extraction of a profile at Y-location 24 km. This profile passes
-through a borehole location that can alos be loaded into GMG for aiding interpretation.
+through a borehole location that can also be loaded into GMG for aiding interpretation.
 
 To run the profile extraction follow these commands::
 
@@ -60,7 +60,7 @@ SEGY Data menu in the menubar and select *Load SEGY...*.
 You will be prompted by a window in which to enter the dimensions of the SEGY file and name of the segy file. Input the
 dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now select *Set Coordinates*.
 
-A file explorer will now load. Naivage to the SEGY file (i.e. either 2d_profile_24000N_agc.segy or
+A file explorer will now load. Navigate to the SEGY file (i.e. either 2d_profile_24000N_agc.segy or
 2d_profile_24000N.segy) you want to load and select *Open*.
 
 You should now see the seismic profile in your GMG modelling frame!

@@ -68,11 +68,11 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>9.0 Adding XY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>8.0 Adding Outcrop data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>7.0 Adding XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>6.0 Adding Outcrop data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>8.0 Creating a model layer</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>9.0 Setting layer attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>10.0 Seismic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
@@ -115,17 +115,17 @@
 <p>As we are interested in modelling the structure of the Weardale granite, there are some important pre-modelling steps that
 we need to consider prior to forward modelling the gravity and magnetic anomalies. These relate to how we deal with
 other factors (other than the granite) that are contributing to the observed total field anomalies.</p>
-<p>A preprocessing step that is commonly applied when focused on modelling near-surface structure, is to separate the
+<p>A preprocessing step that is commonly applied when focused on modelling near-surface structure is the separation of the
 “regional” component of the anomaly from the total anomaly. This separation aims to eliminate the contribution from the
-longer wavelength, regional signal, which can originate, for example, from the juxtaposition of different basement terranes.
-Typically, these regional anomalies, caused by deep sources, produce much longer wavelength anomalies compared to those associated
+longer wavelength, regional signal, which may originate from, for example, the juxtaposition of different basement terranes.
+Typically, regional anomalies produced by deep sources produce much longer wavelength anomalies compared to those associated
 with near-surface features.</p>
 <p>By performing a regional-residual separation, we can focus specifically on the anomalies produced by our target structure. This
 will aid in generating a more accurate model.</p>
 </section>
 <section id="gravity-anomaly-regional-residual-separation">
 <h1><em>2.1 Gravity anomaly: regional/residual separation</em><a class="headerlink" href="#gravity-anomaly-regional-residual-separation" title="Permalink to this heading"></a></h1>
-<p>There are several different strategies for calculating regional anomalies. For the gravity data we will use the regional gravity field
+<p>There are several different strategies for calculating regional anomalies. In this case, we will use the regional gravity field
 as determined by <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 10</span></a>. As can be seen in this figure, there is a long
 wavelength positive anomaly in this region with amplitudes ranging <span class="math notranslate nohighlight">\(\sim\)</span> <span class="math notranslate nohighlight">\(14-21\)</span> <span class="math notranslate nohighlight">\(mGal\)</span>.</p>
 <p>We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown
@@ -142,18 +142,18 @@ anomaly relative to the surrounding basement rock.</span><a class="headerlink" h
 <a class="reference internal image-reference" href="_images/residual_bouguer_anomaly.png"><img alt="_images/residual_bouguer_anomaly.png" src="_images/residual_bouguer_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
 <figcaption>
 <p><span class="caption-number">Figure 11 </span><span class="caption-text">Residual gravity anomaly derived by subtracting the regional anomaly from the total. This reflects the
-anomaly caused upper crustal features (i.e., the Weardale granite). Note, the central low, related to the
-granite, now has a larger amplitude.</span><a class="headerlink" href="#residual-gravity-map" title="Permalink to this image"></a></p>
+anomaly caused by upper crustal features (i.e., the Weardale granite). Note, the central low (related to the
+granite) now has a larger amplitude.</span><a class="headerlink" href="#residual-gravity-map" title="Permalink to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="magnetic-anomaly-reduction-to-the-pole">
 <h1><em>2.2 Magnetic anomaly: Reduction To the Pole</em><a class="headerlink" href="#magnetic-anomaly-reduction-to-the-pole" title="Permalink to this heading"></a></h1>
-<p>In order to model the magnetic anomaly, we’ll apply a Reduction To the
+<p>In order to model the magnetic anomaly, we’ll apply   a Reduction To the
 Pole (RTP) operation on the grid. We do this to simplify the interpretation of the anomaly as
 the resulting anomaly appears as if it were observed at the geomagnetic pole, such that,
 the subsurface bodies are magnetized vertically. This removes the skewness introduced to the observed anomaly as observation
-latitude increases. Here, we assume the magnetic sources share the same inclination and declination as the Earth field.</p>
+latitude decreases. Here, we assume the magnetic sources share the same inclination and declination as the Earth field.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Processing of the magnetic anomaly data was conducted using the python implementation of the Generic Mapping Tools
@@ -170,7 +170,7 @@ inclination and declination of <span class="math notranslate nohighlight">\(9.1\
 </section>
 <section id="regional-residual-separation">
 <h1><em>2.3 Regional/Residual Separation</em><a class="headerlink" href="#regional-residual-separation" title="Permalink to this heading"></a></h1>
-<p>Similarly to the gravity grid, we will also perform a regional-residual seperation to extract a
+<p>Similarly to the gravity grid, we will also perform a regional-residual separation to extract a
 long wavelength regional field. We then remove regional field from the total field to produce a
 residual anomaly that reflects near surface sources.</p>
 <p>To produce the regional grid we will apply a 2000 m upward continuation operation on the anomaly to
@@ -204,8 +204,8 @@ mineral veins, dykes and sills (<span id="id3">[<a class="reference internal" hr
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on Aug 16, 2023.
+    <p>&#169; Copyright 2014-2024, B. Tozer.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

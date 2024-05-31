@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>0.0 Seismic data &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>10.0 Seismic data &mdash; GMG: An open source geophysical modelling GUI</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Contribute" href="contribute.html" />
-    <link rel="prev" title="7.0 Setting layer attributes" href="tutorial_setting_layer_attributes.html" />
+    <link rel="prev" title="9.0 Setting layer attributes" href="tutorial_setting_layer_attributes.html" />
     <link href="_static/style.css" rel="stylesheet" type="text/css">
 
 </head>
@@ -67,11 +67,11 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>9.0 Adding XY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>8.0 Adding Outcrop data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>7.0 Adding XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>6.0 Adding Outcrop data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>8.0 Creating a model layer</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>9.0 Setting layer attributes</strong></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>10.0 Seismic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
@@ -99,7 +99,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="tutorial.html"><strong>Tutorial</strong></a></li>
-      <li class="breadcrumb-item active"><strong>0.0 Seismic data</strong></li>
+      <li class="breadcrumb-item active"><strong>10.0 Seismic data</strong></li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/tutorial_seismic_data.txt" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -110,7 +110,7 @@
            <div itemprop="articleBody">
              
   <section id="seismic-data">
-<h1><strong>0.0 Seismic data</strong><a class="headerlink" href="#seismic-data" title="Permalink to this heading"></a></h1>
+<h1><strong>10.0 Seismic data</strong><a class="headerlink" href="#seismic-data" title="Permalink to this heading"></a></h1>
 <p>Any 2D Seismic SEGY data can be loaded into GMG models, however, to be useful, it is highly recommended these data are
 pre-processed in the depth domain.</p>
 <p>As an example, we will download the freely available Society of exploration geophysicists (SEG) Advanced Modeling
@@ -131,7 +131,7 @@ Program (SEAM) Phase 1 data. This is a synthetic 35 x 40 x 15 km 3D cube that si
 </div>
 <p>Now, to plot a profile with GMG lets extract a 2D profile from the 3D volume using an ObsPy routine.</p>
 <p>A script is provided with this tutorial to preform the extraction of a profile at Y-location 24 km. This profile passes
-through a borehole location that can alos be loaded into GMG for aiding interpretation.</p>
+through a borehole location that can also be loaded into GMG for aiding interpretation.</p>
 <p>To run the profile extraction follow these commands:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd &quot;YOUR_GMG_PATH&quot;/gmg/docs/tutorial/SEISMIC_DATA
 mv ../cut_2d_profile.py .
@@ -159,7 +159,7 @@ segywrite &lt; 2d_profile_24000N_agc.su verbose=1 buff=1 tape=2d_profile_24000N_
 SEGY Data menu in the menubar and select <em>Load SEGY…</em>.</p>
 <p>You will be prompted by a window in which to enter the dimensions of the SEGY file and name of the segy file. Input the
 dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now select <em>Set Coordinates</em>.</p>
-<p>A file explorer will now load. Naivage to the SEGY file (i.e. either 2d_profile_24000N_agc.segy or
+<p>A file explorer will now load. Navigate to the SEGY file (i.e. either 2d_profile_24000N_agc.segy or
 2d_profile_24000N.segy) you want to load and select <em>Open</em>.</p>
 <p>You should now see the seismic profile in your GMG modelling frame!</p>
 <p>Try Changing the color palette from grey scale to Red-white-Blue by using:</p>
@@ -177,15 +177,15 @@ dimensions x = 0 35 and y = 0 15 and give the file a name, e.g. profile_24N. Now
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="tutorial_setting_layer_attributes.html" class="btn btn-neutral float-left" title="7.0 Setting layer attributes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorial_setting_layer_attributes.html" class="btn btn-neutral float-left" title="9.0 Setting layer attributes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="contribute.html" class="btn btn-neutral float-right" title="Contribute" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on Aug 16, 2023.
+    <p>&#169; Copyright 2014-2024, B. Tozer.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

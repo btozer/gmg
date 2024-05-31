@@ -1,7 +1,7 @@
 .. adding_xy_data:
 
 =======================
-**9.0 Adding XY data**
+**7.0 Adding XY data**
 =======================
 
 We can load XY data points into the model frame by using the ``*XY Data*`` menu located in the Menubar. XY data can be

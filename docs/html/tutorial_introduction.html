@@ -67,11 +67,11 @@
 <li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_new_model.html"><strong>3.0 Creating a new model</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_observed_profile_data.html"><strong>4.0 Loading observed profile data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="tutorial_loading_well_data.html"><strong>5.0 Loading well data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>9.0 Adding XY data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>8.0 Adding Outcrop data</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>6.0 Creating a model layer</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>7.0 Setting layer attributes</strong></a></li>
-<li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>0.0 Seismic data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_xy_data.html"><strong>7.0 Adding XY data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_loading_outcrop_data.html"><strong>6.0 Adding Outcrop data</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_creating_a_model_layer.html"><strong>8.0 Creating a model layer</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_setting_layer_attributes.html"><strong>9.0 Setting layer attributes</strong></a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial_seismic_data.html"><strong>10.0 Seismic data</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="z_bibliography.html"><strong>Bibliography</strong></a></li>
 </ul>
 </li>
@@ -114,8 +114,8 @@
 <p>The purpose of this tutorial is to help familiarise the user with the main features of GMG.
 It will guide you step-by-step through the process of importing and modeling an example dataset.</p>
 <p>We will be working with data related to the Weardale granite, which is located in the Northern Pennines of North England (see <a class="reference internal" href="#location-map"><span class="std std-numref">Figure 7</span></a>).
-Our goal is model the subsurface structure of this granite body using the Bouguer gravity anomaly as the primary dataset, thereby recreating the study
-conducted by British geophysicist Martin Bott in 1967 [cite Bott, 1967]. In addition to the gravity anomaly,
+Our goal is model the subsurface structure of this granite body and we will use the Bouguer gravity anomaly as our primary dataset. We will thereby recreate the study
+conducted by British geophysicist Martin Bott in 1967 <span id="id1">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>. In addition to the gravity anomaly,
 we will also utilize other supporting datasets including the magnetic anomaly, a borehole record, geological information, and a <em>fictional</em> depth migrated
 seismic reflection horizon. These auxiliary datasets will help us better constrain the subsurface model and demonstrate how they can be integrated
 within the GMG modeling environment.</p>
@@ -127,23 +127,24 @@ Note map coordinates are British National Grid Projection [EPSG code: 27700].</s
 </figcaption>
 </figure>
 <p>The tutorial will guide you through the following steps:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1. Launching GMG and creating a new 2D model.
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>1.  Launching GMG and creating a new 2D model.
 
-2. Saving the model and reloading it for future use.
+2.  Saving the model and reloading it for future use.
 
-3. Importing observed 2D profile data, including gravity and magnetic anomalies, into the GMG modeling environment.
+3.  Importing observed 2D profile data, including gravity and magnetic anomalies, into the GMG modeling environment.
 
-4. Incorporating borehole horizon tops into your model.
+4.  Incorporating borehole horizon tops into your model.
 
-5. Adding new layers to your model and assigning attributes such as bulk density and magnetic susceptibility.
+5.  Adding new layers to your model and assigning attributes such as bulk density and magnetic susceptibility.
 
-6. Configuring magnetic field attributes in your model, such as the strength of Earth&#39;s field and the elevation of data acquisition.
+6.  Configuring magnetic field attributes in your model, such as the strength of Earth&#39;s
+    field and the elevation of data acquisition.
 
-7. Importing XY data points, specifically representing a 2D seismic reflection horizon, into your model.
+7.  Importing XY data points, specifically representing a 2D seismic reflection horizon, into your model.
 
-8. Running forward model calculations to predict gravity, vertical gravity gradient, and magnetic anomalies.
+8.  Running forward model calculations to predict gravity, vertical gravity gradient, and magnetic anomalies.
 
-9. Utilizing the GMG interface to conduct forward modeling of gravity and magnetic anomalies.
+9.  Utilizing the GMG interface to conduct forward modeling of gravity and magnetic anomalies.
 
 10. Saving the predicted anomaly profiles as external text files.
 
@@ -153,15 +154,15 @@ Note map coordinates are British National Grid Projection [EPSG code: 27700].</s
 <p><strong>1.1 Geologic background and potential field datasets</strong></p>
 <p>The Weardale granite is situated in the Northern Pennines of Northern England (refer to Figure 7). The existence of this Caledonian-aged
 granite was initially proposed by Dunham (1934) to explain the observed lead-zinc mineralization in nearby outcrops.
-Subsequent gravity and magnetic surveys conducted by various researchers strongly supported this hypothesis, and Bott (1967) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>
-compiled and published regional maps displaying these data (see Figures <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 8</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 9</span></a>). The presence
-of the granite was finally confirmed through the drilling of the Rookhope borehole by Dunham et al. (1961). In
-Figures <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 8</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 9</span></a>, you can identify the location of this borehole denoted by a yellow circle.</p>
+Subsequent gravity and magnetic surveys conducted by various researchers strongly supported this hypothesis, and Bott (1967) <span id="id2">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>
+compiled and published regional maps displaying these data (see <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 8</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 9</span></a>). The presence
+of the granite was finally confirmed through the drilling of the Rookhope borehole by Dunham et al. (1961). The location of this borehole
+denoted by a yellow circle in <a class="reference internal" href="#bouguer-gravity-map"><span class="std std-numref">Figure 8</span></a> and <a class="reference internal" href="#magnetic-map"><span class="std std-numref">Figure 9</span></a>.</p>
 <figure class="align-default" id="bouguer-gravity-map">
 <a class="reference internal image-reference" href="_images/bouguer_anomaly.png"><img alt="_images/bouguer_anomaly.png" src="_images/bouguer_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
 <figcaption>
 <p><span class="caption-number">Figure 8 </span><span class="caption-text">Bouguer gravity anomaly contoured at 2 mGal increments
-(digitized from figure 2 of Bott (1967) <span id="id2">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>). The white line X-X’ shows the profile we will model in this
+(digitized from figure 2 of Bott (1967) <span id="id3">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>). The white line X-X’ shows the profile we will model in this
 tutorial. This is chosen to intersect the Rookhope borehole (yellow circle). Note map coordinates are British
 National Grid Projection [EPSG code: 27700].</span><a class="headerlink" href="#bouguer-gravity-map" title="Permalink to this image"></a></p>
 </figcaption>
@@ -188,8 +189,8 @@ National Grid Projection [EPSG code: 27700].</span><a class="headerlink" href="#
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2023, B. Tozer.
-      <span class="lastupdated">Last updated on Aug 16, 2023.
+    <p>&#169; Copyright 2014-2024, B. Tozer.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

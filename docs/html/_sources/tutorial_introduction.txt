@@ -9,8 +9,8 @@ The purpose of this tutorial is to help familiarise the user with the main featu
 It will guide you step-by-step through the process of importing and modeling an example dataset.
 
 We will be working with data related to the Weardale granite, which is located in the Northern Pennines of North England (see :numref:`location_map`). 
-Our goal is model the subsurface structure of this granite body using the Bouguer gravity anomaly as the primary dataset, thereby recreating the study 
-conducted by British geophysicist Martin Bott in 1967 [cite Bott, 1967]. In addition to the gravity anomaly, 
+Our goal is model the subsurface structure of this granite body and we will use the Bouguer gravity anomaly as our primary dataset. We will thereby recreate the study 
+conducted by British geophysicist Martin Bott in 1967 :cite:`bott1967`. In addition to the gravity anomaly, 
 we will also utilize other supporting datasets including the magnetic anomaly, a borehole record, geological information, and a *fictional* depth migrated 
 seismic reflection horizon. These auxiliary datasets will help us better constrain the subsurface model and demonstrate how they can be integrated 
 within the GMG modeling environment.
@@ -25,23 +25,24 @@ within the GMG modeling environment.
 
 The tutorial will guide you through the following steps::
 
-   1. Launching GMG and creating a new 2D model.
+   1.  Launching GMG and creating a new 2D model.
 
-   2. Saving the model and reloading it for future use.
+   2.  Saving the model and reloading it for future use.
 
-   3. Importing observed 2D profile data, including gravity and magnetic anomalies, into the GMG modeling environment.
+   3.  Importing observed 2D profile data, including gravity and magnetic anomalies, into the GMG modeling environment.
 
-   4. Incorporating borehole horizon tops into your model.
+   4.  Incorporating borehole horizon tops into your model.
 
-   5. Adding new layers to your model and assigning attributes such as bulk density and magnetic susceptibility.
+   5.  Adding new layers to your model and assigning attributes such as bulk density and magnetic susceptibility.
 
-   6. Configuring magnetic field attributes in your model, such as the strength of Earth's field and the elevation of data acquisition.
+   6.  Configuring magnetic field attributes in your model, such as the strength of Earth's 
+       field and the elevation of data acquisition.
 
-   7. Importing XY data points, specifically representing a 2D seismic reflection horizon, into your model.
+   7.  Importing XY data points, specifically representing a 2D seismic reflection horizon, into your model.
 
-   8. Running forward model calculations to predict gravity, vertical gravity gradient, and magnetic anomalies.
+   8.  Running forward model calculations to predict gravity, vertical gravity gradient, and magnetic anomalies.
 
-   9. Utilizing the GMG interface to conduct forward modeling of gravity and magnetic anomalies.
+   9.  Utilizing the GMG interface to conduct forward modeling of gravity and magnetic anomalies.
 
    10. Saving the predicted anomaly profiles as external text files.
 
@@ -52,9 +53,9 @@ The tutorial will guide you through the following steps::
 The Weardale granite is situated in the Northern Pennines of Northern England (refer to Figure 7). The existence of this Caledonian-aged 
 granite was initially proposed by Dunham (1934) to explain the observed lead-zinc mineralization in nearby outcrops. 
 Subsequent gravity and magnetic surveys conducted by various researchers strongly supported this hypothesis, and Bott (1967) :cite:`bott1967` 
-compiled and published regional maps displaying these data (see Figures :numref:`bouguer_gravity_map` and :numref:`magnetic_map`). The presence 
-of the granite was finally confirmed through the drilling of the Rookhope borehole by Dunham et al. (1961). In 
-Figures :numref:`bouguer_gravity_map` and :numref:`magnetic_map`, you can identify the location of this borehole denoted by a yellow circle.
+compiled and published regional maps displaying these data (see :numref:`bouguer_gravity_map` and :numref:`magnetic_map`). The presence 
+of the granite was finally confirmed through the drilling of the Rookhope borehole by Dunham et al. (1961). The location of this borehole 
+denoted by a yellow circle in :numref:`bouguer_gravity_map` and :numref:`magnetic_map`.
 
 .. figure:: _static/bouguer_anomaly.png
     :name: bouguer_gravity_map
