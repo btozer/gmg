@@ -1,6 +1,8 @@
+# Old Files
+*.old 
+
 # Compiled python modules.
 *.pyc
-*old 
 
 # Setuptools distribution folder.
 /dist/
