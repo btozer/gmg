@@ -734,6 +734,7 @@ class Gmg(wx.Frame):
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
         self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
+        # REMOVE DEFAULT KEYMAPS
         plt.rcParams["keymap.fullscreen"] = ''
         plt.rcParams["keymap.home"] = ''
         plt.rcParams["keymap.pan"] = ''
@@ -3512,15 +3513,6 @@ class Gmg(wx.Frame):
 
 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-
-
-
-
-
 
 
 
