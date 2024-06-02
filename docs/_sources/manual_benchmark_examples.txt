@@ -1,7 +1,7 @@
 .. _manual_benchmark_examples:
 
-**13.0 Benchmark examples**
-===========================
+**13.0 Benchmark tests**
+========================
 
 To test the potential field algorithms employed within gmg, two benchmark models are 
 provided for comparison with the analytical solutions for simple two dimensional shapes.
@@ -34,7 +34,7 @@ and the calculation increment as 0.1 km.
 **Step 2: Load the observed gravity anomaly**
 
 Load the observed gravity anomaly. This was calculated using the analytical solution for a 
-buried cylinder extending infinitely in the 3rd dimension (Heiland (1940) :cite:`heiland1940` Pg. 153).
+buried cylinder extending infinitely in the 3rd dimension given by, for example, Heiland (1940) :cite:`heiland1940` Pg. 153.
 
 To load observed anomaly navigate to *Gravity* in the Menubar. Next, select *Load Gravity Anomaly*. 
 Now, navigate to the file *grav_cylinder_analytical_anomaly.xa* and select it::
@@ -138,7 +138,7 @@ Now, leave angles A, B and C as zero and set F (Earth's field) as 50,000. Finall
 In the Toolbar find the *M* button (fifth in from the left). This is used to switch the magnetic response 
 calculation on and off. Click the button and the calculated anomaly will appear in the magnetics frame.
 
-Note, similarly to the gravity anoamly there is a slight mismatch between the observed and calculated anomaly 
+Note, similarly to the gravity anomaly there is a slight mismatch between the observed and calculated anomaly 
 near the peak. Again, this is due to the missing mass around the edge of the cylinder, 
 given we have dicretised it with a series of straight lines.
 
@@ -158,15 +158,16 @@ a purple line in the gravity data frame.
 
 Select layer 2 (i.e.,  the 360 node cylinder) and set it's susceptibility to 0.001 and f to 50,000 nT. 
 Now, switch off the contribution from layer 1 by unchecking its tick box under the *Layers* window. 
-We see now the RMS value decreases to 0.0002 nT. As with the gravity anoamly, this much reduced relative 
+We see now the RMS value decreases to 0.0002 nT. As with the gravity anomaly, this much reduced relative 
 to the previous value, as we have added most of the mass missing from the cylinder discretised with only 24 nodes.
 
 
 13.3 Summary
 ------------
 
-These tests have demonstrated the accuracy of the gmg algorithms. The RMS values calculated for the 
-gravity and magnetic anomalies are very small for the 24 node discretisation and negligible for the 360 node case. 
+These tests have demonstrated the accuracy of the 2D potential field algorithms employed within gmg. The RMS values 
+calculated for the gravity and magnetic anomalies are very small for the 24 node discretisation and negligible 
+for the 360 node case. 
 
 It is hoped that these tests have provided the user with a feel for the accuracy and limitations of 
 the 2D algorithms incorporated within gmg (For example, the accuracy of the calculated anomaly is 

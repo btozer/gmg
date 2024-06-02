@@ -14,7 +14,7 @@ authors:
 affiliations:
   - name: GNS Science, 1 Fairway Drive Avalon, New Zealand
   - index: 1
-date: 9 July 2023
+date: 4 June 2024
 bibliography: gmg.bib
 ---
 
@@ -27,7 +27,7 @@ and commercially licensed) exist for performing such modelling. However, most, i
 all of these packages suffer from at least one major drawback. Such draw-backs
 include: (1) Being closed-source, with limited information regarding how anomalies are 
 calculated; (2) Being difficult to obtain and install (3) lacking the ability 
-to calculate of both gravity and magnetic anomalies simultaneously; (4) providing no means 
+to calculate both gravity and magnetic anomalies simultaneously; (4) providing no means 
 for integrating complementary data within the modelling environment (e.g., earthquake hypocenters) and 
 (5) being programmed in such a way that the software is cumbersome for integrating within 
 a modern research project due to, for example, being a single platform 
@@ -49,16 +49,16 @@ particular, NumPy [@vanderwalt2011] data structures are used for data
 handling and computational efficiency. Matplotlib [@hunter2007] plotting tools
 are employed for displaying and interacting with graphics. The GUI is
 implemented using the wxWidgets GUI toolkit, wxPython [@rappin2006].
-Further software dependencies include Fatiando a Terra [@Uieda2013],
-from which, the function fatiando.polygon is used for handling model layers and
-ObsPy [@beyreuther2010], from which, the seismic plotting function
-obspy.read is used for loading seismic data. The algorithms for calculating the
-gravity and magnetic anomalies are adapted from [@bott1969] and [@talwani1964] respectively. 
-The source code for ``GMG`` is stored on github at: https://github.com/btozer/gmg
+The function fatiando.polygon from Fatiando a Terra [@Uieda2013] is used for handling 
+model layers and the seismic plotting function obspy.read from 
+ObsPy [@beyreuther2010] is used for loading seismic data. The algorithms 
+for calculating the gravity and magnetic anomalies are adapted from [@bott1969] 
+and [@talwani1964] respectively. The source code for ``GMG`` is stored 
+on github at: https://github.com/btozer/gmg
 
 # Acknowledgements
 
 GMG was conceived at the University of Oxford and we thank Brook Keats for helpful discussion and 
-contributions during development.
+contributions during development. 
 
 # References
