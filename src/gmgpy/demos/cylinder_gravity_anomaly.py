@@ -1,5 +1,9 @@
 """
-Calculate the gravity anomaly caused by a 2D infinite cylinder.
+Analytical solution to calculate gravity anomaly caused by a 
+2D infinite cylinder.
+
+Used to benchmark 2D forward modeling of gravity anomalies
+using the Talwani & Heirtzler (1964) algorithm.
 
 **references**
 

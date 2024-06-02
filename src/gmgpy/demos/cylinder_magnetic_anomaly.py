@@ -1,11 +1,15 @@
 """
-Calculate the magnetic anomaly caused by a 2D infinite cylinder.
+Analytical solution to calculate the magnetic anomaly 
+caused by a 2D infinite cylinder.
+
+Used to benchmark 2D forward modeling of magnetic anomalies
+using the Talwani & Heirtzler (1964) algorithm.
 
 **references**
 
 Lowrie, W. Fundamentals of Geophysics pg. 330 eq. 5.54
-Sleep & Fujita 1997. Pg. 223 eq. 6.45
 
+Sleep & Fujita 1997. Pg. 223 eq. 6.45
 """
 
 import numpy as np
