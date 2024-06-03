@@ -16,3 +16,4 @@
 ./src/gmgpy/pygmt_plot.ipynb
 ./src/gmgpy/test.py
 ./tests/
+./build/
