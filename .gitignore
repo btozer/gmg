@@ -20,3 +20,5 @@
 .vscode/
 .idea/
 .travis.yml
+build_pip.sh
+gmt.history
