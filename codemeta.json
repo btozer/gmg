@@ -26,11 +26,6 @@
   "dependencies": [
     {
       "@type": "SoftwareApplication",
-      "name": "numpY",
-      "version": ">=1.24.4"
-    },
-    {
-      "@type": "SoftwareApplication",
       "name": "numpy",
       "version": ">=1.24.4"
     },
@@ -57,7 +52,7 @@
     {
       "@type": "SoftwareApplication",
       "name": "pygmt",
-      "version": ">=0.11.0"
+      "version": ">=0.9.0"
     },
     {
       "@type": "SoftwareApplication",
