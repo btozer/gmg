@@ -24,6 +24,7 @@ venv/
 .travis.yml
 build_pip.sh
 gmt.history
+gmg.yml
 
 .DS_STORE
 /src/.DS_STORE
