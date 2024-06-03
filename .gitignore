@@ -12,4 +12,7 @@
 
 #
 /SEISMIC_DATA/
-horizontal_derivative.py
+./horizontal_derivative.py
+./src/gmgpy/pygmt_plot.ipynb
+./src/gmgpy/test.py
+./tests/
