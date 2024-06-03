@@ -8,3 +8,4 @@ dependencies:
   - scipy>=1.10.1
   - wxpython>=4.2.0
   - future>=0.18
+  - pytest>=8.2.1
