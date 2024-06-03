@@ -1,21 +1,71 @@
 {
   "@context": "https://raw.githubusercontent.com/codemeta/codemeta/master/codemeta.jsonld",
   "@type": "Code",
-  "author": [
-      "@id": "https://orcid.org/0000-0003-0043-0580",
-      "@type": "orcid",
-      "email": "b.tozer@gns.cri.nz",
-      "name:": "Brook Tozer",
-      "affiliation": "GNS Science, 1 Fairway Drive, Lower Hutt, New Zealand",
-  ],
+  "author": {
+    "@id": "https://orcid.org/0000-0003-0043-0580",
+    "@type": "orcid",
+    "email": "b.tozer@gns.cri.nz",
+    "name:": "Brook Tozer",
+    "affiliation": "GNS Science, 1 Fairway Drive, Lower Hutt, New Zealand"
+  },
   "identifier": "",
   "codeRepository": "https://github.com/btozer/gmg",
-  "datePublished": "2019-01-01",
-  "dateModified": "2019-01-01",
-  "dateCreated": "2019-01-01",
+  "issueTracker": "https://github.com/btozer/gmg/issues",
   "description": "gmg: An open source geophysical forward modelling GUI",
   "keywords": "Geophysics, gravity, magnetics, modelling",
   "license": "BSD-3-Clause License",
   "title": "gmg",
-  "version": "v0.1.0"
+  "version": "v0.1.12",
+  "programmingLanguage": [
+    {
+      "@type": "ComputerLanguage",
+      "name": "Python",
+      "url": "https://www.python.org/"
+    }
+  ],
+  "dependencies": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "numpY",
+      "version": ">=1.24.4"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "numpy",
+      "version": ">=1.24.4"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "obspy",
+      "version": ">=1.4.0"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "scipy",
+      "version": ">=1.10.1"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "wxpython",
+      "version": ">=4.2.0"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "future",
+      "version": ">=0.18"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "pygmt",
+      "version": ">=0.11.0"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "pytest",
+      "version": ">=8.2.1"
+    }
+  ],
+  "dateModified": "2024-06-03",
+  "dateCreated": "2016-01-01",
+  "datePublished": "2019-01-01"
 }
