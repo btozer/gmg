@@ -1974,11 +1974,13 @@ class Gmg(wx.Frame):
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def zoom(self, event):
+        """SWTICH ON ZOOM IN MODE"""
         self.nav_toolbar.zoom()
         # REDRAW
         self.draw()
 
     def zoom_out(self, event):
+        """SWTICH ON ZOOM OUT MODE"""
         self.nav_toolbar.back()
         # REDRAW
         self.draw()
@@ -2028,6 +2030,7 @@ class Gmg(wx.Frame):
     def pan(self, event):
         """PAN MODEL VIEW USING MOUSE DRAG"""
         self.nav_toolbar.pan()
+        # REDRAW
         self.draw()
 
     def calc_grav_switch_callback(self, event):
@@ -4704,6 +4707,12 @@ class Gmg(wx.Frame):
 
         # z = ZOOM IN MODE
         if event.key == 'z':
+            # SWTICH BITMAP IN TOOLBAR
+            if self.t_zoom.IsToggled():
+                self.toolbar.ToggleTool(self.t_zoom.GetId(), False)
+            else:
+                self.toolbar.ToggleTool(self.t_zoom.GetId(), True)
+            # CALL ZOOM EVENT
             self.zoom(event)
 
         # ctrl+z = ZOOM OUT
@@ -4711,7 +4720,13 @@ class Gmg(wx.Frame):
             self.zoom_out(event)
 
         # shift = PAN MODE
-        if event.key == 'ctrl+p':
+        if event.key == 'w':
+            # SWTICH BITMAP IN TOOLBAR
+            if self.t_pan.IsToggled():
+                self.toolbar.ToggleTool(self.t_pan.GetId(), False)
+            else:
+                self.toolbar.ToggleTool(self.t_pan.GetId(), True)
+            # CALL PAN EVENT
             self.pan(event)
 
         # a = FULL EXTENT VIEW'
@@ -4719,7 +4734,7 @@ class Gmg(wx.Frame):
             self.full_extent(event)
 
         # p = TURN ON PINCH NODE MODE
-        if event.key == 'p':
+        if event.key == 'ctrl+p':
             if self.pinch_switch is False:
                 self.pinch_switch = True
             else:
