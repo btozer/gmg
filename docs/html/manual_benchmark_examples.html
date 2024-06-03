@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>13.0 Benchmark examples &mdash; GMG: An open source geophysical modelling GUI</title>
+  <title>13.0 Benchmark tests &mdash; GMG: An open source geophysical modelling GUI</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -73,7 +73,7 @@
 <li class="toctree-l2"><a class="reference internal" href="manual_python_console.html"><strong>10.0 Python console</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_coordinate_capture.html"><strong>11.0 Coordinate capture</strong></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manual_export_figure.html"><strong>12.0 Export figure</strong></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>13.0 Benchmark examples</strong></a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><strong>13.0 Benchmark tests</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#gravity-modelling-benchmark-buried-cylinder">13.1 Gravity modelling benchmark: Buried cylinder</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#magnetic-benchmark">13.2 Magnetic benchmark</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#summary">13.3 Summary</a></li>
@@ -109,7 +109,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="gmg_documentation.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="manual.html"><strong>Manual</strong></a></li>
-      <li class="breadcrumb-item active"><strong>13.0 Benchmark examples</strong></li>
+      <li class="breadcrumb-item active"><strong>13.0 Benchmark tests</strong></li>
       <li class="wy-breadcrumbs-aside">
               <a href="https://github.com/btozer/gmg/blob/master/docs/_sources/manual_benchmark_examples.txt" class="fa fa-github"> Edit on GitHub</a>
       </li>
@@ -119,8 +119,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="benchmark-examples">
-<span id="manual-benchmark-examples"></span><h1><strong>13.0 Benchmark examples</strong><a class="headerlink" href="#benchmark-examples" title="Permalink to this heading"></a></h1>
+  <section id="benchmark-tests">
+<span id="manual-benchmark-examples"></span><h1><strong>13.0 Benchmark tests</strong><a class="headerlink" href="#benchmark-tests" title="Permalink to this heading"></a></h1>
 <p>To test the potential field algorithms employed within gmg, two benchmark models are
 provided for comparison with the analytical solutions for simple two dimensional shapes.</p>
 <section id="gravity-modelling-benchmark-buried-cylinder">
@@ -147,7 +147,7 @@ grav_cylinder_analytical_anomaly.xa
 and the calculation increment as 0.1 km.</p>
 <p><strong>Step 2: Load the observed gravity anomaly</strong></p>
 <p>Load the observed gravity anomaly. This was calculated using the analytical solution for a
-buried cylinder extending infinitely in the 3rd dimension (Heiland (1940) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id4" title="C.A. Heiland. Geophysical Exploration. Geology series / edited by Norman E.A. Hinds. Prentice-Hall, Incorporated, 1940.">4</a>]</span> Pg. 153).</p>
+buried cylinder extending infinitely in the 3rd dimension given by, for example, Heiland (1940) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id4" title="C.A. Heiland. Geophysical Exploration. Geology series / edited by Norman E.A. Hinds. Prentice-Hall, Incorporated, 1940.">4</a>]</span> Pg. 153.</p>
 <p>To load observed anomaly navigate to <em>Gravity</em> in the Menubar. Next, select <em>Load Gravity Anomaly</em>.
 Now, navigate to the file <em>grav_cylinder_analytical_anomaly.xa</em> and select it:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Load Gravity Anomaly -&gt; Select file to load
@@ -222,7 +222,7 @@ Now, leave angles A, B and C as zero and set F (Earth’s field) as 50,000. Fina
 <p><strong>Step 3: Turn on the magnetic calculator</strong></p>
 <p>In the Toolbar find the <em>M</em> button (fifth in from the left). This is used to switch the magnetic response
 calculation on and off. Click the button and the calculated anomaly will appear in the magnetics frame.</p>
-<p>Note, similarly to the gravity anoamly there is a slight mismatch between the observed and calculated anomaly
+<p>Note, similarly to the gravity anomaly there is a slight mismatch between the observed and calculated anomaly
 near the peak. Again, this is due to the missing mass around the edge of the cylinder,
 given we have dicretised it with a series of straight lines.</p>
 <p><strong>Step 4: Calculate the root-mean-square misfit</strong></p>
@@ -237,13 +237,14 @@ a purple line in the gravity data frame.</p>
 <p><strong>Step 5: Test the difference using a more accurate cylinder representation</strong></p>
 <p>Select layer 2 (i.e.,  the 360 node cylinder) and set it’s susceptibility to 0.001 and f to 50,000 nT.
 Now, switch off the contribution from layer 1 by unchecking its tick box under the <em>Layers</em> window.
-We see now the RMS value decreases to 0.0002 nT. As with the gravity anoamly, this much reduced relative
+We see now the RMS value decreases to 0.0002 nT. As with the gravity anomaly, this much reduced relative
 to the previous value, as we have added most of the mass missing from the cylinder discretised with only 24 nodes.</p>
 </section>
 <section id="summary">
 <h2>13.3 Summary<a class="headerlink" href="#summary" title="Permalink to this heading"></a></h2>
-<p>These tests have demonstrated the accuracy of the gmg algorithms. The RMS values calculated for the
-gravity and magnetic anomalies are very small for the 24 node discretisation and negligible for the 360 node case.</p>
+<p>These tests have demonstrated the accuracy of the 2D potential field algorithms employed within gmg. The RMS values
+calculated for the gravity and magnetic anomalies are very small for the 24 node discretisation and negligible
+for the 360 node case.</p>
 <p>It is hoped that these tests have provided the user with a feel for the accuracy and limitations of
 the 2D algorithms incorporated within gmg (For example, the accuracy of the calculated anomaly is
 dependent on the number of nodes used) and provided a quick and easy introduction to key features within
@@ -271,7 +272,7 @@ is a key focus of future development.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2024, B. Tozer.
-      <span class="lastupdated">Last updated on May 31, 2024.
+      <span class="lastupdated">Last updated on Jun 04, 2024.
       </span></p>
   </div>
 

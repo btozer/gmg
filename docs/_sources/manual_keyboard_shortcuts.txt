@@ -7,7 +7,7 @@
 Key                 Function                    Key                 Function
 =================== =========================== =================== ===========================
 **i**               Insert node                 **a**               Reset view (1:1 aspect)
-**d**               Delete node                 **shift+p**         Pan view
+**d**               Delete node                 **w**               Pan view
 **n**               Create new layer            **up arrow**        Increase aspect ratio
 **p**               Pinch node :math:`^{*}`     **down arrow**      Decrease aspect ratio
 **>**               Edit next layer             **ctrl+up arrow**   Increase aspect ratio x2
