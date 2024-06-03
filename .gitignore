@@ -17,3 +17,6 @@
 ./src/gmgpy/test.py
 ./tests/
 ./build/
+.vscode/
+.idea/
+.travis.yml
