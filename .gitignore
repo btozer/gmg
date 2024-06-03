@@ -11,6 +11,7 @@
 /*.egg-info
 
 #
+venv/
 /SEISMIC_DATA/
 ./horizontal_derivative.py
 ./src/gmgpy/pygmt_plot.ipynb
