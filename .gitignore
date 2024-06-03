@@ -22,3 +22,4 @@
 .travis.yml
 build_pip.sh
 gmt.history
+.DS_STORE
