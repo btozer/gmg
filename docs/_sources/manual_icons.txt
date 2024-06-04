@@ -25,6 +25,7 @@
 .. |fig20| image:: _images/F_24.png
 .. |fig21| image:: _images/faultline_24.png
 .. |fig22| image:: _images/undo_24.png
+.. |fig23| image:: _images/pinch_24.png
 
 Menubar shortcuts
 -----------------
@@ -52,22 +53,24 @@ Menubar shortcuts
 +-------------------------------------+-------------------------------------+
 | |fig21| Start fault picking         | |fig22| Undo last model update      |
 +-------------------------------------+-------------------------------------+
+| |fig23| Pinch node to another layer |                                     |
++-------------------------------------+-------------------------------------+
 
-.. |fig23| image:: _images/large_up_24.png
-.. |fig24| image:: _images/python_24.png
-.. |fig25| image:: _images/T_24.png
-.. |fig26| image:: _images/G_24.png
-.. |fig27| image:: _images/M_24.png
-.. |fig28| image:: _images/V_24.png
+.. |fig24| image:: _images/large_up_24.png
+.. |fig25| image:: _images/python_24.png
+.. |fig26| image:: _images/T_24.png
+.. |fig27| image:: _images/G_24.png
+.. |fig28| image:: _images/M_24.png
+.. |fig29| image:: _images/V_24.png
 
 
 Controlbar shortcuts
 --------------------
 
 +-----------------------------------+---------------------------------+
-| |fig23| Toggle controls frame     | |fig24| Toggle python console   |
+| |fig24| Toggle controls frame     | |fig25| Toggle python console   |
 +-----------------------------------+---------------------------------+
-| |fig25| Toggle topography frame   | |fig26| Toggle  gravity frame   |
+| |fig26| Toggle topography frame   | |fig27| Toggle  gravity frame   |
 +-----------------------------------+---------------------------------+
-| |fig27| Toggle magnetic frame     | |fig28| Toggle VGG frame        |
+| |fig28| Toggle magnetic frame     | |fig29| Toggle VGG frame        |
 +-----------------------------------+---------------------------------+
