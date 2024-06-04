@@ -716,6 +716,13 @@ class Gmg(wx.Frame):
                                                  shortHelp="Undo")
         self.Bind(wx.EVT_TOOL, self.undo, self.t_undo)
 
+        self.t_pinch = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Pinch nodes",
+                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'pinch_24.png'),
+                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'pinch_24.png'),
+                                               shortHelp="Pinch nodes",
+                                               longHelp="", clientData=None)
+        self.Bind(wx.EVT_TOOL, self.pinch_out_layer_switch, self.t_pinch)
+
         # REDO ICON
         # self.t_redo = self.toolbar.AddTool(wx.ID_ANY, "Redo",
         #                                          bitmap=wx.Bitmap(self.gui_icons_dir + 'redo_24.png'),
@@ -4250,6 +4257,13 @@ class Gmg(wx.Frame):
             # COORDINATE CAPTURE MODE OR NEW LAYER CREATION OR NEW FAULT CREATION IS ON. SO PASS
             return
 
+    def pinch_out_layer_switch(self, event):
+        if self.pinch_switch is False:
+            self.pinch_switch = True
+        else:
+            self.pinch_switch = False
+            self.pinch_count = 0
+
     def move(self, event):
         """WHAT HAPPEN WHEN THE LEFT MOUSE BUTTON IS HELD AND THE MOUSE IS MOVED"""
 
@@ -4740,6 +4754,11 @@ class Gmg(wx.Frame):
             else:
                 self.pinch_switch = False
                 self.pinch_count = 0
+            # TOGGLE TOOLBAR BUTTON
+            if self.t_pinch.IsToggled():
+                self.toolbar.ToggleTool(self.t_pinch.GetId(), False)
+            else:
+                self.toolbar.ToggleTool(self.t_pinch.GetId(), True)
 
         # ctrl+i = INCREASE LAYER TRANSPARENCY
         if event.key == 'ctrl+i':
