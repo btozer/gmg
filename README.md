@@ -123,13 +123,9 @@ Or on Windows use:
 
     activate gmgpy
 
-**Installation option 1: using conda (highly recommended)**
+**Installation option using pip test**
 
-    conda install gmgpy
-
-**Installation option 2: using pip**
-
-    pip install gmgpy
+    pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple gmgpy
 
 Launching gmg
 -------------
