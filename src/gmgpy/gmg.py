@@ -86,12 +86,13 @@ https://www.sphinx-doc.org/en/master/
 # IMPORT MODULES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 import wx
 import matplotlib
-matplotlib.use('WXAgg')
+#matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
+import matplotlib.image as mplimg
 import wx.adv
 import wx.lib.agw.customtreectrl as ct
 import wx.py as py
@@ -121,7 +122,9 @@ import gc
 import webbrowser
 import copy
 from types import MappingProxyType
-
+import warnings
+# Suppress warnings
+warnings.filterwarnings("ignore")
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -156,9 +159,11 @@ class Gmg(wx.Frame):
                                      wx.adv.SPLASH_TIMEOUT, 3000,
                                      self, id=wx.ID_ANY, size=(1, 1),
                                      style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
+        self.Show(True)
+        self.Raise()
+        self.SetFocus()
         splash.Show()
-        self.Show()
-
+        
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
 
@@ -294,8 +299,8 @@ class Gmg(wx.Frame):
         # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
 
-        # MAXIMIZE FRAME
-        self.Maximize(True)
+        # # MAXIMIZE FRAME
+        # self.Maximize(True)
 
     def create_menu(self):
         """CREATE GUI MENUBAR"""
@@ -504,6 +509,28 @@ class Gmg(wx.Frame):
         self.menubar.Append(self.seismic_data, "&Seismic Data")
         # --------------------------------------------------------------------------------------------------------------
 
+        # GRID DATA MENU -----------------------------------------------------------------------------------------------
+        self.grid_data = wx.Menu()
+        self.m_load_grid = self.grid_data.Append(-1, "&Load grid...\tCtrl-Shift-g", "Load GMT .nc grid")
+        self.Bind(wx.EVT_MENU, self.grid_input, self.m_load_grid)
+        # GRID SUBMENU
+        self.m_grid_submenu = wx.Menu()
+        self.grid_data.AppendSubMenu(self.m_grid_submenu, "Grids...")
+        # DRAW MENU
+        self.menubar.Append(self.grid_data, "&Grid Data")
+        # --------------------------------------------------------------------------------------------------------------
+
+        # PNG DATA MENU -----------------------------------------------------------------------------------------------
+        self.png_data = wx.Menu()
+        self.m_load_png = self.png_data.Append(-1, "&Load PNG...\tCtrl-Shift-p", "Load .png image")
+        self.Bind(wx.EVT_MENU, self.png_input, self.m_load_png)
+        # GRID SUBMENU
+        self.m_png_submenu = wx.Menu()
+        self.png_data.AppendSubMenu(self.m_png_submenu, "PNGs...")
+        # DRAW MENU
+        self.menubar.Append(self.png_data, "&Png Data")
+        # --------------------------------------------------------------------------------------------------------------
+        
         # WELL DATA MENU -----------------------------------------------------------------------------------------------
         self.well_data = wx.Menu()
         self.m_load_well = self.well_data.Append(-1, "&Load well record...\tCtrl-Shift-w", "Load well record")
@@ -887,12 +914,20 @@ class Gmg(wx.Frame):
         # INITIALISE SEISMIC ATTRIBUTES
         self.segy_data_list = []
         self.segy_counter = 0
-        # self.segy_color_map = cm.gray
-        self.segy_color_map = cm.jet
+        self.segy_color_map = cm.gray
         # self.segy_gain_neg = -4.0
         # self.segy_gain_pos = 4.0
         self.segy_gain_neg = 1500
         self.segy_gain_pos = 6000
+
+       # INITIALISE GRID ATTRIBUTES
+        self.grid_data_list = []
+        self.grid_counter = 0
+        self.segy_color_map = cm.jet
+
+       # INITIALISE PNG ATTRIBUTES
+        self.png_data_list = []
+        self.png_counter = 0
 
         # INITIALIZE COORDINATE CAPTURE
         self.capture = False
@@ -1984,12 +2019,14 @@ class Gmg(wx.Frame):
         """SWTICH ON ZOOM IN MODE"""
         self.nav_toolbar.zoom()
         # REDRAW
+        self.update_layer_data()
         self.draw()
 
     def zoom_out(self, event):
         """SWTICH ON ZOOM OUT MODE"""
         self.nav_toolbar.back()
         # REDRAW
+        self.update_layer_data()
         self.draw()
 
     def full_extent(self, event):
@@ -2038,6 +2075,7 @@ class Gmg(wx.Frame):
         """PAN MODEL VIEW USING MOUSE DRAG"""
         self.nav_toolbar.pan()
         # REDRAW
+        self.update_layer_data()
         self.draw()
 
     def calc_grav_switch_callback(self, event):
@@ -2236,7 +2274,9 @@ class Gmg(wx.Frame):
                   'observed_topography_list',
                   'well_data_list',
                   'outcrop_data_list',
-                  'segy_data_list']
+                  'segy_data_list',
+                  'grid_data_list',
+                  'png_data_list']
 
         model_params = [self.model_aspect, self.area, self.xp,
                         self.tree_items, self.fault_tree_items,
@@ -2251,7 +2291,9 @@ class Gmg(wx.Frame):
                         self.observed_topography_list,
                         self.well_data_list,
                         self.outcrop_data_list,
-                        self.segy_data_list]
+                        self.segy_data_list,
+                        self.grid_data_list,
+                        self.png_data_list]
 
         for i in range(0, len(model_params)):
             try:
@@ -2429,6 +2471,16 @@ class Gmg(wx.Frame):
             # LOAD SEGY DATA
             if len(self.segy_data_list) > 0:
                 self.replot_segy_data()
+
+            # LOAD GRID DATA
+            if len(self.grid_data_list) > 0:
+                pass
+                # self.replot_grid_data()
+
+            # LOAD PNG DATA
+            if len(self.png_data_list) > 0:
+                pass
+                # self.replot_png_data()
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -3450,11 +3502,148 @@ class Gmg(wx.Frame):
         self.draw()
 
 
+    # PNG DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    def png_input(self, event):
+        png_data_box = SeisDialog(self, -1, 'PNG Fig Dimensions', self.area)
+        answer = png_data_box.ShowModal()
+        self.d = png_data_box.dimensions
+        self.png_name = png_data_box.segy_name_input
+        self.sx1, self.sx2, self.sz1, self.sz2 = self.d
+        self.load_png(self)
+
+    def load_png(self, event):
+        try:
+            open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
+                                             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if open_file_dialog.ShowModal() == wx.ID_CANCEL:
+                return  # THE USER CHANGED THEIR MIND
+
+            # PARSE INPUT FILE
+            file_in = open_file_dialog.GetPath()
+
+            # CREATE NEW SEGY OBJECT
+            png = SegyData()
+
+            # ASSIGN ATTRIBUTES
+            #png.id = self.png_counter
+            png.file = file_in
+            #png.name = self.segy_name
+            png.dimensions = self.d
+            print(png.dimensions)
+            # PLOT PNG ON MODEL
+            ## USING WX
+            # Load the image from file
+            # png_figure = wx.Image(file_in, wx.BITMAP_TYPE_ANY)
+            # # Convert the image to a bitmap
+            # png_bitmap = wx.Bitmap(png_figure)
+            # # Create a wx.StaticBitmap widget to display the image
+            # png.mpl_actor = wx.StaticBitmap(self, wx.ID_ANY, png_bitmap)
+            
+            # self.model_frame.sizer.Add(png.mpl_actor, 1, wx.EXPAND | wx.ALL, 5)
+
+            # png_sizer = wx.BoxSizer(wx.VERTICAL)
+            # png_sizer.Add(png.mpl_actor, 1, wx.EXPAND | wx.ALL, 5)
+            # png_sizer.SetSizer(png_sizer)
+
+            # # LOAD SEGY DATA
+            png_figure = mplimg.imread(file_in)
+
+            # # SET AXIS
+            png.axis = [png.dimensions[0], png.dimensions[1], png.dimensions[3], png.dimensions[2]]
+
+            # # USING MPL
+            png.mpl_actor = self.model_frame.imshow(png_figure, extent=png.axis, aspect='auto')
+            
+            # REMOVE SEGY DATA
+            # del png_figure
+
+            # # SET SEGY ON SWTICH
+            # self.png_on = True
+
+            # # APPEND NEW SEGY TO THE SEGY DATA LIST
+            # self.png_data_list.append(png)
+
+            # # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
+            # self.png_name_submenu = wx.Menu()
+            # self.m_png_submenu.Append(self.png_counter + 1000, png.name, self.grid_png_submenu)
+            # self.png_name_submenu.Append(self.png_counter + 1000, 'delete png')
+            # self.Bind(wx.EVT_MENU, self.remove_png, id=self.png_counter + 1000)
+
+            # INCREMENT COUNTER
+            self.png_counter += 1
+
+        except Exception:
+            load_error = MessageDialog(self, -1, "PNG LOAD ERROR", "png load error")
+
+        # REPLOT MODEL
+        # self.update_layer_data()
+        # self.draw()
 
 
+    # GRID DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    def grid_input(self, event):
+        grid_data_box = SeisDialog(self, -1, 'Grid Dimensions', self.area)
+        answer = grid_data_box.ShowModal()
+        self.d = grid_data_box.dimensions
+        self.grid_name = grid_data_box.segy_name_input
+        self.sx1, self.sx2, self.sz1, self.sz2 = self.d
+        self.load_grid_data(self)
 
+    def load_grid_data(self, event):
+        try:
+            open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
+                                             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if open_file_dialog.ShowModal() == wx.ID_CANCEL:
+                return  # THE USER CHANGED THEIR MIND
+
+            # PARSE INPUT FILE
+            file_in = open_file_dialog.GetPath()
+
+            # CREATE NEW SEGY OBJECT
+            grid = SegyData()
+
+            # ASSIGN ATTRIBUTES
+            grid.id = self.segy_counter
+            grid.file = file_in
+            grid.name = self.segy_name
+            grid.dimensions = self.d
+
+            # LOAD SEGY DATA
+            grid_data = np.genfromtxt(file_in, dtype=np.float32, delimiter=" ")
+
+            # SET AXIS
+            grid.axis = [grid.dimensions[0], grid.dimensions[1], grid.dimensions[3], grid.dimensions[2]]
+
+            # PLOT SEGY DATA ON MODEL
+            grid.mpl_actor = self.model_frame.imshow(grid_data, vmin=1.5, vmax=8.5,
+                                                     aspect='auto', extent=grid.axis, cmap=self.segy_color_map,
+                                                     alpha=0.75)
+            # REMOVE SEGY DATA
+            del grid_data
+
+            # SET SEGY ON SWTICH
+            self.grid_on = True
+
+            # APPEND NEW SEGY TO THE SEGY DATA LIST
+            self.grid_data_list.append(grid)
+
+            # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
+            self.grid_name_submenu = wx.Menu()
+            self.m_grid_submenu.Append(self.grid_counter + 1000, grid.name, self.grid_name_submenu)
+            self.grid_name_submenu.Append(self.grid_counter + 1000, 'delete grid')
+            self.Bind(wx.EVT_MENU, self.remove_grid, id=self.grid_counter + 1000)
+
+            # INCREMENT COUNTER
+            self.grid_counter += 1
+
+        except Exception:
+            load_error = MessageDialog(self, -1, "GRID LOAD ERROR", "grid load error")
+
+        # REPLOT MODEL
+        self.update_layer_data()
+        self.draw()
 
     # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3486,13 +3675,19 @@ class Gmg(wx.Frame):
             segy.dimensions = self.d
 
             # LOAD SEGY DATA
-            seis_data = np.genfromtxt(file_in, dtype=np.float32, delimiter=" ")
+            section = read(file_in, unpack_trace_headers=False)
+            nsamples = len(section.traces[0].data)
+            ntraces = len(section.traces)
+            seis_data = plt.zeros((nsamples, ntraces))
+            for i, tr in enumerate(section.traces):
+                seis_data[:, i] = tr.data
+            del section
 
             # SET AXIS
             segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
 
             # PLOT SEGY DATA ON MODEL
-            segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=1.5, vmax=6,
+            segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
                                                      aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
                                                      alpha=0.75)
             # REMOVE SEGY DATA
@@ -3519,82 +3714,6 @@ class Gmg(wx.Frame):
         # REPLOT MODEL
         self.update_layer_data()
         self.draw()
-
-
-
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-    # # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-    # def segy_input(self, event):
-    #     seismic_data_box = SeisDialog(self, -1, 'Segy Dimensions', self.area)
-    #     answer = seismic_data_box.ShowModal()
-    #     self.d = seismic_data_box.dimensions
-    #     self.segy_name = seismic_data_box.segy_name_input
-    #     self.sx1, self.sx2, self.sz1, self.sz2 = self.d
-    #     self.load_segy(self)
-
-    # def load_segy(self, event):
-    #     try:
-    #         open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
-    #                                          wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-    #         if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-    #             return  # THE USER CHANGED THEIR MIND
-
-    #         # PARSE INPUT FILE
-    #         file_in = open_file_dialog.GetPath()
-
-    #         # CREATE NEW SEGY OBJECT
-    #         segy = SegyData()
-
-    #         # ASSIGN ATTRIBUTES
-    #         segy.id = self.segy_counter
-    #         segy.file = file_in
-    #         segy.name = self.segy_name
-    #         segy.dimensions = self.d
-
-    #         # LOAD SEGY DATA
-    #         section = read(file_in, unpack_trace_headers=False)
-    #         nsamples = len(section.traces[0].data)
-    #         ntraces = len(section.traces)
-    #         seis_data = plt.zeros((nsamples, ntraces))
-    #         for i, tr in enumerate(section.traces):
-    #             seis_data[:, i] = tr.data
-    #         del section
-
-    #         # SET AXIS
-    #         segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
-
-    #         # PLOT SEGY DATA ON MODEL
-    #         segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
-    #                                                  aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
-    #                                                  alpha=0.75)
-    #         # REMOVE SEGY DATA
-    #         del seis_data
-
-    #         # SET SEGY ON SWTICH
-    #         self.segy_on = True
-
-    #         # APPEND NEW SEGY TO THE SEGY DATA LIST
-    #         self.segy_data_list.append(segy)
-
-    #         # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
-    #         self.segy_name_submenu = wx.Menu()
-    #         self.m_segy_submenu.Append(self.segy_counter + 1000, segy.name, self.segy_name_submenu)
-    #         self.segy_name_submenu.Append(self.segy_counter + 1000, 'delete segy')
-    #         self.Bind(wx.EVT_MENU, self.remove_segy, id=self.segy_counter + 1000)
-
-    #         # INCREMENT COUNTER
-    #         self.segy_counter += 1
-
-    #     except Exception:
-    #         load_error = MessageDialog(self, -1, "SEGY LOAD ERROR", "segy load error")
-
-    #     # REPLOT MODEL
-    #     self.update_layer_data()
-    #     self.draw()
 
     def remove_segy(self, event):
         """DELETE SEGY DATA. NB 1000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH GRAV EVENT.IDS"""
@@ -4732,6 +4851,7 @@ class Gmg(wx.Frame):
         # ctrl+z = ZOOM OUT
         if event.key == 'ctrl+z':
             self.zoom_out(event)
+            self.update_layer_data()
 
         # shift = PAN MODE
         if event.key == 'w':
@@ -6458,8 +6578,5 @@ class Gmg(wx.Frame):
 # START SOFTWARE
 if __name__ == "__main__":
     app = wx.App(False)
-    fr = wx.Frame(None, title='GMG: Geophysical Modelling GUI')
     app.frame = Gmg()
-    app.frame.CenterOnScreen()
-    app.frame.Show()
     app.MainLoop()

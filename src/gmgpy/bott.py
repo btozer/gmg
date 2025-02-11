@@ -1,5 +1,4 @@
-""".zip
-.5335724
+""".
 Calculate the gravitational attraction of a 2D body defined as a polygon of
 infinite extent orthogonal to the cross section using the method of Bott (1965).
 
