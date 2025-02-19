@@ -176,6 +176,8 @@ class LoadObservedDataFrame(wx.Frame):
             self.parent.open_obs_g()
         elif self.type == 'magnetics':
             self.parent.open_obs_m()
+        elif self.type == 'vgg':
+            self.parent.open_obs_vgg()
         elif self.type == 'topography':
             self.parent.open_obs_t()
         elif self.type == 'XY':
