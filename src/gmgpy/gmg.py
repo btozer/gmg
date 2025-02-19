@@ -116,6 +116,7 @@ import kim_and_wessel
 from frames import *
 from dialogs import *
 from objects import *
+from gmg_documentation import * 
 import model_stats
 import struct
 import gc
@@ -2971,6 +2972,7 @@ class Gmg(wx.Frame):
     def load_obs_g(self, event):
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'gravity')
         self.load_window.Show(True)
+        # ON CLICK USE dialogs.LoadObservedDataFrame to call open_obs_g
 
     def open_obs_g(self):
         """
@@ -2978,10 +2980,11 @@ class Gmg(wx.Frame):
         DATA ARE STORED IN gmg.observed_gravity_list as a ObservedData object.
         object IDs start at 11000.
         """
+        print("load grav")
 
         # PARSE USER INPUT FILE
         input_file = self.load_window.file_path
-
+        print(input_file)
         # CREATE NEW OBSERVED GRAVITY OBJECT
         observed_gravity = ObservedData()
 
@@ -3147,8 +3150,10 @@ class Gmg(wx.Frame):
    # VGG DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def load_obs_vgg(self, event):
+        print("open vgg")
         self.load_window = LoadObservedDataFrame(self, -1, 'Load observed data', 'vgg')
         self.load_window.Show(True)
+        # ON CLICK USE dialogs.LoadObservedDataFrame to call open_obs_vgg
 
     def open_obs_vgg(self):
         """
@@ -3156,10 +3161,11 @@ class Gmg(wx.Frame):
         DATA ARE STORED IN gmg.observed_vgg_list as a ObservedData object.
         object IDs start at 15000.
         """
+        print("load vgg")
 
         # PARSE USER INPUT FILE
         input_file = self.load_window.file_path
-
+        print(input_file)
         # CREATE NEW OBSERVED vgg OBJECT
         observed_vgg = ObservedData()
 
@@ -3192,7 +3198,7 @@ class Gmg(wx.Frame):
 
         # INCREMENT OBSERVED vgg COUNTER
         self.observed_vgg_counter += 1
-
+    
         # UPDATE GMG GUI
         self.update_layer_data()
         self.set_frame_limits()
@@ -3331,8 +3337,8 @@ class Gmg(wx.Frame):
 
     def open_obs_m(self):
         """
-        LOAD OBSERVE GRAVITY DATA.
-        DATA ARE STORED IN gmg.observed_gravity_list as a ObservedData object.
+        LOAD OBSERVED MAGNETIC DATA.
+        DATA ARE STORED IN gmg.observed_magnetic_list as a ObservedData object.
         object IDs start at 12000.
         """
 
@@ -5920,6 +5926,9 @@ class Gmg(wx.Frame):
         if self.gravity_frame:
             self.gravity_frame.set_xlim(xmin, xmax)
             self.gravity_d_frame.set_xlim(xmin, xmax)
+        if self.vertical_gg_frame:
+            self.vertical_gg_frame.set_xlim(xmin, xmax)
+            self.vertical_gg_frame.set_xlim(xmin, xmax)
         if self.magnetic_frame:
             self.magnetic_frame.set_xlim(xmin, xmax)
             self.magnetic_d_frame.set_xlim(xmin, xmax)
@@ -6156,7 +6165,12 @@ class Gmg(wx.Frame):
             self.gravity_rms_plot.set_data(self.grav_residuals[:, 0], self.grav_residuals[:, 1])
         else:
             pass
-
+        
+        # # SET VGG RMS
+        # if len(self.obs_vgg_data_for_rms) != 0 and self.calc_vgg_switch is True and len(self.predicted_vgg) != 0:
+        #     self.vgg_rms_plot.set_data(self.vgg_residuals[:, 0], self.vgg_residuals[:, 1])
+        # else:
+        #     pass
         # SET MAGNETIC RMS
         if len(self.obs_mag_data_for_rms) != 0 and self.calc_mag_switch is True and len(self.predicted_nt) != 0:
             self.mag_rms_plot.set_data(self.mag_residuals[:, 0], self.mag_residuals[:, 1])
@@ -6300,7 +6314,10 @@ class Gmg(wx.Frame):
             pass
 
         if self.vertical_gg_frame is not None:
-            self.vertical_gg_frame.set_ylim(ymin, ymax)
+            try: 
+                self.vertical_gg_frame.set_ylim(ymin, ymax)
+            except:
+                self.vertical_gg_frame.set_ylim(-10, 10)
         # --------------------------------------------------------------------------------------------------------------
         # SET DERIVATIVE Y-AXIS LIMITS
 
@@ -6492,61 +6509,13 @@ class Gmg(wx.Frame):
     # DOCUMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def open_documentation(self, event):
-        """OPEN DOCUMENTATION HTML"""
-
-        # self.doc_dir = os.path.dirname(os.path.abspath(__file__)).split('/')
-        # doc_url = self.doc_dir[0] + '/' + self.doc_dir[1] + '/' + self.doc_dir[2] + '/' + self.doc_dir[3] + \
-        #           '/' + self.doc_dir[4] + '/docs/html/gmg_documentation.html'
-        doc_url = "https://btozer.github.io/gmg/html/gmg_documentation.html"
-        if platform == "linux" or platform == "linux2" or platform == "win32":
-            # LINUX & WINDOWS
-            webbrowser.open_new(doc_url)
-        else:
-            # OS X
-            client = webbrowser.get("open -a /Applications/Safari.app %s")
-            client.open(doc_url)
+        open_documentation(event)
 
     def about_gmg(self, event):
-        """ SHOW SOFTWARE INFORMATION"""
-        about = [
-            "GMG is an Open Source Graphical User Interface (GUI) designed principally for modelling 2D potential "
-            "field (gravity and magnetic) profiles. The software also includes functions for loading XY data, "
-            "seismic reflection SEGY data and exploration well horizons. The software therefore provides an "
-            "integrated geological/geophysical interpretation package. It is anticipated that GMG will be "
-            "useful for undergraduate teaching purposes. \n \n"
-            "Data I/O is made as simple as possible using space delimited ASCII text files. \n \n"
-            "The project was instigated after failing to find an adequate open source option (in which the source "
-            "code can be viewed and modified by the user) for performing 2D geophysical modeling tasks.           "
-            "Inspiration came from fatiando a terra and GMT. \n \n"
-            "GMG was initially developed at the University of Oxford 2014-2017. \n \n"
-            "B. Tozer"]
-
-        dlg = wx.MessageDialog(self, about[0], "About", wx.OK | wx.ICON_INFORMATION)
-        result = dlg.ShowModal()
-        dlg.Destroy()
+        about_gmg(event)
 
     def legal(self, event):
-        """ SHOW LICENCE"""
-        licence = ["Copyright 2015-2023 Brook Tozer \n\nRedistribution and use in source and binary forms, with or "
-                   "without modification, are permitted provided that the following conditions are met: \n \n"
-                   "1. Redistributions of source code must retain the above copyright notice, this list of conditions "
-                   "and the following disclaimer. \n\n2. Redistributions in binary form must reproduce the above "
-                   "copyright notice, this list of conditions and the following disclaimer in the documentation and/or "
-                   "other materials provided with the distribution. \n\n3. Neither the name of the copyright holder "
-                   "nor the names of its contributors may be used to endorse or promote products  derived from this "
-                   "software without specific prior written permission. \n\nTHIS SOFTWARE IS PROVIDED BY THE "
-                   "COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT "
-                   "NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE "
-                   "DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, "
-                   "INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, "
-                   "PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS "
-                   "INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,"
-                   " OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, "
-                   "EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."]
-
-        dlg = wx.MessageDialog(self, licence[0], "BSD-3-Clause Licence", wx.OK | wx.ICON_INFORMATION)
-        result = dlg.ShowModal()
-        dlg.Destroy()
+        legal(event)
 
     # EXIT FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
