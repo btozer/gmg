@@ -126,7 +126,7 @@ from types import MappingProxyType
 import warnings
 # Suppress warnings
 warnings.filterwarnings("ignore")
-from theme import THEME, wx_colour, get_font
+from theme import THEME, wx_colour, get_font, MPL_DARK_RC
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -801,6 +801,7 @@ class Gmg(wx.Frame):
     def start(self, area, xp, zp):
         """CREATE MPL FIGURE CANVAS"""
 
+        plt.rcParams.update(MPL_DARK_RC)  # APPLY DARK THEME
         self.fig = plt.figure()  # CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
