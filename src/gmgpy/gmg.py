@@ -150,12 +150,6 @@ class Gmg(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, 
                           'gmg: 2D Geophysical Modelling GUI', 
                           size=(1800, 1050))
-        # Fit window to the usable display area (excludes macOS menu bar / Dock)
-        # without triggering macOS full-screen mode which merges the title bar
-        # into the toolbar row and pushes buttons to the right.
-        _rect = wx.GetClientDisplayRect()
-        self.SetSize(_rect.GetSize())
-        self.SetPosition(_rect.GetTopLeft())
 
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
