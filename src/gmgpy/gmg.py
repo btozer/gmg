@@ -150,6 +150,7 @@ class Gmg(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, 
                           'gmg: 2D Geophysical Modelling GUI', 
                           size=(1800, 1050))
+        self.Maximize()  # Fill available screen space on startup
 
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
@@ -1421,10 +1422,10 @@ class Gmg(wx.Frame):
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
-        self.vertical_gg_frame = self.vertical_gg_frame.twinx()
-        self.vertical_gg_frame.set_ylabel("d/dx")
-        self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
-        self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        self.vertical_gg_d_frame = self.vertical_gg_frame.twinx()
+        self.vertical_gg_d_frame.set_ylabel("d/dx")
+        self.vertical_gg_d_frame.xaxis.set_major_formatter(plt.NullFormatter())
+        self.vertical_gg_d_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
 
     def mag_frame_params(self, span_size, z_orig):
         # MAG CANVAS
@@ -1491,7 +1492,22 @@ class Gmg(wx.Frame):
 
 
         # ADJUST FRAME SIZING AND SET PROGRAM WINDOW --------------------------------
-        
+
+        # REMOVE STALE DATA AXES BEFORE RECREATION TO PREVENT LAYOUT ACCUMULATION
+        for _ax in [self.topography_frame, self.topography_d_frame,
+                    self.gravity_frame, self.gravity_d_frame,
+                    self.vertical_gg_frame, self.vertical_gg_d_frame,
+                    self.magnetic_frame, self.magnetic_d_frame]:
+            if _ax is not None:
+                try:
+                    self.fig.delaxes(_ax)
+                except Exception:
+                    pass
+        self.topography_frame = self.topography_d_frame = None
+        self.gravity_frame = self.gravity_d_frame = None
+        self.vertical_gg_frame = self.vertical_gg_d_frame = None
+        self.magnetic_frame = self.magnetic_d_frame = None
+
         # 1 TRUE TRUE TRUE TRUE -----------------------------------------------------
         if self.topography_frame_switch is True and self.gravity_frame_switch is True and \
             self.vertical_gg_frame_switch is True and self.magnetic_frame_switch is True:
