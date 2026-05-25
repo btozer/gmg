@@ -6389,7 +6389,8 @@ class Gmg(wx.Frame):
                 self.observed_magnetic_list[i].type == str('derivative'):
                 ymin_list.append(self.observed_magnetic_list[i].data[:, 1].min() - 0.2)
                 ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 0.2)
-        self.magnetic_d_frame.set_ylim(ymin, ymax)
+        if self.magnetic_frame is not None:
+            self.magnetic_d_frame.set_ylim(ymin, ymax)
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
 
