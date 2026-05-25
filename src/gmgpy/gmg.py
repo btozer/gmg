@@ -1229,6 +1229,26 @@ class Gmg(wx.Frame):
         # self.cb1.ax.tick_params(labelsize=6)
         # self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=6)
 
+        # APPLY DARK THEME TO SIDEBAR CONTROLS
+        for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
+                      self.angle_a_text, self.angle_b_text, self.angle_c_text,
+                      self.earth_field_text, self.node_text, self.x_text, self.y_text,
+                      self.text_size_text):
+            label.SetForegroundColour(wx_colour('fg_primary'))
+            label.SetBackgroundColour(wx_colour('bg_sidebar'))
+        for spin in (self.density_input, self.ref_density_input, self.susceptibility_input,
+                     self.angle_a_input, self.angle_b_input, self.angle_c_input,
+                     self.earth_field_input, self.x_input, self.y_input):
+            spin.SetBackgroundColour(wx_colour('bg_input'))
+            spin.GetTextCtrl().SetBackgroundColour(wx_colour('bg_input'))
+            spin.GetTextCtrl().SetForegroundColour(wx_colour('fg_input'))
+        self.node_set_button.SetBackgroundColour(wx_colour('bg_input'))
+        self.node_set_button.SetForegroundColour(wx_colour('fg_primary'))
+        self.text_size_input.SetBackgroundColour(wx_colour('bg_sidebar'))
+        for tree in (self.tree, self.fault_tree):
+            tree.SetBackgroundColour(wx_colour('bg_sidebar'))
+            tree.SetForegroundColour(wx_colour('fg_primary'))
+
         # UPDATE INFO BAR
         self.display_info()
 
