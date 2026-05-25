@@ -126,6 +126,7 @@ from types import MappingProxyType
 import warnings
 # Suppress warnings
 warnings.filterwarnings("ignore")
+from theme import THEME, wx_colour, get_font
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -150,6 +151,9 @@ class Gmg(wx.Frame):
         wx.Frame.__init__(self, None, wx.ID_ANY, 
                           'gmg: 2D Geophysical Modelling GUI', 
                           size=(1800, 1050))
+        self.SetBackgroundColour(wx_colour('bg_base'))
+        self.SetForegroundColour(wx_colour('fg_primary'))
+        self.SetFont(get_font())
 
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
@@ -183,16 +187,20 @@ class Gmg(wx.Frame):
         self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, 
                                             size=(235, 1000), 
                                             style=wx.SP_NOBORDER)
+        self.left_panel.SetBackgroundColour(wx_colour('bg_panel'))
 
         # CREATE FOLDPANELBAR FOR ATTRIBUTE CONTROLS
         self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, 
                                                     size=(235, 1000),
                                                     agwStyle=fpb.FPB_VERTICAL)
+        self.controls_fold_panel.SetBackgroundColour(wx_colour('bg_panel'))
 
         # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
         self.scrolled_window_item1 = wx.ScrolledWindow(
-            self.controls_fold_panel, wx.ID_ANY, size=(235, 400), 
-            style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
+            self.controls_fold_panel, wx.ID_ANY, size=(235, 400),
+            style=wx.ALIGN_LEFT | wx.BORDER_NONE)
+        self.scrolled_window_item1.SetBackgroundColour(wx_colour('bg_sidebar'))
+        self.scrolled_window_item1.SetForegroundColour(wx_colour('fg_primary'))
 
         self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel(
             "Layer Attributes", collapsed=True, foldIcons=images)
@@ -203,8 +211,10 @@ class Gmg(wx.Frame):
        # SECOND PANE; LEFT PANEL (=LAYERS) ------------------------------------------------------------
         # GREY wx PANEL
         self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(235, 300),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_NONE |
                                                          wx.EXPAND)
+        self.scrolled_window_item2.SetBackgroundColour(wx_colour('bg_sidebar'))
+        self.scrolled_window_item2.SetForegroundColour(wx_colour('fg_primary'))
         
         self.fold_panel_item2 = self.controls_fold_panel.AddFoldPanel("Layers", 
                                                                         collapsed=True, 
@@ -217,8 +227,10 @@ class Gmg(wx.Frame):
         # THIRD PANE; LEFT PANEL (=FAULTS) -------------------------------------------------------------
         # GREY wx PANEL
         self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(235, 300),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_NONE |
                                                          wx.EXPAND)
+        self.scrolled_window_item3.SetBackgroundColour(wx_colour('bg_sidebar'))
+        self.scrolled_window_item3.SetForegroundColour(wx_colour('fg_primary'))
         
         self.fold_panel_item3 = self.controls_fold_panel.AddFoldPanel("Faults", 
                                                                         collapsed=True, 
@@ -235,10 +247,12 @@ class Gmg(wx.Frame):
         self.scrolled_window_item3.SetScrollbar(1, 1, 10, 10)
 
         # CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)
-        self.rightPanel = wx.Panel(self, -1, size=(1600, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
+        self.rightPanel = wx.Panel(self, -1, size=(1600, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_NONE | wx.EXPAND)
+        self.rightPanel.SetBackgroundColour(wx_colour('bg_base'))
 
         # CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)
-        self.ConsolePanel = wx.Panel(self, -1, size=(1600, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
+        self.ConsolePanel = wx.Panel(self, -1, size=(1600, 100), style=wx.ALIGN_LEFT | wx.BORDER_NONE | wx.EXPAND)
+        self.ConsolePanel.SetBackgroundColour(wx_colour('bg_sidebar'))
         intro = "###############################################################\r" \
                 "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
                 "ctrl+up FOR COMMAND HISTORY                                    \r" \
@@ -252,6 +266,21 @@ class Gmg(wx.Frame):
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
         self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
         self.mgr.GetPaneByName('console').Hide()  # HIDE PYTHON CONSOLE BY DEFAULT
+
+        # APPLY DARK THEME TO AUI DOCK ART
+        art = self.mgr.GetArtProvider()
+        art.SetColour(aui.AUI_DOCKART_BACKGROUND_COLOUR,        wx_colour('bg_base'))
+        art.SetColour(aui.AUI_DOCKART_SASH_COLOUR,              wx_colour('bg_base'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_COLOUR,    wx_colour('accent'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, wx_colour('accent'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_COLOUR,  wx_colour('bg_panel'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_GRADIENT_COLOUR, wx_colour('bg_panel'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_TEXT_COLOUR,   wx_colour('fg_statusbar'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR, wx_colour('fg_caption'))
+        art.SetColour(aui.AUI_DOCKART_BORDER_COLOUR,            wx_colour('border'))
+        art.SetColour(aui.AUI_DOCKART_GRIPPER_COLOUR,           wx_colour('bg_panel'))
+        art.SetMetric(aui.AUI_DOCKART_SASH_SIZE, 3)
+        art.SetMetric(aui.AUI_DOCKART_CAPTION_SIZE, 18)
         self.mgr.Update()
 
         # CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)
@@ -292,6 +321,12 @@ class Gmg(wx.Frame):
         self.statusbar.SetStatusWidths([-1, -1, 1700])
         self.statusbar.SetStatusText(self.status_text, 2)
         self.statusbar.SetSize((1800, 24))
+        self.statusbar.SetBackgroundColour(wx_colour('bg_statusbar'))
+        self.statusbar.SetForegroundColour(wx_colour('fg_statusbar'))
+        for btn in (self.controls_button, self.console_button,
+                    self.topography_button, self.gravity_button,
+                    self.vgg_button, self.magnetic_button):
+            btn.SetBackgroundColour(wx_colour('bg_statusbar'))
 
         # SET PROGRAM STATUS
         self.model_saved = False
