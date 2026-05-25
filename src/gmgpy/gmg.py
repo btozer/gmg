@@ -195,6 +195,13 @@ class Gmg(wx.Frame):
                                                     agwStyle=fpb.FPB_VERTICAL)
         self.controls_fold_panel.SetBackgroundColour(wx_colour('bg_panel'))
 
+        # DARK CAPTION BAR STYLE (shared by all three fold panels)
+        _caption_style = fpb.CaptionBarStyle()
+        _caption_style.SetCaptionStyle(fpb.CAPTIONBAR_SINGLE_COLOUR)
+        _caption_style.SetFirstColour(wx_colour('bg_panel'))
+        _caption_style.SetSecondColour(wx_colour('bg_panel'))
+        _caption_style.SetCaptionColour(wx_colour('fg_primary'))
+
         # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
         self.scrolled_window_item1 = wx.ScrolledWindow(
             self.controls_fold_panel, wx.ID_ANY, size=(235, 400),
@@ -203,7 +210,7 @@ class Gmg(wx.Frame):
         self.scrolled_window_item1.SetForegroundColour(wx_colour('fg_primary'))
 
         self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel(
-            "Layer Attributes", collapsed=True, foldIcons=images)
+            "Layer Attributes", collapsed=True, foldIcons=images, cbstyle=_caption_style)
         
         self.fold_panel_item1.AddWindow(self.scrolled_window_item1, 1, wx.EXPAND | wx.ALL, 0)
         # --------------------------------------------------------------------
@@ -218,7 +225,8 @@ class Gmg(wx.Frame):
         
         self.fold_panel_item2 = self.controls_fold_panel.AddFoldPanel("Layers", 
                                                                         collapsed=True, 
-                                                                        foldIcons=images)
+                                                                        foldIcons=images,
+                                                                        cbstyle=_caption_style)
         
         self.fold_panel_item2.AddWindow(self.scrolled_window_item2, 1, wx.EXPAND | wx.ALL, 0)
 
@@ -234,7 +242,8 @@ class Gmg(wx.Frame):
         
         self.fold_panel_item3 = self.controls_fold_panel.AddFoldPanel("Faults", 
                                                                         collapsed=True, 
-                                                                        foldIcons=images)
+                                                                        foldIcons=images,
+                                                                        cbstyle=_caption_style)
         
         self.fold_panel_item3.AddWindow(self.scrolled_window_item3, 1, wx.EXPAND | wx.ALL, 0)
         # ----------------------------------------------------------------------------------------------
