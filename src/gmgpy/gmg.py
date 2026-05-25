@@ -197,7 +197,7 @@ class Gmg(wx.Frame):
 
         # DARK CAPTION BAR STYLE (shared by all three fold panels)
         _caption_style = fpb.CaptionBarStyle()
-        _caption_style.SetCaptionStyle(fpb.CAPTIONBAR_SINGLE_COLOUR)
+        _caption_style.SetCaptionStyle(fpb.CAPTIONBAR_SINGLE)
         _caption_style.SetFirstColour(wx_colour('bg_panel'))
         _caption_style.SetSecondColour(wx_colour('bg_panel'))
         _caption_style.SetCaptionColour(wx_colour('fg_primary'))
