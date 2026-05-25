@@ -1449,46 +1449,19 @@ class Gmg(wx.Frame):
         self.current_xlim = self.model_frame.get_xlim()
         self.current_ylim = self.model_frame.get_ylim()
 
-        # SWITCH CALLBACKS
+        # SWITCH CALLBACKS — axes are deleted and recreated each toggle,
+        # so only the boolean flag needs to change here
         if event.Id == 601:
-            if self.topography_frame_switch is True:
-                self.topography_frame.set_visible(False)
-                self.topography_d_frame.set_visible(False)
-                self.topography_frame_switch = False
-            else:
-                self.topography_frame_switch = True
-                self.topography_frame.set_visible(True)
-                self.topography_d_frame.set_visible(True)
-        
+            self.topography_frame_switch = not self.topography_frame_switch
+
         if event.Id == 602:
-            if self.gravity_frame_switch is True:
-                self.gravity_frame.set_visible(False)
-                self.gravity_d_frame.set_visible(False)
-                self.gravity_frame_switch = False
-            else:
-                self.gravity_frame_switch = True
-                self.gravity_frame.set_visible(True)
-                self.gravity_d_frame.set_visible(True)
-        
+            self.gravity_frame_switch = not self.gravity_frame_switch
+
         if event.Id == 605:
-            if self.vertical_gg_frame_switch is True:
-                self.vertical_gg_frame.set_visible(False)
-                self.vertical_gg_d_frame.set_visible(False)
-                self.vertical_gg_frame_switch = False
-            else:
-                self.vertical_gg_frame_switch = True
-                self.vertical_gg_frame.set_visible(True)
-                self.vertical_gg_d_frame.set_visible(True)
-        
+            self.vertical_gg_frame_switch = not self.vertical_gg_frame_switch
+
         if event.Id == 603:
-            if self.magnetic_frame_switch is True:
-                self.magnetic_frame.set_visible(False)
-                self.magnetic_d_frame.set_visible(False)
-                self.magnetic_frame_switch = False
-            else:
-                self.magnetic_frame_switch = True
-                self.magnetic_frame.set_visible(True)
-                self.magnetic_d_frame.set_visible(True)
+            self.magnetic_frame_switch = not self.magnetic_frame_switch
 
 
         # ADJUST FRAME SIZING AND SET PROGRAM WINDOW --------------------------------
