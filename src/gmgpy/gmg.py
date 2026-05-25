@@ -649,7 +649,8 @@ class Gmg(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
 
         # TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)
-        self.toolbar = self.CreateToolBar()
+        self.toolbar = self.CreateToolBar(style=wx.TB_FLAT | wx.TB_NODIVIDER)
+        self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
 
         t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
                                             shortHelp="Save model")
@@ -795,6 +796,7 @@ class Gmg(wx.Frame):
         # CREATE TOOLBAR
         self.toolbar.Realize()
         self.toolbar.SetSize((1790, 36))
+        self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
 
     def start(self, area, xp, zp):
         """CREATE MPL FIGURE CANVAS"""
