@@ -1280,18 +1280,19 @@ class Gmg(wx.Frame):
         dpi = self.fig.get_dpi()
         fig_h_px = max(fig_h * dpi, 1.0)
 
-        # tight_layout auto-computes all margins to avoid label clipping.
-        # pad (outer margin, inches) and h_pad (inter-axes gap, inches) stay small
-        # so panels fill the canvas. No separate hspace override — that was expanding
-        # inter-axes gaps to 80-110% of average axis height, dwarfing the small panels.
-        try:
-            self.fig.tight_layout(pad=0.1, h_pad=0.15)
-        except Exception:
-            self.fig.subplots_adjust(top=0.98, left=0.06, right=0.99, bottom=0.02, hspace=0.05)
+        # Explicit margins tuned to the subplot content at 4-6 pt labels:
+        #   left=0.06  — tick labels + small rotated y-axis titles (≈3% needed, 6% gives breathing room)
+        #   right=0.975 — twinx d/dx tick labels on the right side
+        #   bottom=0.05 — x-axis label "x (km)" + tick labels
+        #   top=0.99   — minimal top pad
+        #   hspace=0.3  — moderate vertical gap between panels (user requested slight increase)
+        self.fig.subplots_adjust(
+            top=0.99, left=0.06, right=0.975, bottom=0.05, hspace=0.3
+        )
 
         # Dynamic tick/label size proportional to the pixel height of each data panel.
         # Each data panel occupies 3 of the 26 subplot rows.
-        panel_h_px = 0.97 * fig_h_px * (3.0 / 26.0)
+        panel_h_px = 0.94 * fig_h_px * (3.0 / 26.0)
         labelsize = max(4, min(6, int(panel_h_px / 8)))
         for ax in self.fig.get_axes():
             ax.tick_params(labelsize=labelsize)
