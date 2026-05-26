@@ -3227,16 +3227,22 @@ class Gmg(wx.Frame):
         self.draw()
 
     def set_gravity_elv(self, event):
-        """POPOUT BOX TO LET USER DEFINE THE ELEVATION AT WHICH TO CALCULATE THE GRAVITY ANOMALY"""
-
-        # CREATE THE POPOUT BOX FOR USER UNPUT
-        grav_box = GravDialog(self, -1, 'Gravity elevation', self.gravity_observation_elv)
-        answer = grav_box.ShowModal()
-
-        # SET THE NEW CALCULATION ELEVATION
-        self.gravity_observation_elv = grav_box.grav_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
-
-        # UPDATE GMG
+        """Set a constant observation elevation for gravity calculations."""
+        current_km = (float(self.gravity_observation_elv) / 1000.
+                      if np.isscalar(self.gravity_observation_elv) else 0.0)
+        dlg = wx.TextEntryDialog(self, "Observation elevation (km):",
+                                 "Set Constant Gravity Elevation",
+                                 str(round(current_km, 4)))
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        try:
+            self.gravity_observation_elv = float(dlg.GetValue()) * 1000.
+        except ValueError:
+            wx.MessageBox("Please enter a valid number.", "Invalid input", wx.OK | wx.ICON_ERROR)
+            dlg.Destroy()
+            return
+        dlg.Destroy()
         self.run_algorithms()
         self.draw()
 
@@ -3248,7 +3254,8 @@ class Gmg(wx.Frame):
         if file_dialog.ShowModal() == wx.ID_CANCEL:
             return
         try:
-            data = np.loadtxt(file_dialog.GetPath())
+            with open(file_dialog.GetPath(), 'r') as f:
+                data = np.loadtxt(f)
             if data.ndim != 2 or data.shape[1] < 2:
                 raise ValueError("File must contain at least 2 columns (X km, Z km).")
             self.gravity_observation_elv = self._interp_elv(data[:, 0], data[:, 1])
@@ -3427,16 +3434,22 @@ class Gmg(wx.Frame):
         self.draw()
 
     def set_vgg_elv(self, event):
-        """POPOUT BOX TO LET USER DEFINE THE ELEVATION AT WHICH TO CALCULATE THE vgg ANOMALY"""
-
-        # CREATE THE POPOUT BOX FOR USER UNPUT
-        vgg_box = GravDialog(self, -1, 'VGG elevation', self.gravity_observation_elv)
-        answer = vgg_box.ShowModal()
-
-        # SET THE NEW CALCULATION ELEVATION
-        self.vgg_observation_elv = vgg_box.vgg_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
-
-        # UPDATE GMG
+        """Set a constant observation elevation for VGG calculations."""
+        current_km = (float(self.vgg_observation_elv) / 1000.
+                      if np.isscalar(self.vgg_observation_elv) else 0.0)
+        dlg = wx.TextEntryDialog(self, "Observation elevation (km):",
+                                 "Set Constant VGG Elevation",
+                                 str(round(current_km, 4)))
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        try:
+            self.vgg_observation_elv = float(dlg.GetValue()) * 1000.
+        except ValueError:
+            wx.MessageBox("Please enter a valid number.", "Invalid input", wx.OK | wx.ICON_ERROR)
+            dlg.Destroy()
+            return
+        dlg.Destroy()
         self.run_algorithms()
         self.draw()
 
@@ -3448,7 +3461,8 @@ class Gmg(wx.Frame):
         if file_dialog.ShowModal() == wx.ID_CANCEL:
             return
         try:
-            data = np.loadtxt(file_dialog.GetPath())
+            with open(file_dialog.GetPath(), 'r') as f:
+                data = np.loadtxt(f)
             if data.ndim != 2 or data.shape[1] < 2:
                 raise ValueError("File must contain at least 2 columns (X km, Z km).")
             self.vgg_observation_elv = self._interp_elv(data[:, 0], data[:, 1])
@@ -3627,16 +3641,22 @@ class Gmg(wx.Frame):
         self.draw()
 
     def set_mag_variables(self, event):
-        """POPOUT BOX TO LET USER DEFINE MAGNETIC FIELD VALUES"""
-
-        # CREATE POPOUT MENU
-        mag_box = MagDialog(self, -1, 'Magnetic parameters', self.mag_observation_elv)
-        answer = mag_box.ShowModal()
-
-        # UPDATE MAGNETIC OBSERVATION ELEVATION
-        self.mag_observation_elv = mag_box.mag_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
-
-        # UPDATE GMG
+        """Set a constant observation elevation for magnetic calculations."""
+        current_km = (float(self.mag_observation_elv) / 1000.
+                      if np.isscalar(self.mag_observation_elv) else 0.0)
+        dlg = wx.TextEntryDialog(self, "Observation elevation (km):",
+                                 "Set Constant Magnetic Elevation",
+                                 str(round(current_km, 4)))
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        try:
+            self.mag_observation_elv = float(dlg.GetValue()) * 1000.
+        except ValueError:
+            wx.MessageBox("Please enter a valid number.", "Invalid input", wx.OK | wx.ICON_ERROR)
+            dlg.Destroy()
+            return
+        dlg.Destroy()
         self.run_algorithms()
         self.draw()
 
@@ -3648,7 +3668,8 @@ class Gmg(wx.Frame):
         if file_dialog.ShowModal() == wx.ID_CANCEL:
             return
         try:
-            data = np.loadtxt(file_dialog.GetPath())
+            with open(file_dialog.GetPath(), 'r') as f:
+                data = np.loadtxt(f)
             if data.ndim != 2 or data.shape[1] < 2:
                 raise ValueError("File must contain at least 2 columns (X km, Z km).")
             self.mag_observation_elv = self._interp_elv(data[:, 0], data[:, 1])
