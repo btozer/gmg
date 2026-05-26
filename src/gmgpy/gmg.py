@@ -1280,20 +1280,24 @@ class Gmg(wx.Frame):
         dpi = self.fig.get_dpi()
         fig_h_px = max(fig_h * dpi, 1.0)
 
-        # Explicit margins tuned to the subplot content at 4-6 pt labels:
-        #   left=0.06  — tick labels + small rotated y-axis titles (≈3% needed, 6% gives breathing room)
-        #   right=0.975 — twinx d/dx tick labels on the right side
-        #   bottom=0.05 — x-axis label "x (km)" + tick labels
-        #   top=0.99   — minimal top pad
-        #   hspace=0.3  — moderate vertical gap between panels (user requested slight increase)
-        self.fig.subplots_adjust(
-            top=0.99, left=0.06, right=0.975, bottom=0.05, hspace=0.3
-        )
-
         # Dynamic tick/label size proportional to the pixel height of each data panel.
         # Each data panel occupies 3 of the 26 subplot rows.
         panel_h_px = 0.94 * fig_h_px * (3.0 / 26.0)
         labelsize = max(4, min(6, int(panel_h_px / 8)))
+
+        # The subplot grid uses x_orig=10 out of 100 columns, so the actual axes left
+        # edge in figure coords = left + (right - left) * x_orig/100.
+        # We need left to be negative so the combined offset gives ~5% of figure width
+        # as the real margin (enough for 4-6pt tick labels + small rotated y-titles).
+        # Formula: left = (target - right * x_frac) / (1 - x_frac)
+        x_frac = getattr(self, 'x_orig', 10) / 100.0
+        target_axes_left = max(0.04, labelsize * 4 / 72.0 / max(fig_w, 1.0))
+        left = (target_axes_left - 0.975 * x_frac) / (1.0 - x_frac)
+
+        self.fig.subplots_adjust(
+            top=0.99, left=left, right=0.975, bottom=0.05, hspace=0.3
+        )
+
         for ax in self.fig.get_axes():
             ax.tick_params(labelsize=labelsize)
             ax.yaxis.label.set_size(labelsize)
