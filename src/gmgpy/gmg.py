@@ -148,9 +148,14 @@ class Gmg(wx.Frame):
     """
 
     def __init__(self, *args, **kwds):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 
-                          'gmg: 2D Geophysical Modelling GUI', 
-                          size=(1800, 1050))
+        # SIZE WINDOW TO 85% OF SCREEN AND CENTER IT
+        _dpy = wx.Display(0)
+        _sw, _sh = _dpy.GetGeometry().GetSize()
+        _w, _h = int(_sw * 0.85), int(_sh * 0.85)
+        _x, _y = (_sw - _w) // 2, (_sh - _h) // 2
+        wx.Frame.__init__(self, None, wx.ID_ANY,
+                          'gmg: 2D Geophysical Modelling GUI',
+                          pos=(_x, _y), size=(_w, _h))
         self.SetBackgroundColour(wx_colour('bg_base'))
         self.SetForegroundColour(wx_colour('fg_primary'))
         self.SetFont(get_font())
@@ -328,9 +333,9 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
         self.status_text = " "
-        self.statusbar.SetStatusWidths([-1, -1, 1700])
+        self.statusbar.SetStatusWidths([-1, -1, -1])
         self.statusbar.SetStatusText(self.status_text, 2)
-        self.statusbar.SetSize((1800, 24))
+        self.statusbar.SetSize((-1, 24))
         self.statusbar.SetBackgroundColour(wx_colour('bg_statusbar'))
         self.statusbar.SetForegroundColour(wx_colour('fg_statusbar'))
         for btn in (self.controls_button, self.console_button,
@@ -805,7 +810,7 @@ class Gmg(wx.Frame):
 
         # CREATE TOOLBAR
         self.toolbar.Realize()
-        self.toolbar.SetSize((1790, 36))
+        self.toolbar.SetSize((-1, 36))
         self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
 
     def start(self, area, xp, zp):
