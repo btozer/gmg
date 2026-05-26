@@ -69,19 +69,26 @@ def plot_fig(file_path, area, xp, model_aspect,
     data_panel_h_cm = 4.0    # fixed height for each data panel
 
     x_min, x_max = model_xlim
-    z_min, z_max = model_ylim    # z_min < z_max (depth increases downward)
+
+    # matplotlib returns ylim inverted for depth axes, e.g. (10.0, 0.0).
+    # GMT requires y_lo < y_hi in -R; we flip via a negative projection height.
+    z_lo = min(model_ylim)   # shallowest value (top of figure)
+    z_hi = max(model_ylim)   # deepest value   (bottom of figure)
 
     x_range = x_max - x_min
-    z_range = abs(z_max - z_min)
+    z_range = z_hi - z_lo
 
     # Model panel height respects the current vertical exaggeration.
     # A larger model_aspect means more vertical compression in the output.
     raw_h = (z_range / x_range) * fig_width_cm
     model_h_cm = max(raw_h / model_aspect, 4.0)
 
-    def _proj(height_cm):
-        """Absolute Cartesian projection for a panel of the given height."""
-        return f"X{fig_width_cm}c/{height_cm}c"
+    def _proj(height_cm, invert_y=False):
+        """Absolute Cartesian projection for a panel of the given height.
+        Pass invert_y=True to flip the y-axis (depth-down convention).
+        """
+        sign = "-" if invert_y else ""
+        return f"X{fig_width_cm}c/{sign}{height_cm}c"
 
     xp_km = np.asarray(xp, dtype=float) * 1e-3
 
@@ -89,7 +96,7 @@ def plot_fig(file_path, area, xp, model_aspect,
     # HELPER: draw one data panel at the current origin
     # ------------------------------------------------------------------
     def _draw_data_panel(ylim, y_label, obs_list, pred_array, pred_color):
-        y_lo, y_hi = ylim
+        y_lo, y_hi = min(ylim), max(ylim)
         fig.basemap(
             region=[x_min, x_max, y_lo, y_hi],
             projection=_proj(data_panel_h_cm),
@@ -139,9 +146,10 @@ def plot_fig(file_path, area, xp, model_aspect,
     # ------------------------------------------------------------------
     # MODEL PANEL  (drawn first; sits at the bottom of the stacked figure)
     # ------------------------------------------------------------------
+    # Use a negative projection height so depth increases downward in the figure.
     fig.basemap(
-        region=[x_min, x_max, z_min, z_max],
-        projection=_proj(model_h_cm),
+        region=[x_min, x_max, z_lo, z_hi],
+        projection=_proj(model_h_cm, invert_y=True),
         frame=["WSen", "xaf+lDistance (km)", "yaf+lDepth (km)"],
     )
 
