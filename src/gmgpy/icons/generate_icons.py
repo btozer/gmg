@@ -257,18 +257,17 @@ def _G_badge(px: int, name: str, colour=IC):
     except TypeError:
         d.rectangle([pad, pad, n-pad, n-pad], outline=colour, width=w)
 
-    # G: thick arc (C-shape, opening on right) + crossbar
+    # G: arc starts at 0° (= right-side mid-height) and goes CW 320° through
+    # bottom → left → top, ending at ~320° (upper-right).
+    # The crossbar runs from centre to (cx+r, cy) — the exact arc start point —
+    # so the two strokes share one endpoint and form a single continuous G.
     inset = pad + max(3, int(n * 0.11))
     cx, cy = n // 2, n // 2
     sw = max(3, n // 9)                    # letter stroke width
     r  = cx - inset - sw // 2
 
-    # Arc start=40→end=320 clockwise leaves a ~80° opening on the right side
-    d.arc([cx-r, cy-r, cx+r, cy+r], start=40, end=320, fill=colour, width=sw)
-
-    # Crossbar: from centre to right edge at mid-height
-    bar_y = cy + int(r * 0.05)
-    d.line([(cx, bar_y), (cx + r, bar_y)], fill=colour, width=sw)
+    d.arc([cx-r, cy-r, cx+r, cy+r], start=0, end=320, fill=colour, width=sw)
+    d.line([(cx, cy), (cx + r, cy)], fill=colour, width=sw)
 
     _save(img, px, name)
 
