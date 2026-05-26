@@ -440,9 +440,14 @@ class Gmg(wx.Frame):
         grav_m_set_rms = self.gravity_data.Append(-1, "Set RMS Input...", "Set RMS Input...")
         self.Bind(wx.EVT_MENU, self.set_obs_grav_rms, grav_m_set_rms)
         # SET ELEVATION FOR CALCULATIONS
-        m_set_grav_elv = self.gravity_data.Append(-1, "&Set Calculation Elevation...",
-                                                  "Set Calculation Elevation...")
-        self.Bind(wx.EVT_MENU, self.set_gravity_elv, m_set_grav_elv)
+        m_set_grav_elv_sub = wx.Menu()
+        self.gravity_data.AppendSubMenu(m_set_grav_elv_sub, "&Set Calculation Elevation...")
+        m_set_grav_elv_const = m_set_grav_elv_sub.Append(-1, "Constant elevation...",
+                                                        "Set a constant calculation elevation")
+        self.Bind(wx.EVT_MENU, self.set_gravity_elv, m_set_grav_elv_const)
+        m_set_grav_elv_var = m_set_grav_elv_sub.Append(-1, "Variable elevation from file...",
+                                                       "Load a 2-column (X km, Z km) elevation profile")
+        self.Bind(wx.EVT_MENU, self.load_gravity_elv_profile, m_set_grav_elv_var)
         # SAVE PREDICTED ANOMALY TO DISC
         m_save_g_submenu = self.gravity_data.Append(-1, "&Save Predicted Anomaly...",
                                                     "Save Predicted Anomaly to Disc...")
@@ -470,9 +475,14 @@ class Gmg(wx.Frame):
         vgg_m_set_rms = self.vgg_data.Append(-1, "Set RMS Input...", "Set RMS Input...")
         self.Bind(wx.EVT_MENU, self.set_obs_vgg_rms, vgg_m_set_rms)
         # SET ELEVATION FOR CALCULATIONS
-        m_set_vgg_elv = self.vgg_data.Append(-1, "&Set Calculation Elevation...",
-                                                  "Set Calculation Elevation...")
-        self.Bind(wx.EVT_MENU, self.set_vgg_elv, m_set_vgg_elv)
+        m_set_vgg_elv_sub = wx.Menu()
+        self.vgg_data.AppendSubMenu(m_set_vgg_elv_sub, "&Set Calculation Elevation...")
+        m_set_vgg_elv_const = m_set_vgg_elv_sub.Append(-1, "Constant elevation...",
+                                                       "Set a constant calculation elevation")
+        self.Bind(wx.EVT_MENU, self.set_vgg_elv, m_set_vgg_elv_const)
+        m_set_vgg_elv_var = m_set_vgg_elv_sub.Append(-1, "Variable elevation from file...",
+                                                      "Load a 2-column (X km, Z km) elevation profile")
+        self.Bind(wx.EVT_MENU, self.load_vgg_elv_profile, m_set_vgg_elv_var)
         # SAVE PREDICTED ANOMALY TO DISC
         m_save_vgg_submenu = self.vgg_data.Append(-1, "&Save Predicted Anomaly...",
                                                     "Save Predicted Anomaly to Disc...")
@@ -501,9 +511,14 @@ class Gmg(wx.Frame):
         mag_m_set_rms = self.magnetic_data.Append(-1, "Set RMS Input..", "Set RMS input..")
         self.Bind(wx.EVT_MENU, self.set_obs_mag_rms, mag_m_set_rms)
         # SET MAG
-        m_set_mag_variables = self.magnetic_data.Append(-1, "&Set Calculation Elevation...",
-                                                        "Set Calculation Elevation...")
-        self.Bind(wx.EVT_MENU, self.set_mag_variables, m_set_mag_variables)
+        m_set_mag_elv_sub = wx.Menu()
+        self.magnetic_data.AppendSubMenu(m_set_mag_elv_sub, "&Set Calculation Elevation...")
+        m_set_mag_elv_const = m_set_mag_elv_sub.Append(-1, "Constant elevation...",
+                                                       "Set a constant calculation elevation")
+        self.Bind(wx.EVT_MENU, self.set_mag_variables, m_set_mag_elv_const)
+        m_set_mag_elv_var = m_set_mag_elv_sub.Append(-1, "Variable elevation from file...",
+                                                      "Load a 2-column (X km, Z km) elevation profile")
+        self.Bind(wx.EVT_MENU, self.load_mag_elv_profile, m_set_mag_elv_var)
         # SAVE PREDICTED ANOMALY TO DISC
         m_save_mag_submenu = self.magnetic_data.Append(-1, "&Save Predicted Anomaly...",
                                                        "Save Predicted Anomaly to Disc...")
@@ -1347,6 +1362,31 @@ class Gmg(wx.Frame):
                             + self.magnetic_button.GetSize()[0])
                 filler_w = max(0, w - filler_x)
                 self.statusbar_filler.SetSize(filler_x, -4, filler_w, 28)
+
+    def _interp_elv(self, xdata_km, zdata_km):
+        """Interpolate a (X km, Z km) elevation profile to self.xp (metres).
+
+        Linear extrapolation is used beyond the endpoints of the input data.
+        Returns a float32 array in metres, same length as self.xp.
+        """
+        xm = np.array(xdata_km, dtype='f') * 1000.0
+        zm = np.array(zdata_km, dtype='f') * 1000.0
+        # sort by x (required for np.interp)
+        idx = np.argsort(xm)
+        xm, zm = xm[idx], zm[idx]
+        # interior interpolation
+        result = np.interp(self.xp, xm, zm)
+        # linear extrapolation below left end
+        mask_l = self.xp < xm[0]
+        if np.any(mask_l) and len(xm) >= 2:
+            slope = (zm[1] - zm[0]) / (xm[1] - xm[0])
+            result[mask_l] = zm[0] + slope * (self.xp[mask_l] - xm[0])
+        # linear extrapolation above right end
+        mask_r = self.xp > xm[-1]
+        if np.any(mask_r) and len(xm) >= 2:
+            slope = (zm[-1] - zm[-2]) / (xm[-1] - xm[-2])
+            result[mask_r] = zm[-1] + slope * (self.xp[mask_r] - xm[-1])
+        return result.astype('f')
 
     def size_handler(self):
         """PLACE THE GUI FRAMES IN THE wxSIZER WINDOWS"""
@@ -3200,6 +3240,25 @@ class Gmg(wx.Frame):
         self.run_algorithms()
         self.draw()
 
+    def load_gravity_elv_profile(self, event):
+        """Load a variable elevation profile for gravity calculations from a 2-column text file (X km, Z km)."""
+        file_dialog = wx.FileDialog(self, "Load Gravity Elevation Profile", "", "",
+                                    "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                                    wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if file_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+        try:
+            data = np.loadtxt(file_dialog.GetPath())
+            if data.ndim != 2 or data.shape[1] < 2:
+                raise ValueError("File must contain at least 2 columns (X km, Z km).")
+            self.gravity_observation_elv = self._interp_elv(data[:, 0], data[:, 1])
+        except Exception as e:
+            wx.MessageBox(str(e), "Error loading gravity elevation profile",
+                          wx.OK | wx.ICON_ERROR)
+            return
+        self.run_algorithms()
+        self.draw()
+
     def save_modelled_grav(self, event):
         """SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
         save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
@@ -3381,6 +3440,25 @@ class Gmg(wx.Frame):
         self.run_algorithms()
         self.draw()
 
+    def load_vgg_elv_profile(self, event):
+        """Load a variable elevation profile for VGG calculations from a 2-column text file (X km, Z km)."""
+        file_dialog = wx.FileDialog(self, "Load VGG Elevation Profile", "", "",
+                                    "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                                    wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if file_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+        try:
+            data = np.loadtxt(file_dialog.GetPath())
+            if data.ndim != 2 or data.shape[1] < 2:
+                raise ValueError("File must contain at least 2 columns (X km, Z km).")
+            self.vgg_observation_elv = self._interp_elv(data[:, 0], data[:, 1])
+        except Exception as e:
+            wx.MessageBox(str(e), "Error loading VGG elevation profile",
+                          wx.OK | wx.ICON_ERROR)
+            return
+        self.run_algorithms()
+        self.draw()
+
     def save_modelled_vgg(self, event):
         """SAVE PREDICTED vgg TO EXTERNAL ASCII FILE"""
         save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
@@ -3559,6 +3637,25 @@ class Gmg(wx.Frame):
         self.mag_observation_elv = mag_box.mag_observation_elv * 1000.  # CONVERT FROM (km) TO (m)
 
         # UPDATE GMG
+        self.run_algorithms()
+        self.draw()
+
+    def load_mag_elv_profile(self, event):
+        """Load a variable elevation profile for magnetic calculations from a 2-column text file (X km, Z km)."""
+        file_dialog = wx.FileDialog(self, "Load Magnetic Elevation Profile", "", "",
+                                    "Text files (*.txt)|*.txt|All files (*.*)|*.*",
+                                    wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+        if file_dialog.ShowModal() == wx.ID_CANCEL:
+            return
+        try:
+            data = np.loadtxt(file_dialog.GetPath())
+            if data.ndim != 2 or data.shape[1] < 2:
+                raise ValueError("File must contain at least 2 columns (X km, Z km).")
+            self.mag_observation_elv = self._interp_elv(data[:, 0], data[:, 1])
+        except Exception as e:
+            wx.MessageBox(str(e), "Error loading magnetic elevation profile",
+                          wx.OK | wx.ICON_ERROR)
+            return
         self.run_algorithms()
         self.draw()
 
