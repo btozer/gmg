@@ -302,7 +302,7 @@ class Gmg(wx.Frame):
         self.create_menu()
 
         # CREATE STATUS BAR
-        self.statusbar = self.CreateStatusBar(3)
+        self.statusbar = self.CreateStatusBar(2)
         self.controls_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'large_up_16.png'),
                                                pos=(0, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_controls, self.controls_button)
@@ -333,8 +333,8 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
         self.status_text = " "
-        self.statusbar.SetStatusWidths([-1, -1, -1])
-        self.statusbar.SetStatusText(self.status_text, 2)
+        self.statusbar.SetStatusWidths([160, -1])  # pane 0: buttons; pane 1: status text
+        self.statusbar.SetStatusText(self.status_text, 1)
         self.statusbar.SetSize((-1, 24))
         self.statusbar.SetBackgroundColour(wx_colour('bg_statusbar'))
         self.statusbar.SetForegroundColour(wx_colour('fg_statusbar'))
@@ -2110,13 +2110,14 @@ class Gmg(wx.Frame):
         self.draw()
 
     def display_info(self):
-        self.statusbar.SetStatusText("                                                                                 "
-                                     "                                                   "
-                                     " || Currently Editing Layer: %s  || "
-                                     " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
-                                     " || MAG RMS = %s  ||" % (self.currently_active_layer_id,
-                                                               self.model_frame.get_aspect(), self.gravity_rms_value,
-                                                               self.magnetic_rms_value), 2)
+        self.statusbar.SetStatusText(
+            " || Currently Editing Layer: %s"
+            "  || Model Aspect Ratio = %s:1.0"
+            "  || GRAV RMS = %s"
+            "  || MAG RMS = %s  ||" % (self.currently_active_layer_id,
+                                       self.model_frame.get_aspect(),
+                                       self.gravity_rms_value,
+                                       self.magnetic_rms_value), 1)
         self.statusbar.Update()
 
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
