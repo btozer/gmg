@@ -126,7 +126,7 @@ from types import MappingProxyType
 import warnings
 # Suppress warnings
 warnings.filterwarnings("ignore")
-from theme import THEME, wx_colour, get_font, get_mono_font, MPL_DARK_RC
+from theme import THEME, wx_colour, get_font, get_mono_font, MPL_DARK_RC, load_icon
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -666,12 +666,13 @@ class Gmg(wx.Frame):
         # TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)
         self.toolbar = self.CreateToolBar(style=wx.TB_FLAT | wx.TB_NODIVIDER)
         self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
+        _icon = lambda name: load_icon(self.gui_icons_dir + name)
 
-        t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
+        t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", _icon('save_24.png'),
                                             shortHelp="Save model")
         self.Bind(wx.EVT_TOOL, self.save_model, t_save_model)
 
-        t_load_model = self.toolbar.AddTool(wx.ID_ANY, "Load model", wx.Bitmap(self.gui_icons_dir + 'load_24.png'),
+        t_load_model = self.toolbar.AddTool(wx.ID_ANY, "Load model", _icon('load_24.png'),
                                             shortHelp="Load model")
         self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
 
@@ -680,124 +681,124 @@ class Gmg(wx.Frame):
         # self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
         self.t_calc_grav = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="grav",
-                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
-                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
+                                                     bitmap1=_icon('G_24.png'),
+                                                     bmpDisabled=_icon('G_24.png'),
                                                      shortHelp="Calculate gravity anomaly",
                                                      longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.calc_grav_switch_callback, self.t_calc_grav)
 
         self.t_calc_vgg = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="vgg",
-                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'V_24.png'),
-                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'V_24.png'),
+                                                     bitmap1=_icon('V_24.png'),
+                                                     bmpDisabled=_icon('V_24.png'),
                                                      shortHelp="Calculate vertical gravity gradient",
                                                      longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.calc_vgg_switch_callback, self.t_calc_vgg)
 
         self.t_calc_mag = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="mag",
-                                                    bitmap1=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
-                                                    bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
+                                                    bitmap1=_icon('M_24.png'),
+                                                    bmpDisabled=_icon('M_24.png'),
                                                     shortHelp="Calculate magnetic anomaly",
                                                     longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.calc_mag_switch_callback, self.t_calc_mag)
 
         self.t_capture_coordinates = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Capture coordinates",
-                                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
-                                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
+                                                               bitmap1=_icon('C_24.png'),
+                                                               bmpDisabled=_icon('C_24.png'),
                                                                shortHelp="Capture coordinates",
                                                                longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.capture_coordinates, self.t_capture_coordinates)
 
         t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
-                                                 wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'),
+                                                 _icon('large_up_24.png'),
                                                  shortHelp="Aspect increase")
         self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
 
         t_aspect_decrease = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease",
-                                                 wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'),
+                                                 _icon('large_down_24.png'),
                                                  shortHelp="Aspect decrease")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease, t_aspect_decrease)
 
         t_aspect_increase2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase x2",
-                                                  wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'),
+                                                  _icon('small_up_24.png'),
                                                   shortHelp="Aspect increase x2")
         self.Bind(wx.EVT_TOOL, self.aspect_increase2, t_aspect_increase2)
 
         t_aspect_decrease2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease x2",
-                                                  wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'),
+                                                  _icon('small_down_24.png'),
                                                   shortHelp="Aspect decrease x2")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
 
         self.t_zoom = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Zoom in",
-                                                bitmap1=wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'),
-                                                bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'),
+                                                bitmap1=_icon('zoom_in_24.png'),
+                                                bmpDisabled=_icon('zoom_in_24.png'),
                                                 shortHelp="Zoom in",
                                                 longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.zoom, self.t_zoom)
 
         t_zoom_out = self.toolbar.AddTool(wx.ID_ANY, "Zoom out",
-                                          wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'), shortHelp="Zoom out")
+                                          _icon('zoom_out_24.png'), shortHelp="Zoom out")
         self.Bind(wx.EVT_TOOL, self.zoom_out, t_zoom_out)
 
         t_full_extent = self.toolbar.AddTool(wx.ID_ANY, "Full extent",
-                                             wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'),
+                                             _icon('full_extent_24.png'),
                                              shortHelp="Full extent")
         self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
 
         self.t_pan = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Pan",
-                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'pan_24.png'),
-                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'pan_24.png'),
+                                               bitmap1=_icon('pan_24.png'),
+                                               bmpDisabled=_icon('pan_24.png'),
                                                shortHelp="Pan",
                                                longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.pan, self.t_pan)
 
         t_gain_down = self.toolbar.AddTool(wx.ID_ANY, "Gain down",
-                                           wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'), shortHelp="Gain down")
+                                           _icon('left_small_24.png'), shortHelp="Gain down")
         self.Bind(wx.EVT_TOOL, self.gain_decrease, t_gain_down)
 
         t_gain_up = self.toolbar.AddTool(wx.ID_ANY, "Gain up",
-                                         wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'), shortHelp="Gain up")
+                                         _icon('right_small_24.png'), shortHelp="Gain up")
         self.Bind(wx.EVT_TOOL, self.gain_increase, t_gain_up)
 
         t_transparency_down = self.toolbar.AddTool(wx.ID_ANY, "Transparency down",
-                                                   wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'),
+                                                   _icon('large_left_24.png'),
                                                    shortHelp="Transparency down")
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
 
         # INCREASE TRANSPARENCY ICON
         t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
-                                                 wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'),
+                                                 _icon('large_right_24.png'),
                                                  shortHelp="Transparency up")
         self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
 
         # LOAD WELL ICON
         t_load_well = self.toolbar.AddTool(wx.ID_ANY, "Load well horizons",
-                                           wx.Bitmap(self.gui_icons_dir + 'well_24.png'),
+                                           _icon('well_24.png'),
                                            shortHelp="Load well horizons")
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
 
         # TOOGLE FAULT PICKING MODE
         self.t_toogle_fault_mode = self.toolbar.AddCheckTool(toolId=10000, label="Fault pick",
-                                                             bitmap1=wx.Bitmap(self.gui_icons_dir + 'F_24.png'),
-                                                             bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'off_F_24.png'),
+                                                             bitmap1=_icon('F_24.png'),
+                                                             bmpDisabled=_icon('off_F_24.png'),
                                                              shortHelp="Toogle fault picking")
-        self.t_toogle_fault_mode.SetDisabledBitmap(wx.Bitmap(self.gui_icons_dir + 'off_F_24.png'))
+        self.t_toogle_fault_mode.SetDisabledBitmap(_icon('off_F_24.png'))
         self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, self.t_toogle_fault_mode)
 
         # FAULT PICKER ICON
         self.t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                                 bitmap=wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'),
+                                                 bitmap=_icon('faultline_24.png'),
                                                  shortHelp="Fault picker")
         self.Bind(wx.EVT_TOOL, self.pick_new_fault, self.t_fault_pick)
 
         # UNDO ICON
         self.t_undo = self.toolbar.AddTool(wx.ID_ANY, "Undo",
-                                                 bitmap=wx.Bitmap(self.gui_icons_dir + 'undo_24.png'),
+                                                 bitmap=_icon('undo_24.png'),
                                                  shortHelp="Undo")
         self.Bind(wx.EVT_TOOL, self.undo, self.t_undo)
 
         self.t_pinch = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Pinch nodes",
-                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'pinch_24.png'),
-                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'pinch_24.png'),
+                                               bitmap1=_icon('pinch_24.png'),
+                                               bmpDisabled=_icon('pinch_24.png'),
                                                shortHelp="Pinch nodes",
                                                longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.pinch_out_layer_switch, self.t_pinch)

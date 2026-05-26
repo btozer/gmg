@@ -136,3 +136,31 @@ MPL_DARK_RC = {
     "savefig.facecolor":    THEME["bg_canvas"],
     "savefig.edgecolor":    THEME["bg_canvas"],
 }
+
+
+# ---------------------------------------------------------------------------
+# Icon loader  (dark-theme adapted bitmaps for the toolbar)
+# ---------------------------------------------------------------------------
+
+def load_icon(path: str) -> "wx.Bitmap":
+    """
+    Load a 24-px PNG toolbar icon adapted for a dark background:
+      - near-white pixels  (R,G,B > 220)  → fully transparent
+      - near-black pixels  (unsaturated, max channel < 80) → light grey #cccccc
+      - all other (coloured) pixels are left untouched
+    """
+    img = wx.Image(path, wx.BITMAP_TYPE_PNG)
+    if not img.HasAlpha():
+        img.InitAlpha()
+    for y in range(img.GetHeight()):
+        for x in range(img.GetWidth()):
+            r = img.GetRed(x, y)
+            g = img.GetGreen(x, y)
+            b = img.GetBlue(x, y)
+            if r > 220 and g > 220 and b > 220:          # near-white → transparent
+                img.SetAlpha(x, y, 0)
+            elif max(r, g, b) < 80 and (max(r, g, b) - min(r, g, b)) < 30:
+                img.SetRed(x, y, 204)                     # near-black → light grey
+                img.SetGreen(x, y, 204)
+                img.SetBlue(x, y, 204)
+    return wx.Bitmap(img)
