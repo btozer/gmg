@@ -95,8 +95,10 @@ def plot_fig(file_path, area, xp, model_aspect,
     # Model panel height matches the vertical exaggeration used in the GUI.
     # matplotlib set_aspect(model_aspect) stretches y by model_aspect, so we
     # multiply to get the same proportions in GMT.
+    # A 0.5 cm floor prevents a degenerate zero-height panel but allows
+    # compressed aspect ratios (model_aspect < 1.0) to produce a short panel.
     raw_h = (z_range / x_range) * fig_width_cm
-    model_h_cm = max(raw_h * model_aspect, 4.0)
+    model_h_cm = max(raw_h * model_aspect, 0.5)
 
     def _proj(height_cm, invert_y=False):
         """Absolute Cartesian projection for a panel of the given height.
