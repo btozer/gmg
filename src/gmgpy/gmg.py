@@ -663,8 +663,8 @@ class Gmg(wx.Frame):
         self.SetMenuBar(self.menubar)
         # --------------------------------------------------------------------------------------------------------------
 
-        # TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)
-        self.toolbar = self.CreateToolBar(style=wx.TB_FLAT | wx.TB_NODIVIDER)
+        # TOOLBAR - embedded as AUI pane so macOS doesn't centre the items
+        self.toolbar = wx.ToolBar(self, -1, style=wx.TB_FLAT | wx.TB_NODIVIDER)
         self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
         _icon = lambda name: load_icon(self.gui_icons_dir + name)
 
@@ -809,13 +809,15 @@ class Gmg(wx.Frame):
         #                                          shortHelp="Redo")
         # self.Bind(wx.EVT_TOOL, self.redo, self.t_redo)
 
-        # Stretchable space pushes all tools to the left on macOS
-        self.toolbar.AddStretchableSpace()
-
         # CREATE TOOLBAR
         self.toolbar.Realize()
-        self.toolbar.SetSize((-1, 36))
         self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
+        self.mgr.AddPane(self.toolbar, aui.AuiPaneInfo()
+                         .Name('toolbar').ToolbarPane().Top().Row(0)
+                         .Gripper(False).Floatable(False)
+                         .LeftDockable(False).RightDockable(False)
+                         .MinSize((-1, 36)).BestSize((-1, 36)))
+        self.mgr.Update()
 
     def start(self, area, xp, zp):
         """CREATE MPL FIGURE CANVAS"""
