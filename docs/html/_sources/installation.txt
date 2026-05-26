@@ -3,8 +3,8 @@
 Installation
 ============
 
-Pre-Installation
-----------------
+1. Pre-Installation
+-------------------
 
 .. note::
 
@@ -54,8 +54,8 @@ GMG is currently only tested on macOS Monterey, Ubuntu 22.04 Linux and Windows 1
 that issues may arise when trying to install on other distributions. Please raise any information regarding
 installation problems on github.
 
-Installing gmg
---------------
+2. Installing gmg
+-----------------
 
 THe gmg package is hosted on both conda-forge and PyPi (pip). It is highly recommended that
 you install gmg in a standalone conda environment using option 1 below. This is ensure
@@ -89,3 +89,33 @@ The splash screen and model shell should appear as shown below:
 
 .. figure:: _static/gmg_splash_screen.png
     :name: gmg_splash_screen
+
+3. Run optional tests
+---------------------
+
+Once the installation is compete you can check that the gmg potential field algorithms 
+are working correctly by running the test suite. Open a terminal and navigate to the directory
+where gmg has been installed e.g.::
+
+    cd **/miniforge3/envs/gmg/lib/python*.*/site-packages/gmgpy
+
+Then, simply type::
+
+    gmgpy test
+
+This should return a message similar to the following::
+
+    ========================== test session starts =========================
+    platform darwin -- Python 3.8.6, pytest-8.2.1, pluggy-1.5.0
+    rootdir: /**/**/miniforge3/envs/gmg/lib/python*.*/site-packages/gmgpy
+    plugins: cov-5.0.0, typeguard-2.13.3
+    collected 3 items                                                     
+
+    tests/test_01_bott_gravity.py .                                 [ 33%]
+    tests/test_02_talwani_magnetic.py .                             [ 66%]
+    tests/test_03_kim_and_wessel.py .                               [100%]
+
+    ========================== 3 passed in 0.48s ==========================
+
+The software can then be more fully tested by following the instructions in 
+:ref:`manual_benchmark_examples`.

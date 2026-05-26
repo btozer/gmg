@@ -53,9 +53,10 @@
               <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#pre-installation">Pre-Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installing-gmg">Installing gmg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-installation">1. Pre-Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-gmg">2. Installing gmg</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#launching-gmg">Launching gmg</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-optional-tests">3. Run optional tests</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html"><strong>Getting Started</strong></a></li>
@@ -100,7 +101,7 @@
   <section id="installation">
 <span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading"></a></h1>
 <section id="pre-installation">
-<h2>Pre-Installation<a class="headerlink" href="#pre-installation" title="Permalink to this heading"></a></h2>
+<h2>1. Pre-Installation<a class="headerlink" href="#pre-installation" title="Permalink to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>gmg is written in Python 3 and can be installing using common python package managers
@@ -144,7 +145,7 @@ that issues may arise when trying to install on other distributions. Please rais
 installation problems on github.</p>
 </section>
 <section id="installing-gmg">
-<h2>Installing gmg<a class="headerlink" href="#installing-gmg" title="Permalink to this heading"></a></h2>
+<h2>2. Installing gmg<a class="headerlink" href="#installing-gmg" title="Permalink to this heading"></a></h2>
 <p>THe gmg package is hosted on both conda-forge and PyPi (pip). It is highly recommended that
 you install gmg in a standalone conda environment using option 1 below. This is ensure
 you do not create any dependencies issues that may arise if you install system-wide using pip.</p>
@@ -177,6 +178,35 @@ you do not create any dependencies issues that may arise if you install system-w
 <img alt="_images/gmg_splash_screen.png" src="_images/gmg_splash_screen.png" />
 </figure>
 </section>
+<section id="run-optional-tests">
+<h2>3. Run optional tests<a class="headerlink" href="#run-optional-tests" title="Permalink to this heading"></a></h2>
+<p>Once the installation is compete you can check that the gmg potential field algorithms
+are working correctly by running the test suite. Open a terminal and navigate to the directory
+where gmg has been installed e.g.:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd **/miniforge3/envs/gmg/lib/python*.*/site-packages/gmgpy
+</pre></div>
+</div>
+<p>Then, simply type:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gmgpy test
+</pre></div>
+</div>
+<p>This should return a message similar to the following:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>========================== test session starts =========================
+platform darwin -- Python 3.8.6, pytest-8.2.1, pluggy-1.5.0
+rootdir: /**/**/miniforge3/envs/gmg/lib/python*.*/site-packages/gmgpy
+plugins: cov-5.0.0, typeguard-2.13.3
+collected 3 items
+
+tests/test_01_bott_gravity.py .                                 [ 33%]
+tests/test_02_talwani_magnetic.py .                             [ 66%]
+tests/test_03_kim_and_wessel.py .                               [100%]
+
+========================== 3 passed in 0.48s ==========================
+</pre></div>
+</div>
+<p>The software can then be more fully tested by following the instructions in
+<a class="reference internal" href="manual_benchmark_examples.html#manual-benchmark-examples"><span class="std std-ref">13.0 Benchmark tests</span></a>.</p>
+</section>
 </section>
 
 
@@ -191,7 +221,7 @@ you do not create any dependencies issues that may arise if you install system-w
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2024, B. Tozer.
-      <span class="lastupdated">Last updated on Jun 04, 2024.
+      <span class="lastupdated">Last updated on Jun 20, 2024.
       </span></p>
   </div>
 
