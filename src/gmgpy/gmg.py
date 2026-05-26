@@ -809,6 +809,9 @@ class Gmg(wx.Frame):
         #                                          shortHelp="Redo")
         # self.Bind(wx.EVT_TOOL, self.redo, self.t_redo)
 
+        # Stretchable space pushes all tools to the left on macOS
+        self.toolbar.AddStretchableSpace()
+
         # CREATE TOOLBAR
         self.toolbar.Realize()
         self.toolbar.SetSize((-1, 36))
