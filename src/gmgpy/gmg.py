@@ -1284,8 +1284,9 @@ class Gmg(wx.Frame):
         hspace = max(0.2, min(1.5, 1000.0 / fig_h_px))
 
         # tight_layout auto-computes left/right margins so y-axis labels are never clipped.
+        # pad=0.2 and h_pad=0.05 minimise empty space around and between axes.
         try:
-            self.fig.tight_layout(rect=[0, 0.02, 1, 0.99], h_pad=0.3)
+            self.fig.tight_layout(rect=[0, 0.02, 1, 0.99], pad=0.2, h_pad=0.05)
         except Exception:
             self.fig.subplots_adjust(top=0.99, left=0.06, right=0.99, bottom=0.02)
 
@@ -1294,8 +1295,9 @@ class Gmg(wx.Frame):
 
         # Dynamic tick/label size proportional to the pixel height of each data panel.
         # Each data panel occupies 3 of the 26 subplot rows.
+        # Cap at 6 pt (≈30% smaller than previous 8 pt cap).
         panel_h_px = (0.99 - 0.02) * fig_h_px * (3.0 / 26.0)
-        labelsize = max(5, min(8, int(panel_h_px / 8)))
+        labelsize = max(4, min(6, int(panel_h_px / 8)))
         for ax in self.fig.get_axes():
             ax.tick_params(labelsize=labelsize)
             ax.yaxis.label.set_size(labelsize)
