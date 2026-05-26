@@ -1122,12 +1122,12 @@ class Gmg(wx.Frame):
             self.layer_list.append(layer0)
 
         # INITALISE CALCULATED ANOMALY LINES
-        self.pred_gravity_plot, = self.gravity_frame.plot([], [], 'red', linewidth=2, alpha=0.5)
-        self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
-        self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'gold', linewidth=2, alpha=0.5)
-        self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='pink', linewidth=1.5, alpha=0.5)
-        self.predicted_nt_plot, = self.magnetic_frame.plot([], [], 'green', linewidth=2, alpha=0.5)
-        self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+        self.pred_gravity_plot, = self.gravity_frame.plot([], [], color=THEME['plot_pred_grav'], linewidth=2, alpha=0.8)
+        self.gravity_rms_plot, = self.gravity_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
+        self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_pred_vgg'], linewidth=2, alpha=0.8)
+        self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
+        self.predicted_nt_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_pred_mag'], linewidth=2, alpha=0.8)
+        self.mag_rms_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
 
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
 
