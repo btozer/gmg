@@ -334,7 +334,7 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
         self.status_text = " "
-        self.statusbar.SetStatusWidths([160, -1])  # pane 0: buttons; pane 1: status text
+        self.statusbar.SetStatusWidths([235, -1])  # pane 0: buttons (matches Controls panel width); pane 1: status text
         self.statusbar.SetStatusText(self.status_text, 1)
         self.statusbar.SetSize((-1, 24))
         self.statusbar.SetBackgroundColour(wx_colour('bg_statusbar'))
