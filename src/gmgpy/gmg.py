@@ -1236,7 +1236,7 @@ class Gmg(wx.Frame):
         # self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=6)
 
         # APPLY DARK THEME TO SIDEBAR CONTROLS
-        _ui_font = get_font(size=9)
+        _ui_font = get_font(size=12)
         for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
                       self.angle_a_text, self.angle_b_text, self.angle_c_text,
                       self.earth_field_text, self.node_text, self.x_text, self.y_text,
