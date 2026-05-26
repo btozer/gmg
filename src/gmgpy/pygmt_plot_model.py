@@ -92,10 +92,11 @@ def plot_fig(file_path, area, xp, model_aspect,
     x_range = x_max - x_min
     z_range = z_hi - z_lo
 
-    # Model panel height respects the current vertical exaggeration.
-    # A larger model_aspect means more vertical compression in the output.
+    # Model panel height matches the vertical exaggeration used in the GUI.
+    # matplotlib set_aspect(model_aspect) stretches y by model_aspect, so we
+    # multiply to get the same proportions in GMT.
     raw_h = (z_range / x_range) * fig_width_cm
-    model_h_cm = max(raw_h / model_aspect, 4.0)
+    model_h_cm = max(raw_h * model_aspect, 4.0)
 
     def _proj(height_cm, invert_y=False):
         """Absolute Cartesian projection for a panel of the given height.
