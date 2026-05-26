@@ -126,6 +126,7 @@ from types import MappingProxyType
 import warnings
 # Suppress warnings
 warnings.filterwarnings("ignore")
+from theme import THEME, wx_colour, get_font, get_mono_font, MPL_DARK_RC, load_icon
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -147,9 +148,17 @@ class Gmg(wx.Frame):
     """
 
     def __init__(self, *args, **kwds):
-        wx.Frame.__init__(self, None, wx.ID_ANY, 
-                          'gmg: 2D Geophysical Modelling GUI', 
-                          size=(1800, 1050))
+        # SIZE WINDOW TO 85% OF SCREEN AND CENTER IT
+        _dpy = wx.Display(0)
+        _sw, _sh = _dpy.GetGeometry().GetSize()
+        _w, _h = int(_sw * 0.85), int(_sh * 0.85)
+        _x, _y = (_sw - _w) // 2, (_sh - _h) // 2
+        wx.Frame.__init__(self, None, wx.ID_ANY,
+                          'gmgpy: A 2D Geophysical Modelling GUI',
+                          pos=(_x, _y), size=(_w, _h))
+        self.SetBackgroundColour(wx_colour('bg_base'))
+        self.SetForegroundColour(wx_colour('fg_primary'))
+        self.SetFont(get_font())
 
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
@@ -183,19 +192,31 @@ class Gmg(wx.Frame):
         self.left_panel = wx.SplitterWindow(self, wx.ID_ANY, 
                                             size=(235, 1000), 
                                             style=wx.SP_NOBORDER)
+        self.left_panel.SetBackgroundColour(wx_colour('bg_panel'))
 
         # CREATE FOLDPANELBAR FOR ATTRIBUTE CONTROLS
         self.controls_fold_panel = fpb.FoldPanelBar(self.left_panel, 1, 
                                                     size=(235, 1000),
                                                     agwStyle=fpb.FPB_VERTICAL)
+        self.controls_fold_panel.SetBackgroundColour(wx_colour('bg_panel'))
+
+        # DARK CAPTION BAR STYLE (shared by all three fold panels)
+        _caption_style = fpb.CaptionBarStyle()
+        _caption_style.SetCaptionStyle(fpb.CAPTIONBAR_SINGLE)
+        _caption_style.SetFirstColour(wx_colour('bg_panel'))
+        _caption_style.SetSecondColour(wx_colour('bg_panel'))
+        _caption_style.SetCaptionColour(wx_colour('fg_primary'))
+        _caption_style.SetCaptionFont(get_font(size=15))
 
         # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
         self.scrolled_window_item1 = wx.ScrolledWindow(
-            self.controls_fold_panel, wx.ID_ANY, size=(235, 400), 
-            style=wx.ALIGN_LEFT | wx.BORDER_RAISED)
+            self.controls_fold_panel, wx.ID_ANY, size=(235, 400),
+            style=wx.ALIGN_LEFT | wx.BORDER_NONE)
+        self.scrolled_window_item1.SetBackgroundColour(wx_colour('bg_sidebar'))
+        self.scrolled_window_item1.SetForegroundColour(wx_colour('fg_primary'))
 
         self.fold_panel_item1 = self.controls_fold_panel.AddFoldPanel(
-            "Layer Attributes", collapsed=True, foldIcons=images)
+            "Layer Attributes", collapsed=True, foldIcons=images, cbstyle=_caption_style)
         
         self.fold_panel_item1.AddWindow(self.scrolled_window_item1, 1, wx.EXPAND | wx.ALL, 0)
         # --------------------------------------------------------------------
@@ -203,12 +224,15 @@ class Gmg(wx.Frame):
        # SECOND PANE; LEFT PANEL (=LAYERS) ------------------------------------------------------------
         # GREY wx PANEL
         self.scrolled_window_item2 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(235, 300),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_NONE |
                                                          wx.EXPAND)
+        self.scrolled_window_item2.SetBackgroundColour(wx_colour('bg_sidebar'))
+        self.scrolled_window_item2.SetForegroundColour(wx_colour('fg_primary'))
         
         self.fold_panel_item2 = self.controls_fold_panel.AddFoldPanel("Layers", 
                                                                         collapsed=True, 
-                                                                        foldIcons=images)
+                                                                        foldIcons=images,
+                                                                        cbstyle=_caption_style)
         
         self.fold_panel_item2.AddWindow(self.scrolled_window_item2, 1, wx.EXPAND | wx.ALL, 0)
 
@@ -217,12 +241,15 @@ class Gmg(wx.Frame):
         # THIRD PANE; LEFT PANEL (=FAULTS) -------------------------------------------------------------
         # GREY wx PANEL
         self.scrolled_window_item3 = wx.ScrolledWindow(self.left_panel, wx.ID_ANY, size=(235, 300),
-                                                         style=wx.ALIGN_LEFT | wx.BORDER_RAISED | 
+                                                         style=wx.ALIGN_LEFT | wx.BORDER_NONE |
                                                          wx.EXPAND)
+        self.scrolled_window_item3.SetBackgroundColour(wx_colour('bg_sidebar'))
+        self.scrolled_window_item3.SetForegroundColour(wx_colour('fg_primary'))
         
         self.fold_panel_item3 = self.controls_fold_panel.AddFoldPanel("Faults", 
                                                                         collapsed=True, 
-                                                                        foldIcons=images)
+                                                                        foldIcons=images,
+                                                                        cbstyle=_caption_style)
         
         self.fold_panel_item3.AddWindow(self.scrolled_window_item3, 1, wx.EXPAND | wx.ALL, 0)
         # ----------------------------------------------------------------------------------------------
@@ -235,10 +262,12 @@ class Gmg(wx.Frame):
         self.scrolled_window_item3.SetScrollbar(1, 1, 10, 10)
 
         # CREATE PANEL TO FILL WITH MATPLOTLIB INTERACTIVE FIGURE (MAIN GUI MODELLING FRAME)
-        self.rightPanel = wx.Panel(self, -1, size=(1600, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_RAISED | wx.EXPAND)
+        self.rightPanel = wx.Panel(self, -1, size=(1600, 1100), style=wx.ALIGN_RIGHT | wx.BORDER_NONE | wx.EXPAND)
+        self.rightPanel.SetBackgroundColour(wx_colour('bg_base'))
 
         # CREATE PANEL FOR PYTHON CONSOLE (USED FOR DEBUGGING AND CUSTOM USAGES)
-        self.ConsolePanel = wx.Panel(self, -1, size=(1600, 100), style=wx.ALIGN_LEFT | wx.BORDER_RAISED | wx.EXPAND)
+        self.ConsolePanel = wx.Panel(self, -1, size=(1600, 100), style=wx.ALIGN_LEFT | wx.BORDER_NONE | wx.EXPAND)
+        self.ConsolePanel.SetBackgroundColour(wx_colour('bg_sidebar'))
         intro = "###############################################################\r" \
                 "!USE import sys; then sys.Gmg.OBJECT TO ACCESS PROGRAM OBJECTS \r" \
                 "ctrl+up FOR COMMAND HISTORY                                    \r" \
@@ -246,19 +275,35 @@ class Gmg(wx.Frame):
         py_local = {'__app__': 'gmg Application'}
         sys.gmg = self
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
+        self.win.SetFont(get_mono_font(size=10))
 
         # ADD THE PANES TO THE AUI MANAGER
         self.mgr.AddPane(self.left_panel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
         self.mgr.AddPane(self.rightPanel, aui.AuiPaneInfo().Name('right').CenterPane())
         self.mgr.AddPane(self.ConsolePanel, aui.AuiPaneInfo().Name('console').Bottom().Caption("Console"))
         self.mgr.GetPaneByName('console').Hide()  # HIDE PYTHON CONSOLE BY DEFAULT
+
+        # APPLY DARK THEME TO AUI DOCK ART
+        art = self.mgr.GetArtProvider()
+        art.SetColour(aui.AUI_DOCKART_BACKGROUND_COLOUR,        wx_colour('bg_base'))
+        art.SetColour(aui.AUI_DOCKART_SASH_COLOUR,              wx_colour('bg_base'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_COLOUR,    wx_colour('accent'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, wx_colour('accent'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_COLOUR,  wx_colour('bg_panel'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_GRADIENT_COLOUR, wx_colour('bg_panel'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_TEXT_COLOUR,   wx_colour('fg_statusbar'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR, wx_colour('fg_caption'))
+        art.SetColour(aui.AUI_DOCKART_BORDER_COLOUR,            wx_colour('border'))
+        art.SetColour(aui.AUI_DOCKART_GRIPPER_COLOUR,           wx_colour('bg_panel'))
+        art.SetMetric(aui.AUI_DOCKART_SASH_SIZE, 3)
+        art.SetMetric(aui.AUI_DOCKART_CAPTION_SIZE, 18)
         self.mgr.Update()
 
         # CREATE PROGRAM MENUBAR & TOOLBAR (PLACED AT TOP OF FRAME)
         self.create_menu()
 
         # CREATE STATUS BAR
-        self.statusbar = self.CreateStatusBar(3)
+        self.statusbar = self.CreateStatusBar(2)
         self.controls_button = GenBitmapButton(self.statusbar, -1, wx.Bitmap(self.gui_icons_dir + 'large_up_16.png'),
                                                pos=(0, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.show_controls, self.controls_button)
@@ -288,10 +333,22 @@ class Gmg(wx.Frame):
                                                pos=(120, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
+        # Blue filler: wx.Panel extends the coloured region beyond the buttons to
+        # the right edge of the Controls pane (the native macOS status bar does not
+        # paint SetBackgroundColour, so only wx-drawn children show colour)
+        self.statusbar_filler = wx.Panel(self.statusbar, -1, pos=(144, -4), size=(0, 28))
+        self.statusbar_filler.SetBackgroundColour(wx_colour('bg_statusbar'))
+
         self.status_text = " "
-        self.statusbar.SetStatusWidths([-1, -1, 1700])
-        self.statusbar.SetStatusText(self.status_text, 2)
-        self.statusbar.SetSize((1800, 24))
+        self.statusbar.SetStatusWidths([235, -1])  # pane 0: buttons (matches Controls panel width); pane 1: status text
+        self.statusbar.SetStatusText(self.status_text, 1)
+        self.statusbar.SetSize((-1, 24))
+        self.statusbar.SetBackgroundColour(wx_colour('bg_statusbar'))
+        self.statusbar.SetForegroundColour(wx_colour('fg_statusbar'))
+        for btn in (self.controls_button, self.console_button,
+                    self.topography_button, self.gravity_button,
+                    self.vgg_button, self.magnetic_button):
+            btn.SetBackgroundColour(wx_colour('bg_statusbar'))
 
         # SET PROGRAM STATUS
         self.model_saved = False
@@ -299,6 +356,9 @@ class Gmg(wx.Frame):
 
         # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+        # Sync statusbar pane-0 width with the Controls panel after layout
+        wx.CallAfter(self._sync_statusbar_width)
 
         # # MAXIMIZE FRAME
         # self.Maximize(True)
@@ -613,14 +673,18 @@ class Gmg(wx.Frame):
         self.SetMenuBar(self.menubar)
         # --------------------------------------------------------------------------------------------------------------
 
-        # TOOLBAR - (THIS IS THE ICON BAR BELOW THE MENU BAR)
-        self.toolbar = self.CreateToolBar()
+        # TOOLBAR - embedded as AUI pane so macOS doesn't centre the items
+        self.toolbar = wx.ToolBar(self, -1, style=wx.TB_FLAT | wx.TB_NODIVIDER)
+        self.toolbar.SetToolBitmapSize(wx.Size(24, 24))
+        self.toolbar.SetMargins(6, 4)
+        self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
+        _icon = lambda name: load_icon(self.gui_icons_dir + name)
 
-        t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", wx.Bitmap(self.gui_icons_dir + 'save_24.png'),
+        t_save_model = self.toolbar.AddTool(wx.ID_ANY, "Save model", _icon('save_24.png'),
                                             shortHelp="Save model")
         self.Bind(wx.EVT_TOOL, self.save_model, t_save_model)
 
-        t_load_model = self.toolbar.AddTool(wx.ID_ANY, "Load model", wx.Bitmap(self.gui_icons_dir + 'load_24.png'),
+        t_load_model = self.toolbar.AddTool(wx.ID_ANY, "Load model", _icon('load_24.png'),
                                             shortHelp="Load model")
         self.Bind(wx.EVT_TOOL, self.load_model, t_load_model)
 
@@ -629,124 +693,124 @@ class Gmg(wx.Frame):
         # self.Bind(wx.EVT_TOOL, self.calc_topo_switch, t_calc_topo)  # FUTURE
 
         self.t_calc_grav = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="grav",
-                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
-                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'G_24.png'),
+                                                     bitmap1=_icon('G_24.png'),
+                                                     bmpDisabled=_icon('G_24.png'),
                                                      shortHelp="Calculate gravity anomaly",
                                                      longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.calc_grav_switch_callback, self.t_calc_grav)
 
         self.t_calc_vgg = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="vgg",
-                                                     bitmap1=wx.Bitmap(self.gui_icons_dir + 'V_24.png'),
-                                                     bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'V_24.png'),
+                                                     bitmap1=_icon('V_24.png'),
+                                                     bmpDisabled=_icon('V_24.png'),
                                                      shortHelp="Calculate vertical gravity gradient",
                                                      longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.calc_vgg_switch_callback, self.t_calc_vgg)
 
         self.t_calc_mag = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="mag",
-                                                    bitmap1=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
-                                                    bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'M_24.png'),
+                                                    bitmap1=_icon('M_24.png'),
+                                                    bmpDisabled=_icon('M_24.png'),
                                                     shortHelp="Calculate magnetic anomaly",
                                                     longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.calc_mag_switch_callback, self.t_calc_mag)
 
         self.t_capture_coordinates = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Capture coordinates",
-                                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
-                                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'C_24.png'),
+                                                               bitmap1=_icon('C_24.png'),
+                                                               bmpDisabled=_icon('C_24.png'),
                                                                shortHelp="Capture coordinates",
                                                                longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.capture_coordinates, self.t_capture_coordinates)
 
         t_aspect_increase = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase",
-                                                 wx.Bitmap(self.gui_icons_dir + 'large_up_24.png'),
+                                                 _icon('large_up_24.png'),
                                                  shortHelp="Aspect increase")
         self.Bind(wx.EVT_TOOL, self.aspect_increase, t_aspect_increase)
 
         t_aspect_decrease = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease",
-                                                 wx.Bitmap(self.gui_icons_dir + 'large_down_24.png'),
+                                                 _icon('large_down_24.png'),
                                                  shortHelp="Aspect decrease")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease, t_aspect_decrease)
 
         t_aspect_increase2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect increase x2",
-                                                  wx.Bitmap(self.gui_icons_dir + 'small_up_24.png'),
+                                                  _icon('small_up_24.png'),
                                                   shortHelp="Aspect increase x2")
         self.Bind(wx.EVT_TOOL, self.aspect_increase2, t_aspect_increase2)
 
         t_aspect_decrease2 = self.toolbar.AddTool(wx.ID_ANY, "Aspect decrease x2",
-                                                  wx.Bitmap(self.gui_icons_dir + 'small_down_24.png'),
+                                                  _icon('small_down_24.png'),
                                                   shortHelp="Aspect decrease x2")
         self.Bind(wx.EVT_TOOL, self.aspect_decrease2, t_aspect_decrease2)
 
         self.t_zoom = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Zoom in",
-                                                bitmap1=wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'),
-                                                bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'zoom_in_24.png'),
+                                                bitmap1=_icon('zoom_in_24.png'),
+                                                bmpDisabled=_icon('zoom_in_24.png'),
                                                 shortHelp="Zoom in",
                                                 longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.zoom, self.t_zoom)
 
         t_zoom_out = self.toolbar.AddTool(wx.ID_ANY, "Zoom out",
-                                          wx.Bitmap(self.gui_icons_dir + 'zoom_out_24.png'), shortHelp="Zoom out")
+                                          _icon('zoom_out_24.png'), shortHelp="Zoom out")
         self.Bind(wx.EVT_TOOL, self.zoom_out, t_zoom_out)
 
         t_full_extent = self.toolbar.AddTool(wx.ID_ANY, "Full extent",
-                                             wx.Bitmap(self.gui_icons_dir + 'full_extent_24.png'),
+                                             _icon('full_extent_24.png'),
                                              shortHelp="Full extent")
         self.Bind(wx.EVT_TOOL, self.full_extent, t_full_extent, id=604)
 
         self.t_pan = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Pan",
-                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'pan_24.png'),
-                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'pan_24.png'),
+                                               bitmap1=_icon('pan_24.png'),
+                                               bmpDisabled=_icon('pan_24.png'),
                                                shortHelp="Pan",
                                                longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.pan, self.t_pan)
 
         t_gain_down = self.toolbar.AddTool(wx.ID_ANY, "Gain down",
-                                           wx.Bitmap(self.gui_icons_dir + 'left_small_24.png'), shortHelp="Gain down")
+                                           _icon('left_small_24.png'), shortHelp="Gain down")
         self.Bind(wx.EVT_TOOL, self.gain_decrease, t_gain_down)
 
         t_gain_up = self.toolbar.AddTool(wx.ID_ANY, "Gain up",
-                                         wx.Bitmap(self.gui_icons_dir + 'right_small_24.png'), shortHelp="Gain up")
+                                         _icon('right_small_24.png'), shortHelp="Gain up")
         self.Bind(wx.EVT_TOOL, self.gain_increase, t_gain_up)
 
         t_transparency_down = self.toolbar.AddTool(wx.ID_ANY, "Transparency down",
-                                                   wx.Bitmap(self.gui_icons_dir + 'large_left_24.png'),
+                                                   _icon('large_left_24.png'),
                                                    shortHelp="Transparency down")
         self.Bind(wx.EVT_TOOL, self.transparency_decrease, t_transparency_down)
 
         # INCREASE TRANSPARENCY ICON
         t_transparency_up = self.toolbar.AddTool(wx.ID_ANY, "Transparency up",
-                                                 wx.Bitmap(self.gui_icons_dir + 'large_right_24.png'),
+                                                 _icon('large_right_24.png'),
                                                  shortHelp="Transparency up")
         self.Bind(wx.EVT_TOOL, self.transparency_increase, t_transparency_up)
 
         # LOAD WELL ICON
         t_load_well = self.toolbar.AddTool(wx.ID_ANY, "Load well horizons",
-                                           wx.Bitmap(self.gui_icons_dir + 'well_24.png'),
+                                           _icon('well_24.png'),
                                            shortHelp="Load well horizons")
         self.Bind(wx.EVT_TOOL, self.load_well, t_load_well)
 
         # TOOGLE FAULT PICKING MODE
         self.t_toogle_fault_mode = self.toolbar.AddCheckTool(toolId=10000, label="Fault pick",
-                                                             bitmap1=wx.Bitmap(self.gui_icons_dir + 'F_24.png'),
-                                                             bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'off_F_24.png'),
+                                                             bitmap1=_icon('F_24.png'),
+                                                             bmpDisabled=_icon('off_F_24.png'),
                                                              shortHelp="Toogle fault picking")
-        self.t_toogle_fault_mode.SetDisabledBitmap(wx.Bitmap(self.gui_icons_dir + 'off_F_24.png'))
+        self.t_toogle_fault_mode.SetDisabledBitmap(_icon('off_F_24.png'))
         self.Bind(wx.EVT_TOOL, self.toogle_fault_mode, self.t_toogle_fault_mode)
 
         # FAULT PICKER ICON
         self.t_fault_pick = self.toolbar.AddTool(wx.ID_ANY, "Fault pick",
-                                                 bitmap=wx.Bitmap(self.gui_icons_dir + 'faultline_24.png'),
+                                                 bitmap=_icon('faultline_24.png'),
                                                  shortHelp="Fault picker")
         self.Bind(wx.EVT_TOOL, self.pick_new_fault, self.t_fault_pick)
 
         # UNDO ICON
         self.t_undo = self.toolbar.AddTool(wx.ID_ANY, "Undo",
-                                                 bitmap=wx.Bitmap(self.gui_icons_dir + 'undo_24.png'),
+                                                 bitmap=_icon('undo_24.png'),
                                                  shortHelp="Undo")
         self.Bind(wx.EVT_TOOL, self.undo, self.t_undo)
 
         self.t_pinch = self.toolbar.AddCheckTool(toolId=wx.ID_ANY, label="Pinch nodes",
-                                               bitmap1=wx.Bitmap(self.gui_icons_dir + 'pinch_24.png'),
-                                               bmpDisabled=wx.Bitmap(self.gui_icons_dir + 'pinch_24.png'),
+                                               bitmap1=_icon('pinch_24.png'),
+                                               bmpDisabled=_icon('pinch_24.png'),
                                                shortHelp="Pinch nodes",
                                                longHelp="", clientData=None)
         self.Bind(wx.EVT_TOOL, self.pinch_out_layer_switch, self.t_pinch)
@@ -758,14 +822,23 @@ class Gmg(wx.Frame):
         # self.Bind(wx.EVT_TOOL, self.redo, self.t_redo)
 
         # CREATE TOOLBAR
+        self.toolbar.SetToolPacking(10)
         self.toolbar.Realize()
-        self.toolbar.SetSize((1790, 36))
+        self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
+        self.mgr.AddPane(self.toolbar, aui.AuiPaneInfo()
+                         .Name('toolbar').ToolbarPane().Top().Row(0)
+                         .Gripper(False).Floatable(False)
+                         .LeftDockable(False).RightDockable(False)
+                         .MinSize((-1, 44)).BestSize((-1, 44)))
+        self.mgr.Update()
 
     def start(self, area, xp, zp):
         """CREATE MPL FIGURE CANVAS"""
 
+        plt.rcParams.update(MPL_DARK_RC)  # APPLY DARK THEME
         self.fig = plt.figure()  # CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
+        self.Bind(wx.EVT_SIZE, self._on_wx_resize)  # DYNAMIC LAYOUT ON RESIZE
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
         self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
@@ -952,7 +1025,7 @@ class Gmg(wx.Frame):
         # TOPOGRAPHY CANVAS -------------------------------------------------------------------------------
         self.topography_frame = plt.subplot2grid((26, 100), (0, self.x_orig), 
                                            rowspan=self.data_row_span, colspan=self.columns)
-        self.topography_frame.set_ylabel("Topo (km)")
+        self.topography_frame.set_ylabel("T (km)")
         self.topography_frame.set_navigate(False)
         self.topography_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topography_frame.grid()
@@ -969,7 +1042,7 @@ class Gmg(wx.Frame):
         self.gravity_frame = plt.subplot2grid((26, 100), (3, self.x_orig), 
                                               rowspan=self.data_row_span, colspan=self.columns)
         self.gravity_frame.set_navigate(False)
-        self.gravity_frame.set_ylabel("Grav (mGal)")
+        self.gravity_frame.set_ylabel("G (mGal)")
         self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.gravity_frame.grid()
         self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -985,7 +1058,7 @@ class Gmg(wx.Frame):
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (6, self.x_orig), 
                                           rowspan=self.data_row_span, colspan=self.columns)
         self.vertical_gg_frame.set_navigate(False)
-        self.vertical_gg_frame.set_ylabel("VGG (Eotvos)")
+        self.vertical_gg_frame.set_ylabel("V (Eotvos)")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1000,7 +1073,7 @@ class Gmg(wx.Frame):
         # MAGNETIC CANVAS ----------------------------------------------------------------------------------
         self.magnetic_frame = plt.subplot2grid((26, 100), (9, self.x_orig), 
                                                rowspan=self.data_row_span, colspan=self.columns)
-        self.magnetic_frame.set_ylabel("Mag (nT)")
+        self.magnetic_frame.set_ylabel("M (nT)")
         self.magnetic_frame.set_navigate(False)
         self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_frame.grid()
@@ -1032,8 +1105,6 @@ class Gmg(wx.Frame):
         self.gravity_frame.set_xlim(self.model_frame.get_xlim())
         self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
         self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
-        self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02,
-                                 hspace=1.5)
 
         # ADD FIRST LAYER
         if self.newmodel:
@@ -1068,12 +1139,12 @@ class Gmg(wx.Frame):
             self.layer_list.append(layer0)
 
         # INITALISE CALCULATED ANOMALY LINES
-        self.pred_gravity_plot, = self.gravity_frame.plot([], [], 'red', linewidth=2, alpha=0.5)
-        self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
-        self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'gold', linewidth=2, alpha=0.5)
-        self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='pink', linewidth=1.5, alpha=0.5)
-        self.predicted_nt_plot, = self.magnetic_frame.plot([], [], 'green', linewidth=2, alpha=0.5)
-        self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+        self.pred_gravity_plot, = self.gravity_frame.plot([], [], color=THEME['plot_pred_grav'], linewidth=2, alpha=0.8)
+        self.gravity_rms_plot, = self.gravity_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
+        self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_pred_vgg'], linewidth=2, alpha=0.8)
+        self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
+        self.predicted_nt_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_pred_mag'], linewidth=2, alpha=0.8)
+        self.mag_rms_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
 
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
 
@@ -1182,11 +1253,100 @@ class Gmg(wx.Frame):
         # self.cb1.ax.tick_params(labelsize=6)
         # self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=6)
 
+        # APPLY DARK THEME TO SIDEBAR CONTROLS
+        _ui_font = get_font(size=12)
+        for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
+                      self.angle_a_text, self.angle_b_text, self.angle_c_text,
+                      self.earth_field_text, self.node_text, self.x_text, self.y_text,
+                      self.text_size_text):
+            label.SetForegroundColour(wx_colour('fg_primary'))
+            label.SetBackgroundColour(wx_colour('bg_sidebar'))
+            label.SetFont(_ui_font)
+        for spin in (self.density_input, self.ref_density_input, self.susceptibility_input,
+                     self.angle_a_input, self.angle_b_input, self.angle_c_input,
+                     self.earth_field_input, self.x_input, self.y_input):
+            spin.SetBackgroundColour(wx_colour('bg_input'))
+            spin.GetTextCtrl().SetBackgroundColour(wx_colour('bg_input'))
+            spin.GetTextCtrl().SetForegroundColour(wx_colour('fg_input'))
+            spin.GetTextCtrl().SetFont(_ui_font)
+        self.node_set_button.SetBackgroundColour(wx_colour('bg_input'))
+        self.node_set_button.SetForegroundColour(wx_colour('fg_primary'))
+        self.node_set_button.SetFont(_ui_font)
+        self.text_size_input.SetBackgroundColour(wx_colour('bg_sidebar'))
+        for tree in (self.tree, self.fault_tree):
+            tree.SetBackgroundColour(wx_colour('bg_sidebar'))
+            tree.SetForegroundColour(wx_colour('fg_primary'))
+            tree.SetFont(_ui_font)
+
         # UPDATE INFO BAR
         self.display_info()
 
         # REDRAW MAIN
         self.draw()
+
+    def _on_wx_resize(self, event):
+        """wx.EVT_SIZE handler — let sizers run first, then recalculate axes layout."""
+        event.Skip()  # allow default sizer/layout processing
+        wx.CallAfter(self._recalc_layout)
+
+    def _recalc_layout(self, event=None):
+        """Recompute subplot spacing and axis label sizes for the current figure dimensions.
+        Called after every wx window resize and after frame_adjustment() toggles."""
+        if not hasattr(self, 'fig') or not hasattr(self, 'canvas'):
+            return
+        fig_w, fig_h = self.fig.get_size_inches()
+        dpi = self.fig.get_dpi()
+        fig_h_px = max(fig_h * dpi, 1.0)
+
+        # Dynamic tick/label size proportional to the pixel height of each data panel.
+        # Each data panel occupies 3 of the 26 subplot rows.
+        panel_h_px = 0.94 * fig_h_px * (3.0 / 26.0)
+        labelsize = max(3, min(5, int(panel_h_px / 10)))
+
+        # The subplot grid uses x_orig=10 out of 100 columns, so the actual axes left
+        # edge in figure coords = left + (right - left) * x_orig/100.
+        # We need left to be negative so the combined offset gives ~5% of figure width
+        # as the real margin (enough for 4-6pt tick labels + small rotated y-titles).
+        # Formula: left = (target - right * x_frac) / (1 - x_frac)
+        x_frac = getattr(self, 'x_orig', 10) / 100.0
+        target_axes_left = max(0.04, labelsize * 4 / 72.0 / max(fig_w, 1.0))
+        left = (target_axes_left - 0.975 * x_frac) / (1.0 - x_frac)
+
+        self.fig.subplots_adjust(
+            top=0.99, left=left, right=0.975, bottom=0.05, hspace=0.5
+        )
+
+        for ax in self.fig.get_axes():
+            ax.tick_params(labelsize=labelsize)
+            ax.yaxis.label.set_size(labelsize)
+            ax.xaxis.label.set_size(labelsize)
+
+        self.canvas.draw_idle()
+        self._sync_statusbar_width()
+
+    def _sync_statusbar_width(self):
+        """Set statusbar pane-0 width to match the actual rendered Controls panel width.
+
+        Uses the AUI pane rect (which includes caption + borders) so that pane-0
+        aligns visually with the full-width 'Controls' caption bar above it.
+        Falls back to the content-widget width when the AUI rect is not yet computed.
+        """
+        if not hasattr(self, 'statusbar') or not hasattr(self, 'mgr'):
+            return
+        pane = self.mgr.GetPaneByName('left')
+        if pane.IsOk() and pane.rect.GetWidth() > 0:
+            w = pane.rect.GetWidth()
+        elif hasattr(self, 'left_panel'):
+            w = self.left_panel.GetSize()[0]
+        else:
+            return
+        if w > 0:
+            self.statusbar.SetStatusWidths([w, -1])
+            if hasattr(self, 'statusbar_filler') and hasattr(self, 'magnetic_button'):
+                filler_x = (self.magnetic_button.GetPosition()[0]
+                            + self.magnetic_button.GetSize()[0])
+                filler_w = max(0, w - filler_x)
+                self.statusbar_filler.SetSize(filler_x, -4, filler_w, 28)
 
     def size_handler(self):
         """PLACE THE GUI FRAMES IN THE wxSIZER WINDOWS"""
@@ -1379,8 +1539,8 @@ class Gmg(wx.Frame):
         self.controls_fold_panel.Expand(self.fold_panel_item3)
 
         # SETUP RIGHT PANEL
-        self.rightPanel.SetSizerAndFit(self.canvas_box)
-        self.rightPanel.SetSize(self.GetSize())
+        self.rightPanel.SetSizer(self.canvas_box)
+        self._recalc_layout()
         # --------------------------------------------------------------------------------------------------------------
 
     def topo_frame_params(self, span_size):
@@ -1416,7 +1576,7 @@ class Gmg(wx.Frame):
         # VGG CANVAS
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
                                           rowspan=span_size, colspan=self.columns)
-        self.vertical_gg_frame.set_ylabel("VGG (Eotvos)")
+        self.vertical_gg_frame.set_ylabel("V (Eotvos)")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1430,7 +1590,7 @@ class Gmg(wx.Frame):
         # MAG CANVAS
         self.magnetic_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
                                                rowspan=span_size, colspan=self.columns)
-        self.magnetic_frame.set_ylabel("Mag (nT)")
+        self.magnetic_frame.set_ylabel("M (nT)")
         self.magnetic_frame.set_navigate(False)
         self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_frame.grid()
@@ -1657,20 +1817,20 @@ class Gmg(wx.Frame):
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
             self.magnetic_d_frame.set_xlim(self.model_frame.get_xlim())
-        self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
+        self._recalc_layout()
 
         # INITALISE CALCULATED P.F. LINES
         if self.gravity_frame is not None:
-            self.pred_gravity_plot, = self.gravity_frame.plot([], [], 'red', linewidth=2, alpha=0.5)
-            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.pred_gravity_plot, = self.gravity_frame.plot([], [], color=THEME['plot_pred_grav'], linewidth=2, alpha=0.8)
+            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
         
         if self.vertical_gg_frame is not None:
-            self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'yellow', linewidth=2, alpha=0.5)
-            self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_pred_vgg'], linewidth=2, alpha=0.8)
+            self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
 
         if self.magnetic_frame is not None:
-            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], 'green', linewidth=2, alpha=0.5)
-            self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_pred_mag'], linewidth=2, alpha=0.8)
+            self.mag_rms_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
 
         # PLOT OBSERVED TOPO DATA
         if self.topography_frame is not None:
@@ -1993,13 +2153,14 @@ class Gmg(wx.Frame):
         self.draw()
 
     def display_info(self):
-        self.statusbar.SetStatusText("                                                                                 "
-                                     "                                                   "
-                                     " || Currently Editing Layer: %s  || "
-                                     " || Model Aspect Ratio = %s:1.0  || GRAV RMS = %s "
-                                     " || MAG RMS = %s  ||" % (self.currently_active_layer_id,
-                                                               self.model_frame.get_aspect(), self.gravity_rms_value,
-                                                               self.magnetic_rms_value), 2)
+        self.statusbar.SetStatusText(
+            " || Currently Editing Layer: %s"
+            "  || Model Aspect Ratio = %s:1.0"
+            "  || GRAV RMS = %s"
+            "  || MAG RMS = %s  ||" % (self.currently_active_layer_id,
+                                       self.model_frame.get_aspect(),
+                                       self.gravity_rms_value,
+                                       self.magnetic_rms_value), 1)
         self.statusbar.Update()
 
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2048,7 +2209,7 @@ class Gmg(wx.Frame):
             self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
-        self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
+        self._recalc_layout()
 
         'ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
         if self.topography_frame is False:
