@@ -333,6 +333,12 @@ class Gmg(wx.Frame):
                                                pos=(120, -4), style=wx.NO_BORDER)
         self.Bind(wx.EVT_BUTTON, self.frame_adjustment, self.magnetic_button)
 
+        # Blue filler: wx.Panel extends the coloured region beyond the buttons to
+        # the right edge of the Controls pane (the native macOS status bar does not
+        # paint SetBackgroundColour, so only wx-drawn children show colour)
+        self.statusbar_filler = wx.Panel(self.statusbar, -1, pos=(144, -4), size=(0, 28))
+        self.statusbar_filler.SetBackgroundColour(wx_colour('bg_statusbar'))
+
         self.status_text = " "
         self.statusbar.SetStatusWidths([235, -1])  # pane 0: buttons (matches Controls panel width); pane 1: status text
         self.statusbar.SetStatusText(self.status_text, 1)
@@ -350,6 +356,9 @@ class Gmg(wx.Frame):
 
         # BIND PROGRAM EXIT BUTTON WITH EXIT FUNCTION
         self.Bind(wx.EVT_CLOSE, self.on_close_button)
+
+        # Sync statusbar pane-0 width with the Controls panel after layout
+        wx.CallAfter(self._sync_statusbar_width)
 
         # # MAXIMIZE FRAME
         # self.Maximize(True)
@@ -1313,6 +1322,31 @@ class Gmg(wx.Frame):
             ax.xaxis.label.set_size(labelsize)
 
         self.canvas.draw_idle()
+        self._sync_statusbar_width()
+
+    def _sync_statusbar_width(self):
+        """Set statusbar pane-0 width to match the actual rendered Controls panel width.
+
+        Uses the AUI pane rect (which includes caption + borders) so that pane-0
+        aligns visually with the full-width 'Controls' caption bar above it.
+        Falls back to the content-widget width when the AUI rect is not yet computed.
+        """
+        if not hasattr(self, 'statusbar') or not hasattr(self, 'mgr'):
+            return
+        pane = self.mgr.GetPaneByName('left')
+        if pane.IsOk() and pane.rect.GetWidth() > 0:
+            w = pane.rect.GetWidth()
+        elif hasattr(self, 'left_panel'):
+            w = self.left_panel.GetSize()[0]
+        else:
+            return
+        if w > 0:
+            self.statusbar.SetStatusWidths([w, -1])
+            if hasattr(self, 'statusbar_filler') and hasattr(self, 'magnetic_button'):
+                filler_x = (self.magnetic_button.GetPosition()[0]
+                            + self.magnetic_button.GetSize()[0])
+                filler_w = max(0, w - filler_x)
+                self.statusbar_filler.SetSize(filler_x, -4, filler_w, 28)
 
     def size_handler(self):
         """PLACE THE GUI FRAMES IN THE wxSIZER WINDOWS"""

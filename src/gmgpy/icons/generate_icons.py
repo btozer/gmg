@@ -161,27 +161,31 @@ def _pan():
     img, n = _canvas(24)
     d = _draw(img)
 
-    # Main fist body (palm + curled fingers)
-    fx1, fx2 = int(n * 0.24), int(n * 0.84)
-    fy1, fy2 = int(n * 0.42), int(n * 0.86)
-    d.rounded_rectangle([fx1, fy1, fx2, fy2], radius=int(n * 0.08), fill=IC)
-
-    # Four finger knuckle bumps along the top
-    seg = (fx2 - fx1) // 4
-    bh  = int(n * 0.20)
-    br  = int(n * 0.07)
-    gap = int(n * 0.02)
+    # ── four upright fingers ───────────────────────────────────────────────
+    fw   = int(n * 0.12)        # finger width
+    fgap = int(n * 0.04)        # gap between adjacent fingers
+    f0x  = int(n * 0.32)        # left edge of first finger
+    ftop = int(n * 0.08)        # finger-tip y
+    fbot = int(n * 0.52)        # finger-base y (blends into palm)
+    fr   = int(n * 0.06)        # rounded-tip corner radius
     for i in range(4):
-        bx = fx1 + i * seg
-        d.rounded_rectangle([bx + gap, fy1 - bh, bx + seg - gap, fy1 + int(n * 0.04)],
-                             radius=br, fill=IC)
+        bx = f0x + i * (fw + fgap)
+        d.rounded_rectangle([bx, ftop, bx + fw, fbot], radius=fr, fill=IC)
 
-    # Thumb on the left side
-    tx1 = int(n * 0.06)
-    ty1 = int(n * 0.36)
-    tw  = int(n * 0.22)
-    th  = int(n * 0.26)
-    d.rounded_rectangle([tx1, ty1, tx1 + tw, ty1 + th], radius=int(n * 0.08), fill=IC)
+    # ── palm ──────────────────────────────────────────────────────────────
+    px1 = f0x - int(n * 0.02)
+    px2 = f0x + 4 * (fw + fgap) - fgap + int(n * 0.02)
+    py1 = int(n * 0.46)
+    py2 = int(n * 0.88)
+    d.rounded_rectangle([px1, py1, px2, py2], radius=int(n * 0.09), fill=IC)
+
+    # ── thumb (left of palm, only ~2 px protrusion at final 24 px size) ───
+    th_w  = int(n * 0.14)
+    th_x2 = px1 + int(n * 0.05)    # overlaps palm left edge slightly
+    th_x1 = th_x2 - th_w
+    th_y1 = int(n * 0.36)
+    th_y2 = int(n * 0.66)
+    d.rounded_rectangle([th_x1, th_y1, th_x2, th_y2], radius=int(n * 0.06), fill=IC)
 
     _save(img, 24, 'pan_24.png')
 
