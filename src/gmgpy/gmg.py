@@ -2466,7 +2466,15 @@ class Gmg(wx.Frame):
                   'outcrop_data_list',
                   'segy_data_list',
                   'grid_data_list',
-                  'png_data_list']
+                  'png_data_list',
+                  # FRAME VISIBILITY SWITCHES
+                  'topography_frame_switch', 'gravity_frame_switch',
+                  'vertical_gg_frame_switch', 'magnetic_frame_switch',
+                  # CALCULATION SWITCHES
+                  'calc_grav_switch', 'calc_vgg_switch', 'calc_mag_switch',
+                  # PHYSICAL / DISPLAY SETTINGS
+                  'earth_field', 'background_density', 'absolute_densities',
+                  'layer_transparency', 'calc_padding', 'padding']
 
         model_params = [self.model_aspect, self.area, self.xp,
                         self.tree_items, self.fault_tree_items,
@@ -2483,7 +2491,15 @@ class Gmg(wx.Frame):
                         self.outcrop_data_list,
                         self.segy_data_list,
                         self.grid_data_list,
-                        self.png_data_list]
+                        self.png_data_list,
+                        # FRAME VISIBILITY SWITCHES
+                        self.topography_frame_switch, self.gravity_frame_switch,
+                        self.vertical_gg_frame_switch, self.magnetic_frame_switch,
+                        # CALCULATION SWITCHES
+                        self.calc_grav_switch, self.calc_vgg_switch, self.calc_mag_switch,
+                        # PHYSICAL / DISPLAY SETTINGS
+                        self.earth_field, self.background_density, self.absolute_densities,
+                        self.layer_transparency, self.calc_padding, self.padding]
 
         for i in range(0, len(model_params)):
             try:
@@ -2530,12 +2546,30 @@ class Gmg(wx.Frame):
             for x in range(len(model_data)):
                 setattr(self, list(model_data.keys())[x], list(model_data.values())[x])
 
+            # RESTORE layer_transparency NOW so polygon fills use the saved value
+            # when load_model recreates the layer actors below.
+            # (setattr above already set it; this comment documents the ordering dependency.)
+
+            # RESTORE frame-visibility switches saved by newer files; fall back to
+            # True for older .model files that did not include these keys.
+            self.topography_frame_switch  = model_data.get('topography_frame_switch',  True)
+            self.gravity_frame_switch     = model_data.get('gravity_frame_switch',     True)
+            self.vertical_gg_frame_switch = model_data.get('vertical_gg_frame_switch', True)
+            self.magnetic_frame_switch    = model_data.get('magnetic_frame_switch',    True)
+
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
             self.loaded_fault_tree_items = self.fault_tree_items
 
             # DRAW CANVAS
             self.start(self.area, self.xp, self.gravity_observation_elv)
+
+            # RESTORE FRAME LAYOUT to match the saved visibility switches
+            # (start() resets all four switches to True via __init__ defaults;
+            # calling frame_adjustment() with a dummy event-like object re-applies them)
+            class _FakeEvent:
+                Id = -1
+            self.frame_adjustment(_FakeEvent())
 
             # ----------------------------------------------------------------------------------------------------------
             # LOAD OBSERVED TOPOGRAPHY DATA
