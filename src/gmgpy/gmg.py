@@ -6688,78 +6688,71 @@ class Gmg(wx.Frame):
         it.  The output format is determined by the file extension
         (.pdf, .png, .eps, .svg).
         """
-        # STEP 1 – FIGURE SETTINGS DIALOG
-        settings_dlg = PlotFigureSettingsDialog(self, -1, "Figure Settings",
-                                                self.model_aspect)
-        if settings_dlg.ShowModal() != wx.ID_OK:
-            settings_dlg.Destroy()
-            return
-        font_size       = settings_dlg.font_size
-        calc_line_width = settings_dlg.calc_line_width
-        layer_line_width = settings_dlg.layer_line_width
-        obs_point_size  = settings_dlg.obs_point_size
-        aspect_ratio    = settings_dlg.aspect_ratio
-        panel_gap_cm    = settings_dlg.panel_gap
-        settings_dlg.Destroy()
-
-        # STEP 2 – OUTPUT FILE DIALOG
         wildcard = ("PDF (*.pdf)|*.pdf|"
                     "PNG (*.png)|*.png|"
                     "EPS (*.eps)|*.eps|"
                     "SVG (*.svg)|*.svg")
-        file_dlg = wx.FileDialog(self, "Save figure as...", wildcard=wildcard,
-                                 style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if file_dlg.ShowModal() != wx.ID_OK:
+
+        def _do_save(dlg):
+            """Callback invoked by the settings dialog's Save Figure button."""
+            file_dlg = wx.FileDialog(self, "Save figure as...", wildcard=wildcard,
+                                     style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+            if file_dlg.ShowModal() != wx.ID_OK:
+                file_dlg.Destroy()
+                return
+            file_path = file_dlg.GetPath()
             file_dlg.Destroy()
-            return
-        file_path = file_dlg.GetPath()
-        file_dlg.Destroy()
 
-        # STEP 3 – BUILD AND SAVE FIGURE
-        # Frames are set to None when hidden, so guard every attribute access.
-        topo_visible  = self.topography_frame  is not None and self.topography_frame.get_visible()
-        grav_visible  = self.gravity_frame     is not None and self.gravity_frame.get_visible()
-        vgg_visible   = self.vertical_gg_frame is not None and self.vertical_gg_frame.get_visible()
-        mag_visible   = self.magnetic_frame    is not None and self.magnetic_frame.get_visible()
+            # Frames are set to None when hidden, so guard every attribute access.
+            topo_visible = self.topography_frame  is not None and self.topography_frame.get_visible()
+            grav_visible = self.gravity_frame     is not None and self.gravity_frame.get_visible()
+            vgg_visible  = self.vertical_gg_frame is not None and self.vertical_gg_frame.get_visible()
+            mag_visible  = self.magnetic_frame    is not None and self.magnetic_frame.get_visible()
 
-        topo_ylim = self.topography_frame.get_ylim()  if topo_visible else (0.0, 1.0)
-        grav_ylim = self.gravity_frame.get_ylim()     if grav_visible else (0.0, 1.0)
-        vgg_ylim  = self.vertical_gg_frame.get_ylim() if vgg_visible  else (0.0, 1.0)
-        mag_ylim  = self.magnetic_frame.get_ylim()    if mag_visible  else (0.0, 1.0)
+            topo_ylim = self.topography_frame.get_ylim()  if topo_visible else (0.0, 1.0)
+            grav_ylim = self.gravity_frame.get_ylim()     if grav_visible else (0.0, 1.0)
+            vgg_ylim  = self.vertical_gg_frame.get_ylim() if vgg_visible  else (0.0, 1.0)
+            mag_ylim  = self.magnetic_frame.get_ylim()    if mag_visible  else (0.0, 1.0)
 
-        try:
-            plot_model.plot_fig(
-                file_path=file_path,
-                area=self.area,
-                xp=self.xp,
-                model_aspect=aspect_ratio,
-                layer_list=self.layer_list,
-                topography_frame_visible=topo_visible,
-                observed_topography_list=self.observed_topography_list,
-                topo_ylim=topo_ylim,
-                gravity_frame_visible=grav_visible,
-                observed_gravity_list=self.observed_gravity_list,
-                predicted_gravity=self.predicted_gravity,
-                gravity_ylim=grav_ylim,
-                vgg_frame_visible=vgg_visible,
-                observed_vgg_list=self.observed_vgg_list,
-                predicted_vgg=self.predicted_vgg,
-                vgg_ylim=vgg_ylim,
-                magnetic_frame_visible=mag_visible,
-                observed_magnetic_list=self.observed_magnetic_list,
-                predicted_nt=self.predicted_nt,
-                mag_ylim=mag_ylim,
-                model_xlim=self.model_frame.get_xlim(),
-                model_ylim=self.model_frame.get_ylim(),
-                font_size=font_size,
-                calc_line_width=calc_line_width,
-                layer_line_width=layer_line_width,
-                obs_point_size=obs_point_size,
-                panel_gap_cm=panel_gap_cm,
-            )
-        except Exception as e:
-            wx.MessageBox(f"Error saving figure:\n{e}", "Figure Error",
-                          wx.OK | wx.ICON_ERROR)
+            try:
+                plot_model.plot_fig(
+                    file_path=file_path,
+                    area=self.area,
+                    xp=self.xp,
+                    model_aspect=dlg.aspect_ratio,
+                    layer_list=self.layer_list,
+                    topography_frame_visible=topo_visible,
+                    observed_topography_list=self.observed_topography_list,
+                    topo_ylim=topo_ylim,
+                    gravity_frame_visible=grav_visible,
+                    observed_gravity_list=self.observed_gravity_list,
+                    predicted_gravity=self.predicted_gravity,
+                    gravity_ylim=grav_ylim,
+                    vgg_frame_visible=vgg_visible,
+                    observed_vgg_list=self.observed_vgg_list,
+                    predicted_vgg=self.predicted_vgg,
+                    vgg_ylim=vgg_ylim,
+                    magnetic_frame_visible=mag_visible,
+                    observed_magnetic_list=self.observed_magnetic_list,
+                    predicted_nt=self.predicted_nt,
+                    mag_ylim=mag_ylim,
+                    model_xlim=self.model_frame.get_xlim(),
+                    model_ylim=self.model_frame.get_ylim(),
+                    font_size=dlg.font_size,
+                    calc_line_width=dlg.calc_line_width,
+                    layer_line_width=dlg.layer_line_width,
+                    obs_point_size=dlg.obs_point_size,
+                    panel_gap_cm=dlg.panel_gap,
+                )
+            except Exception as e:
+                wx.MessageBox(f"Error saving figure:\n{e}", "Figure Error",
+                              wx.OK | wx.ICON_ERROR)
+
+        settings_dlg = PlotFigureSettingsDialog(self, -1, "Figure Settings",
+                                                self.model_aspect,
+                                                save_callback=_do_save)
+        settings_dlg.ShowModal()
+        settings_dlg.Destroy()
 
     # DOCUMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

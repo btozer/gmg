@@ -916,11 +916,18 @@ class MessageDialog(wx.MessageDialog):
 
 
 class PlotFigureSettingsDialog(wx.Dialog):
-    """SETTINGS DIALOG FOR PYGMT FIGURE EXPORT"""
+    """SETTINGS DIALOG FOR PYGMT FIGURE EXPORT
 
-    def __init__(self, parent, id, title, model_aspect):
+    The dialog remains open after each save so settings can be tweaked
+    and the figure re-exported without reopening the dialog.
+    Pass save_callback(dlg) to handle the actual export; it receives this
+    dialog instance so it can read the validated setting attributes.
+    """
+
+    def __init__(self, parent, id, title, model_aspect, save_callback=None):
         wx.Dialog.__init__(self, parent, id, title,
                            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        self._save_callback = save_callback
         input_panel = wx.Panel(self, -1)
 
         # FONT SIZE
@@ -948,15 +955,15 @@ class PlotFigureSettingsDialog(wx.Dialog):
         self.gap_label = wx.StaticText(input_panel, -1, "Panel gap (cm):")
         self.gap_text = wx.TextCtrl(input_panel, -1, "1.5", size=(100, -1))
 
-        # OK / CANCEL BUTTONS
-        self.ok_button = wx.Button(input_panel, wx.ID_OK, "OK")
-        self.cancel_button = wx.Button(input_panel, wx.ID_CANCEL, "Cancel")
-        self.Bind(wx.EVT_BUTTON, self.on_ok, self.ok_button)
-        self.Bind(wx.EVT_BUTTON, self.on_cancel, self.cancel_button)
+        # SAVE FIGURE / CLOSE BUTTONS
+        self.save_button = wx.Button(input_panel, -1, "Save Figure")
+        self.close_button = wx.Button(input_panel, wx.ID_CANCEL, "Close")
+        self.Bind(wx.EVT_BUTTON, self.on_save, self.save_button)
+        self.Bind(wx.EVT_BUTTON, self.on_close, self.close_button)
 
         btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn_sizer.Add(self.ok_button, 0, wx.ALL, 4)
-        btn_sizer.Add(self.cancel_button, 0, wx.ALL, 4)
+        btn_sizer.Add(self.save_button, 0, wx.ALL, 4)
+        btn_sizer.Add(self.close_button, 0, wx.ALL, 4)
 
         grid = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
         grid.AddMany([
@@ -974,7 +981,8 @@ class PlotFigureSettingsDialog(wx.Dialog):
         input_panel.SetSizerAndFit(outer)
         outer.Fit(self)
 
-    def on_ok(self, event):
+    def _validate(self):
+        """Parse all fields; return True on success, False (with error dialog) on bad input."""
         try:
             self.font_size = float(self.font_size_text.GetValue())
             self.calc_line_width = float(self.calc_lw_text.GetValue())
@@ -982,12 +990,18 @@ class PlotFigureSettingsDialog(wx.Dialog):
             self.obs_point_size = float(self.obs_ps_text.GetValue())
             self.aspect_ratio = float(self.aspect_text.GetValue())
             self.panel_gap = float(self.gap_text.GetValue())
+            return True
         except ValueError:
             wx.MessageBox("Please enter valid numbers for all fields.",
                           "Invalid Input", wx.OK | wx.ICON_ERROR)
-            return
-        self.EndModal(wx.ID_OK)
+            return False
 
-    def on_cancel(self, event):
+    def on_save(self, event):
+        """Validate settings and call the save callback; dialog stays open."""
+        if not self._validate():
+            return
+        if self._save_callback is not None:
+            self._save_callback(self)
+
+    def on_close(self, event):
         self.EndModal(wx.ID_CANCEL)
-        dlg.Destroy()
