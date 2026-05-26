@@ -820,6 +820,7 @@ class Gmg(wx.Frame):
         plt.rcParams.update(MPL_DARK_RC)  # APPLY DARK THEME
         self.fig = plt.figure()  # CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
+        self.Bind(wx.EVT_SIZE, self._on_wx_resize)  # DYNAMIC LAYOUT ON RESIZE
         self.nav_toolbar = NavigationToolbar(self.canvas)  # CREATE DEFAULT NAVIGATION TOOLBAR
         self.nav_toolbar.Hide()  # HIDE DEFAULT NAVIGATION TOOLBAR
 
@@ -1086,8 +1087,6 @@ class Gmg(wx.Frame):
         self.gravity_frame.set_xlim(self.model_frame.get_xlim())
         self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
         self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
-        self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02,
-                                 hspace=1.5)
 
         # ADD FIRST LAYER
         if self.newmodel:
@@ -1266,6 +1265,43 @@ class Gmg(wx.Frame):
 
         # REDRAW MAIN
         self.draw()
+
+    def _on_wx_resize(self, event):
+        """wx.EVT_SIZE handler — let sizers run first, then recalculate axes layout."""
+        event.Skip()  # allow default sizer/layout processing
+        wx.CallAfter(self._recalc_layout)
+
+    def _recalc_layout(self, event=None):
+        """Recompute subplot spacing and axis label sizes for the current figure dimensions.
+        Called after every wx window resize and after frame_adjustment() toggles."""
+        if not hasattr(self, 'fig') or not hasattr(self, 'canvas'):
+            return
+        fig_w, fig_h = self.fig.get_size_inches()
+        dpi = self.fig.get_dpi()
+        fig_h_px = max(fig_h * dpi, 1.0)
+
+        # Scale hspace so axes stay within the figure at any window height.
+        hspace = max(0.2, min(1.5, 1000.0 / fig_h_px))
+
+        # tight_layout auto-computes left/right margins so y-axis labels are never clipped.
+        try:
+            self.fig.tight_layout(rect=[0, 0.02, 1, 0.99], h_pad=0.3)
+        except Exception:
+            self.fig.subplots_adjust(top=0.99, left=0.06, right=0.99, bottom=0.02)
+
+        # Apply dynamic hspace on top of what tight_layout set.
+        self.fig.subplots_adjust(hspace=hspace)
+
+        # Dynamic tick/label size proportional to the pixel height of each data panel.
+        # Each data panel occupies 3 of the 26 subplot rows.
+        panel_h_px = (0.99 - 0.02) * fig_h_px * (3.0 / 26.0)
+        labelsize = max(5, min(8, int(panel_h_px / 8)))
+        for ax in self.fig.get_axes():
+            ax.tick_params(labelsize=labelsize)
+            ax.yaxis.label.set_size(labelsize)
+            ax.xaxis.label.set_size(labelsize)
+
+        self.canvas.draw_idle()
 
     def size_handler(self):
         """PLACE THE GUI FRAMES IN THE wxSIZER WINDOWS"""
@@ -1458,8 +1494,8 @@ class Gmg(wx.Frame):
         self.controls_fold_panel.Expand(self.fold_panel_item3)
 
         # SETUP RIGHT PANEL
-        self.rightPanel.SetSizerAndFit(self.canvas_box)
-        self.rightPanel.SetSize(self.GetSize())
+        self.rightPanel.SetSizer(self.canvas_box)
+        self._recalc_layout()
         # --------------------------------------------------------------------------------------------------------------
 
     def topo_frame_params(self, span_size):
@@ -1736,20 +1772,20 @@ class Gmg(wx.Frame):
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
             self.magnetic_d_frame.set_xlim(self.model_frame.get_xlim())
-        self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
+        self._recalc_layout()
 
         # INITALISE CALCULATED P.F. LINES
         if self.gravity_frame is not None:
-            self.pred_gravity_plot, = self.gravity_frame.plot([], [], 'red', linewidth=2, alpha=0.5)
-            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.pred_gravity_plot, = self.gravity_frame.plot([], [], color=THEME['plot_pred_grav'], linewidth=2, alpha=0.8)
+            self.gravity_rms_plot, = self.gravity_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
         
         if self.vertical_gg_frame is not None:
-            self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], 'yellow', linewidth=2, alpha=0.5)
-            self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.pred_vgg_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_pred_vgg'], linewidth=2, alpha=0.8)
+            self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
 
         if self.magnetic_frame is not None:
-            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], 'green', linewidth=2, alpha=0.5)
-            self.mag_rms_plot, = self.magnetic_frame.plot([], [], color='purple', linewidth=1.5, alpha=0.5)
+            self.predicted_nt_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_pred_mag'], linewidth=2, alpha=0.8)
+            self.mag_rms_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
 
         # PLOT OBSERVED TOPO DATA
         if self.topography_frame is not None:
@@ -2127,7 +2163,7 @@ class Gmg(wx.Frame):
             self.vertical_gg_frame.set_xlim(self.model_frame.get_xlim())
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
-        self.fig.subplots_adjust(top=0.99, left=-0.045, right=0.99, bottom=0.02, hspace=1.5)
+        self._recalc_layout()
 
         'ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
         if self.topography_frame is False:
