@@ -46,6 +46,15 @@ def lw(n): return max(3, n // 12)   # stroke width
 def mg(n): return max(6, n // 10)   # outer margin
 
 
+def _filled_ring(d, cx, cy, r, w, fill=IC):
+    """Draw a crisp solid ring by filling the outer disk then punching out the inside.
+    Avoids the dotted/uneven appearance of PIL's ellipse(outline=) at thick widths."""
+    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=fill)
+    inner = r - w
+    if inner > 0:
+        d.ellipse([cx - inner, cy - inner, cx + inner, cy + inner], fill=(0, 0, 0, 0))
+
+
 # ── arrows ────────────────────────────────────────────────────────────────────
 
 def _arrow(direction: str, thick: bool, px: int, name: str, colour=IC):
@@ -82,8 +91,8 @@ def _arrow(direction: str, thick: bool, px: int, name: str, colour=IC):
         a = math.radians(deg)
         ca, sa = math.cos(a), math.sin(a)
         c0 = n / 2
-        return [(c0 + (x-c0)*ca - (y-c0)*sa,
-                 c0 + (x-c0)*sa + (y-c0)*ca) for x, y in pts]
+        return [(int(round(c0 + (x-c0)*ca - (y-c0)*sa)),
+                 int(round(c0 + (x-c0)*sa + (y-c0)*ca))) for x, y in pts]
 
     rots = {'up': 0, 'down': 180, 'left': 270, 'right': 90}
     d.polygon(rot(pts_up, rots[direction]), fill=colour)
@@ -101,22 +110,23 @@ def _magnifier(sign: str, name: str):
     # glass – offset toward top-left so handle fits
     r  = int(n * 0.30)
     gx, gy = int(n * 0.38), int(n * 0.38)
-    d.ellipse([gx-r, gy-r, gx+r, gy+r], outline=IC, width=w)
+    _filled_ring(d, gx, gy, r, w)
 
     # handle — exits bottom-right of glass toward icon corner
-    angle = math.radians(45)              # 45° = lower-right in PIL coords
+    angle = math.radians(45)
     hx0 = int(gx + r * math.cos(angle))
     hy0 = int(gy + r * math.sin(angle))
     hx1, hy1 = int(n * 0.88), int(n * 0.88)
     d.line([(hx0, hy0), (hx1, hy1)], fill=IC, width=w + 2)
 
-    # symbol inside glass
+    # symbol inside glass — use w+2 for a solid, fully-filled cross/bar
     arm = int(r * 0.52)
+    aw  = w + 2
     if sign == '+':
-        d.line([(gx-arm, gy), (gx+arm, gy)], fill=IC, width=w)
-        d.line([(gx, gy-arm), (gx, gy+arm)], fill=IC, width=w)
+        d.line([(gx-arm, gy), (gx+arm, gy)], fill=IC, width=aw)
+        d.line([(gx, gy-arm), (gx, gy+arm)], fill=IC, width=aw)
     else:  # minus
-        d.line([(gx-arm, gy), (gx+arm, gy)], fill=IC, width=w)
+        d.line([(gx-arm, gy), (gx+arm, gy)], fill=IC, width=aw)
 
     _save(img, 24, name)
 
@@ -136,8 +146,11 @@ def _full_extent():
         (pad,   n-pad, +1, -1),   # bottom-left
         (n-pad, n-pad, -1, -1),   # bottom-right
     ]:
-        d.line([(bx, by), (bx + dx*arm, by)],        fill=IC, width=w)
-        d.line([(bx, by), (bx,          by + dy*arm)], fill=IC, width=w)
+        d.line([(bx, by), (bx + dx*arm, by)],          fill=IC, width=w)
+        d.line([(bx, by), (bx,          by + dy*arm)],  fill=IC, width=w)
+        # Fill the corner pixel so the two lines join solidly
+        c = w // 2
+        d.rectangle([bx - c, by - c, bx + c, by + c], fill=IC)
 
     _save(img, 24, 'full_extent_24.png')
 
@@ -288,6 +301,10 @@ def _V_badge(px: int, name: str, colour=IC):
     cx    = n // 2
     d.line([(inset,     top_y), (cx, bot_y)], fill=colour, width=sw)
     d.line([(n - inset, top_y), (cx, bot_y)], fill=colour, width=sw)
+    # Round caps at the top tips of the V to fill end-pixel gaps
+    hf = sw // 2
+    d.ellipse([inset - hf,     top_y - hf, inset + hf,     top_y + hf], fill=colour)
+    d.ellipse([n-inset - hf,   top_y - hf, n-inset + hf,   top_y + hf], fill=colour)
 
     _save(img, px, name)
 
@@ -311,7 +328,9 @@ def _save_icon():
         (n - pad,          n - pad),
         (pad,              n - pad),
     ]
-    d.polygon(body, outline=IC, width=w)
+    # Draw outline as a connected polyline with rounded joints to avoid
+    # missing corner pixels that d.polygon(outline=) can produce.
+    d.line(body + [body[0]], fill=IC, width=w, joint='curve')
 
     # Label window (upper inset rectangle)
     lx0 = pad + w
@@ -369,8 +388,8 @@ def _well():
     r_out = int(n * 0.38)   # outer ring radius
     r_in  = int(n * 0.14)   # inner filled disk radius
 
-    # Outer ring
-    d.ellipse([cx - r_out, cy - r_out, cx + r_out, cy + r_out], outline=IC, width=w)
+    # Outer ring — filled donut for crisp, unbroken rendering
+    _filled_ring(d, cx, cy, r_out, w)
     # Inner filled disk
     d.ellipse([cx - r_in,  cy - r_in,  cx + r_in,  cy + r_in],  fill=IC)
 
@@ -387,15 +406,17 @@ def _faultline():
 
     # Bolt tilts upper-right → lower-left.  Two parallel bands share a Z-kink.
     # Points go clockwise:
+    # Kink spans n*0.44→n*0.56 (≈12 px at 96 px scale) so it survives
+    # LANCZOS downscaling to 24 px without collapsing to a dot.
     pts = [
         (int(n * 0.38), pad),               # top-left
         (int(n * 0.65), pad),               # top-right
-        (int(n * 0.58), int(n * 0.50)),     # upper-right base
-        (int(n * 0.74), int(n * 0.52)),     # notch — far right  (Z kink)
+        (int(n * 0.56), int(n * 0.44)),     # upper-right base
+        (int(n * 0.76), int(n * 0.56)),     # notch — far right  (Z kink)
         (int(n * 0.60), n - pad),           # bottom-right
         (int(n * 0.35), n - pad),           # bottom-left
-        (int(n * 0.44), int(n * 0.52)),     # lower-left apex
-        (int(n * 0.28), int(n * 0.50)),     # notch — far left   (Z kink)
+        (int(n * 0.42), int(n * 0.56)),     # lower-left apex
+        (int(n * 0.26), int(n * 0.44)),     # notch — far left   (Z kink)
     ]
     d.polygon(pts, fill=IC)
     _save(img, 24, 'faultline_24.png')
@@ -408,26 +429,35 @@ def _undo():
     d = _draw(img)
     w   = lw(n)
 
-    # Centre and radius of the arc
     cx0, cy0 = int(n * 0.52), int(n * 0.46)
     r  = int(n * 0.28)
 
-    # Draw top semicircle: PIL angles – 0=right, 90=bottom, 270=top
-    # start=180 → end=360 traces left → top → right (the upper arc)
-    d.arc([cx0-r, cy0-r, cx0+r, cy0+r], start=180, end=360, fill=IC, width=w)
+    # Upper semicircle drawn as a filled annular polygon to avoid PIL arc dotting.
+    # In PIL coords: 180°=left, 270°=top, 360°=right (clockwise).
+    r_out = r + w // 2
+    r_in  = max(2, r - w // 2)
+    steps = 64
+    outer_pts = []
+    inner_pts = []
+    for i in range(steps + 1):
+        a = math.radians(180 + 180 * i / steps)
+        outer_pts.append((cx0 + r_out * math.cos(a), cy0 + r_out * math.sin(a)))
+        inner_pts.append((cx0 + r_in  * math.cos(a), cy0 + r_in  * math.sin(a)))
+    inner_pts.reverse()
+    d.polygon(outer_pts + inner_pts, fill=IC)
 
-    # Short descending stem at the RIGHT end of the arc (x=cx0+r, y=cy0)
+    # Short descending stem at the RIGHT end (x=cx0+r, y=cy0)
     stem_len = int(r * 0.65)
     d.line([(cx0+r, cy0), (cx0+r, cy0+stem_len)], fill=IC, width=w)
 
-    # Arrowhead at the LEFT end of the arc (x=cx0-r, y=cy0), pointing DOWN
-    ah  = int(w * 2.2)    # arrowhead height
-    ahw = int(w * 1.8)    # arrowhead half-width
+    # Arrowhead at the LEFT end (x=cx0-r, y=cy0), pointing DOWN
+    ah  = int(w * 2.2)
+    ahw = int(w * 1.8)
     lx, ly = cx0 - r, cy0
     d.polygon([
-        (lx,      ly + ah),        # tip (down)
-        (lx - ahw, ly - ah // 2), # left
-        (lx + ahw, ly - ah // 2), # right
+        (lx,       ly + ah),
+        (lx - ahw, ly - ah // 2),
+        (lx + ahw, ly - ah // 2),
     ], fill=IC)
 
     _save(img, 24, 'undo_24.png')
@@ -447,7 +477,10 @@ def _pinch():
 
     # LEFT  arrow tip → pointing RIGHT toward centre
     tip_lx, tip_ly = cx0 - gap, cy0
-    d.line([(pad + arr, cy0), (tip_lx, cy0)], fill=IC, width=w)
+    # Stem runs from the outer margin all the way to the arrowhead tip;
+    # the arrowhead polygon paints over the inner portion, leaving a
+    # visible tail from pad to (tip_lx - arr).
+    d.line([(pad, cy0), (tip_lx, cy0)], fill=IC, width=w)
     d.polygon([
         (tip_lx,       tip_ly),
         (tip_lx - arr, tip_ly - ahw),
@@ -456,7 +489,7 @@ def _pinch():
 
     # RIGHT arrow tip → pointing LEFT toward centre
     tip_rx, tip_ry = cx0 + gap, cy0
-    d.line([(n - pad - arr, cy0), (tip_rx, cy0)], fill=IC, width=w)
+    d.line([(tip_rx, cy0), (n - pad, cy0)], fill=IC, width=w)
     d.polygon([
         (tip_rx,       tip_ry),
         (tip_rx + arr, tip_ry - ahw),
