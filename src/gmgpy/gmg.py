@@ -154,7 +154,7 @@ class Gmg(wx.Frame):
         _w, _h = int(_sw * 0.85), int(_sh * 0.85)
         _x, _y = (_sw - _w) // 2, (_sh - _h) // 2
         wx.Frame.__init__(self, None, wx.ID_ANY,
-                          'gmg: 2D Geophysical Modelling GUI',
+                          'gmgpy: A 2D Geophysical Modelling GUI',
                           pos=(_x, _y), size=(_w, _h))
         self.SetBackgroundColour(wx_colour('bg_base'))
         self.SetForegroundColour(wx_colour('fg_primary'))
@@ -206,6 +206,7 @@ class Gmg(wx.Frame):
         _caption_style.SetFirstColour(wx_colour('bg_panel'))
         _caption_style.SetSecondColour(wx_colour('bg_panel'))
         _caption_style.SetCaptionColour(wx_colour('fg_primary'))
+        _caption_style.SetCaptionFont(get_font(size=15))
 
         # FIRST FOLD PANEL (=ATTRIBUTES) --------------------------------------
         self.scrolled_window_item1 = wx.ScrolledWindow(
