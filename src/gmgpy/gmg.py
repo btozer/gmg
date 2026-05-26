@@ -665,6 +665,8 @@ class Gmg(wx.Frame):
 
         # TOOLBAR - embedded as AUI pane so macOS doesn't centre the items
         self.toolbar = wx.ToolBar(self, -1, style=wx.TB_FLAT | wx.TB_NODIVIDER)
+        self.toolbar.SetToolBitmapSize(wx.Size(24, 24))
+        self.toolbar.SetMargins(6, 4)
         self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
         _icon = lambda name: load_icon(self.gui_icons_dir + name)
 
@@ -810,13 +812,14 @@ class Gmg(wx.Frame):
         # self.Bind(wx.EVT_TOOL, self.redo, self.t_redo)
 
         # CREATE TOOLBAR
+        self.toolbar.SetToolPacking(10)
         self.toolbar.Realize()
         self.toolbar.SetBackgroundColour(wx_colour('bg_toolbar'))
         self.mgr.AddPane(self.toolbar, aui.AuiPaneInfo()
                          .Name('toolbar').ToolbarPane().Top().Row(0)
                          .Gripper(False).Floatable(False)
                          .LeftDockable(False).RightDockable(False)
-                         .MinSize((-1, 36)).BestSize((-1, 36)))
+                         .MinSize((-1, 44)).BestSize((-1, 44)))
         self.mgr.Update()
 
     def start(self, area, xp, zp):
