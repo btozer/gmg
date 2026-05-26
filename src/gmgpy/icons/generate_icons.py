@@ -147,37 +147,28 @@ def _full_extent():
 def _pan():
     img, n = _canvas(24)
     d = _draw(img)
-    w   = lw(n)
-    pad = mg(n)
-    cx0 = cy0 = n // 2
-    arr = int(n * 0.17)    # arrowhead height
-    gap = int(n * 0.13)    # gap around centre
 
-    def arrowhead(tx, ty, dx, dy):
-        """Filled triangle arrowhead with tip at (tx,ty), direction (dx,dy)."""
-        hw = int(n * 0.09)
-        px0, py0 = tx - dx*arr, ty - dy*arr     # base centre
-        perp_x, perp_y = -dy, dx
-        d.polygon([
-            (tx, ty),
-            (px0 + perp_x*hw, py0 + perp_y*hw),
-            (px0 - perp_x*hw, py0 - perp_y*hw),
-        ], fill=IC)
+    # Main fist body (palm + curled fingers)
+    fx1, fx2 = int(n * 0.24), int(n * 0.84)
+    fy1, fy2 = int(n * 0.42), int(n * 0.86)
+    d.rounded_rectangle([fx1, fy1, fx2, fy2], radius=int(n * 0.08), fill=IC)
 
-    # Stems
-    for (x1,y1),(x2,y2) in [
-        ((cx0, cy0-gap), (cx0, pad+arr+w)),      # N stem
-        ((cx0, cy0+gap), (cx0, n-pad-arr-w)),    # S stem
-        ((cx0-gap, cy0), (pad+arr+w, cy0)),      # W stem
-        ((cx0+gap, cy0), (n-pad-arr-w, cy0)),    # E stem
-    ]:
-        d.line([(x1,y1),(x2,y2)], fill=IC, width=w)
+    # Four finger knuckle bumps along the top
+    seg = (fx2 - fx1) // 4
+    bh  = int(n * 0.20)
+    br  = int(n * 0.07)
+    gap = int(n * 0.02)
+    for i in range(4):
+        bx = fx1 + i * seg
+        d.rounded_rectangle([bx + gap, fy1 - bh, bx + seg - gap, fy1 + int(n * 0.04)],
+                             radius=br, fill=IC)
 
-    # Arrowheads
-    arrowhead(cx0, pad,    0, -1)   # N
-    arrowhead(cx0, n-pad,  0, +1)   # S
-    arrowhead(pad, cy0,   -1,  0)   # W
-    arrowhead(n-pad, cy0,  1,  0)   # E
+    # Thumb on the left side
+    tx1 = int(n * 0.06)
+    ty1 = int(n * 0.36)
+    tw  = int(n * 0.22)
+    th  = int(n * 0.26)
+    d.rounded_rectangle([tx1, ty1, tx1 + tw, ty1 + th], radius=int(n * 0.08), fill=IC)
 
     _save(img, 24, 'pan_24.png')
 
@@ -372,28 +363,16 @@ def _load_icon():
 def _well():
     img, n = _canvas(24)
     d = _draw(img)
-    w   = lw(n)
-    pad = mg(n)
+    w  = lw(n)
+    cx = cy = n // 2
 
-    cx0 = n // 2
-    # Drill-rig platform (small filled rectangle at top)
-    pl_w = int(n * 0.30)
-    pl_h = int(n * 0.16)
-    d.rectangle([cx0 - pl_w, pad, cx0 + pl_w, pad + pl_h], fill=IC)
+    r_out = int(n * 0.38)   # outer ring radius
+    r_in  = int(n * 0.14)   # inner filled disk radius
 
-    # Borehole casing: two parallel vertical lines
-    cas_x = int(n * 0.14)
-    casing_top = pad + pl_h
-    casing_bot = n - pad
-    d.line([(cx0 - cas_x, casing_top), (cx0 - cas_x, casing_bot)], fill=IC, width=w)
-    d.line([(cx0 + cas_x, casing_top), (cx0 + cas_x, casing_bot)], fill=IC, width=w)
-
-    # Depth tick marks (right side)
-    tick = int(n * 0.13)
-    span = casing_bot - casing_top
-    for i in range(1, 4):
-        ty = casing_top + span * i // 4
-        d.line([(cx0 + cas_x, ty), (cx0 + cas_x + tick, ty)], fill=IC, width=w)
+    # Outer ring
+    d.ellipse([cx - r_out, cy - r_out, cx + r_out, cy + r_out], outline=IC, width=w)
+    # Inner filled disk
+    d.ellipse([cx - r_in,  cy - r_in,  cx + r_in,  cy + r_in],  fill=IC)
 
     _save(img, 24, 'well_24.png')
 
