@@ -145,9 +145,12 @@ MPL_DARK_RC = {
 def load_icon(path: str) -> "wx.Bitmap":
     """
     Load a 24-px PNG toolbar icon adapted for a dark background:
-      - near-white pixels  (R,G,B > 220)  → fully transparent
+      - near-white pixels  (R,G,B > 240)  → fully transparent
       - near-black pixels  (unsaturated, max channel < 80) → light grey #cccccc
       - all other (coloured) pixels are left untouched
+
+    Note: threshold is 240 (not 220) to avoid zapping Lanczos ringing artifacts
+    on grey icons, which can overshoot to ~232 RGB after 4x→1x downscaling.
     """
     img = wx.Image(path, wx.BITMAP_TYPE_PNG)
     if not img.HasAlpha():
@@ -157,7 +160,7 @@ def load_icon(path: str) -> "wx.Bitmap":
             r = img.GetRed(x, y)
             g = img.GetGreen(x, y)
             b = img.GetBlue(x, y)
-            if r > 220 and g > 220 and b > 220:          # near-white → transparent
+            if r > 240 and g > 240 and b > 240:          # near-white → transparent
                 img.SetAlpha(x, y, 0)
             elif max(r, g, b) < 80 and (max(r, g, b) - min(r, g, b)) < 30:
                 img.SetRGB(x, y, 204, 204, 204)           # near-black → light grey
