@@ -559,6 +559,23 @@ def _chevron_up_16():
     _save(img, 16, 'large_up_16.png')
 
 
+def _chevron_down_16():
+    img, n = _canvas(16)
+    d = _draw(img)
+    w   = lw(n)
+    cx0 = n // 2
+    arm = int(n * 0.32)
+    depth = int(n * 0.26)
+    mid_y = n // 2 - depth // 2
+
+    d.line([(cx0 - arm, mid_y - depth // 2),
+            (cx0,        mid_y + depth)], fill=IC, width=w)
+    d.line([(cx0,        mid_y + depth),
+            (cx0 + arm,  mid_y - depth // 2)], fill=IC, width=w)
+
+    _save(img, 16, 'large_down_16.png')
+
+
 # ── generate all icons ────────────────────────────────────────────────────────
 
 def main():
@@ -608,6 +625,7 @@ def main():
 
     # Status-bar (16 px)
     _chevron_up_16()
+    _chevron_down_16()
     _python_16()
 
     print('Done.')
