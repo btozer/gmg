@@ -492,34 +492,38 @@ def _pinch():
     _save(img, 24, 'pinch_24.png')
 
 
-# ── python/console (terminal icon: >_ ) ──────────────────────────────────────
+# ── Python logo (two interlocked snake arcs) ─────────────────────────────────
 
 def _python_16():
+    """Two interlocked C-arcs + head dots — simplified Python snake logo."""
     img, n = _canvas(16)
     d = _draw(img)
-    w   = lw(n)
-    pad = mg(n) - 2
 
-    # Terminal window outline
-    try:
-        d.rounded_rectangle([pad, pad, n-pad, n-pad], radius=max(3, n//12),
-                             outline=IC, width=w)
-    except TypeError:
-        d.rectangle([pad, pad, n-pad, n-pad], outline=IC, width=w)
+    r   = int(n * 0.26)          # snake body arc radius
+    sw  = max(5, n // 6)         # arc stroke width
+    rh  = max(3, n // 12)        # head dot radius
+    off = int(n * 0.09)          # centre offset for each snake's arc centre
+    cx, cy = n // 2, n // 2
 
-    # ">" chevron (left third)
-    inset = pad + w + 4
-    mid   = n // 2
-    arm   = int(n * 0.17)
-    depth = int(n * 0.14)
-    d.line([(inset, mid - arm), (inset + depth, mid)],  fill=IC, width=w)
-    d.line([(inset + depth, mid), (inset, mid + arm)],  fill=IC, width=w)
+    # ── Upper snake ──────────────────────────────────────────────────────────
+    # Arc centre: upper-left; 270° arc opens toward lower-right;
+    # head dot placed at the upper-right endpoint (~310°).
+    ux, uy = cx - off, cy - off
+    d.arc([ux-r, uy-r, ux+r, uy+r], start=40, end=310, fill=IC, width=sw)
+    ang1 = math.radians(310)
+    hx1  = int(ux + r * math.cos(ang1))
+    hy1  = int(uy + r * math.sin(ang1))
+    d.ellipse([hx1-rh, hy1-rh, hx1+rh, hy1+rh], fill=IC)
 
-    # "_" underbar (right half)
-    ux0 = inset + depth + w + 3
-    ux1 = n - pad - w - 2
-    uy  = mid + arm - w
-    d.line([(ux0, uy), (ux1, uy)], fill=IC, width=w)
+    # ── Lower snake ──────────────────────────────────────────────────────────
+    # Arc centre: lower-right (mirror of upper); 270° arc opens toward upper-left;
+    # head dot placed at the lower-left endpoint (~130°).
+    lx, ly = cx + off, cy + off
+    d.arc([lx-r, ly-r, lx+r, ly+r], start=220, end=130, fill=IC, width=sw)
+    ang2 = math.radians(130)
+    hx2  = int(lx + r * math.cos(ang2))
+    hy2  = int(ly + r * math.sin(ang2))
+    d.ellipse([hx2-rh, hy2-rh, hx2+rh, hy2+rh], fill=IC)
 
     _save(img, 16, 'python_16.png')
 
