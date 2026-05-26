@@ -23,7 +23,7 @@ def plot_fig(file_path, area, xp, model_aspect,
              magnetic_frame_visible, observed_magnetic_list, predicted_nt, mag_ylim,
              model_xlim, model_ylim,
              font_size=10.0, calc_line_width=1.0, layer_line_width=0.5,
-             obs_point_size=0.08, panel_gap_cm=1.5):
+             obs_point_size=0.08, panel_gap_cm=1.5, data_panel_h_cm=4.0):
     """
     Build a multi-panel PyGMT figure of the current GMG model and save to file.
 
@@ -65,6 +65,7 @@ def plot_fig(file_path, area, xp, model_aspect,
     layer_line_width : float   Layer polygon outline pen width in points (default 0.5).
     obs_point_size : float   Observed data circle diameter in cm (default 0.08).
     panel_gap_cm : float   Vertical gap between panels in cm (default 1.5).
+    data_panel_h_cm : float   Height of each data panel (gravity/VGG/magnetic/topo) in cm (default 4.0).
     """
 
     fig = pygmt.Figure()
@@ -80,7 +81,6 @@ def plot_fig(file_path, area, xp, model_aspect,
     # FIGURE DIMENSIONS
     # ------------------------------------------------------------------
     fig_width_cm = 15.0      # horizontal width shared by all panels
-    data_panel_h_cm = 4.0    # fixed height for each data panel
 
     x_min, x_max = model_xlim
 

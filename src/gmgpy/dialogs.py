@@ -955,6 +955,10 @@ class PlotFigureSettingsDialog(wx.Dialog):
         self.gap_label = wx.StaticText(input_panel, -1, "Panel gap (cm):")
         self.gap_text = wx.TextCtrl(input_panel, -1, "1.5", size=(100, -1))
 
+        # DATA PANEL HEIGHT
+        self.data_h_label = wx.StaticText(input_panel, -1, "Data panel height (cm):")
+        self.data_h_text = wx.TextCtrl(input_panel, -1, "4.0", size=(100, -1))
+
         # SAVE FIGURE / CLOSE BUTTONS
         self.save_button = wx.Button(input_panel, -1, "Save Figure")
         self.close_button = wx.Button(input_panel, wx.ID_CANCEL, "Close")
@@ -973,6 +977,7 @@ class PlotFigureSettingsDialog(wx.Dialog):
             self.obs_ps_label,     self.obs_ps_text,
             self.aspect_label,     self.aspect_text,
             self.gap_label,        self.gap_text,
+            self.data_h_label,     self.data_h_text,
         ])
 
         outer = wx.BoxSizer(wx.VERTICAL)
@@ -990,6 +995,7 @@ class PlotFigureSettingsDialog(wx.Dialog):
             self.obs_point_size = float(self.obs_ps_text.GetValue())
             self.aspect_ratio = float(self.aspect_text.GetValue())
             self.panel_gap = float(self.gap_text.GetValue())
+            self.data_panel_h = float(self.data_h_text.GetValue())
             return True
         except ValueError:
             wx.MessageBox("Please enter valid numbers for all fields.",

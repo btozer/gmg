@@ -6743,6 +6743,7 @@ class Gmg(wx.Frame):
                     layer_line_width=dlg.layer_line_width,
                     obs_point_size=dlg.obs_point_size,
                     panel_gap_cm=dlg.panel_gap,
+                    data_panel_h_cm=dlg.data_panel_h,
                 )
             except Exception as e:
                 wx.MessageBox(f"Error saving figure:\n{e}", "Figure Error",
