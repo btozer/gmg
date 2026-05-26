@@ -1280,23 +1280,18 @@ class Gmg(wx.Frame):
         dpi = self.fig.get_dpi()
         fig_h_px = max(fig_h * dpi, 1.0)
 
-        # Scale hspace so axes stay within the figure at any window height.
-        hspace = max(0.2, min(1.5, 1000.0 / fig_h_px))
-
-        # tight_layout auto-computes left/right margins so y-axis labels are never clipped.
-        # pad=0.2 and h_pad=0.05 minimise empty space around and between axes.
+        # tight_layout auto-computes all margins to avoid label clipping.
+        # pad (outer margin, inches) and h_pad (inter-axes gap, inches) stay small
+        # so panels fill the canvas. No separate hspace override — that was expanding
+        # inter-axes gaps to 80-110% of average axis height, dwarfing the small panels.
         try:
-            self.fig.tight_layout(rect=[0, 0.02, 1, 0.99], pad=0.2, h_pad=0.05)
+            self.fig.tight_layout(pad=0.1, h_pad=0.15)
         except Exception:
-            self.fig.subplots_adjust(top=0.99, left=0.06, right=0.99, bottom=0.02)
-
-        # Apply dynamic hspace on top of what tight_layout set.
-        self.fig.subplots_adjust(hspace=hspace)
+            self.fig.subplots_adjust(top=0.98, left=0.06, right=0.99, bottom=0.02, hspace=0.05)
 
         # Dynamic tick/label size proportional to the pixel height of each data panel.
         # Each data panel occupies 3 of the 26 subplot rows.
-        # Cap at 6 pt (≈30% smaller than previous 8 pt cap).
-        panel_h_px = (0.99 - 0.02) * fig_h_px * (3.0 / 26.0)
+        panel_h_px = 0.97 * fig_h_px * (3.0 / 26.0)
         labelsize = max(4, min(6, int(panel_h_px / 8)))
         for ax in self.fig.get_axes():
             ax.tick_params(labelsize=labelsize)
