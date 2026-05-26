@@ -126,7 +126,7 @@ from types import MappingProxyType
 import warnings
 # Suppress warnings
 warnings.filterwarnings("ignore")
-from theme import THEME, wx_colour, get_font, MPL_DARK_RC
+from theme import THEME, wx_colour, get_font, get_mono_font, MPL_DARK_RC
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -269,6 +269,7 @@ class Gmg(wx.Frame):
         py_local = {'__app__': 'gmg Application'}
         sys.gmg = self
         self.win = py.shell.Shell(self.ConsolePanel, -1, size=(2200, 1100), locals=py_local, introText=intro)
+        self.win.SetFont(get_mono_font(size=10))
 
         # ADD THE PANES TO THE AUI MANAGER
         self.mgr.AddPane(self.left_panel, aui.AuiPaneInfo().Name('left').Left().Caption("Controls"))
@@ -1230,24 +1231,29 @@ class Gmg(wx.Frame):
         # self.cb1.set_label('Density contrast ($kg/m^{3}$)', fontsize=6)
 
         # APPLY DARK THEME TO SIDEBAR CONTROLS
+        _ui_font = get_font(size=9)
         for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
                       self.angle_a_text, self.angle_b_text, self.angle_c_text,
                       self.earth_field_text, self.node_text, self.x_text, self.y_text,
                       self.text_size_text):
             label.SetForegroundColour(wx_colour('fg_primary'))
             label.SetBackgroundColour(wx_colour('bg_sidebar'))
+            label.SetFont(_ui_font)
         for spin in (self.density_input, self.ref_density_input, self.susceptibility_input,
                      self.angle_a_input, self.angle_b_input, self.angle_c_input,
                      self.earth_field_input, self.x_input, self.y_input):
             spin.SetBackgroundColour(wx_colour('bg_input'))
             spin.GetTextCtrl().SetBackgroundColour(wx_colour('bg_input'))
             spin.GetTextCtrl().SetForegroundColour(wx_colour('fg_input'))
+            spin.GetTextCtrl().SetFont(_ui_font)
         self.node_set_button.SetBackgroundColour(wx_colour('bg_input'))
         self.node_set_button.SetForegroundColour(wx_colour('fg_primary'))
+        self.node_set_button.SetFont(_ui_font)
         self.text_size_input.SetBackgroundColour(wx_colour('bg_sidebar'))
         for tree in (self.tree, self.fault_tree):
             tree.SetBackgroundColour(wx_colour('bg_sidebar'))
             tree.SetForegroundColour(wx_colour('fg_primary'))
+            tree.SetFont(_ui_font)
 
         # UPDATE INFO BAR
         self.display_info()
