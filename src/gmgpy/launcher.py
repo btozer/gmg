@@ -1,3 +1,7 @@
+"""
+Function to launch the app using the correct 
+python interpreter depending on the OS
+"""
 import os
 import subprocess 
 from sys import platform
@@ -9,7 +13,7 @@ def launch():
     ## RUN APP
     ## IF ON WINDOWS OR LINUX
     if platform == "win32" or platform == "linux" or platform == "linux2":
-        subprocess.run(["pythonw", path+"/gmg.py"])
+        subprocess.run(["python", path+"/gmg.py"])
     ## IF ON MAC
     elif platform == "darwin":
         subprocess.run(["pythonw", path+"/gmg.py"])
@@ -18,4 +22,4 @@ def launch():
         exit()
 
 if __name__ == '__main__':
-    launcher()
+    launch()
