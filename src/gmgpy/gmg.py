@@ -6679,100 +6679,54 @@ class Gmg(wx.Frame):
 
     def plot_model(self, event):
         """
-        CREATE AN EXTERNAL FIGURE OF THE CURRENT MODEL USING THE INBUILT 
-        FIGURE CONSTRUCTION TOOL. THIS USES pygmt TO CREATE THE FIGURE.
+        Save a PyGMT figure of the current model to disc.
+
+        Asks the user for an output file path via a file-save dialog, then
+        passes the current GUI state to pygmt_plot_model.plot_fig() which
+        builds a stacked multi-panel figure (model + any visible data panels)
+        and saves it.  The output format is determined by the file extension
+        (.pdf, .png, .eps, .svg).
         """
+        wildcard = ("PDF (*.pdf)|*.pdf|"
+                    "PNG (*.png)|*.png|"
+                    "EPS (*.eps)|*.eps|"
+                    "SVG (*.svg)|*.svg")
+        dlg = wx.FileDialog(self, "Save figure as...", wildcard=wildcard,
+                            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return
+        file_path = dlg.GetPath()
+        dlg.Destroy()
 
-        # GET PLOTTING PARAMETERS FROM DIALOG BOX
-        self.set_values = PlotSettingsDialog(self, -1, 'Set figure parameters', self.model_aspect,
-                                             self.grav_frame_aspect)
-        self.set_values.Show(True)
-
-    def draw_model(self):
-        # GET USER INPUT FROM POPOUT BOX
-        self.file_path = self.set_values.file_path
-        self.file_type = self.set_values.file_type
-        self.use_tight_layout = self.set_values.use_tight_layout
-
-        self.fs = self.set_values.fs  # FONT SIZE
-        self.aspect_ratio = self.set_values.aspect_ratio  # MODEL ASPECT RATIO
-        self.ps = self.set_values.ps  # OBSERVED POINT SIZE
-        self.calc_line_width = self.set_values.lw  # CALCUALTED LINE WIDTH
-
-        self.font_type = self.set_values.font_type_text.GetValue()
-
-        self.topography_frame_min = self.set_values.topo_min_text.GetValue()
-        self.topography_frame_max = self.set_values.topo_max_text.GetValue()
-        self.grav_frame_min = self.set_values.grav_min_text.GetValue()
-        self.grav_frame_max = self.set_values.grav_max_text.GetValue()
-        self.mag_frame_min = self.set_values.mag_min_text.GetValue()
-        self.mag_frame_max = self.set_values.mag_max_text.GetValue()
-
-        self.draw_polygons = self.set_values.draw_polygons
-        self.polygon_alpha = self.set_values.polygon_alpha
-
-        self.draw_fixed_layers = self.set_values.draw_fixed_layers
-        self.layer_line_width = self.set_values.layer_line_width
-
-        self.draw_floating_layers = self.set_values.draw_floating_layers
-        self.layer_line_alpha = self.set_values.layer_line_alpha
-
-        self.draw_colorbar = self.set_values.draw_colorbar
-        self.colorbar_x = self.set_values.colorbar_x
-        self.colorbar_y = self.set_values.colorbar_y
-        self.colorbar_size_x = self.set_values.colorbar_size_x
-        self.colorbar_size_y = self.set_values.colorbar_size_y
-
-        self.draw_xy_data = self.set_values.draw_xy_data
-        self.xy_size = self.set_values.xy_size
-        self.xy_color = self.set_values.xy_color
-
-        self.draw_wells = self.set_values.draw_wells
-        self.well_fs = self.set_values.well_fs
-        self.well_line_width = self.set_values.well_line_width
-
-        self.draw_faults = self.set_values.draw_faults
-        self.faults_lw = self.set_values.faults_lw
-
-        # GET FIGURE DIMENSIONS
-        xmin, xmax = self.model_frame.get_xlim()
-        ymin, ymax = self.model_frame.get_ylim()
-        area = np.array([xmin, xmax, ymin, ymax])
-
-        # # RUN PLOT MODEL CODE
-        fig_plot = plot_model.plot_fig(self.file_path, self.file_type, self.use_tight_layout, self.fs,
-                                       self.aspect_ratio, self.ps, self.calc_line_width, self.font_type,
-                                       self.topography_frame_min, self.topography_frame_max, self.grav_frame_min,
-                                       self.grav_frame_max, self.mag_frame_min, self.mag_frame_max,
-                                       self.draw_polygons, self.polygon_alpha, self.draw_fixed_layers,
-                                       self.layer_line_width, self.draw_floating_layers, self.layer_line_alpha,
-                                       self.draw_colorbar, self.colorbar_x, self.colorbar_y, self.colorbar_size_x,
-                                       self.colorbar_size_y, self.draw_xy_data, self.xy_size, self.xy_color,
-                                       self.draw_wells, self.well_fs, self.well_line_width, self.draw_faults,
-                                       self.faults_lw,
-                                       self.layer_list, self.fault_list, self.observed_topography_list,
-                                       self.observed_gravity_list, self.observed_magnetic_list,
-                                       self.outcrop_data_list, self.well_data_list, self.segy_data_list,
-                                       self.topography_frame, self.gravity_frame, self.magnetic_frame, self.predicted_gravity,
-                                       self.gravity_rms_value, self.predicted_nt, self.magnetic_rms_value, self.area,
-                                       self.xp)
-        del fig_plot
-        #
-        # # IF ON A LINUX SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-        # try:
-        #     if sys.platform == 'linux2':
-        #         subprocess.call(["xdg-open", self.file_path])
-        #     # IF ON A macOS SYSTEM OPEN THE FIGURE WITH PDF VIEWER
-        #     elif sys.platform == 'darwin':
-        #         os.open(self.file_path)
-        # except IOError:
-        #     pass
-
-        # UPDATE GMG
-        self.update_layer_data()
-        self.draw()
-
-        return
+        try:
+            plot_model.plot_fig(
+                file_path=file_path,
+                area=self.area,
+                xp=self.xp,
+                model_aspect=self.model_aspect,
+                layer_list=self.layer_list,
+                topography_frame_visible=self.topography_frame.get_visible(),
+                observed_topography_list=self.observed_topography_list,
+                topo_ylim=self.topography_frame.get_ylim(),
+                gravity_frame_visible=self.gravity_frame.get_visible(),
+                observed_gravity_list=self.observed_gravity_list,
+                predicted_gravity=self.predicted_gravity,
+                gravity_ylim=self.gravity_frame.get_ylim(),
+                vgg_frame_visible=self.vertical_gg_frame.get_visible(),
+                observed_vgg_list=self.observed_vgg_list,
+                predicted_vgg=self.predicted_vgg,
+                vgg_ylim=self.vertical_gg_frame.get_ylim(),
+                magnetic_frame_visible=self.magnetic_frame.get_visible(),
+                observed_magnetic_list=self.observed_magnetic_list,
+                predicted_nt=self.predicted_nt,
+                mag_ylim=self.magnetic_frame.get_ylim(),
+                model_xlim=self.model_frame.get_xlim(),
+                model_ylim=self.model_frame.get_ylim(),
+            )
+        except Exception as e:
+            wx.MessageBox(f"Error saving figure:\n{e}", "Figure Error",
+                          wx.OK | wx.ICON_ERROR)
 
     # DOCUMENTATION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
