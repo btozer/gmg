@@ -6681,30 +6681,47 @@ class Gmg(wx.Frame):
         """
         Save a PyGMT figure of the current model to disc.
 
-        Asks the user for an output file path via a file-save dialog, then
-        passes the current GUI state to pygmt_plot_model.plot_fig() which
-        builds a stacked multi-panel figure (model + any visible data panels)
-        and saves it.  The output format is determined by the file extension
+        First shows a settings dialog (font size, line widths, aspect ratio,
+        panel gap), then a file-save dialog for the output path.  The current
+        GUI state is passed to pygmt_plot_model.plot_fig() which builds a
+        stacked multi-panel figure (model + any visible data panels) and saves
+        it.  The output format is determined by the file extension
         (.pdf, .png, .eps, .svg).
         """
+        # STEP 1 – FIGURE SETTINGS DIALOG
+        settings_dlg = PlotFigureSettingsDialog(self, -1, "Figure Settings",
+                                                self.model_aspect)
+        if settings_dlg.ShowModal() != wx.ID_OK:
+            settings_dlg.Destroy()
+            return
+        font_size       = settings_dlg.font_size
+        calc_line_width = settings_dlg.calc_line_width
+        layer_line_width = settings_dlg.layer_line_width
+        obs_point_size  = settings_dlg.obs_point_size
+        aspect_ratio    = settings_dlg.aspect_ratio
+        panel_gap_cm    = settings_dlg.panel_gap
+        settings_dlg.Destroy()
+
+        # STEP 2 – OUTPUT FILE DIALOG
         wildcard = ("PDF (*.pdf)|*.pdf|"
                     "PNG (*.png)|*.png|"
                     "EPS (*.eps)|*.eps|"
                     "SVG (*.svg)|*.svg")
-        dlg = wx.FileDialog(self, "Save figure as...", wildcard=wildcard,
-                            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if dlg.ShowModal() != wx.ID_OK:
-            dlg.Destroy()
+        file_dlg = wx.FileDialog(self, "Save figure as...", wildcard=wildcard,
+                                 style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        if file_dlg.ShowModal() != wx.ID_OK:
+            file_dlg.Destroy()
             return
-        file_path = dlg.GetPath()
-        dlg.Destroy()
+        file_path = file_dlg.GetPath()
+        file_dlg.Destroy()
 
+        # STEP 3 – BUILD AND SAVE FIGURE
         try:
             plot_model.plot_fig(
                 file_path=file_path,
                 area=self.area,
                 xp=self.xp,
-                model_aspect=self.model_aspect,
+                model_aspect=aspect_ratio,
                 layer_list=self.layer_list,
                 topography_frame_visible=self.topography_frame.get_visible(),
                 observed_topography_list=self.observed_topography_list,
@@ -6723,6 +6740,11 @@ class Gmg(wx.Frame):
                 mag_ylim=self.magnetic_frame.get_ylim(),
                 model_xlim=self.model_frame.get_xlim(),
                 model_ylim=self.model_frame.get_ylim(),
+                font_size=font_size,
+                calc_line_width=calc_line_width,
+                layer_line_width=layer_line_width,
+                obs_point_size=obs_point_size,
+                panel_gap_cm=panel_gap_cm,
             )
         except Exception as e:
             wx.MessageBox(f"Error saving figure:\n{e}", "Figure Error",

@@ -913,4 +913,81 @@ class MessageDialog(wx.MessageDialog):
         wx.MessageDialog.__init__(self, parent, message_text, title)
         dlg = wx.MessageDialog(self, message_text, title, wx.OK)
         answer = dlg.ShowModal()
+
+
+class PlotFigureSettingsDialog(wx.Dialog):
+    """SETTINGS DIALOG FOR PYGMT FIGURE EXPORT"""
+
+    def __init__(self, parent, id, title, model_aspect):
+        wx.Dialog.__init__(self, parent, id, title,
+                           style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        input_panel = wx.Panel(self, -1)
+
+        # FONT SIZE
+        self.font_size_label = wx.StaticText(input_panel, -1, "Font size (pt):")
+        self.font_size_text = wx.TextCtrl(input_panel, -1, "10", size=(100, -1))
+
+        # PREDICTED CURVE LINE WIDTH
+        self.calc_lw_label = wx.StaticText(input_panel, -1, "Predicted curve line width (pt):")
+        self.calc_lw_text = wx.TextCtrl(input_panel, -1, "1.0", size=(100, -1))
+
+        # LAYER OUTLINE WIDTH
+        self.layer_lw_label = wx.StaticText(input_panel, -1, "Layer outline width (pt):")
+        self.layer_lw_text = wx.TextCtrl(input_panel, -1, "0.5", size=(100, -1))
+
+        # OBSERVED POINT SIZE
+        self.obs_ps_label = wx.StaticText(input_panel, -1, "Observed data point size (cm):")
+        self.obs_ps_text = wx.TextCtrl(input_panel, -1, "0.08", size=(100, -1))
+
+        # VERTICAL EXAGGERATION
+        self.aspect_label = wx.StaticText(input_panel, -1, "Vertical exaggeration:")
+        self.aspect_text = wx.TextCtrl(input_panel, -1, str(round(model_aspect, 2)),
+                                       size=(100, -1))
+
+        # INTER-PANEL GAP
+        self.gap_label = wx.StaticText(input_panel, -1, "Panel gap (cm):")
+        self.gap_text = wx.TextCtrl(input_panel, -1, "1.5", size=(100, -1))
+
+        # OK / CANCEL BUTTONS
+        self.ok_button = wx.Button(input_panel, wx.ID_OK, "OK")
+        self.cancel_button = wx.Button(input_panel, wx.ID_CANCEL, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.on_ok, self.ok_button)
+        self.Bind(wx.EVT_BUTTON, self.on_cancel, self.cancel_button)
+
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        btn_sizer.Add(self.ok_button, 0, wx.ALL, 4)
+        btn_sizer.Add(self.cancel_button, 0, wx.ALL, 4)
+
+        grid = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
+        grid.AddMany([
+            self.font_size_label,  self.font_size_text,
+            self.calc_lw_label,    self.calc_lw_text,
+            self.layer_lw_label,   self.layer_lw_text,
+            self.obs_ps_label,     self.obs_ps_text,
+            self.aspect_label,     self.aspect_text,
+            self.gap_label,        self.gap_text,
+        ])
+
+        outer = wx.BoxSizer(wx.VERTICAL)
+        outer.Add(grid, 0, wx.ALL, 10)
+        outer.Add(btn_sizer, 0, wx.ALIGN_RIGHT | wx.ALL, 6)
+        input_panel.SetSizerAndFit(outer)
+        outer.Fit(self)
+
+    def on_ok(self, event):
+        try:
+            self.font_size = float(self.font_size_text.GetValue())
+            self.calc_line_width = float(self.calc_lw_text.GetValue())
+            self.layer_line_width = float(self.layer_lw_text.GetValue())
+            self.obs_point_size = float(self.obs_ps_text.GetValue())
+            self.aspect_ratio = float(self.aspect_text.GetValue())
+            self.panel_gap = float(self.gap_text.GetValue())
+        except ValueError:
+            wx.MessageBox("Please enter valid numbers for all fields.",
+                          "Invalid Input", wx.OK | wx.ICON_ERROR)
+            return
+        self.EndModal(wx.ID_OK)
+
+    def on_cancel(self, event):
+        self.EndModal(wx.ID_CANCEL)
         dlg.Destroy()

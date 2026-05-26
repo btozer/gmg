@@ -21,7 +21,9 @@ def plot_fig(file_path, area, xp, model_aspect,
              gravity_frame_visible, observed_gravity_list, predicted_gravity, gravity_ylim,
              vgg_frame_visible, observed_vgg_list, predicted_vgg, vgg_ylim,
              magnetic_frame_visible, observed_magnetic_list, predicted_nt, mag_ylim,
-             model_xlim, model_ylim):
+             model_xlim, model_ylim,
+             font_size=10.0, calc_line_width=1.0, layer_line_width=0.5,
+             obs_point_size=0.08, panel_gap_cm=1.5):
     """
     Build a multi-panel PyGMT figure of the current GMG model and save to file.
 
@@ -58,9 +60,21 @@ def plot_fig(file_path, area, xp, model_aspect,
     mag_ylim : (float, float)
     model_xlim : (float, float)   X-axis limits in km (from the matplotlib model axes).
     model_ylim : (float, float)   Z-axis limits in km (from the matplotlib model axes).
+    font_size : float   Annotation and label font size in points (default 10).
+    calc_line_width : float   Predicted curve pen width in points (default 1.0).
+    layer_line_width : float   Layer polygon outline pen width in points (default 0.5).
+    obs_point_size : float   Observed data circle diameter in cm (default 0.08).
+    panel_gap_cm : float   Vertical gap between panels in cm (default 1.5).
     """
 
     fig = pygmt.Figure()
+
+    # Apply font sizes globally for this figure
+    pygmt.config(
+        FONT_ANNOT_PRIMARY=f"{font_size}p",
+        FONT_ANNOT_SECONDARY=f"{font_size}p",
+        FONT_LABEL=f"{font_size}p",
+    )
 
     # ------------------------------------------------------------------
     # FIGURE DIMENSIONS
@@ -114,7 +128,7 @@ def plot_fig(file_path, area, xp, model_aspect,
                 fig.plot(
                     x=obs.data[:, 0],
                     y=obs.data[:, 1],
-                    style="c0.08c",
+                    style=f"c{obs_point_size}c",
                     fill=color_str,
                     pen="0.25p,black",
                 )
@@ -123,7 +137,7 @@ def plot_fig(file_path, area, xp, model_aspect,
             fig.plot(
                 x=xp_km,
                 y=np.asarray(pred_array, dtype=float),
-                pen=f"1p,{pred_color}",
+                pen=f"{calc_line_width}p,{pred_color}",
             )
 
     # ------------------------------------------------------------------
@@ -176,15 +190,17 @@ def plot_fig(file_path, area, xp, model_aspect,
             y=y_poly,
             fill=fill_str,
             transparency=alpha_pct,
-            pen=f"0.5p,{pen_color}",
+            pen=f"{layer_line_width}p,{pen_color}",
         )
 
     # ------------------------------------------------------------------
     # DATA PANELS  (each shifted upward from the previous panel)
+    # A panel_gap_cm gap is added between each panel so that tick labels
+    # and axis titles from the lower panel do not overlap the one above.
     # ------------------------------------------------------------------
     prev_h = model_h_cm
     for ylim, ylabel, obs_list, pred, pred_color in data_panels:
-        fig.shift_origin(yshift=f"{prev_h}c")
+        fig.shift_origin(yshift=f"{prev_h + panel_gap_cm}c")
         _draw_data_panel(ylim, ylabel, obs_list, pred, pred_color)
         prev_h = data_panel_h_cm
 
