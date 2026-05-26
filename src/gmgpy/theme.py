@@ -160,7 +160,5 @@ def load_icon(path: str) -> "wx.Bitmap":
             if r > 220 and g > 220 and b > 220:          # near-white → transparent
                 img.SetAlpha(x, y, 0)
             elif max(r, g, b) < 80 and (max(r, g, b) - min(r, g, b)) < 30:
-                img.SetRed(x, y, 204)                     # near-black → light grey
-                img.SetGreen(x, y, 204)
-                img.SetBlue(x, y, 204)
+                img.SetRGB(x, y, 204, 204, 204)           # near-black → light grey
     return wx.Bitmap(img)
