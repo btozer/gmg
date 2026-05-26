@@ -1007,7 +1007,7 @@ class Gmg(wx.Frame):
         # TOPOGRAPHY CANVAS -------------------------------------------------------------------------------
         self.topography_frame = plt.subplot2grid((26, 100), (0, self.x_orig), 
                                            rowspan=self.data_row_span, colspan=self.columns)
-        self.topography_frame.set_ylabel("Topo (km)")
+        self.topography_frame.set_ylabel("T (km)")
         self.topography_frame.set_navigate(False)
         self.topography_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topography_frame.grid()
@@ -1024,7 +1024,7 @@ class Gmg(wx.Frame):
         self.gravity_frame = plt.subplot2grid((26, 100), (3, self.x_orig), 
                                               rowspan=self.data_row_span, colspan=self.columns)
         self.gravity_frame.set_navigate(False)
-        self.gravity_frame.set_ylabel("Grav (mGal)")
+        self.gravity_frame.set_ylabel("G (mGal)")
         self.gravity_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.gravity_frame.grid()
         self.gravity_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1040,7 +1040,7 @@ class Gmg(wx.Frame):
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (6, self.x_orig), 
                                           rowspan=self.data_row_span, colspan=self.columns)
         self.vertical_gg_frame.set_navigate(False)
-        self.vertical_gg_frame.set_ylabel("VGG (Eotvos)")
+        self.vertical_gg_frame.set_ylabel("V (Eotvos)")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1055,7 +1055,7 @@ class Gmg(wx.Frame):
         # MAGNETIC CANVAS ----------------------------------------------------------------------------------
         self.magnetic_frame = plt.subplot2grid((26, 100), (9, self.x_orig), 
                                                rowspan=self.data_row_span, colspan=self.columns)
-        self.magnetic_frame.set_ylabel("Mag (nT)")
+        self.magnetic_frame.set_ylabel("M (nT)")
         self.magnetic_frame.set_navigate(False)
         self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_frame.grid()
@@ -1283,7 +1283,7 @@ class Gmg(wx.Frame):
         # Dynamic tick/label size proportional to the pixel height of each data panel.
         # Each data panel occupies 3 of the 26 subplot rows.
         panel_h_px = 0.94 * fig_h_px * (3.0 / 26.0)
-        labelsize = max(4, min(6, int(panel_h_px / 8)))
+        labelsize = max(3, min(5, int(panel_h_px / 10)))
 
         # The subplot grid uses x_orig=10 out of 100 columns, so the actual axes left
         # edge in figure coords = left + (right - left) * x_orig/100.
@@ -1295,7 +1295,7 @@ class Gmg(wx.Frame):
         left = (target_axes_left - 0.975 * x_frac) / (1.0 - x_frac)
 
         self.fig.subplots_adjust(
-            top=0.99, left=left, right=0.975, bottom=0.05, hspace=0.3
+            top=0.99, left=left, right=0.975, bottom=0.05, hspace=0.5
         )
 
         for ax in self.fig.get_axes():
@@ -1533,7 +1533,7 @@ class Gmg(wx.Frame):
         # VGG CANVAS
         self.vertical_gg_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
                                           rowspan=span_size, colspan=self.columns)
-        self.vertical_gg_frame.set_ylabel("VGG (Eotvos)")
+        self.vertical_gg_frame.set_ylabel("V (Eotvos)")
         self.vertical_gg_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.vertical_gg_frame.grid()
         self.vertical_gg_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -1547,7 +1547,7 @@ class Gmg(wx.Frame):
         # MAG CANVAS
         self.magnetic_frame = plt.subplot2grid((26, 100), (z_orig, self.x_orig), 
                                                rowspan=span_size, colspan=self.columns)
-        self.magnetic_frame.set_ylabel("Mag (nT)")
+        self.magnetic_frame.set_ylabel("M (nT)")
         self.magnetic_frame.set_navigate(False)
         self.magnetic_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.magnetic_frame.grid()
