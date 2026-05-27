@@ -126,7 +126,7 @@ from types import MappingProxyType
 import warnings
 # Suppress warnings
 warnings.filterwarnings("ignore")
-from theme import THEME, wx_colour, get_font, get_mono_font, MPL_DARK_RC, load_icon
+from theme import THEME, wx_colour, get_font, get_mono_font, MPL_DARK_RC, load_icon, set_theme, get_mpl_rc
 # FUTURE
 # from wx.lib.agw import floatspin as fs
 # import wx.grid as gridlib
@@ -382,6 +382,13 @@ class Gmg(wx.Frame):
         self.Bind(wx.EVT_MENU, self.write_c_xy, m_save_c)
         m_save_fig = menu_file.Append(-1, "Save Figure...", "Save model Figure...")
         self.Bind(wx.EVT_MENU, self.plot_model, m_save_fig)
+        menu_file.AppendSeparator()
+        m_theme_submenu = wx.Menu()
+        m_theme_dark = m_theme_submenu.Append(-1, "Dark theme", "Switch to dark theme")
+        self.Bind(wx.EVT_MENU, self.on_theme_dark, m_theme_dark)
+        m_theme_light = m_theme_submenu.Append(-1, "Light theme", "Switch to light theme")
+        self.Bind(wx.EVT_MENU, self.on_theme_light, m_theme_light)
+        menu_file.AppendSubMenu(m_theme_submenu, "Change Theme")
         menu_file.AppendSeparator()
         m_exit = menu_file.Append(-1, "Exit...", "Exit...")
         self.Bind(wx.EVT_MENU, self.exit, m_exit)
@@ -850,7 +857,7 @@ class Gmg(wx.Frame):
     def start(self, area, xp, zp):
         """CREATE MPL FIGURE CANVAS"""
 
-        plt.rcParams.update(MPL_DARK_RC)  # APPLY DARK THEME
+        plt.rcParams.update(get_mpl_rc())  # APPLY ACTIVE THEME
         self.fig = plt.figure()  # CREATE MPL FIGURE
         self.canvas = FigureCanvas(self.rightPanel, -1, self.fig)  # CREATE FIGURE CANVAS
         self.Bind(wx.EVT_SIZE, self._on_wx_resize)  # DYNAMIC LAYOUT ON RESIZE
@@ -2365,6 +2372,94 @@ class Gmg(wx.Frame):
                 new_alpha = self.layer_list[l].polygon_mpl_actor[0].get_alpha() - 0.1
                 self.layer_list[l].polygon_mpl_actor[0].set_alpha(new_alpha)
         self.draw()
+
+    # THEME SWITCHING ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    def on_theme_dark(self, event):
+        """Switch to the dark colour theme."""
+        set_theme('dark')
+        self._apply_wx_theme()
+
+    def on_theme_light(self, event):
+        """Switch to the light colour theme."""
+        set_theme('light')
+        self._apply_wx_theme()
+
+    def _apply_wx_theme(self):
+        """Re-apply the current THEME to all live wx widgets and the matplotlib figure.
+        Called after set_theme() to update the running GUI without restarting."""
+        # MAIN FRAME
+        self.SetBackgroundColour(wx_colour('bg_base'))
+        self.SetForegroundColour(wx_colour('fg_primary'))
+
+        # PANELS
+        self.left_panel.SetBackgroundColour(wx_colour('bg_panel'))
+        self.controls_fold_panel.SetBackgroundColour(wx_colour('bg_panel'))
+        for sw in (self.scrolled_window_item1,
+                   self.scrolled_window_item2,
+                   self.scrolled_window_item3):
+            sw.SetBackgroundColour(wx_colour('bg_sidebar'))
+            sw.SetForegroundColour(wx_colour('fg_primary'))
+        for panel in (self.fold_panel_item1,
+                      self.fold_panel_item2,
+                      self.fold_panel_item3):
+            panel.SetBackgroundColour(wx_colour('bg_panel'))
+        self.rightPanel.SetBackgroundColour(wx_colour('bg_base'))
+        self.ConsolePanel.SetBackgroundColour(wx_colour('bg_sidebar'))
+
+        # AUI DOCK ART
+        art = self.mgr.GetArtProvider()
+        art.SetColour(aui.AUI_DOCKART_BACKGROUND_COLOUR,              wx_colour('bg_base'))
+        art.SetColour(aui.AUI_DOCKART_SASH_COLOUR,                    wx_colour('bg_base'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_COLOUR,          wx_colour('accent'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, wx_colour('accent'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_COLOUR,        wx_colour('bg_panel'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_GRADIENT_COLOUR, wx_colour('bg_panel'))
+        art.SetColour(aui.AUI_DOCKART_ACTIVE_CAPTION_TEXT_COLOUR,     wx_colour('fg_statusbar'))
+        art.SetColour(aui.AUI_DOCKART_INACTIVE_CAPTION_TEXT_COLOUR,   wx_colour('fg_caption'))
+        art.SetColour(aui.AUI_DOCKART_BORDER_COLOUR,                  wx_colour('border'))
+        art.SetColour(aui.AUI_DOCKART_GRIPPER_COLOUR,                 wx_colour('bg_panel'))
+        self.mgr.Update()
+
+        # SIDEBAR CONTROLS
+        _ui_font = get_font(size=12)
+        for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
+                      self.angle_a_text, self.angle_b_text, self.angle_c_text,
+                      self.earth_field_text, self.node_text, self.x_text, self.y_text,
+                      self.text_size_text):
+            label.SetForegroundColour(wx_colour('fg_primary'))
+            label.SetBackgroundColour(wx_colour('bg_sidebar'))
+            label.SetFont(_ui_font)
+        for spin in (self.density_input, self.ref_density_input, self.susceptibility_input,
+                     self.angle_a_input, self.angle_b_input, self.angle_c_input,
+                     self.earth_field_input, self.x_input, self.y_input):
+            spin.SetBackgroundColour(wx_colour('bg_input'))
+            spin.GetTextCtrl().SetBackgroundColour(wx_colour('bg_input'))
+            spin.GetTextCtrl().SetForegroundColour(wx_colour('fg_input'))
+            spin.GetTextCtrl().SetFont(_ui_font)
+        self.node_set_button.SetBackgroundColour(wx_colour('bg_input'))
+        self.node_set_button.SetForegroundColour(wx_colour('fg_primary'))
+        self.text_size_input.SetBackgroundColour(wx_colour('bg_sidebar'))
+        for tree in (self.tree, self.fault_tree):
+            tree.SetBackgroundColour(wx_colour('bg_sidebar'))
+            tree.SetForegroundColour(wx_colour('fg_primary'))
+
+        # MATPLOTLIB FIGURE
+        if hasattr(self, 'fig') and hasattr(self, 'canvas'):
+            plt.rcParams.update(get_mpl_rc())
+            self.fig.set_facecolor(THEME['bg_canvas'])
+            for ax in self.fig.get_axes():
+                ax.set_facecolor(THEME['bg_axes'])
+                ax.tick_params(colors=THEME['plot_tick'],
+                               labelcolor=THEME['plot_tick'])
+                ax.xaxis.label.set_color(THEME['plot_label'])
+                ax.yaxis.label.set_color(THEME['plot_label'])
+                for spine in ax.spines.values():
+                    spine.set_edgecolor(THEME['plot_spine'])
+                ax.grid(True, color=THEME['plot_grid'], linewidth=0.5)
+            self.canvas.draw_idle()
+
+        self.Refresh()
+        self.Update()
 
     # SAVE/LOAD MODEL~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     def store_model_state(self):

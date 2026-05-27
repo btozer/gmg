@@ -14,10 +14,10 @@ Usage
 import wx
 
 # ---------------------------------------------------------------------------
-# Colour palette (mirrors VS Code Dark+ defaults)
+# Colour palettes
 # ---------------------------------------------------------------------------
 
-THEME = {
+DARK_THEME = {
     # ---- Backgrounds -------------------------------------------------------
     "bg_base":          "#1e1e1e",  # Main frame / editor background
     "bg_panel":         "#252526",  # Side panel / activity bar
@@ -59,6 +59,53 @@ THEME = {
     "plot_pred_mag":    "#98c379",  # Predicted magnetic line  (green)
     "plot_rms":         "#c678dd",  # RMS residual line        (purple)
 }
+
+LIGHT_THEME = {
+    # ---- Backgrounds -------------------------------------------------------
+    "bg_base":          "#ffffff",  # Main frame / editor background
+    "bg_panel":         "#f3f3f3",  # Side panel / activity bar
+    "bg_sidebar":       "#e8e8e8",  # Scrolled windows, tree panels
+    "bg_input":         "#ffffff",  # TextCtrl / SpinCtrl inputs
+    "bg_toolbar":       "#f3f3f3",  # Toolbar strip
+    "bg_statusbar":     "#007acc",  # Status bar (VS Code blue)
+    "bg_statusbar_err": "#c72e0f",  # Status bar error state
+    "bg_tooltip":       "#f3f3f3",  # Tooltip background
+    "bg_canvas":        "#ffffff",  # Matplotlib figure background
+    "bg_axes":          "#ffffff",  # Matplotlib axes face
+
+    # ---- Foregrounds -------------------------------------------------------
+    "fg_primary":       "#1e1e1e",  # Normal text
+    "fg_secondary":     "#666666",  # Dimmed / secondary text
+    "fg_statusbar":     "#ffffff",  # Status bar text
+    "fg_caption":       "#333333",  # AUI pane captions
+    "fg_input":         "#111111",  # Input widget text
+    "fg_placeholder":   "#999999",  # Placeholder / hint text
+
+    # ---- Accents -----------------------------------------------------------
+    "accent":           "#007acc",  # Primary accent (VS Code blue)
+    "accent_hover":     "#1a8ad4",  # Hover highlight
+    "accent_active":    "#005f9e",  # Active / pressed
+
+    # ---- Borders & separators ---------------------------------------------
+    "border":           "#cccccc",  # Panel/pane borders
+    "border_focus":     "#007acc",  # Focused input border
+    "separator":        "#d0d0d0",  # Thin divider lines
+
+    # ---- Matplotlib plot colours ------------------------------------------
+    "plot_grid":        "#dddddd",  # Axes grid lines
+    "plot_spine":       "#aaaaaa",  # Axes spine lines
+    "plot_tick":        "#444444",  # Tick labels
+    "plot_label":       "#1e1e1e",  # Axis labels
+    "plot_title":       "#1e1e1e",  # Plot title text
+    "plot_pred_grav":   "#c0392b",  # Predicted gravity line   (red)
+    "plot_pred_vgg":    "#d68910",  # Predicted VGG line       (golden)
+    "plot_pred_mag":    "#1e8449",  # Predicted magnetic line  (green)
+    "plot_rms":         "#7d3c98",  # RMS residual line        (purple)
+}
+
+# Active theme — mutable dict, updated in-place by set_theme()
+THEME = dict(DARK_THEME)
+_active_theme_name: str = 'dark'
 
 
 def wx_colour(key: str) -> wx.Colour:
@@ -136,6 +183,46 @@ MPL_DARK_RC = {
     "savefig.facecolor":    THEME["bg_canvas"],
     "savefig.edgecolor":    THEME["bg_canvas"],
 }
+
+
+# ---------------------------------------------------------------------------
+# Theme switching
+# ---------------------------------------------------------------------------
+
+def set_theme(name: str) -> None:
+    """Switch the active theme by updating THEME in-place.
+
+    Parameters
+    ----------
+    name : 'dark' or 'light'
+    """
+    global _active_theme_name
+    _active_theme_name = name
+    source = LIGHT_THEME if name == 'light' else DARK_THEME
+    THEME.update(source)
+
+
+def get_mpl_rc() -> dict:
+    """Return a matplotlib rcParams dict built from the *current* active theme."""
+    return {
+        "figure.facecolor":     THEME["bg_canvas"],
+        "axes.facecolor":       THEME["bg_axes"],
+        "axes.edgecolor":       THEME["plot_spine"],
+        "axes.labelcolor":      THEME["plot_label"],
+        "axes.grid":            True,
+        "grid.color":           THEME["plot_grid"],
+        "grid.linewidth":       0.5,
+        "xtick.color":          THEME["plot_tick"],
+        "ytick.color":          THEME["plot_tick"],
+        "xtick.labelcolor":     THEME["plot_tick"],
+        "ytick.labelcolor":     THEME["plot_tick"],
+        "text.color":           THEME["fg_primary"],
+        "legend.facecolor":     THEME["bg_panel"],
+        "legend.edgecolor":     THEME["border"],
+        "legend.labelcolor":    THEME["fg_primary"],
+        "savefig.facecolor":    THEME["bg_canvas"],
+        "savefig.edgecolor":    THEME["bg_canvas"],
+    }
 
 
 # ---------------------------------------------------------------------------
