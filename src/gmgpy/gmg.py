@@ -459,6 +459,9 @@ class Gmg(wx.Frame):
         m_save_g_submenu = self.gravity_data.Append(-1, "&Save Predicted Anomaly...",
                                                     "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_grav, m_save_g_submenu)
+        # GENERATE REGIONAL FIELD
+        m_regional_g = self.gravity_data.Append(-1, "Generate regional field...", "Generate regional field")
+        self.Bind(wx.EVT_MENU, self.on_regional_field_gravity, m_regional_g)
         # DRAW MENU
         self.menubar.Append(self.gravity_data, "&Gravity")
         # --------------------------------------------------------------------------------------------------------------
@@ -494,6 +497,9 @@ class Gmg(wx.Frame):
         m_save_vgg_submenu = self.vgg_data.Append(-1, "&Save Predicted Anomaly...",
                                                     "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_vgg, m_save_vgg_submenu)
+        # GENERATE REGIONAL FIELD
+        m_regional_vgg = self.vgg_data.Append(-1, "Generate regional field...", "Generate regional field")
+        self.Bind(wx.EVT_MENU, self.on_regional_field_vgg, m_regional_vgg)
         # DRAW MENU
         self.menubar.Append(self.vgg_data, "&VGG")
         # --------------------------------------------------------------------------------------------------------------
@@ -530,6 +536,9 @@ class Gmg(wx.Frame):
         m_save_mag_submenu = self.magnetic_data.Append(-1, "&Save Predicted Anomaly...",
                                                        "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_mag, m_save_mag_submenu)
+        # GENERATE REGIONAL FIELD
+        m_regional_mag = self.magnetic_data.Append(-1, "Generate regional field...", "Generate regional field")
+        self.Bind(wx.EVT_MENU, self.on_regional_field_mag, m_regional_mag)
         # DRAW MENU
         self.menubar.Append(self.magnetic_data, "&Magnetics")
         # --------------------------------------------------------------------------------------------------------------
@@ -3450,6 +3459,65 @@ class Gmg(wx.Frame):
         self.set_frame_limits()
         self.draw()
 
+    def _compute_regional_field(self, x_data, y_data, poly_order):
+        """FIT A POLYNOMIAL OF GIVEN ORDER TO Y(X) AND RETURN THE REGIONAL CURVE"""
+        coeffs = np.polyfit(x_data, y_data, poly_order)
+        return np.polyval(coeffs, x_data)
+
+    def on_regional_field_gravity(self, event):
+        """COMPUTE AND PLOT A POLYNOMIAL REGIONAL FIELD FOR OBSERVED GRAVITY DATA"""
+        if not self.observed_gravity_list:
+            wx.MessageBox("No observed gravity data loaded.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+        dlg = RegionalFieldDialog(self, -1, "Regional Field", self.observed_gravity_list)
+        if dlg.ShowModal() == wx.ID_OK:
+            regional_y = self._compute_regional_field(
+                dlg.input_data[:, 0], dlg.input_data[:, 1], dlg.poly_order)
+            regional_data = np.column_stack((dlg.input_data[:, 0], regional_y))
+
+            # CREATE REGIONAL FIELD OBSERVED DATA OBJECT
+            observed = ObservedData()
+            observed.id = int(self.observed_gravity_counter)
+            observed.type = str('regional')
+            observed.name = dlg.output_name
+            observed.color = dlg.output_color
+            observed.data = regional_data
+            observed.mpl_actor = self.gravity_frame.scatter(
+                regional_data[:, 0], regional_data[:, 1],
+                marker='o', color=dlg.output_color, s=5, gid=observed.id)
+            self.observed_gravity_list.append(observed)
+            self.observed_gravity_switch = True
+            self.grav_submenu = wx.Menu()
+            self.m_obs_g_submenu.Append(11000 + observed.id, observed.name, self.grav_submenu)
+            self.grav_submenu.Append(11000 + observed.id, 'delete observed data')
+            self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + observed.id)
+            self.observed_gravity_counter += 1
+
+            if dlg.apply_separation:
+                # RESIDUAL = OBSERVED - REGIONAL
+                residual_data = np.column_stack(
+                    (dlg.input_data[:, 0], dlg.input_data[:, 1] - regional_y))
+                residual_obs = ObservedData()
+                residual_obs.id = int(self.observed_gravity_counter)
+                residual_obs.type = str('residual')
+                residual_obs.name = dlg.output_name + " residual"
+                residual_obs.color = dlg.output_color
+                residual_obs.data = residual_data
+                residual_obs.mpl_actor = self.gravity_frame.scatter(
+                    residual_data[:, 0], residual_data[:, 1],
+                    marker='o', color=dlg.output_color, s=5, gid=residual_obs.id)
+                self.observed_gravity_list.append(residual_obs)
+                self.grav_submenu = wx.Menu()
+                self.m_obs_g_submenu.Append(11000 + residual_obs.id, residual_obs.name, self.grav_submenu)
+                self.grav_submenu.Append(11000 + residual_obs.id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + residual_obs.id)
+                self.observed_gravity_counter += 1
+
+            self.update_layer_data()
+            self.set_frame_limits()
+            self.draw()
+        dlg.Destroy()
+
     def take_gravity_horizontal_derivative(self, event):
         """
         TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
@@ -3658,6 +3726,60 @@ class Gmg(wx.Frame):
         self.set_frame_limits()
         self.draw()
 
+    def on_regional_field_vgg(self, event):
+        """COMPUTE AND PLOT A POLYNOMIAL REGIONAL FIELD FOR OBSERVED VGG DATA"""
+        if not self.observed_vgg_list:
+            wx.MessageBox("No observed VGG data loaded.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+        dlg = RegionalFieldDialog(self, -1, "Regional Field", self.observed_vgg_list)
+        if dlg.ShowModal() == wx.ID_OK:
+            regional_y = self._compute_regional_field(
+                dlg.input_data[:, 0], dlg.input_data[:, 1], dlg.poly_order)
+            regional_data = np.column_stack((dlg.input_data[:, 0], regional_y))
+
+            # CREATE REGIONAL FIELD OBSERVED DATA OBJECT
+            observed = ObservedData()
+            observed.id = int(self.observed_vgg_counter)
+            observed.type = str('regional')
+            observed.name = dlg.output_name
+            observed.color = dlg.output_color
+            observed.data = regional_data
+            observed.mpl_actor = self.vertical_gg_frame.scatter(
+                regional_data[:, 0], regional_data[:, 1],
+                marker='o', color=dlg.output_color, s=5, gid=observed.id)
+            self.observed_vgg_list.append(observed)
+            self.observed_vgg_switch = True
+            self.vgg_submenu = wx.Menu()
+            self.m_obs_vgg_submenu.Append(15000 + observed.id, observed.name, self.vgg_submenu)
+            self.vgg_submenu.Append(15000 + observed.id, 'delete observed data')
+            self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + observed.id)
+            self.observed_vgg_counter += 1
+
+            if dlg.apply_separation:
+                # RESIDUAL = OBSERVED - REGIONAL
+                residual_data = np.column_stack(
+                    (dlg.input_data[:, 0], dlg.input_data[:, 1] - regional_y))
+                residual_obs = ObservedData()
+                residual_obs.id = int(self.observed_vgg_counter)
+                residual_obs.type = str('residual')
+                residual_obs.name = dlg.output_name + " residual"
+                residual_obs.color = dlg.output_color
+                residual_obs.data = residual_data
+                residual_obs.mpl_actor = self.vertical_gg_frame.scatter(
+                    residual_data[:, 0], residual_data[:, 1],
+                    marker='o', color=dlg.output_color, s=5, gid=residual_obs.id)
+                self.observed_vgg_list.append(residual_obs)
+                self.vgg_submenu = wx.Menu()
+                self.m_obs_vgg_submenu.Append(15000 + residual_obs.id, residual_obs.name, self.vgg_submenu)
+                self.vgg_submenu.Append(15000 + residual_obs.id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + residual_obs.id)
+                self.observed_vgg_counter += 1
+
+            self.update_layer_data()
+            self.set_frame_limits()
+            self.draw()
+        dlg.Destroy()
+
     def take_vgg_horizontal_derivative(self, event):
         """
         TAKE HORIZONTAL DERIVATIVE OF OBSERVED DATA.
@@ -3860,6 +3982,60 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.set_frame_limits()
         self.draw()
+
+    def on_regional_field_mag(self, event):
+        """COMPUTE AND PLOT A POLYNOMIAL REGIONAL FIELD FOR OBSERVED MAGNETIC DATA"""
+        if not self.observed_magnetic_list:
+            wx.MessageBox("No observed magnetic data loaded.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+        dlg = RegionalFieldDialog(self, -1, "Regional Field", self.observed_magnetic_list)
+        if dlg.ShowModal() == wx.ID_OK:
+            regional_y = self._compute_regional_field(
+                dlg.input_data[:, 0], dlg.input_data[:, 1], dlg.poly_order)
+            regional_data = np.column_stack((dlg.input_data[:, 0], regional_y))
+
+            # CREATE REGIONAL FIELD OBSERVED DATA OBJECT
+            observed = ObservedData()
+            observed.id = int(self.observed_magnetic_counter)
+            observed.type = str('regional')
+            observed.name = dlg.output_name
+            observed.color = dlg.output_color
+            observed.data = regional_data
+            observed.mpl_actor = self.magnetic_frame.scatter(
+                regional_data[:, 0], regional_data[:, 1],
+                marker='o', color=dlg.output_color, s=5, gid=observed.id)
+            self.observed_magnetic_list.append(observed)
+            self.observed_magnetic_switch = True
+            self.mag_submenu = wx.Menu()
+            self.m_obs_mag_submenu.Append(12000 + observed.id, observed.name, self.mag_submenu)
+            self.mag_submenu.Append(12000 + observed.id, 'delete observed data')
+            self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000 + observed.id)
+            self.observed_magnetic_counter += 1
+
+            if dlg.apply_separation:
+                # RESIDUAL = OBSERVED - REGIONAL
+                residual_data = np.column_stack(
+                    (dlg.input_data[:, 0], dlg.input_data[:, 1] - regional_y))
+                residual_obs = ObservedData()
+                residual_obs.id = int(self.observed_magnetic_counter)
+                residual_obs.type = str('residual')
+                residual_obs.name = dlg.output_name + " residual"
+                residual_obs.color = dlg.output_color
+                residual_obs.data = residual_data
+                residual_obs.mpl_actor = self.magnetic_frame.scatter(
+                    residual_data[:, 0], residual_data[:, 1],
+                    marker='o', color=dlg.output_color, s=5, gid=residual_obs.id)
+                self.observed_magnetic_list.append(residual_obs)
+                self.mag_submenu = wx.Menu()
+                self.m_obs_mag_submenu.Append(12000 + residual_obs.id, residual_obs.name, self.mag_submenu)
+                self.mag_submenu.Append(12000 + residual_obs.id, 'delete observed data')
+                self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000 + residual_obs.id)
+                self.observed_magnetic_counter += 1
+
+            self.update_layer_data()
+            self.set_frame_limits()
+            self.draw()
+        dlg.Destroy()
 
     def take_magnetic_horizontal_derivative(self, event):
         """
