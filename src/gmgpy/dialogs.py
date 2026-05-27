@@ -1034,7 +1034,7 @@ class RegionalFieldDialog(wx.Dialog):
 
         # POLYNOMIAL ORDER SLIDER
         poly_label = wx.StaticText(input_panel, -1, "Polynomial order:")
-        self.poly_slider = wx.Slider(input_panel, -1, value=4, minValue=2, maxValue=16,
+        self.poly_slider = wx.Slider(input_panel, -1, value=2, minValue=1, maxValue=6,
                                      size=(200, -1), style=wx.SL_HORIZONTAL | wx.SL_LABELS)
 
         # OUTPUT NAME
