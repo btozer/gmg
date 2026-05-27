@@ -1041,11 +1041,16 @@ class RegionalFieldDialog(wx.Dialog):
         output_name_label = wx.StaticText(input_panel, -1, "Output name:")
         self.output_name_text = wx.TextCtrl(input_panel, -1, "regional")
 
-        # OUTPUT COLOR
+        # REGIONAL FIELD COLOR
         colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
-        output_color_label = wx.StaticText(input_panel, -1, "Output color:")
+        regional_color_label = wx.StaticText(input_panel, -1, "Regional field color:")
         self.output_color_combo = wx.ComboBox(input_panel, -1, value='green', choices=colors,
                                               size=(100, -1), style=wx.CB_DROPDOWN)
+
+        # RESIDUAL FIELD COLOR
+        residual_color_label = wx.StaticText(input_panel, -1, "Residual field color:")
+        self.residual_color_combo = wx.ComboBox(input_panel, -1, value='red', choices=colors,
+                                               size=(100, -1), style=wx.CB_DROPDOWN)
 
         # REGIONAL/RESIDUAL SEPARATION CHECKBOX
         self.apply_sep_check = wx.CheckBox(input_panel, -1, "Apply regional/residual separation?")
@@ -1062,7 +1067,8 @@ class RegionalFieldDialog(wx.Dialog):
             obs_combo_label, self.obs_combo_list,
             poly_label, self.poly_slider,
             output_name_label, self.output_name_text,
-            output_color_label, self.output_color_combo,
+            regional_color_label, self.output_color_combo,
+            residual_color_label, self.residual_color_combo,
             self.apply_sep_check, (0, 0),
         ])
 
@@ -1081,6 +1087,7 @@ class RegionalFieldDialog(wx.Dialog):
         """VALIDATE AND STORE RESULTS, THEN CLOSE WITH OK"""
         self.output_name = self.output_name_text.GetValue().strip()
         self.output_color = self.output_color_combo.GetValue()
+        self.residual_color = self.residual_color_combo.GetValue()
         self.poly_order = self.poly_slider.GetValue()
         self.apply_separation = self.apply_sep_check.IsChecked()
 

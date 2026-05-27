@@ -3501,11 +3501,11 @@ class Gmg(wx.Frame):
                 residual_obs.id = int(self.observed_gravity_counter)
                 residual_obs.type = str('residual')
                 residual_obs.name = dlg.output_name + " residual"
-                residual_obs.color = dlg.output_color
+                residual_obs.color = dlg.residual_color
                 residual_obs.data = residual_data
                 residual_obs.mpl_actor = self.gravity_frame.scatter(
                     residual_data[:, 0], residual_data[:, 1],
-                    marker='o', color=dlg.output_color, s=5, gid=residual_obs.id)
+                    marker='o', color=dlg.residual_color, s=5, gid=residual_obs.id)
                 self.observed_gravity_list.append(residual_obs)
                 self.grav_submenu = wx.Menu()
                 self.m_obs_g_submenu.Append(11000 + residual_obs.id, residual_obs.name, self.grav_submenu)
@@ -3763,11 +3763,11 @@ class Gmg(wx.Frame):
                 residual_obs.id = int(self.observed_vgg_counter)
                 residual_obs.type = str('residual')
                 residual_obs.name = dlg.output_name + " residual"
-                residual_obs.color = dlg.output_color
+                residual_obs.color = dlg.residual_color
                 residual_obs.data = residual_data
                 residual_obs.mpl_actor = self.vertical_gg_frame.scatter(
                     residual_data[:, 0], residual_data[:, 1],
-                    marker='o', color=dlg.output_color, s=5, gid=residual_obs.id)
+                    marker='o', color=dlg.residual_color, s=5, gid=residual_obs.id)
                 self.observed_vgg_list.append(residual_obs)
                 self.vgg_submenu = wx.Menu()
                 self.m_obs_vgg_submenu.Append(15000 + residual_obs.id, residual_obs.name, self.vgg_submenu)
@@ -4020,11 +4020,11 @@ class Gmg(wx.Frame):
                 residual_obs.id = int(self.observed_magnetic_counter)
                 residual_obs.type = str('residual')
                 residual_obs.name = dlg.output_name + " residual"
-                residual_obs.color = dlg.output_color
+                residual_obs.color = dlg.residual_color
                 residual_obs.data = residual_data
                 residual_obs.mpl_actor = self.magnetic_frame.scatter(
                     residual_data[:, 0], residual_data[:, 1],
-                    marker='o', color=dlg.output_color, s=5, gid=residual_obs.id)
+                    marker='o', color=dlg.residual_color, s=5, gid=residual_obs.id)
                 self.observed_magnetic_list.append(residual_obs)
                 self.mag_submenu = wx.Menu()
                 self.m_obs_mag_submenu.Append(12000 + residual_obs.id, residual_obs.name, self.mag_submenu)
