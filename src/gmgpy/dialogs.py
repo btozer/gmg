@@ -1011,3 +1011,101 @@ class PlotFigureSettingsDialog(wx.Dialog):
 
     def on_close(self, event):
         self.EndModal(wx.ID_CANCEL)
+
+
+class RegionalFieldDialog(wx.Dialog):
+    """COMPUTE AND APPLY A POLYNOMIAL REGIONAL FIELD TO OBSERVED DATA"""
+
+    def __init__(self, parent, id, title, observed_list):
+        wx.Dialog.__init__(self, parent, id, "Generate Regional Field",
+                           style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        input_panel = wx.Panel(self, -1)
+
+        self.observed_list = observed_list
+
+        # INPUT DATA SELECTOR
+        obs_combo_label = wx.StaticText(input_panel, -1, "Input data:")
+        self.obs_combo_list = wx.ComboBox(input_panel, id=-1, value="", choices=[])
+        for obs in observed_list:
+            if obs is not None:
+                self.obs_combo_list.Append(obs.name)
+        if observed_list:
+            self.obs_combo_list.SetSelection(0)
+
+        # POLYNOMIAL ORDER SLIDER
+        poly_label = wx.StaticText(input_panel, -1, "Polynomial order:")
+        self.poly_slider = wx.Slider(input_panel, -1, value=2, minValue=1, maxValue=6,
+                                     size=(200, -1), style=wx.SL_HORIZONTAL | wx.SL_LABELS)
+
+        # OUTPUT NAME
+        output_name_label = wx.StaticText(input_panel, -1, "Output name:")
+        self.output_name_text = wx.TextCtrl(input_panel, -1, "regional")
+
+        # REGIONAL FIELD COLOR
+        colors = ['red', 'orange', 'yellow', 'green', 'blue', 'grey', 'white', 'black']
+        regional_color_label = wx.StaticText(input_panel, -1, "Regional field color:")
+        self.output_color_combo = wx.ComboBox(input_panel, -1, value='green', choices=colors,
+                                              size=(100, -1), style=wx.CB_DROPDOWN)
+
+        # RESIDUAL FIELD COLOR
+        residual_color_label = wx.StaticText(input_panel, -1, "Residual field color:")
+        self.residual_color_combo = wx.ComboBox(input_panel, -1, value='red', choices=colors,
+                                               size=(100, -1), style=wx.CB_DROPDOWN)
+
+        # REGIONAL/RESIDUAL SEPARATION CHECKBOX
+        self.apply_sep_check = wx.CheckBox(input_panel, -1, "Apply regional/residual separation?")
+
+        # BUTTONS
+        b_apply = wx.Button(input_panel, wx.ID_OK, "Apply")
+        b_cancel = wx.Button(input_panel, wx.ID_CANCEL, "Cancel")
+        self.Bind(wx.EVT_BUTTON, self.on_apply, b_apply)
+        self.Bind(wx.EVT_BUTTON, self.on_cancel, b_cancel)
+
+        # LAYOUT
+        grid_sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
+        grid_sizer.AddMany([
+            obs_combo_label, self.obs_combo_list,
+            poly_label, self.poly_slider,
+            output_name_label, self.output_name_text,
+            regional_color_label, self.output_color_combo,
+            residual_color_label, self.residual_color_combo,
+            self.apply_sep_check, (0, 0),
+        ])
+
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        btn_sizer.Add(b_apply, 0, wx.ALL, 5)
+        btn_sizer.Add(b_cancel, 0, wx.ALL, 5)
+
+        main_sizer = wx.BoxSizer(wx.VERTICAL)
+        main_sizer.Add(grid_sizer, 1, wx.ALL | wx.EXPAND, 10)
+        main_sizer.Add(btn_sizer, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
+
+        input_panel.SetSizerAndFit(main_sizer)
+        main_sizer.Fit(self)
+
+    def on_apply(self, event):
+        """VALIDATE AND STORE RESULTS, THEN CLOSE WITH OK"""
+        self.output_name = self.output_name_text.GetValue().strip()
+        self.output_color = self.output_color_combo.GetValue()
+        self.residual_color = self.residual_color_combo.GetValue()
+        self.poly_order = self.poly_slider.GetValue()
+        self.apply_separation = self.apply_sep_check.IsChecked()
+
+        selected_name = self.obs_combo_list.GetValue()
+        self.input_data = None
+        for obs in self.observed_list:
+            if obs is not None and obs.name == selected_name:
+                self.input_data = obs.data
+                break
+
+        if self.input_data is None:
+            wx.MessageBox("Please select an input dataset.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+        if not self.output_name:
+            wx.MessageBox("Please enter an output name.", "Error", wx.OK | wx.ICON_ERROR)
+            return
+
+        self.EndModal(wx.ID_OK)
+
+    def on_cancel(self, event):
+        self.EndModal(wx.ID_CANCEL)
