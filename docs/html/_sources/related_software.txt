@@ -3,7 +3,7 @@
 **Related software**
 ====================
 
-Software packages offering similar/related functionality included (but are by no means limited to)::
+Software packages offering similar/related functionality included (but are not limited to)::
 
     *HYPERMAG*
     

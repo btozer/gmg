@@ -1,24 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>3.0 Layer attributes &mdash; GMG: An open source geophysical modelling GUI</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5b801204" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=804ff984"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+      <script src="_static/doctools.js?v=454853ac"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -40,9 +39,6 @@
             
               <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -126,7 +122,7 @@
            <div itemprop="articleBody">
              
   <section id="layer-attributes">
-<h1><strong>3.0 Layer attributes</strong><a class="headerlink" href="#layer-attributes" title="Permalink to this heading"></a></h1>
+<h1><strong>3.0 Layer attributes</strong><a class="headerlink" href="#layer-attributes" title="Link to this heading"></a></h1>
 <p>Attributes refer to the physical properties assigned to a given model layer(polygon) and are used to calculate
 the predicted gravity and magnetic anomalies. Each layer contains five attributes:</p>
 <ul class="simple">
@@ -148,7 +144,7 @@ the modelled anomaly, be that gravity or magnetic.</p>
 Inclination and Declination.</p>
 </div>
 <section id="bulk-density">
-<h2>3.1 Bulk density<a class="headerlink" href="#bulk-density" title="Permalink to this heading"></a></h2>
+<h2>3.1 Bulk density<a class="headerlink" href="#bulk-density" title="Link to this heading"></a></h2>
 <p>Gravity modelling is achieved using bulk <strong>density contrasts</strong> relative to a <strong>reference density</strong>.</p>
 <p>Each layer requires:</p>
 <ol class="arabic simple">
@@ -162,7 +158,7 @@ determine the density contrast to use when calculating the gravity anomaly.
 For example, popular choices for a bulk crustal reference density are 2670, 2700 and 2800 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>
 depending on the particular geology in the region of interest. See Hinze et al., (2003) for more details regarding
 the choice of reference density.</p>
-<p>You can als use a different reference density for different layers. This is useful if you wish to model
+<p>You can also use a different reference density for different layers. This is useful if you wish to model
 crustal structure and relative to, for example, an upper crust of 2670 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>, lower crust
 2900 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> and upper mantle of 3330 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span>.</p>
 <p>To assign density values use the <em>Attribute Sidebar</em> or the <em>Attribute table</em>.</p>
@@ -189,7 +185,7 @@ the menubar navigate to:</p>
 </div>
 </section>
 <section id="magnetic-susceptibility">
-<h2>3.2 Magnetic Susceptibility<a class="headerlink" href="#magnetic-susceptibility" title="Permalink to this heading"></a></h2>
+<h2>3.2 Magnetic Susceptibility<a class="headerlink" href="#magnetic-susceptibility" title="Link to this heading"></a></h2>
 <p>Magnetic susceptibility, <span class="math notranslate nohighlight">\(k\)</span>, is related to the intensity of magnetisation, <span class="math notranslate nohighlight">\(J_{i}\)</span>, and the strength of the
 magnetising force, <span class="math notranslate nohighlight">\(H\)</span> by:</p>
 <div class="math notranslate nohighlight">
@@ -201,21 +197,21 @@ magnetising force, <span class="math notranslate nohighlight">\(H\)</span> by:</
 </div>
 </section>
 <section id="magnetisation-vector">
-<h2>3.3 Magnetisation Vector<a class="headerlink" href="#magnetisation-vector" title="Permalink to this heading"></a></h2>
+<h2>3.3 Magnetisation Vector<a class="headerlink" href="#magnetisation-vector" title="Link to this heading"></a></h2>
 <section id="angle-a">
-<h3>Angle A<a class="headerlink" href="#angle-a" title="Permalink to this heading"></a></h3>
+<h3>Angle A<a class="headerlink" href="#angle-a" title="Link to this heading"></a></h3>
 <p>For induced magnetisation, Angle A is equal to the inclination of Earth’s field. If magnetistion is remnant or a mix of
 remnant and induced, then the direction of magnetisation will likely differ from Earth’s inclination and Angle A must
 be  calculated outside of GMG.</p>
 </section>
 <section id="angle-b">
-<h3>Angle B<a class="headerlink" href="#angle-b" title="Permalink to this heading"></a></h3>
+<h3>Angle B<a class="headerlink" href="#angle-b" title="Link to this heading"></a></h3>
 <p>For induced magnetisation, Angle B is equal to the declination of Earth’s field. If magnetisation is remnant or a mix of
 remnant and induced, then the direction of magnetisation will likely differ from Earth’s declination and Angle B must
 be calculated outside of GMG.</p>
 </section>
 <section id="angle-c">
-<h3>Angle C<a class="headerlink" href="#angle-c" title="Permalink to this heading"></a></h3>
+<h3>Angle C<a class="headerlink" href="#angle-c" title="Link to this heading"></a></h3>
 <p><em>Angle C (Azimuth)</em> is the angle (in degrees) that the strike of the model profile with respect to geographic north
 (the angle is positive when measured clockwise). See <a class="reference internal" href="manual_magnetic_algorithm.html#magnetic-algorithm"><span class="std std-ref">A2</span></a> for further details.
 The strike of the polygon (geological feature/layer) is assumed to be orthogonal to the model profile. For example,
@@ -223,7 +219,7 @@ if the model is orientated West-East Angle C will equal 90.</p>
 </section>
 </section>
 <section id="remnant-magnetism">
-<h2>3.3 Remnant Magnetism<a class="headerlink" href="#remnant-magnetism" title="Permalink to this heading"></a></h2>
+<h2>3.3 Remnant Magnetism<a class="headerlink" href="#remnant-magnetism" title="Link to this heading"></a></h2>
 <p>Currently, modelling of remnant magnetism  is not explicitly included within GMG. THis could, however, be achieved using
 user defined combinations of Angles A, B and C.</p>
 </section>
@@ -240,8 +236,8 @@ user defined combinations of Angles A, B and C.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2024, B. Tozer.
-      <span class="lastupdated">Last updated on Jun 20, 2024.
+    <p>&#169; Copyright 2014-2026, B. Tozer.
+      <span class="lastupdated">Last updated on May 28, 2026.
       </span></p>
   </div>
 

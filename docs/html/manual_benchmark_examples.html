@@ -1,24 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>13.0 Benchmark tests &mdash; GMG: An open source geophysical modelling GUI</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5b801204" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=804ff984"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+      <script src="_static/doctools.js?v=454853ac"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -40,9 +39,6 @@
             
               <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -120,11 +116,11 @@
            <div itemprop="articleBody">
              
   <section id="benchmark-tests">
-<span id="manual-benchmark-examples"></span><h1><strong>13.0 Benchmark tests</strong><a class="headerlink" href="#benchmark-tests" title="Permalink to this heading"></a></h1>
+<span id="manual-benchmark-examples"></span><h1><strong>13.0 Benchmark tests</strong><a class="headerlink" href="#benchmark-tests" title="Link to this heading"></a></h1>
 <p>To test the potential field algorithms employed within gmg, two benchmark models are
 provided for comparison with the analytical solutions for simple two dimensional shapes.</p>
 <section id="gravity-modelling-benchmark-buried-cylinder">
-<h2>13.1 Gravity modelling benchmark: Buried cylinder<a class="headerlink" href="#gravity-modelling-benchmark-buried-cylinder" title="Permalink to this heading"></a></h2>
+<h2>13.1 Gravity modelling benchmark: Buried cylinder<a class="headerlink" href="#gravity-modelling-benchmark-buried-cylinder" title="Link to this heading"></a></h2>
 <p>Please see <a class="reference internal" href="manual_gravity_algorithm.html"><span class="doc">A1</span></a> for details regarding the 2D gravity anomaly algorithm
 used within gmg. The example shown in this description can be replicated by the user using
 the files stored in demos/GRAVITY:</p>
@@ -147,7 +143,7 @@ grav_cylinder_analytical_anomaly.xa
 and the calculation increment as 0.1 km.</p>
 <p><strong>Step 2: Load the observed gravity anomaly</strong></p>
 <p>Load the observed gravity anomaly. This was calculated using the analytical solution for a
-buried cylinder extending infinitely in the 3rd dimension given by, for example, Heiland (1940) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id4" title="C.A. Heiland. Geophysical Exploration. Geology series / edited by Norman E.A. Hinds. Prentice-Hall, Incorporated, 1940.">4</a>]</span> Pg. 153.</p>
+buried cylinder extending infinitely in the 3rd dimension given by, for example, Heiland (1940) <span class="bibtex-citation" id="id1">[<a class="reference internal" href="z_bibliography.html#id4" title="C.A. Heiland. Geophysical Exploration. Geology series / edited by Norman E.A. Hinds. Prentice-Hall, Incorporated, 1940.">4</a>]</span> Pg. 153.</p>
 <p>To load observed anomaly navigate to <em>Gravity</em> in the Menubar. Next, select <em>Load Gravity Anomaly</em>.
 Now, navigate to the file <em>grav_cylinder_analytical_anomaly.xa</em> and select it:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Gravity -&gt; Load Gravity Anomaly -&gt; Select file to load
@@ -155,7 +151,7 @@ Now, navigate to the file <em>grav_cylinder_analytical_anomaly.xa</em> and selec
 </div>
 <p>Finally, give your observed anomaly a name, for example, <em>observed_anom</em>.</p>
 <p><strong>Step 3: Load a discretised representation of a buried cylinder</strong></p>
-<p>Now, load a gmg layer representation of the buried cyclinder used to calculate the observed anomaly.</p>
+<p>Now, load a gmg layer representation of the buried cylinder used to calculate the observed anomaly.</p>
 <p>To load the layer, navigate to <em>Layers</em> in the Menubar. Next, select <em>Load Layer…</em>. Finally,
 navigate to the file <em>24_nodes_cylinder_layer.txt</em> and select it.</p>
 <p>The cylinder layer, consisting of 24 nodes, should appear in within your model.</p>
@@ -185,12 +181,12 @@ because we have added most of the mass missing from the
 cylinder discretised with only 24 nodes.</p>
 </section>
 <section id="magnetic-benchmark">
-<h2>13.2 Magnetic benchmark<a class="headerlink" href="#magnetic-benchmark" title="Permalink to this heading"></a></h2>
+<h2>13.2 Magnetic benchmark<a class="headerlink" href="#magnetic-benchmark" title="Link to this heading"></a></h2>
 <p>Please see <a class="reference internal" href="manual_magnetic_algorithm.html"><span class="doc">A2</span></a> for details regarding the 2D magnetic anomaly algorithm
 used within gmg.</p>
 <p>To benchmark the magnetic anomaly algorithm we can, similarly to as done above for the gravity algorithm, compare
 the anomaly produced by the algorithm with an analytical solution for a buried cylinder. In the case of a
-magnetic anomaly this solution is given by, for example, Sleep &amp; Fujita (1997) Pg. 223 eq. 6.45 <span id="id2">[<a class="reference internal" href="z_bibliography.html#id12" title="N.H. Sleep and K. Fujita. Principles of Modern Geophysics. Blackwell Science, 1997. ISBN 9780865420755. URL: https://books.google.co.nz/books?id=sZ5BkgEACAAJ.">8</a>]</span>.</p>
+magnetic anomaly this solution is given by, for example, Sleep &amp; Fujita (1997) Pg. 223 eq. 6.45 <span class="bibtex-citation" id="id2">[<a class="reference internal" href="z_bibliography.html#id12" title="N.H. Sleep and K. Fujita. Principles of Modern Geophysics. Blackwell Science, 1997. ISBN 9780865420755. URL: https://books.google.co.nz/books?id=sZ5BkgEACAAJ.">8</a>]</span>.</p>
 <div class="math notranslate nohighlight">
 \[\Delta T = f \kappa r^2 \frac{(x_{i}-x)^2 - z^2}{2((x_{i}-x)^2 + z^2)^2}\]</div>
 <p>where <span class="math notranslate nohighlight">\(\Delta T\)</span> is the magnetic anomaly, <span class="math notranslate nohighlight">\(r\)</span> is the radius of the cylinder,
@@ -241,7 +237,7 @@ We see now the RMS value decreases to 0.0002 nT. As with the gravity anomaly, th
 to the previous value, as we have added most of the mass missing from the cylinder discretised with only 24 nodes.</p>
 </section>
 <section id="summary">
-<h2>13.3 Summary<a class="headerlink" href="#summary" title="Permalink to this heading"></a></h2>
+<h2>13.3 Summary<a class="headerlink" href="#summary" title="Link to this heading"></a></h2>
 <p>These tests have demonstrated the accuracy of the 2D potential field algorithms employed within gmg. The RMS values
 calculated for the gravity and magnetic anomalies are very small for the 24 node discretisation and negligible
 for the 360 node case.</p>
@@ -271,8 +267,8 @@ is a key focus of future development.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2024, B. Tozer.
-      <span class="lastupdated">Last updated on Jun 20, 2024.
+    <p>&#169; Copyright 2014-2026, B. Tozer.
+      <span class="lastupdated">Last updated on May 28, 2026.
       </span></p>
   </div>
 

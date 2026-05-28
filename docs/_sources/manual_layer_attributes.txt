@@ -43,7 +43,7 @@ For example, popular choices for a bulk crustal reference density are 2670, 2700
 depending on the particular geology in the region of interest. See Hinze et al., (2003) for more details regarding
 the choice of reference density.
 
-You can als use a different reference density for different layers. This is useful if you wish to model
+You can also use a different reference density for different layers. This is useful if you wish to model
 crustal structure and relative to, for example, an upper crust of 2670 :math:`kg` :math:`m^{-3}`, lower crust
 2900 :math:`kg` :math:`m^{-3}` and upper mantle of 3330 :math:`kg` :math:`m^{-3}`.
 

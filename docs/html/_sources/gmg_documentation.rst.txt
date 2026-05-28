@@ -23,7 +23,7 @@ geophysical modeling tasks. Inspiration came from [Fatiando a Terra](https://www
 and [GMT](https://www.generic-mapping-tools.org/). It is anticipated that GMG will also be useful 
 for teaching purposes.
 
-GMG makes use of several other open-source python packages to preform various tasks including:
+GMG makes use of several other open-source python packages to perform various tasks including:
 
 * WxPython
 * Matplotlib
@@ -33,7 +33,7 @@ GMG makes use of several other open-source python packages to preform various ta
 
 (see `References <references.html>`_ for a detailed listing).
 
-**NB: GMG is in development. Some documentation is incomplete and some features may not work as expected. If you experience any issues, please feel free to raise these on the issue tracker.**
+**NB: GMG is in development. Some documentation is incomplete and some features may not work as expected. If you experience any issues, please raise these on the issue tracker.**
 
 Key features
 ------------
