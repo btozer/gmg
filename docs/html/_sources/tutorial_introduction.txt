@@ -11,7 +11,7 @@ It will guide you step-by-step through the process of importing and modeling an 
 We will be working with data related to the Weardale granite, which is located in the Northern Pennines of North England (see :numref:`location_map`). 
 Our goal is model the subsurface structure of this granite body and we will use the Bouguer gravity anomaly as our primary dataset. We will thereby recreate the study 
 conducted by British geophysicist Martin Bott in 1967 :cite:`bott1967`. In addition to the gravity anomaly, 
-we will also utilize other supporting datasets including the magnetic anomaly, a borehole record, geological information, and a *fictional* depth migrated 
+we will also use other supporting datasets including the magnetic anomaly, a borehole record, geological information, and a *fictional* depth migrated 
 seismic reflection horizon. These auxiliary datasets will help us better constrain the subsurface model and demonstrate how they can be integrated 
 within the GMG modeling environment.
 
@@ -42,7 +42,7 @@ The tutorial will guide you through the following steps::
 
    8.  Running forward model calculations to predict gravity, vertical gravity gradient, and magnetic anomalies.
 
-   9.  Utilizing the GMG interface to conduct forward modeling of gravity and magnetic anomalies.
+   9.  Using the GMG interface to conduct forward modeling of gravity and magnetic anomalies.
 
    10. Saving the predicted anomaly profiles as external text files.
 

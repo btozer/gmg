@@ -27,7 +27,7 @@ Once you have downloaded the directory SEAM_Interpretation_Challenge_1_Depth/ mo
 
 Now, to plot a profile with GMG lets extract a 2D profile from the 3D volume using an ObsPy routine.
 
-A script is provided with this tutorial to preform the extraction of a profile at Y-location 24 km. This profile passes
+A script is provided with this tutorial to perform the extraction of a profile at Y-location 24 km. This profile passes
 through a borehole location that can also be loaded into GMG for aiding interpretation.
 
 To run the profile extraction follow these commands::

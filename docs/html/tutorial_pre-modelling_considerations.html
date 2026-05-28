@@ -1,24 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>2.0 Pre-modelling data processing and considerations &mdash; GMG: An open source geophysical modelling GUI</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5b801204" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=804ff984"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+      <script src="_static/doctools.js?v=454853ac"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -40,9 +39,6 @@
             
               <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -111,7 +107,7 @@
            <div itemprop="articleBody">
              
   <section id="pre-modelling-data-processing-and-considerations">
-<span id="pre-modelling-considerations"></span><h1><strong>2.0 Pre-modelling data processing and considerations</strong><a class="headerlink" href="#pre-modelling-data-processing-and-considerations" title="Permalink to this heading"></a></h1>
+<span id="pre-modelling-considerations"></span><h1><strong>2.0 Pre-modelling data processing and considerations</strong><a class="headerlink" href="#pre-modelling-data-processing-and-considerations" title="Link to this heading"></a></h1>
 <p>As we are interested in modelling the structure of the Weardale granite, there are some important pre-modelling steps that
 we need to consider prior to forward modelling the gravity and magnetic anomalies. These relate to how we deal with
 other factors (other than the granite) that are contributing to the observed total field anomalies.</p>
@@ -124,31 +120,33 @@ with near-surface features.</p>
 will aid in generating a more accurate model.</p>
 </section>
 <section id="gravity-anomaly-regional-residual-separation">
-<h1><em>2.1 Gravity anomaly: regional/residual separation</em><a class="headerlink" href="#gravity-anomaly-regional-residual-separation" title="Permalink to this heading"></a></h1>
+<h1><em>2.1 Gravity anomaly: regional/residual separation</em><a class="headerlink" href="#gravity-anomaly-regional-residual-separation" title="Link to this heading"></a></h1>
 <p>There are several different strategies for calculating regional anomalies. In this case, we will use the regional gravity field
-as determined by <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 10</span></a>. As can be seen in this figure, there is a long
+as determined by <span class="bibtex-citation" id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> as shown in <a class="reference internal" href="#regional-gravity-map"><span class="std std-numref">Figure 10</span></a>. As can be seen in this figure, there is a long
 wavelength positive anomaly in this region with amplitudes ranging <span class="math notranslate nohighlight">\(\sim\)</span> <span class="math notranslate nohighlight">\(14-21\)</span> <span class="math notranslate nohighlight">\(mGal\)</span>.</p>
 <p>We will simply subtract this long wavelength component from the total anomaly, to produce the residual Bouguer anomaly as shown
 in <a class="reference internal" href="#residual-gravity-map"><span class="std std-numref">Figure 11</span></a>. We will model this residual signal to estimate the subsurface structure of the Weardale granite.</p>
 <figure class="align-default" id="regional-gravity-map">
-<a class="reference internal image-reference" href="_images/regional_anomaly.png"><img alt="_images/regional_anomaly.png" src="_images/regional_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<a class="reference internal image-reference" href="_images/regional_anomaly.png"><img alt="_images/regional_anomaly.png" height="526" src="_images/regional_anomaly.png" width="706" />
+</a>
 <figcaption>
-<p><span class="caption-number">Figure 10 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies (as published by <span id="id2">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>).
+<p><span class="caption-number">Figure 10 </span><span class="caption-text">Regional gravity anomaly related to long wavelength density anomalies (as published by <span class="bibtex-citation" id="id2">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>).
 Note, the regional felid is positive, whereas the Waredale granite is expected to produce a negative
-anomaly relative to the surrounding basement rock.</span><a class="headerlink" href="#regional-gravity-map" title="Permalink to this image"></a></p>
+anomaly relative to the surrounding basement rock.</span><a class="headerlink" href="#regional-gravity-map" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-default" id="residual-gravity-map">
-<a class="reference internal image-reference" href="_images/residual_bouguer_anomaly.png"><img alt="_images/residual_bouguer_anomaly.png" src="_images/residual_bouguer_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<a class="reference internal image-reference" href="_images/residual_bouguer_anomaly.png"><img alt="_images/residual_bouguer_anomaly.png" height="526" src="_images/residual_bouguer_anomaly.png" width="706" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 11 </span><span class="caption-text">Residual gravity anomaly derived by subtracting the regional anomaly from the total. This reflects the
 anomaly caused by upper crustal features (i.e., the Weardale granite). Note, the central low (related to the
-granite) now has a larger amplitude.</span><a class="headerlink" href="#residual-gravity-map" title="Permalink to this image"></a></p>
+granite) now has a larger amplitude.</span><a class="headerlink" href="#residual-gravity-map" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="magnetic-anomaly-reduction-to-the-pole">
-<h1><em>2.2 Magnetic anomaly: Reduction To the Pole</em><a class="headerlink" href="#magnetic-anomaly-reduction-to-the-pole" title="Permalink to this heading"></a></h1>
+<h1><em>2.2 Magnetic anomaly: Reduction To the Pole</em><a class="headerlink" href="#magnetic-anomaly-reduction-to-the-pole" title="Link to this heading"></a></h1>
 <p>In order to model the magnetic anomaly, we’ll apply   a Reduction To the
 Pole (RTP) operation on the grid. We do this to simplify the interpretation of the anomaly as
 the resulting anomaly appears as if it were observed at the geomagnetic pole, such that,
@@ -161,15 +159,16 @@ latitude decreases. Here, we assume the magnetic sources share the same inclinat
 processing recipe can be found in the docs/ directory.</p>
 </div>
 <figure class="align-default" id="magnetic-map-rtp">
-<a class="reference internal image-reference" href="_images/rtp_magnetic_anomaly.png"><img alt="_images/rtp_magnetic_anomaly.png" src="_images/rtp_magnetic_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<a class="reference internal image-reference" href="_images/rtp_magnetic_anomaly.png"><img alt="_images/rtp_magnetic_anomaly.png" height="526" src="_images/rtp_magnetic_anomaly.png" width="706" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 12 </span><span class="caption-text">Reduced To Pole magnetic anomaly. The reduction is calculated using the 1964 (when the survey was acquired)
-inclination and declination of <span class="math notranslate nohighlight">\(9.1\)</span> degrees, and a magnetic declination of <span class="math notranslate nohighlight">\(68.6\)</span> degrees.</span><a class="headerlink" href="#magnetic-map-rtp" title="Permalink to this image"></a></p>
+inclination and declination of <span class="math notranslate nohighlight">\(9.1\)</span> degrees, and a magnetic declination of <span class="math notranslate nohighlight">\(68.6\)</span> degrees.</span><a class="headerlink" href="#magnetic-map-rtp" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="regional-residual-separation">
-<h1><em>2.3 Regional/Residual Separation</em><a class="headerlink" href="#regional-residual-separation" title="Permalink to this heading"></a></h1>
+<h1><em>2.3 Regional/Residual Separation</em><a class="headerlink" href="#regional-residual-separation" title="Link to this heading"></a></h1>
 <p>Similarly to the gravity grid, we will also perform a regional-residual separation to extract a
 long wavelength regional field. We then remove regional field from the total field to produce a
 residual anomaly that reflects near surface sources.</p>
@@ -178,17 +177,19 @@ transfer the observation elevation from 305 m (the aeromagnetic survey flight he
 This attenuates short wavelengths signals (generated by relatively shallower sources), with the
 longer wavelength regional field remaining.</p>
 <figure class="align-default" id="regional-magnetic-map">
-<a class="reference internal image-reference" href="_images/rtp_regional_magnetic_anomaly.png"><img alt="_images/rtp_regional_magnetic_anomaly.png" src="_images/rtp_regional_magnetic_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<a class="reference internal image-reference" href="_images/rtp_regional_magnetic_anomaly.png"><img alt="_images/rtp_regional_magnetic_anomaly.png" height="526" src="_images/rtp_regional_magnetic_anomaly.png" width="706" />
+</a>
 <figcaption>
-<p><span class="caption-number">Figure 13 </span><span class="caption-text">Regional magnetic anomaly derived by upward continuing the observed anomaly to 2700 m.</span><a class="headerlink" href="#regional-magnetic-map" title="Permalink to this image"></a></p>
+<p><span class="caption-number">Figure 13 </span><span class="caption-text">Regional magnetic anomaly derived by upward continuing the observed anomaly to 2700 m.</span><a class="headerlink" href="#regional-magnetic-map" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-default" id="residual-magnetic-map">
-<a class="reference internal image-reference" href="_images/rtp_residual_magnetic_anomaly.png"><img alt="_images/rtp_residual_magnetic_anomaly.png" src="_images/rtp_residual_magnetic_anomaly.png" style="width: 706.0px; height: 526.0px;" /></a>
+<a class="reference internal image-reference" href="_images/rtp_residual_magnetic_anomaly.png"><img alt="_images/rtp_residual_magnetic_anomaly.png" height="526" src="_images/rtp_residual_magnetic_anomaly.png" width="706" />
+</a>
 <figcaption>
 <p><span class="caption-number">Figure 14 </span><span class="caption-text">Residual RTP anomaly derived by subtracting the regional anomaly from the Reduced
 To Pole anomaly. Note, this grid reveals many linear anomalies, related to fault traces,
-mineral veins, dykes and sills (<span id="id3">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>).</span><a class="headerlink" href="#residual-magnetic-map" title="Permalink to this image"></a></p>
+mineral veins, dykes and sills (<span class="bibtex-citation" id="id3">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span>).</span><a class="headerlink" href="#residual-magnetic-map" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -204,8 +205,8 @@ mineral veins, dykes and sills (<span id="id3">[<a class="reference internal" hr
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2024, B. Tozer.
-      <span class="lastupdated">Last updated on Jun 20, 2024.
+    <p>&#169; Copyright 2014-2026, B. Tozer.
+      <span class="lastupdated">Last updated on May 28, 2026.
       </span></p>
   </div>
 

@@ -1,24 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>9.0 Setting layer attributes &mdash; GMG: An open source geophysical modelling GUI</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="_static/js/html5shiv.min.js"></script>
-  <![endif]-->
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5b801204" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
-        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      <script src="_static/jquery.js?v=804ff984"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=29a6c3e3"></script>
+      <script src="_static/doctools.js?v=454853ac"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -40,9 +39,6 @@
             
               <img src="_static/gmg_icon.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                0.0.1
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -111,15 +107,15 @@
            <div itemprop="articleBody">
              
   <section id="setting-layer-attributes">
-<h1><strong>9.0 Setting layer attributes</strong><a class="headerlink" href="#setting-layer-attributes" title="Permalink to this heading"></a></h1>
+<h1><strong>9.0 Setting layer attributes</strong><a class="headerlink" href="#setting-layer-attributes" title="Link to this heading"></a></h1>
 <p>Now that we have created a new floating layer to represent the Weardale granite, lets assign it a bulk density so that
 we can model its gravity effect. We will also assign a <code class="docutils literal notranslate"><span class="pre">background</span> <span class="pre">density</span></code> used to represent the surrounding basement
 rock. The difference between these two values represents the <code class="docutils literal notranslate"><span class="pre">density</span> <span class="pre">contrast</span></code> used for calculating the gravity
 effect of the granite.</p>
-<p>Kimbell et al., (2011) <span id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> suggest that 2780 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> is a reasonable bulk density for the
+<p>Kimbell et al., (2011) <span class="bibtex-citation" id="id1">[<a class="reference internal" href="z_bibliography.html#id9" title="G. S. Kimbell, B. Young, D. Millward, and Q. G. Crowley. The North Pennine batholith (Weardale Granite) of northern England: new data on its age and form. Proceedings of the Yorkshire Geological Society, 58(2):107–128, 2011. doi:10.1144/pygs.58.1.273.">6</a>]</span> suggest that 2780 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> is a reasonable bulk density for the
 Lower Palaeozoic rocks of the <cite>Alston Block</cite>, within which the Weardale granite was emplaced. While measurements made
 on rock fragments of the granite itself, recovered from the Rookhope borehole, suggest its bulk density is close to
-2630 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> (Bott, 1967) <span id="id2">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>.</p>
+2630 <span class="math notranslate nohighlight">\(kg\)</span> <span class="math notranslate nohighlight">\(m^{-3}\)</span> (Bott, 1967) <span class="bibtex-citation" id="id2">[<a class="reference internal" href="z_bibliography.html#id10" title="M. H. P. Bott. Geophysical investigations of the northern pennine basement rocks. Proceedings of the Yorkshire Geological Society, 36(9):139–168, 1967.">2</a>]</span>.</p>
 <p>Lets use these values to begin our modelling. To set the bulk density of the granite:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>First, select the ``Weardale`` layer under the menu by double clicking on its name. We can now set the bulk density
 and reference density values under the ``Layer Attributes`` top left control panel. Once you have assigned the
@@ -144,8 +140,8 @@ and <span class="math notranslate nohighlight">\(2.63\)</span> respectively.</p>
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2014-2024, B. Tozer.
-      <span class="lastupdated">Last updated on Jun 20, 2024.
+    <p>&#169; Copyright 2014-2026, B. Tozer.
+      <span class="lastupdated">Last updated on May 28, 2026.
       </span></p>
   </div>
 

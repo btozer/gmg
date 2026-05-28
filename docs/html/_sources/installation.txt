@@ -15,7 +15,7 @@ Installation
 
 **Step 1: Install Miniforge**
 
-If you don't aleady use miniforge or anaconda for managing and installing python packages, then 
+If you don't already use miniforge or anaconda for managing and installing python packages, then 
 the simplest way to install gmg is to first install Miniforge (a minimal installer for `Conda <http://docs.conda.io/en/latest/>`_
 specifically for `conda-forge <http://conda-forge.org>`_).
 
