@@ -8,7 +8,7 @@ Magnetic anomalies are calculated using a python implementation of Talwani and H
 algorithm for two-dimensional uniformly magnetised bodies. This employs a similar procedure to that
 described in Section :ref:`A1 <manual_gravity_algorithm>` for calculating two-dimensional gravity anomalies
 by treating a body as an n-sided polygon, solving the anomaly for each side and summing the result.
-However, in the case of magnetic anomalies, there is added complexity owing to the fact that a given
+However, in the case of magnetic anomalies, there is added complexity because a given
 bodies magnetisation vector is, for the case of induced magnetisation, dependent on the inclination,
 delineation and magnitude of the inducing magnetic field (i.e., Earth's magnetic field). Moreover, if
 the body has retained a remanent magnetisation, then the magnetisation vector may vary from that of the

@@ -80,4 +80,4 @@ See, for example, Kearey et al., (2002) Pgs. 141-142 for more information.
     The Filter Length parameter determines the length of the preconditioning median filter. 
     By default, this value is set to 1, treating the input data in its raw state. Increasing this value 
     applies smoothing to the data before calculating the gradient, which can be beneficial for noisy data.
-    NB. This value must be an odd number.    
+    NB. This value must be an odd number.

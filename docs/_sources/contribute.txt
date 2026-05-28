@@ -16,7 +16,7 @@ There are several ways you can contribute to the project:
 
 2. **Bug Reports**: If you encounter a bug while using the software, please report it. Be sure to include all relevant details and steps to reproduce the issue.
 
-3. **Code Contributions**: Please feel free to modify GMG in anyway you wish, be that optimising existing code, fixing bugs, or adding new features.
+3. **Code Contributions**: Feel free to modify GMG in any way you wish, be that optimising existing code, fixing bugs, or adding new features.
 
 4. **Feature Requests**: If you have ideas for new features or improvements, share them by submitting a feature request. Provide a clear description of the proposed feature and its potential benefits.
 
@@ -53,7 +53,7 @@ Fill out the pull request template with details about your contribution.
 
 **Communication**
 
-Please feel free to reach out by opening an issue on the project's GitHub repository if you have any questions or need assistance.
+Feel free to reach out by opening an issue on the project's GitHub repository if you have any questions or need assistance.
 
 **Acknowledgment**
 

@@ -67,7 +67,7 @@ gmg models are saved as *Pickle* files and must have a ".model" suffix, for exam
 
     ...etc
 
-This will ensure you can revert back to previous models if you "corrupt" your current model, or it becomes a "dead end".
+This will ensure you can revert to previous models if you "corrupt" your current model, or it becomes a "dead end".
 
 -------------------
 1.3 Loading a Model

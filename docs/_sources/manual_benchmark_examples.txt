@@ -45,7 +45,7 @@ Finally, give your observed anomaly a name, for example, *observed_anom*.
 
 **Step 3: Load a discretised representation of a buried cylinder**
 
-Now, load a gmg layer representation of the buried cyclinder used to calculate the observed anomaly.
+Now, load a gmg layer representation of the buried cylinder used to calculate the observed anomaly.
 
 To load the layer, navigate to *Layers* in the Menubar. Next, select *Load Layer...*. Finally,
 navigate to the file *24_nodes_cylinder_layer.txt* and select it.
