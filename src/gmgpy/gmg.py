@@ -2501,11 +2501,9 @@ class Gmg(wx.Frame):
 
     def undo(self, event): 
         if self.model_state_count == 0:
-            self.revent_to = 18
-        elif self.model_state_count == 1:
-            self.revent_to = 19
-        else:
-            self.revent_to = self.model_state_count-2
+            return
+        self.model_state_count -= 1
+        self.revent_to = self.model_state_count
 
         # REMVOE CURRENTLY ACTIVE LAYER DRAWING FROM MODEL FRAME
         self.currently_active_layer.set_visible(False)        
@@ -4862,6 +4860,9 @@ class Gmg(wx.Frame):
             if self.index_node is None:
                 return
 
+            # SAVE STATE BEFORE ANY DRAG MODIFICATION BEGINS
+            self.store_model_state()
+
             # CHECK if the 'p' KEY IS ON (I.E. IN PINCH MODE)
             if self.pinch_switch is True:
                 # SET THE FIRST NODE CLICKED AS NODE 1
@@ -4941,6 +4942,9 @@ class Gmg(wx.Frame):
             self.selected_node = self.get_fault_node_under_point(event)
             if self.selected_node is None:
                 return
+
+            # SAVE STATE BEFORE ANY DRAG MODIFICATION BEGINS
+            self.store_model_state()
 
             # GET CURRENT X AND Y COORDS
             xyt = self.currently_active_fault.get_xydata()
@@ -5115,7 +5119,6 @@ class Gmg(wx.Frame):
         """WHAT HAPPENS WHEN THE LEFT MOUSE BUTTON IS RELEASED"""
         if self.canvas.toolbar.mode.name == 'PAN' or self.canvas.toolbar.mode.name == 'ZOOM':
             return
-        self.store_model_state()
         if event.inaxes is None:
             # CLICK WAS OUTSIDE THE MODEL FRAME
             return
