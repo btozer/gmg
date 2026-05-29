@@ -5314,8 +5314,8 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id = 0
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
                 self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
                 self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
@@ -5340,8 +5340,8 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id += 1
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
                 self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
                 self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
@@ -5359,6 +5359,9 @@ class Gmg(wx.Frame):
                 self.update_layer_data()
                 self.run_algorithms()
 
+            # UPDATE MODEL FRAME
+            self.draw()
+
         # < = MOVE TO NEXT LAYER
         if event.key == ',':
             if self.currently_active_layer_id == 0:
@@ -5369,8 +5372,8 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id = self.total_layer_count
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
                 self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
                 self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
@@ -5394,8 +5397,8 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id -= 1
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(self.layer_list[self.currently_active_layer_id].reference_density)
+                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
+                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
                 self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
                 self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
                 self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
