@@ -4052,9 +4052,13 @@ class Gmg(wx.Frame):
         new_derivative.color = horizontal_derivative_box.output_color
         new_derivative.id = 12000 + self.observed_magnetic_counter
         new_derivative.type = str('derivative')
-        new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
-                                                                 marker='o', color=new_derivative.color, s=5,
-                                                                 gid=12000 + self.observed_magnetic_counter)
+        if self.magnetic_d_frame is not None:
+            new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                                     marker='o', color=new_derivative.color, s=5,
+                                                                     gid=12000 + self.observed_magnetic_counter)
+        else:
+            new_derivative.mpl_actor = None
+            wx.MessageBox("Magnetic frame is closed. Cannot plot horizontal derivative.", "Warning", wx.OK | wx.ICON_WARNING)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_magnetic_list.append(new_derivative)
@@ -6494,6 +6498,9 @@ class Gmg(wx.Frame):
     # LIVE GRAPHICS UPDATES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def update_layer_data(self):
+        # Always show grid lines on model frame
+        self.model_frame.grid(True)
+        # ...existing code...
         """UPDATE PROGRAM GRAPHICS AFTER A CHANGE IS MADE - A.K.A REDRAW EVERYTHING"""
 
         # UPDATE FRAME LIMITS
@@ -6613,8 +6620,11 @@ class Gmg(wx.Frame):
 
         # DRAW CANVAS FEATURES
         self.model_frame.set_aspect(self.model_aspect)
-        self.grav_frame_aspect = ((self.gravity_frame.get_xlim()[1] - self.gravity_frame.get_xlim()[0]) /
-                                  (self.gravity_frame.get_ylim()[1] - self.gravity_frame.get_ylim()[0]))
+        if self.gravity_frame is not None:
+            self.grav_frame_aspect = ((self.gravity_frame.get_xlim()[1] - self.gravity_frame.get_xlim()[0]) /
+                                      (self.gravity_frame.get_ylim()[1] - self.gravity_frame.get_ylim()[0]))
+        else:
+            self.grav_frame_aspect = None
         # UPDATE INFO
         self.display_info()
 
