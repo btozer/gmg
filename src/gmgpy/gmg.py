@@ -956,7 +956,7 @@ class Gmg(wx.Frame):
 
         # INITIALISE FAULT ATTRIBUTES
         self.fault_list = []
-        self.currently_actives_fault_id = 0
+        self.currently_active_fault_id = 0
         self.total_fault_count = 0
         self.fault_picking_switch = False
         self.select_new_fault_nodes = False
@@ -1166,6 +1166,11 @@ class Gmg(wx.Frame):
 
             # SET THE CURRENTLY ACTIVE RED NODE
             self.current_node = self.model_frame.scatter(-100000., -100000., s=50, color='r', zorder=10)  # PLACE HOLDER ONLY
+
+            # ACTIVE FAULT OVERLAY USED BY FAULT PICKING/EDITING
+            self.currently_active_fault, = self.model_frame.plot(
+                [-100000., -100000.], [-100000., -100000.], marker='s',
+                color='green', linewidth=0.75, alpha=1.0, zorder=2, picker=True)
 
             self.layer_list.append(layer0)
 
@@ -2244,10 +2249,12 @@ class Gmg(wx.Frame):
 
     def full_extent_adjustment(self):
         """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
-        if not self.topography_frame.get_visible():
-            self.topography_frame.set_visible(True)
-        if not self.gravity_frame.get_visible():
-            self.gravity_frame.set_visible(True)
+        if self.topography_frame is not None:
+            if not self.topography_frame.get_visible():
+                self.topography_frame.set_visible(True)
+        if self.gravity_frame is not None:
+            if not self.gravity_frame.get_visible():
+                self.gravity_frame.set_visible(True)
         if not self.vertical_gg_frame.get_visible():
             self.vertical_gg_frame.set_visible(True)    
         if not self.magnetic_frame.get_visible():
@@ -3527,6 +3534,9 @@ class Gmg(wx.Frame):
         answer = horizontal_derivative_box.ShowModal()
 
         # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        if not hasattr(horizontal_derivative_box, 'deriv'):
+            wx.MessageBox("No horizontal derivative calculated. Please click 'Calculate' in the dialog.", "Warning", wx.OK | wx.ICON_WARNING)
+            return
         new_derivative = ObservedData()
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
@@ -3789,6 +3799,9 @@ class Gmg(wx.Frame):
         answer = horizontal_derivative_box.ShowModal()
 
         # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        if not hasattr(horizontal_derivative_box, 'deriv'):
+            wx.MessageBox("No horizontal derivative calculated. Please click 'Calculate' in the dialog.", "Warning", wx.OK | wx.ICON_WARNING)
+            return
         new_derivative = ObservedData()
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
@@ -4046,6 +4059,9 @@ class Gmg(wx.Frame):
         answer = horizontal_derivative_box.ShowModal()
 
         # CREATE NEW DATA OBJECT AND PARSE OUTPUT TO THE OBJECT
+        if not hasattr(horizontal_derivative_box, 'deriv'):
+            wx.MessageBox("No horizontal derivative calculated. Please click 'Calculate' in the dialog.", "Warning", wx.OK | wx.ICON_WARNING)
+            return
         new_derivative = ObservedData()
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
@@ -6228,6 +6244,7 @@ class Gmg(wx.Frame):
 
             self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
             self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
+            self.current_node.set_offsets([self.xt[0], self.yt[0]])
 
         '> = INCREMENT WHICH FAULT IS BEING EDITED'
         if event.key == '.':
@@ -6244,6 +6261,7 @@ class Gmg(wx.Frame):
 
             self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
             self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
+            self.current_node.set_offsets([self.xt[0], self.yt[0]])
 
         # UPDATE GMG
         self.update_layer_data()
@@ -6265,6 +6283,7 @@ class Gmg(wx.Frame):
                                              self.fault_list[self.currently_active_fault_id].y_nodes)
         self.xt = self.fault_list[self.currently_active_fault_id].x_nodes
         self.yt = self.fault_list[self.currently_active_fault_id].y_nodes
+        self.current_node.set_offsets([self.xt[0], self.yt[0]])
 
         # UPDATE GRAPHICS WITH CURRENT FAULT SELECTED
         self.update_layer_data()
