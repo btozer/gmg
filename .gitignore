@@ -26,7 +26,7 @@ build_pip.sh
 gmt.history
 gmg.yml
 
-.DS_STORE
-/src/.DS_STORE
+# macOS Finder metadata.
+.DS_Store
 
 /src/gmgpy/gmg.spec
