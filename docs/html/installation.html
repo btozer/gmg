@@ -177,27 +177,25 @@ you do not create any dependencies issues that may arise if you install system-w
 <section id="run-optional-tests">
 <h2>3. Run optional tests<a class="headerlink" href="#run-optional-tests" title="Link to this heading"></a></h2>
 <p>Once the installation is compete you can check that the gmg potential field algorithms
-are working correctly by running the test suite. Open a terminal and navigate to the directory
-where gmg has been installed e.g.:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>cd **/miniforge3/envs/gmg/lib/python*.*/site-packages/gmgpy
-</pre></div>
-</div>
-<p>Then, simply type:</p>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>gmgpy test
+are working correctly by running the test suite. These tests verify the gravity, magnetic
+and vertical gravity gradient algorithms against the analytical solutions for a 2D
+infinite horizontal cylinder.</p>
+<p>Make sure you are using a terminal with your gmgpy environment active
+(i.e., conda activate gmgpy), then, from any directory, type:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pytest --pyargs gmgpy.tests
 </pre></div>
 </div>
 <p>This should return a message similar to the following:</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>========================== test session starts =========================
-platform darwin -- Python 3.8.6, pytest-8.2.1, pluggy-1.5.0
-rootdir: /**/**/miniforge3/envs/gmg/lib/python*.*/site-packages/gmgpy
-plugins: cov-5.0.0, typeguard-2.13.3
+platform darwin -- Python 3.11.6, pytest-8.2.1, pluggy-1.5.0
+rootdir: /**/**
 collected 3 items
 
-tests/test_01_bott_gravity.py .                                 [ 33%]
-tests/test_02_talwani_magnetic.py .                             [ 66%]
-tests/test_03_kim_and_wessel.py .                               [100%]
+**/site-packages/gmgpy/tests/test_01_bott_gravity.py .          [ 33%]
+**/site-packages/gmgpy/tests/test_02_talwani_magnetic.py .      [ 66%]
+**/site-packages/gmgpy/tests/test_03_kim_and_wessel.py .        [100%]
 
-========================== 3 passed in 0.48s ==========================
+========================== 3 passed in 0.27s ==========================
 </pre></div>
 </div>
 <p>The software can then be more fully tested by following the instructions in
@@ -217,7 +215,7 @@ tests/test_03_kim_and_wessel.py .                               [100%]
 
   <div role="contentinfo">
     <p>&#169; Copyright 2014-2026, B. Tozer.
-      <span class="lastupdated">Last updated on May 28, 2026.
+      <span class="lastupdated">Last updated on Aug 14, 2026.
       </span></p>
   </div>
 
