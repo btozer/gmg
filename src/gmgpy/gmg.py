@@ -1337,7 +1337,7 @@ class Gmg(wx.Frame):
         # Dynamic tick/label size proportional to the pixel height of each data panel.
         # Each data panel occupies 3 of the 26 subplot rows.
         panel_h_px = 0.94 * fig_h_px * (3.0 / 26.0)
-        labelsize = max(3, min(5, int(panel_h_px / 10)))
+        labelsize = max(6, min(10, int(panel_h_px / 6)))
 
         # The subplot grid uses x_orig=10 out of 100 columns, so the actual axes left
         # edge in figure coords = left + (right - left) * x_orig/100.
@@ -1608,7 +1608,7 @@ class Gmg(wx.Frame):
         # TOPO CANVAS
         self.topography_frame = plt.subplot2grid((26, 100), (0, self.x_orig), 
                                            rowspan=span_size, colspan=self.columns)
-        self.topography_frame.set_ylabel("(m)")
+        self.topography_frame.set_ylabel("T (km)")
         self.topography_frame.xaxis.set_major_formatter(plt.NullFormatter())
         self.topography_frame.grid()
         self.topography_frame.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
@@ -2255,10 +2255,12 @@ class Gmg(wx.Frame):
         if self.gravity_frame is not None:
             if not self.gravity_frame.get_visible():
                 self.gravity_frame.set_visible(True)
-        if not self.vertical_gg_frame.get_visible():
-            self.vertical_gg_frame.set_visible(True)    
-        if not self.magnetic_frame.get_visible():
-            self.magnetic_frame.set_visible(True)
+        if self.vertical_gg_frame is not None:
+            if not self.vertical_gg_frame.get_visible():
+                self.vertical_gg_frame.set_visible(True)
+        if self.magnetic_frame is not None:
+            if not self.magnetic_frame.get_visible():
+                self.magnetic_frame.set_visible(True)
 
         'SET CANVAS LIMITS'
         self.model_frame.set_xlim(self.x1, self.x2)
@@ -2273,16 +2275,6 @@ class Gmg(wx.Frame):
         if self.magnetic_frame is not None:
             self.magnetic_frame.set_xlim(self.model_frame.get_xlim())
         self._recalc_layout()
-
-        'ADJUST FRAME SIZING AND SET PROGRAM WINDOW'
-        if self.topography_frame is False:
-            self.topography_frame.set_visible(False)
-        if self.gravity_frame is False:
-            self.gravity_frame.set_visible(False)
-        if self.vertical_gg_frame is False:
-            self.vertical_gg_frame.set_visible(False)
-        if self.magnetic_frame is False:
-            self.magnetic_frame.set_visible(False)
 
     def pan(self, event):
         """PAN MODEL VIEW USING MOUSE DRAG"""
@@ -6532,7 +6524,7 @@ class Gmg(wx.Frame):
             self.gravity_d_frame.set_xlim(xmin, xmax)
         if self.vertical_gg_frame:
             self.vertical_gg_frame.set_xlim(xmin, xmax)
-            self.vertical_gg_frame.set_xlim(xmin, xmax)
+            self.vertical_gg_d_frame.set_xlim(xmin, xmax)
         if self.magnetic_frame:
             self.magnetic_frame.set_xlim(xmin, xmax)
             self.magnetic_d_frame.set_xlim(xmin, xmax)
