@@ -1,42 +1,51 @@
-from gmgpy import kim_and_wessel
-from gmgpy.polygon import Polygon
+"""
+Benchmark the Kim & Wessel (2016) vertical gravity gradient (VGG) algorithm
+against the analytical solution for a 2D infinite horizontal cylinder.
+
+The VGG is the vertical derivative of the gravity anomaly used in
+test_01_bott_gravity.py, in the z -> **DOWN** sense, so it is positive directly
+above a body of positive density contrast.
+
+**references**
+
+Analytical solution for buried cylinder: Garland (1965) Pg. 70
+"""
 import numpy as np
 
-def get_circle_points(r, x, z, N):
+from gmgpy import bott, kim_and_wessel
+from gmgpy.polygon import Polygon
+
+DENSITY_CONTRAST = 250.0  # kg/m^3
+
+# SEE test_01_bott_gravity.py FOR WHY BOTH A RELATIVE AND AN ABSOLUTE TERM ARE USED
+RTOL = 1.0e-3
+
+
+def analytical_vgg(xp, cylinder, density_contrast):
     """
-    :param r: float : Radius of circle (m)
-    :param x: float : X position of circle center
-    :param z: float : Z position of circle center
-    :param N: int : Number of nodes defining the 'circle'
+    Vertical gravity gradient of a 2D infinite horizontal cylinder.
 
-    :returns: 2D array (float): C1:X coordinate; C2:Z coordinate
+    :param xp: 1D array (float) : X coordinates of the observation points
+    :param cylinder: the cylinder geometry (radius, centre_x, centre_z)
+    :param density_contrast: float : Density contrast of cylinder (kg/m^3)
 
+    :returns: 1D array (float) : The calculated anomaly (Eotvos)
     """
-    angle = np.linspace(0., 2.*np.pi, N)
-    output_points = np.zeros(shape=(len(angle), 2))
+    dx = xp - cylinder.centre_x
+    z2 = cylinder.centre_z ** 2
+    return ((2. * np.pi * bott.G * (cylinder.radius ** 2) * density_contrast) *
+            ((z2 - (dx ** 2)) / (((dx ** 2) + z2) ** 2))) * kim_and_wessel.SI_TO_EOTVOS
 
-    for i in range(len(angle)):
-        output_points[i, 0] = x + (r * np.cos(angle[i]))
-        output_points[i, 1] = z + (r * np.sin(angle[i]))
 
-    return output_points
-
-def test_kim_vgg():
+def test_kim_vgg(cylinder, profile):
     """
-    Test the kim and wessel vgg algorithm
+    Test the kim and wessel vgg algorithm reproduces the analytical solution
     """
-    # Define x and z points for calculated anomaly profile
-    xp = np.linspace(0., 4000., num=4001)
-    zp = np.zeros_like(xp)
+    xp, zp = profile
+    polygons = [Polygon(cylinder.nodes, {'density': DENSITY_CONTRAST})]
 
-    # Create test cylinder nodes (defining the test polygon) 
-    input_points = get_circle_points(1000., 2000., 2000., 360)
-    density_contrast = 250
-    test_polygon =  Polygon(input_points, {'density': density_contrast})
-    polygons = [test_polygon]
+    calculated = kim_and_wessel.gz(xp, zp, polygons)
+    expected = analytical_vgg(xp, cylinder, DENSITY_CONTRAST)
 
-    # Run bott test
-    kim_and_wessel.gz(xp, zp, polygons)
-
-if __name__ == '__main__':
-    test_kim_vgg()
+    np.testing.assert_allclose(calculated, expected, rtol=RTOL,
+                               atol=RTOL * np.max(np.abs(expected)))

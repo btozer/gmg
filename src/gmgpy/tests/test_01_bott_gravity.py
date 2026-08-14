@@ -1,42 +1,48 @@
-from gmgpy import bott
-from gmgpy.polygon import Polygon
+"""
+Benchmark the Bott (1969) gravity algorithm against the analytical solution for
+a 2D infinite horizontal cylinder.
+
+**references**
+
+Analytical solution for buried cylinder: Garland (1965) Pg. 70
+"""
 import numpy as np
 
-def get_circle_points(r, x, z, N):
+from gmgpy import bott
+from gmgpy.polygon import Polygon
+
+DENSITY_CONTRAST = 250.0  # kg/m^3
+
+# THE POLYGON IS A DISCRETISATION OF A CIRCLE, SO AGREEMENT IS CLOSE, NOT EXACT.
+# THE ABSOLUTE TERM IS SCALED TO THE PEAK AMPLITUDE - RELATIVE ERROR ALONE IS
+# UNBOUNDED WHERE AN ANOMALY CROSSES ZERO.
+RTOL = 1.0e-3
+
+
+def analytical_gz(xp, cylinder, density_contrast):
     """
-    :param r: float : Radius of circle (m)
-    :param x: float : X position of circle center
-    :param z: float : Z position of circle center
-    :param N: int : Number of nodes defining the 'circle'
+    Gravity anomaly of a 2D infinite horizontal cylinder.
 
-    :returns: 2D array (float): C1:X coordinate; C2:Z coordinate
+    :param xp: 1D array (float) : X coordinates of the observation points
+    :param cylinder: the cylinder geometry (radius, centre_x, centre_z)
+    :param density_contrast: float : Density contrast of cylinder (kg/m^3)
 
+    :returns: 1D array (float) : The calculated anomaly (mGal)
     """
-    angle = np.linspace(0., 2.*np.pi, N)
-    output_points = np.zeros(shape=(len(angle), 2))
+    dx = xp - cylinder.centre_x
+    return ((2. * np.pi * bott.G * (cylinder.radius ** 2) * density_contrast) *
+            (cylinder.centre_z / ((dx ** 2) + (cylinder.centre_z ** 2)))) * bott.SI2MGAL
 
-    for i in range(len(angle)):
-        output_points[i, 0] = x + (r * np.cos(angle[i]))
-        output_points[i, 1] = z + (r * np.sin(angle[i]))
 
-    return output_points
-
-def test_bott_gravity():
+def test_bott_gravity(cylinder, profile):
     """
-    Test the bott gravity algorithm
+    Test the bott gravity algorithm reproduces the analytical solution
     """
-    # Define x and z points for calculated anomaly profile
-    xp = np.linspace(0., 4000., num=4001)
-    zp = np.zeros_like(xp)
+    xp, zp = profile
+    polygons = [Polygon(cylinder.nodes, {'density': DENSITY_CONTRAST})]
 
-    # Create test cylinder nodes (defining the test polygon) 
-    input_points = get_circle_points(1000., 2000., 2000., 360)
-    density_contrast = 250
-    test_polygon =  Polygon(input_points, {'density': density_contrast})
-    polygons = [test_polygon]
+    calculated = bott.gz(xp, zp, polygons)
+    expected = analytical_gz(xp, cylinder, DENSITY_CONTRAST)
 
-    # Run bott test
-    bott.gz(xp, zp, polygons)
-
-if __name__ == '__main__':
-    test_bott_gravity()
+    np.testing.assert_allclose(calculated, expected, rtol=RTOL,
+                               atol=RTOL * np.max(np.abs(expected)))

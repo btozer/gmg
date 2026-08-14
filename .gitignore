@@ -17,7 +17,6 @@ venv/
 ./horizontal_derivative.py
 ./src/gmgpy/pygmt_plot.ipynb
 ./src/gmgpy/test.py
-./tests/
 ./build/
 .vscode/
 .idea/
