@@ -74,16 +74,14 @@ def nt(xp, zp, polygons):
             The :math:`n_t` component calculated on the computation points (xp, zp) (TASUM in T&H 1964)
     """
 
-    # INITIALISE TOTAL ANOMALY OUTPUT ARRAYS
-    VASUM = np.zeros_like(xp)  # VERTICAL 
-    HASUM = np.zeros_like(xp)  # HORIZONTAL
-    n_t = np.zeros_like(xp)    # TOTAL 
+    # INITIALISE TOTAL ANOMALY OUTPUT ARRAY
+    n_t = np.zeros_like(xp)    # TOTAL
 
     # LOOP THROUGH THE MODEL POLYGONS
     for polygon in polygons:
 
         # CHECK IF THE CURRENT LAYER HAS A SUSCEPTIBILITY CONTRAST SET. SKIP LAYER IF FALSE
-        if polygon is None or polygon.props['susceptibility'] == 0.0:
+        if polygon is None or 'susceptibility' not in polygon.props or polygon.props['susceptibility'] == 0.0:
             continue  # SKIP THIS POLYGON
         else:
             f = polygon.props['f']  # EARTHS FIELD (nT)
@@ -95,16 +93,23 @@ def nt(xp, zp, polygons):
             z = polygon.y
             nverts = polygon.nverts
 
-            # DETERMINE ANGLES IN RADIANS
-            inclination = polygon.props['angle_a']
-            CDIP = m.cos(m.radians(inclination))
-            CDIPD = m.cos(m.radians(inclination))
-            SDIP = m.sin(m.radians(inclination))
-            SDIPD = m.sin(m.radians(inclination))
+            # DETERMINE THE MAGNETISATION VECTOR ANGLES IN RADIANS
+            angle_a = polygon.props['angle_a']
+            CDIP = m.cos(m.radians(angle_a))
+            SDIP = m.sin(m.radians(angle_a))
 
-            declination = polygon.props['angle_b']
+            angle_b = polygon.props['angle_b']
             model_azimuth = polygon.props['angle_c']
-            SD = m.cos(m.radians(model_azimuth - declination))
+            SD = m.cos(m.radians(model_azimuth - angle_b))
+
+            # DETERMINE THE INDUCING FIELD ANGLES IN RADIANS. THE TOTAL FIELD ANOMALY IS THE PROJECTION OF THE
+            # ANOMALOUS FIELD ONTO THE INDUCING FIELD DIRECTION, WHICH IS ONLY THE SAME AS THE MAGNETISATION
+            # DIRECTION WHEN MAGNETISATION IS INDUCED ONLY. FALL BACK TO THE MAGNETISATION DIRECTION SO THAT A
+            # CALLER THAT SUPPLIES NEITHER GETS THE INDUCED ONLY CASE
+            inclination = polygon.props.get('inclination', angle_a)
+            declination = polygon.props.get('declination', angle_b)
+            CDIPD = m.cos(m.radians(inclination))
+            SDIPD = m.sin(m.radians(inclination))
             SDD = m.cos(m.radians(model_azimuth - declination))
 
             # INITIALIZE CURRENT LAYER OUTPUT ARRAYS
@@ -149,10 +154,15 @@ def nt(xp, zp, polygons):
                 PSUM = P + PSUM
                 QSUM = Q + QSUM
 
-            # ADD CURRENT POLYGON ANOMALY TO TOTAL ANOMALY (VIA SUPER POSITION)
-            VASUM = VASUM + (2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM)))
-            HASUM = HASUM + (2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM)))
+            # THE VERTICAL AND HORIZONTAL COMPONENTS OF THE CURRENT POLYGON'S ANOMALOUS FIELD
+            VA = 2. * k * f * ((CDIP * SD * QSUM) - (SDIP * PSUM))
+            HA = 2. * k * f * ((CDIP * SD * PSUM) + (SDIP * QSUM))
 
-        # CALCULATE TOTAL FIELD ANOMALY
-        n_t = (1/(4.0 * m.pi)) * ((HASUM * CDIPD * SDD) + (VASUM * SDIPD))
+            # PROJECT ONTO THE INDUCING FIELD DIRECTION AND ADD TO THE TOTAL ANOMALY (VIA SUPER POSITION).
+            # NB: THIS MUST BE DONE PER POLYGON. IT USED TO BE DONE ONCE, OUTSIDE THE else BUT INSIDE THIS LOOP,
+            # AGAINST SUMS ACCUMULATED OVER EVERY POLYGON, SO A MODEL WHOSE LAYERS HAD DIFFERENT MAGNETISATION
+            # DIRECTIONS WAS PROJECTED ENTIRELY ONTO THE LAST LAYER'S DIRECTION. THAT BROKE SUPERPOSITION AND MADE
+            # THE RESULT DEPEND ON THE ORDER OF THE LAYERS
+            n_t = n_t + ((1 / (4.0 * m.pi)) * ((HA * CDIPD * SDD) + (VA * SDIPD)))
+
     return n_t

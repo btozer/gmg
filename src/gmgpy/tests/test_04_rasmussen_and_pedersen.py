@@ -50,7 +50,7 @@ N_DIPOLE_CELLS = 48
 RTOL_DIPOLE = 3.0e-4
 
 
-def magnetic_props(angle_a, angle_b, angle_c, y1=None, y2=None):
+def magnetic_props(angle_a, angle_b, angle_c, y1=None, y2=None, **extra):
     """
     Build the polygon properties for a magnetic calculation.
 
@@ -59,16 +59,19 @@ def magnetic_props(angle_a, angle_b, angle_c, y1=None, y2=None):
     :param angle_c: float : Model profile azimuth, in degrees
     :param y1: float : Extent in the strike direction, negative side, in metres. None for infinite extent
     :param y2: float : Extent in the strike direction, positive side, in metres. None for infinite extent
+    :param extra: Any further properties, e.g. ``inclination`` and ``declination`` of the inducing field
 
     :returns: dict : The polygon properties
     """
-    return {'susceptibility': SUSCEPTIBILITY,
-            'angle_a': angle_a,
-            'angle_b': angle_b,
-            'angle_c': angle_c,
-            'f': FIELD_INTENSITY,
-            'y1': y1,
-            'y2': y2}
+    props = {'susceptibility': SUSCEPTIBILITY,
+             'angle_a': angle_a,
+             'angle_b': angle_b,
+             'angle_c': angle_c,
+             'f': FIELD_INTENSITY,
+             'y1': y1,
+             'y2': y2}
+    props.update(extra)
+    return props
 
 
 def analytical_prism_gz(xp, zp, prism, density_contrast):
@@ -103,7 +106,8 @@ def analytical_prism_gz(xp, zp, prism, density_contrast):
     return anomaly * density_contrast * bott.G * bott.SI2MGAL
 
 
-def dipole_sum_nt(xp, zp, prism, angle_a, angle_b, angle_c, n_cells):
+def dipole_sum_nt(xp, zp, prism, angle_a, angle_b, angle_c, n_cells,
+                  inclination=None, declination=None):
     """
     Total field magnetic anomaly of a right rectangular prism, by direct summation of point dipoles.
 
@@ -119,20 +123,27 @@ def dipole_sum_nt(xp, zp, prism, angle_a, angle_b, angle_c, n_cells):
     :param angle_b: float : Magnetisation vector azimuth, in degrees
     :param angle_c: float : Model profile azimuth, in degrees
     :param n_cells: int : Number of cells along each axis
+    :param inclination: float : Inclination of the inducing field, in degrees. Defaults to angle_a
+    :param declination: float : Declination of the inducing field, in degrees. Defaults to angle_b
 
     :returns: 1D array (float) : The calculated anomaly (nT)
     """
     a, b, c = np.radians([angle_a, angle_b, angle_c])
+    i = a if inclination is None else np.radians(inclination)
+    d = b if declination is None else np.radians(declination)
 
     # UNIT MAGNETISATION VECTOR IN THE MODEL FRAME, AND THE INDUCED MAGNETISATION MAGNITUDE IN A/m
     direction = np.array([np.cos(a) * np.cos(c - b), np.cos(a) * np.sin(c - b), np.sin(a)])
     magnetisation = SUSCEPTIBILITY * FIELD_INTENSITY / rasmussen_and_pedersen.MU0_NT
 
+    # UNIT VECTOR OF THE INDUCING FIELD, WHICH IS WHAT THE ANOMALOUS FIELD IS PROJECTED ONTO
+    field = np.array([np.cos(i) * np.cos(c - d), np.cos(i) * np.sin(c - d), np.sin(i)])
+
     # CELL CENTRES AND THE MOMENT OF ONE CELL
     edges = [np.linspace(lo, hi, n_cells, endpoint=False) + (0.5 * (hi - lo) / n_cells)
              for lo, hi in ((prism.x1, prism.x2), (prism.y1, prism.y2), (prism.z1, prism.z2))]
     cell_volume = ((prism.x2 - prism.x1) * (prism.y2 - prism.y1) * (prism.z2 - prism.z1)) / (n_cells ** 3)
-    cx, cy, cz = [a.ravel() for a in np.meshgrid(*edges, indexing='ij')]
+    cx, cy, cz = [axis.ravel() for axis in np.meshgrid(*edges, indexing='ij')]
     moment = magnetisation * cell_volume * direction
 
     anomaly = np.zeros_like(xp)
@@ -151,8 +162,8 @@ def dipole_sum_nt(xp, zp, prism, angle_a, angle_b, angle_c, n_cells):
         b_y = 100.0 * (((3.0 * m_dot_r * ry) / r_squared) - moment[1]) / (r * r_squared)
         b_z = 100.0 * (((3.0 * m_dot_r * rz) / r_squared) - moment[2]) / (r * r_squared)
 
-        # PROJECT ONTO THE MAGNETISATION DIRECTION, MATCHING THE INDUCED ONLY CONVENTION OF gmg
-        anomaly[n] = np.sum((b_x * direction[0]) + (b_y * direction[1]) + (b_z * direction[2]))
+        # PROJECT ONTO THE INDUCING FIELD DIRECTION
+        anomaly[n] = np.sum((b_x * field[0]) + (b_y * field[1]) + (b_z * field[2]))
 
     return anomaly
 
@@ -301,6 +312,62 @@ def test_gravity_converges_on_2d_from_below(cylinder, profile):
     assert np.all(np.diff(peaks) > 0.0), 'anomaly must grow as the body lengthens'
     assert np.all(np.array(peaks) < infinite), 'a finite body must not out predict an infinite one'
     assert peaks[-1] == pytest.approx(infinite, rel=RTOL)
+
+
+def test_layers_superpose_and_order_does_not_matter(cylinder, prism, profile):
+    """
+    Test two finite extent layers with different magnetisation directions superpose, in either order
+    """
+    xp, zp = profile
+    a = Polygon(cylinder.nodes, magnetic_props(30.0, 0.0, 0.0, -4000.0, 9000.0))
+    b = Polygon(prism.nodes, magnetic_props(-50.0, 40.0, 70.0, -2000.0, 3000.0))
+
+    together = rasmussen_and_pedersen.nt(xp, zp, [a, b])
+    apart = (rasmussen_and_pedersen.nt(xp, zp, [a]) +
+             rasmussen_and_pedersen.nt(xp, zp, [b]))
+
+    assert_close(together, apart)
+    np.testing.assert_allclose(together, rasmussen_and_pedersen.nt(xp, zp, [b, a]))
+
+
+def test_remanence_reduces_to_2d(cylinder, profile):
+    """
+    Test a remanently magnetised body still reproduces the 2D algorithm at very large strike extent
+
+    The inducing field direction is given separately from the magnetisation direction, so this checks the
+    two kernels agree on which of the two the anomaly is projected onto.
+    """
+    xp, zp = profile
+    remanent = {'inclination': 60.0, 'declination': -5.0}
+
+    calculated = rasmussen_and_pedersen.nt(
+        xp, zp, [Polygon(cylinder.nodes, magnetic_props(30.0, 10.0, 45.0,
+                                                        -EFFECTIVELY_INFINITE, EFFECTIVELY_INFINITE,
+                                                        **remanent))])
+    expected = talwani_and_heirtzler.nt(
+        xp, zp, [Polygon(cylinder.nodes, magnetic_props(30.0, 10.0, 45.0, **remanent))])
+
+    assert_close(calculated, expected)
+
+
+def test_remanent_finite_prism(prism, coarse_profile):
+    """
+    Test a remanently magnetised finite prism reproduces a direct dipole summation
+
+    This is the only benchmark that exercises the magnetisation direction and the projection direction being
+    genuinely different, so it is what pins down that they are not conflated.
+    """
+    xp, zp = coarse_profile
+    angle_a, angle_b, angle_c = 30.0, 10.0, 45.0
+    inclination, declination = 60.0, -5.0
+    props = magnetic_props(angle_a, angle_b, angle_c, prism.y1, prism.y2,
+                           inclination=inclination, declination=declination)
+
+    calculated = rasmussen_and_pedersen.nt(xp, zp, [Polygon(prism.nodes, props)])
+    expected = dipole_sum_nt(xp, zp, prism, angle_a, angle_b, angle_c, N_DIPOLE_CELLS,
+                             inclination=inclination, declination=declination)
+
+    assert_close(calculated, expected, rtol=RTOL_DIPOLE)
 
 
 def test_mixed_extents_superpose(cylinder, prism, profile):

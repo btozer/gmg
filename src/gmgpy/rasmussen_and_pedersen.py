@@ -186,6 +186,11 @@ def nt(xp, zp, polygons):
         angle_b = np.radians(polygon.props['angle_b'])  # MAGNETISATION VECTOR AZIMUTH
         angle_c = np.radians(polygon.props['angle_c'])  # MODEL PROFILE AZIMUTH
 
+        # THE INDUCING FIELD DIRECTION, ONTO WHICH THE ANOMALOUS FIELD IS PROJECTED. THIS IS ONLY THE SAME AS THE
+        # MAGNETISATION DIRECTION WHEN MAGNETISATION IS INDUCED ONLY, SO IT DEFAULTS TO THAT CASE
+        inclination = np.radians(polygon.props.get('inclination', polygon.props['angle_a']))
+        declination = np.radians(polygon.props.get('declination', polygon.props['angle_b']))
+
         # RESOLVE THE MAGNETISATION VECTOR ONTO THE MODEL FRAME. NB: J_y CONTRIBUTES NOTHING IN TWO DIMENSIONS, WHICH
         # IS WHY talwani_and_heirtzler CARRIES ONLY J_x AND J_z, BUT IT DOES CONTRIBUTE ONCE THE BODY HAS ENDS.
         # NB: THE MAGNETIC EXPRESSIONS BELOW MEASURE y IN THE OPPOSITE SENSE TO y1/y2 AND TO THE GRAVITY KERNEL, SO
@@ -226,11 +231,11 @@ def nt(xp, zp, polygons):
             b_z = b_z + (cos_phi * term_4)
             b_y = b_y + (((sin_phi * j_x) - (cos_phi * j_z)) * term_3) + (j_y * difatan)
 
-        # PROJECT ONTO THE MAGNETISATION DIRECTION TO GIVE THE TOTAL FIELD ANOMALY, AND CONVERT FROM A/m TO nT
+        # PROJECT ONTO THE INDUCING FIELD DIRECTION TO GIVE THE TOTAL FIELD ANOMALY, AND CONVERT FROM A/m TO nT
         # NB: THE LEADING MINUS MATCHES THE VERTEX ORDERING CONVENTION OF talwani_and_heirtzler.nt
-        total_field = ((b_x * np.cos(angle_a) * np.cos(angle_c - angle_b)) +
-                       (b_z * np.sin(angle_a)) +
-                       (-b_y * np.cos(angle_a) * np.sin(angle_c - angle_b)))
+        total_field = ((b_x * np.cos(inclination) * np.cos(angle_c - declination)) +
+                       (b_z * np.sin(inclination)) +
+                       (-b_y * np.cos(inclination) * np.sin(angle_c - declination)))
         n_t = n_t - (total_field * MU0_NT / (4.0 * np.pi))
 
     return n_t

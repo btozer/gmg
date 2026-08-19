@@ -58,3 +58,84 @@ def test_talwani_magnetic(cylinder, profile):
 
     np.testing.assert_allclose(calculated, expected, rtol=RTOL,
                                atol=RTOL * np.max(np.abs(expected)))
+
+
+def magnetic_props(angle_a, angle_b, angle_c, **extra):
+    """Build the polygon properties for a magnetic calculation."""
+    props = {'susceptibility': SUSCEPTIBILITY,
+             'angle_a': angle_a,
+             'angle_b': angle_b,
+             'angle_c': angle_c,
+             'f': FIELD_INTENSITY}
+    props.update(extra)
+    return props
+
+
+def test_layers_superpose(cylinder, prism, profile):
+    """
+    Test two layers modelled together give the same anomaly as the sum of the two modelled alone
+
+    The two layers deliberately have *different* magnetisation directions. The projection onto the inducing
+    field direction has to be done per layer for this to hold; doing it once against sums accumulated over
+    every layer projects all of them onto whichever layer happened to be processed last.
+    """
+    xp, zp = profile
+    a = Polygon(cylinder.nodes, magnetic_props(30.0, 0.0, 0.0))
+    b = Polygon(prism.nodes, magnetic_props(-50.0, 40.0, 70.0))
+
+    together = talwani_and_heirtzler.nt(xp, zp, [a, b])
+    apart = (talwani_and_heirtzler.nt(xp, zp, [a]) +
+             talwani_and_heirtzler.nt(xp, zp, [b]))
+
+    np.testing.assert_allclose(together, apart, rtol=RTOL,
+                               atol=RTOL * np.max(np.abs(apart)))
+
+
+def test_layer_order_does_not_matter(cylinder, prism, profile):
+    """
+    Test the calculated anomaly does not depend on the order the layers are given in
+    """
+    xp, zp = profile
+    a = Polygon(cylinder.nodes, magnetic_props(30.0, 0.0, 0.0))
+    b = Polygon(prism.nodes, magnetic_props(-50.0, 40.0, 70.0))
+
+    np.testing.assert_allclose(talwani_and_heirtzler.nt(xp, zp, [a, b]),
+                               talwani_and_heirtzler.nt(xp, zp, [b, a]))
+
+
+def test_layer_without_susceptibility_is_skipped(cylinder, profile):
+    """
+    Test a polygon carrying no susceptibility is ignored rather than raising
+
+    This matches the behaviour of :func:`~gmgpy.bott.gz` for a polygon carrying no density.
+    """
+    xp, zp = profile
+    gravity_only = Polygon(cylinder.nodes, {'density': 500.0})
+
+    calculated = talwani_and_heirtzler.nt(xp, zp, [gravity_only])
+
+    np.testing.assert_array_equal(calculated, np.zeros_like(xp))
+
+
+def test_remanence_projects_onto_the_inducing_field(cylinder, profile):
+    """
+    Test the anomaly is projected onto the inducing field direction, not the magnetisation direction
+
+    The two are the same only when magnetisation is induced, so supplying an inducing field direction equal
+    to the magnetisation direction must reproduce the induced only default, and supplying a different one
+    must not.
+    """
+    xp, zp = profile
+    angle_a, angle_b, angle_c = 30.0, 10.0, 45.0
+
+    induced = talwani_and_heirtzler.nt(
+        xp, zp, [Polygon(cylinder.nodes, magnetic_props(angle_a, angle_b, angle_c))])
+    stated = talwani_and_heirtzler.nt(
+        xp, zp, [Polygon(cylinder.nodes, magnetic_props(angle_a, angle_b, angle_c,
+                                                        inclination=angle_a, declination=angle_b))])
+    remanent = talwani_and_heirtzler.nt(
+        xp, zp, [Polygon(cylinder.nodes, magnetic_props(angle_a, angle_b, angle_c,
+                                                        inclination=60.0, declination=-5.0))])
+
+    np.testing.assert_allclose(stated, induced)
+    assert not np.allclose(remanent, induced), 'remanence must change the projected anomaly'
