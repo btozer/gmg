@@ -2109,13 +2109,7 @@ class Gmg(wx.Frame):
         self.currently_active_layer_id = self.tree.GetPyData(event.GetItem())
 
         # SET OBJECTS WITH THE CHOSEN LAYER
-        self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-        self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-        self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-        self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-        self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-        self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-        self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+        self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
         # GET THE XY NODES FROM THE ACTIVE LAYER AND SET THE CUURENTLY ACTIVE NODES (I.E. MAKE THEM INTERACTIVE)
         self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
@@ -5329,13 +5323,7 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id = 0
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-                self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-                self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+                self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
                 # SET CURRENT NODE VALUES
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
@@ -5355,13 +5343,7 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id += 1
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-                self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-                self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+                self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
                 # SET CURRENT NODE VALUES
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
@@ -5387,13 +5369,7 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id = self.total_layer_count
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-                self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-                self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+                self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
                 # SET CURRENT NODE VALUES
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
@@ -5412,13 +5388,7 @@ class Gmg(wx.Frame):
                 self.currently_active_layer_id -= 1
 
                 # SET CURRENT INPUT VALUES IN MENU
-                self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-                self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-                self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-                self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-                self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-                self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-                self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+                self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
                 # SET CURRENT NODE VALUES
                 self.x_input.SetValue(self.layer_list[self.currently_active_layer_id].x_nodes[0])
@@ -5682,13 +5652,7 @@ class Gmg(wx.Frame):
             self.current_node.set_offsets([new_layer.x_nodes[0], new_layer.y_nodes[0]])
 
             # SET CURRENT ATTRIBUTE INPUTS IN LEFT PANEL
-            self.density_input.SetValue(new_layer.density)
-            self.ref_density_input.SetValue(new_layer.reference_density)
-            self.susceptibility_input.SetValue(new_layer.susceptibility)
-            self.angle_a_input.SetValue(new_layer.angle_a)
-            self.angle_b_input.SetValue(new_layer.angle_b)
-            self.angle_c_input.SetValue(new_layer.angle_c)
-            self.earth_field_input.SetValue(new_layer.earth_field)
+            self.set_layer_attribute_spinners(new_layer)
 
             # APPEND NEW LAYER TO THE LAYER LIST
             self.layer_list.append(new_layer)
@@ -5754,13 +5718,7 @@ class Gmg(wx.Frame):
         self.current_node.set_offsets([new_layer.x_nodes[0], new_layer.y_nodes[0]])
 
         # SET CURRENT ATTRIBUTE INPUTS IN LEFT PANEL
-        self.density_input.SetValue(new_layer.density)
-        self.ref_density_input.SetValue(new_layer.reference_density)
-        self.susceptibility_input.SetValue(new_layer.susceptibility)
-        self.angle_a_input.SetValue(new_layer.angle_a)
-        self.angle_b_input.SetValue(new_layer.angle_b)
-        self.angle_c_input.SetValue(new_layer.angle_c)
-        self.earth_field_input.SetValue(new_layer.earth_field)
+        self.set_layer_attribute_spinners(new_layer)
 
         # APPEND NEW LAYER TO THE LAYER LIST
         self.layer_list.append(new_layer)
@@ -5877,13 +5835,7 @@ class Gmg(wx.Frame):
         self.current_node.set_offsets([new_layer.x_nodes[0], new_layer.y_nodes[0]])
 
         # SET CURRENT ATTRIBUTE INPUTS IN LEFT PANEL
-        self.density_input.SetValue(new_layer.density)
-        self.ref_density_input.SetValue(new_layer.reference_density)
-        self.susceptibility_input.SetValue(new_layer.susceptibility)
-        self.angle_a_input.SetValue(new_layer.angle_a)
-        self.angle_b_input.SetValue(new_layer.angle_b)
-        self.angle_c_input.SetValue(new_layer.angle_c)
-        self.earth_field_input.SetValue(new_layer.earth_field)
+        self.set_layer_attribute_spinners(new_layer)
 
         # APPEND NEW LAYER TO THE LAYER LIST
         self.layer_list.append(new_layer)
@@ -5934,13 +5886,7 @@ class Gmg(wx.Frame):
             self.currently_active_layer_id = 1
 
             # SET OBJECTS WITH THE CHOSEN LAYER
-            self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-            self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-            self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-            self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-            self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-            self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-            self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+            self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
             # GET THE XY NODES FROM THE ACTIVE LAYER AND SET THE CURRENTLY ACTIVE NODES (I.E. MAKE THEM INTERACTIVE)
             self.current_x_nodes = self.layer_list[self.currently_active_layer_id].x_nodes
@@ -6335,6 +6281,20 @@ class Gmg(wx.Frame):
 
     # LAYER AND MODEL ATTRIBUTE CONTROLS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+    def set_layer_attribute_spinners(self, layer):
+        """
+        SET THE SIDEBAR ATTRIBUTE SPINNERS FROM A LAYER OBJECT.
+
+        NB: DENSITIES ARE STORED IN kg m^-3 BUT DISPLAYED IN g cm^-3, HENCE THE 0.001 FACTOR
+        """
+        self.density_input.SetValue(0.001 * layer.density)
+        self.ref_density_input.SetValue(0.001 * layer.reference_density)
+        self.susceptibility_input.SetValue(layer.susceptibility)
+        self.angle_a_input.SetValue(layer.angle_a)
+        self.angle_b_input.SetValue(layer.angle_b)
+        self.angle_c_input.SetValue(layer.angle_c)
+        self.earth_field_input.SetValue(layer.earth_field)
+
     def set_density(self, value):
         self.layer_list[self.currently_active_layer_id].density = float(self.density_input.GetValue() * 1000.)
 
@@ -6493,13 +6453,7 @@ class Gmg(wx.Frame):
             self.layer_list[l].color = new_layer_list[l].color
 
         # UPDATE LAYER ATTRIBUTE INPUTS
-        self.density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].density)
-        self.ref_density_input.SetValue(0.001 * self.layer_list[self.currently_active_layer_id].reference_density)
-        self.susceptibility_input.SetValue(self.layer_list[self.currently_active_layer_id].susceptibility)
-        self.angle_a_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_a)
-        self.angle_b_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_b)
-        self.angle_c_input.SetValue(self.layer_list[self.currently_active_layer_id].angle_c)
-        self.earth_field_input.SetValue(self.layer_list[self.currently_active_layer_id].earth_field)
+        self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
 
         # UPDATE GMG STATE
         self.update_layer_data()
