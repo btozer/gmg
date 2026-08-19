@@ -23,10 +23,22 @@ CENTRE_X = 2000.0
 CENTRE_Z = 2000.0
 N_NODES = 360
 
+# PRISM GEOMETRY FOR THE 2.75D BENCHMARKS (SI UNITS). THE STRIKE DIRECTION EXTENTS ARE DELIBERATELY ASYMMETRIC ABOUT
+# THE SECTION, SINCE A SYMMETRIC BODY CANNOT DETECT AN ERROR IN THE SIGN OF THE ALONG STRIKE DIRECTION.
+PRISM_X1 = 1500.0
+PRISM_X2 = 2500.0
+PRISM_Z1 = 1000.0
+PRISM_Z2 = 2500.0
+PRISM_Y1 = -2000.0
+PRISM_Y2 = 3000.0
+
 # OBSERVATION PROFILE (SI UNITS)
 PROFILE_START = 0.0
 PROFILE_END = 4000.0
 PROFILE_NUM = 4001
+
+# A COARSER PROFILE FOR THE BENCHMARKS WHOSE REFERENCE SOLUTION COSTS PER OBSERVATION POINT
+COARSE_PROFILE_NUM = 21
 
 
 def get_circle_points(r, x, z, N):
@@ -60,9 +72,51 @@ def cylinder():
     )
 
 
+def get_rectangle_points(x1, x2, z1, z2):
+    """
+    :param x1: float : Minimum X coordinate of the rectangle
+    :param x2: float : Maximum X coordinate of the rectangle
+    :param z1: float : Minimum Z coordinate of the rectangle
+    :param z2: float : Maximum Z coordinate of the rectangle
+
+    :returns: 2D array (float): C1:X coordinate; C2:Z coordinate
+
+    .. note:: The nodes are ordered in the same rotational sense as :func:`get_circle_points`, which is the ordering
+              the algorithms expect.
+    """
+    return np.array([[x2, z1], [x2, z2], [x1, z2], [x1, z1]], dtype=float)
+
+
 @pytest.fixture
 def profile():
     """X and Z coordinates of the observation points."""
     xp = np.linspace(PROFILE_START, PROFILE_END, num=PROFILE_NUM)
+    zp = np.zeros_like(xp)
+    return xp, zp
+
+
+@pytest.fixture
+def prism():
+    """
+    The test prism: a right rectangular prism of finite extent in the strike direction.
+
+    Unlike the cylinder, the polygon nodes describe this body *exactly*, so a 2.75D benchmark against it carries no
+    discretisation error of its own.
+    """
+    return SimpleNamespace(
+        x1=PRISM_X1,
+        x2=PRISM_X2,
+        z1=PRISM_Z1,
+        z2=PRISM_Z2,
+        y1=PRISM_Y1,
+        y2=PRISM_Y2,
+        nodes=get_rectangle_points(PRISM_X1, PRISM_X2, PRISM_Z1, PRISM_Z2),
+    )
+
+
+@pytest.fixture
+def coarse_profile():
+    """X and Z coordinates of a smaller set of observation points."""
+    xp = np.linspace(PROFILE_START, PROFILE_END, num=COARSE_PROFILE_NUM)
     zp = np.zeros_like(xp)
     return xp, zp
