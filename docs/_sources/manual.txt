@@ -23,4 +23,5 @@
    manual_benchmark_examples
    manual_gravity_algorithm
    manual_magnetic_algorithm
+   manual_2_75D_algorithm
    z_bibliography

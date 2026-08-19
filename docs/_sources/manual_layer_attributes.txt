@@ -3,7 +3,7 @@
 ========================
 
 Attributes refer to the physical properties assigned to a given model layer(polygon) and are used to calculate
-the predicted gravity and magnetic anomalies. Each layer contains five attributes:
+the predicted gravity and magnetic anomalies. Each layer contains the following attributes:
 
 * Layer bulk density
 * Layer reference bulk density
@@ -11,6 +11,7 @@ the predicted gravity and magnetic anomalies. Each layer contains five attribute
 * Magnetic field vector angle A (Equal to the inclination of Earth's field if magnetisation is induced only)
 * Magnetic field vector angle B (Equal to the declination of Earth's field if magnetisation is induced only)
 * Magnetic field vector angle C (Angle between model profile positive X-axis and geographic north)
+* Out of plane extents Y1 and Y2 (Optional. The extent of the layer in the strike direction, see below)
 
 
 Layer attributes are set using the **Attributes** sidebar within the modelling window or from the
@@ -22,6 +23,12 @@ the modelled anomaly, be that gravity or magnetic.
 .. Note::
         For the case when a layer requires a remanent magnetism, angles A and B will differ from the
         Inclination and Declination.
+
+.. Note::
+        A layer is of **infinite** extent in the strike direction unless the **Finite extent (2.5D)** box is
+        ticked and the **Y1 extent** and **Y2 extent** values set. Doing so switches that layer to the
+        2.75D algorithms of Section :ref:`A3 <2_75D_algorithm>`. Note that the vertical gravity gradient is
+        calculated in 2D regardless, so it will ignore any extent that is set.
 
 ----------------
 3.1 Bulk density

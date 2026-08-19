@@ -176,8 +176,11 @@ the software.
 
 .. note::
    
-    The algorithms used within gmg are currently 2D implementations. As such, the calculated anomalies
-    assume all model layers extend infinitely in the 3rd dimension. This can result in an underestimation
-    of, for example, a layers density contrast, as it's infinite extent will result in a larger gravity 
-    response to that of a finite length body. Incorporating extent-limited (i.e., 2.5D) algorithms 
-    is a key focus of future development.
+    The gravity and magnetic algorithms benchmarked above are 2D implementations, and so assume the model
+    layer extends infinitely in the 3rd dimension. This results in an overestimation of the anomaly relative
+    to a finite length body, which in turn biases a fitted density or susceptibility contrast low. Layers may
+    instead be given a finite extent in the strike direction, in which case gmg uses the extent-limited
+    (i.e., 2.5D/2.75D) algorithms described in Section :ref:`A3 <2_75D_algorithm>`.
+
+    The vertical gravity gradient remains 2D only. Incorporating an extent-limited VGG algorithm is a key
+    focus of future development.

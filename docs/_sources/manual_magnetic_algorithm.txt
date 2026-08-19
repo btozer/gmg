@@ -94,6 +94,16 @@ The total magnetic anomaly is then given as the sum of the horizontal and vertic
     :label: talwani_mag_total
 
 
+.. Note::
+        Kravchinsky et al. (2019) :cite:`kravchinsky2019` re-derived the Talwani and Heirtzler (1964)
+        :cite:`talwani1964` algorithm and reported errors in the published derivation, recommending that it
+        be avoided. Ghirotto et al. (2021) :cite:`ghirotto2021` subsequently showed that the two approaches
+        are in fact equivalent, Kravchinsky et al.'s formulae being an algebraic variant of Talwani and
+        Heirtzler's, and demonstrated complete agreement between them and the independent formulation of
+        Won and Bevis (1987) over a large number of randomly generated models. gmg therefore continues to
+        use Talwani and Heirtzler (1964) :cite:`talwani1964`.
+
+
 Talwani and Heirtzler (1964) method testing
 -------------------------------------------
 

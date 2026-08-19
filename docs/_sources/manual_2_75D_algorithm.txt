@@ -1,0 +1,104 @@
+.. _2_75D_algorithm:
+
+============================================================
+**A3 Rasmussen and Pedersen (1979) 2.75D end corrections**
+============================================================
+
+The algorithms described in Sections :ref:`A1 <manual_gravity_algorithm>` and
+:ref:`A2 <magnetic_algorithm>` treat a model layer as a polygon of **infinite** extent orthogonal to the
+model cross section. A real geological body is of course of finite length along strike, and an infinite body
+always produces a larger anomaly than a finite one of the same cross section. Modelling a finite body as an
+infinite one therefore biases the fitted density and susceptibility contrasts **low**.
+
+gmg corrects for this using the end corrections of Rasmussen and Pedersen (1979) :cite:`rasmussen1979`, who
+showed that a single fundamental integral serves both the gravity and the magnetic case, and that the two
+dimensional formulae of Talwani et al. (1959) :cite:`talwani1959` and Talwani and Heirtzler (1964)
+:cite:`talwani1964` need only a modest change to represent a body whose tails in the strike direction have
+been cut off. This is the same formulation used by commercial packages such as GM-SYS. The particular form
+of the expressions implemented here follows Zunino et al. (2022) :cite:`zunino2022`.
+
+2.5D and 2.75D
+--------------
+
+The extent of a layer in the strike direction is given by two signed distances measured from the plane of
+the model section:
+
+* :math:`y_{1}`, the extent on the negative side
+* :math:`y_{2}`, the extent on the positive side
+
+Two cases are distinguished in the literature:
+
+* **2.5D**, where the body extends equally either side of the section, i.e. :math:`y_{1} = -y_{2}`
+* **2.75D**, where the two sides differ, i.e. :math:`y_{1} \neq -y_{2}`
+
+gmg implements the general 2.75D case, of which 2.5D is simply the symmetric special case. Setting an
+asymmetric pair of extents is useful where a body is known to terminate closer to the profile on one side
+than the other.
+
+As :math:`y_{1} \rightarrow -\infty` and :math:`y_{2} \rightarrow +\infty` the expressions reduce to the two
+dimensional result. Rather than rely on that limit numerically, a layer with **no** extents set is passed
+straight to the two dimensional algorithms, so a model in which no layer has extents set reproduces the two
+dimensional result exactly. A single model may freely mix layers of finite and infinite extent.
+
+Setting the extent of a layer
+-----------------------------
+
+A layer is of infinite extent by default. To give a layer a finite extent, tick **Finite extent (2.5D)** in
+the **Attributes** sidebar and set the **Y1 extent** and **Y2 extent** spinners, in :math:`km`. Unticking the
+box returns the layer to two dimensional modelling.
+
+Extents may also be set from the **Attribute Table**, using the **Y1 extent** and **Y2 extent** columns. An
+**empty** cell in either column means the layer is of infinite extent. Both columns must be filled for the
+extent to take effect.
+
+The along strike component of magnetisation
+-------------------------------------------
+
+For a two dimensional body the component of the magnetisation vector along strike, :math:`J_{y}`, integrates
+to zero and contributes nothing to the anomaly. This is why the two dimensional formulation in Section
+:ref:`A2 <magnetic_algorithm>` carries only :math:`J_{x}` and :math:`J_{z}`. Once the body has ends, however,
+:math:`J_{y}` produces a real anomaly, and so it is carried here:
+
+.. math:: J_{x} = J \cos A \cos(C-B)
+    :label: rp_mag_J_x
+
+.. math:: J_{y} = J \cos A \sin(C-B)
+    :label: rp_mag_J_y
+
+.. math:: J_{z} = J \sin A
+    :label: rp_mag_J_z
+
+where the angles **A**, **B** and **C** are as defined in Section :ref:`A2 <magnetic_algorithm>`. Note that
+this means a layer whose magnetisation vector is oblique to the model profile (i.e. :math:`C \neq B`) will
+show a change in its calculated magnetic anomaly when given a finite extent, over and above the reduction
+caused by the loss of the body's tails.
+
+.. warning::
+
+    There is no 2.75D vertical gravity gradient algorithm. Rasmussen and Pedersen (1979)
+    :cite:`rasmussen1979` give the gravity and the magnetic field but not the vertical gradient, and gmg
+    continues to calculate the VGG in two dimensions using the method of Section
+    :ref:`A1 <manual_gravity_algorithm>`. **In a model containing any layer of finite extent, the gravity
+    and magnetic anomalies will honour that extent but the VGG will not.** When this is the case the VGG
+    axis is labelled *2D only* as a reminder.
+
+Method testing
+--------------
+
+The 2.75D algorithms are covered by the packaged test suite, which may be run with::
+
+    pytest --pyargs gmgpy.tests
+
+The tests check, for both gravity and magnetics:
+
+1. That a body of very large extent reproduces the two dimensional algorithms, and that a layer with no
+   extents set reproduces them exactly.
+2. That a body of finite extent agrees with an exact three dimensional solution for the same body. Because a
+   rectangle is described exactly by four polygon nodes, the benchmark body is a right rectangular prism,
+   which carries no discretisation error of its own. Gravity is compared against Nagy (1966)
+   :cite:`nagy1966` and magnetics against a direct summation of point dipoles.
+3. That splitting a body along strike gives the same anomaly as the whole body, and that shortening a body
+   reduces its anomaly monotonically.
+
+The benchmark extents are deliberately asymmetric, since a body that is symmetric about the section cannot
+detect an error in the sign of the along strike direction.
