@@ -2674,10 +2674,13 @@ class Gmg(wx.Frame):
                 if wx.MessageBox("Current content has not been saved! Proceed?", "Please confirm",
                                  wx.ICON_QUESTION | wx.YES_NO, self) == wx.NO:
                     return
-                open_file_dialog = wx.FileDialog(self, "Open model file", "", "", "Model files (*.model)|*.model",
-                                                 wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
-                if open_file_dialog.ShowModal() == wx.ID_CANCEL:
-                    return  # USER CHANGED THEIR MIND
+
+            # NB: THE FILE DIALOG MUST BE CREATED WHETHER OR NOT THE CURRENT MODEL IS SAVED. IT USED TO SIT INSIDE
+            # THE BRANCH ABOVE, SO LOADING A MODEL WITH NOTHING OUTSTANDING TO SAVE RAISED UnboundLocalError BELOW
+            open_file_dialog = wx.FileDialog(self, "Open model file", "", "", "Model files (*.model)|*.model",
+                                             wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+            if open_file_dialog.ShowModal() == wx.ID_CANCEL:
+                return  # USER CHANGED THEIR MIND
 
             # INITALISE MODEL PARAMETERS
             self.initalize_model()
@@ -2716,6 +2719,11 @@ class Gmg(wx.Frame):
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
             self.loaded_fault_tree_items = self.fault_tree_items
+
+            # THE LAYERS COME FROM THE FILE, SO start() MUST NOT ALSO CREATE ITS PLACEHOLDER LAYER 0. WITHOUT THIS,
+            # LOADING A MODEL AFTER CREATING A NEW ONE (WHICH SETS newmodel True AND NOTHING RESET IT) APPENDED A
+            # SPURIOUS EMPTY LAYER WHOSE polygon WAS None, WHICH THEN CRASHED run_algorithms
+            self.newmodel = False
 
             # DRAW CANVAS
             self.start(self.area, self.xp, self.gravity_observation_elv)
@@ -2870,7 +2878,9 @@ class Gmg(wx.Frame):
 
             # UPDATE LAYER DATA AND PLOT
             self.draw()
-            if 1 in self.layer_list:
+            # NB: THIS USED TO READ "if 1 in self.layer_list", WHICH TESTS FOR THE INTEGER 1 IN A LIST OF Layer
+            # OBJECTS AND SO WAS ALWAYS FALSE, MEANING THE LAYER POLYGONS WERE NEVER REBUILT ON LOAD
+            if len(self.layer_list) > 1:
                 self.update_layer_data()  # IF THE MODEL INCLUDES LAYERS THEN UPDATE
             self.run_algorithms()
             self.draw()
