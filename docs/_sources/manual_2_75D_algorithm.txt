@@ -51,6 +51,10 @@ Extents may also be set from the **Attribute Table**, using the **Y1 extent** an
 **empty** cell in either column means the layer is of infinite extent. Both columns must be filled for the
 extent to take effect.
 
+To give every layer the same extent at once, or to return the whole model to 2D, use::
+
+    Layers -> Set Out Of Plane Extent...
+
 The along strike component of magnetisation
 -------------------------------------------
 
@@ -68,7 +72,8 @@ to zero and contributes nothing to the anomaly. This is why the two dimensional 
 .. math:: J_{z} = J \sin A
     :label: rp_mag_J_z
 
-where the angles **A**, **B** and **C** are as defined in Section :ref:`A2 <magnetic_algorithm>`. Note that
+where the angles **A**, **B** and **C** are as defined in Section :ref:`A2 <magnetic_algorithm>`, and the
+anomaly is projected onto the inducing field direction as described there. Note that
 this means a layer whose magnetisation vector is oblique to the model profile (i.e. :math:`C \neq B`) will
 show a change in its calculated magnetic anomaly when given a finite extent, over and above the reduction
 caused by the loss of the body's tails.
@@ -97,8 +102,9 @@ The tests check, for both gravity and magnetics:
    rectangle is described exactly by four polygon nodes, the benchmark body is a right rectangular prism,
    which carries no discretisation error of its own. Gravity is compared against Nagy (1966)
    :cite:`nagy1966` and magnetics against a direct summation of point dipoles.
-3. That splitting a body along strike gives the same anomaly as the whole body, and that shortening a body
-   reduces its anomaly monotonically.
+3. That splitting a body along strike gives the same anomaly as the whole body, that two layers modelled
+   together give the same anomaly as the sum of the two modelled alone whatever order they are given in, and
+   that shortening a body reduces its anomaly monotonically.
 
 The benchmark extents are deliberately asymmetric, since a body that is symmetric about the section cannot
 detect an error in the sign of the along strike direction.

@@ -13,4 +13,5 @@ Updates to attributes can then be assigned to layers using the **Set** button.
 
 The **Y1 extent** and **Y2 extent** columns hold the optional extent of the layer in the strike direction,
 in :math:`km` (see Section :ref:`A3 <2_75D_algorithm>`). An **empty** cell in either column means the layer
-is of infinite extent and is modelled in 2D; both columns must be filled for the extent to take effect.
+is of infinite extent and is modelled in 2D; both columns must be filled for the extent to take effect. To set
+the same extent on every layer at once, use **Layers -> Set Out Of Plane Extent...** instead.

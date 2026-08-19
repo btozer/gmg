@@ -22,7 +22,9 @@ the modelled anomaly, be that gravity or magnetic.
 
 .. Note::
         For the case when a layer requires a remanent magnetism, angles A and B will differ from the
-        Inclination and Declination.
+        Inclination and Declination. The inclination and declination of the inducing field are a property of the
+        survey rather than of a layer, so they are set once for the whole model from
+        **Magnetics -> Set Inducing Field Direction...**
 
 .. Note::
         A layer is of **infinite** extent in the strike direction unless the **Finite extent (2.5D)** box is

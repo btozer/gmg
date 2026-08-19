@@ -87,11 +87,32 @@ vector.
     to declination for induced magnetisation (modified after, Talwani and Heirtzler (1964) :cite:`talwani1964`).
 
 
-The total magnetic anomaly is then given as the sum of the horizontal and vertical components in the model plane:
+The total magnetic anomaly is then given by projecting the horizontal and vertical components onto the direction
+of the **inducing** field:
 
 .. math::
-    T = V \sin A + H \cos A \cos (C-B)
+    T = V \sin A^{\prime} + H \cos A^{\prime} \cos (C-B^{\prime})
     :label: talwani_mag_total
+
+where :math:`A^{\prime}` and :math:`B^{\prime}` are the inclination and declination of the inducing (Earth's)
+field. These are equal to the magnetisation angles **A** and **B** only when magnetisation is induced, which is
+why gmg defaults to using **A** and **B** for them.
+
+To model a remanent magnetisation, set the inducing field direction explicitly from::
+
+    Magnetics -> Set Inducing Field Direction...
+
+leaving angles **A** and **B** to describe the magnetisation vector itself. With the box marked *Induced
+magnetisation only* ticked, each layer's own **A** and **B** are used, which is the behaviour described above.
+
+.. warning::
+
+    Versions of gmg before the inducing field direction was separated projected the anomaly onto the
+    magnetisation direction, and did so once per calculation using the angles of whichever layer happened to be
+    processed last. The calculated anomaly therefore did not obey superposition and depended on the order of the
+    layers whenever a model's layers had differing magnetisation directions. Both are fixed, so a model of that
+    kind will produce a different, and correct, magnetic anomaly than it did previously. gmg says so when such a
+    model is loaded.
 
 
 .. Note::
