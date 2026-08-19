@@ -10,6 +10,31 @@ import wx.grid as gridlib
 import numpy as np
 import struct
 
+
+def extent_to_cell(extent):
+    """
+    FORMAT A LAYER OUT OF PLANE EXTENT FOR THE ATTRIBUTE TABLE.
+
+    None MEANS THE LAYER IS OF INFINITE EXTENT (I.E. MODELLED IN 2D) AND IS SHOWN AS AN EMPTY CELL
+    """
+    if extent is None:
+        return ''
+    else:
+        return str(extent)
+
+
+def cell_to_extent(value):
+    """
+    READ A LAYER OUT OF PLANE EXTENT BACK FROM THE ATTRIBUTE TABLE.
+
+    AN EMPTY OR UNPARSEABLE CELL MEANS THE LAYER IS OF INFINITE EXTENT (I.E. MODELLED IN 2D)
+    """
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 class CaptureCoordinates(wx.Frame):
     """CAPTURE MOUSE CLICK COORDINATES AND WRITE TO DISK FILE. RETURNS ASCII TEXT FILE"""
 
@@ -659,7 +684,7 @@ class AttributeEditor(wx.Frame):
 
         # DEFINE ATTRIBUTE GRID
         self.attr_grid = gridlib.Grid(self.input_panel, -1, size=(1000, 500))
-        self.attr_grid.CreateGrid(len(self.tree_items) - 1, 9)
+        self.attr_grid.CreateGrid(len(self.tree_items) - 1, 11)
         self.attr_grid.SetColLabelValue(0, 'Layer Name')
         self.attr_grid.SetColLabelValue(1, 'Density')
         self.attr_grid.SetColLabelValue(2, 'Reference density')
@@ -668,7 +693,9 @@ class AttributeEditor(wx.Frame):
         self.attr_grid.SetColLabelValue(5, 'Angle B')
         self.attr_grid.SetColLabelValue(6, 'Angle C')
         self.attr_grid.SetColLabelValue(7, 'Earth Field')
-        self.attr_grid.SetColLabelValue(8, 'Layer color')
+        self.attr_grid.SetColLabelValue(8, 'Y1 extent')
+        self.attr_grid.SetColLabelValue(9, 'Y2 extent')
+        self.attr_grid.SetColLabelValue(10, 'Layer color')
 
         # SET COLUMN FORMATS
         self.attr_grid.SetColFormatFloat(1, 3, 2)
@@ -678,6 +705,8 @@ class AttributeEditor(wx.Frame):
         self.attr_grid.SetColFormatFloat(5, 3, 2)
         self.attr_grid.SetColFormatFloat(6, 3, 2)
         self.attr_grid.SetColFormatFloat(7, 3, 2)
+        self.attr_grid.SetColFormatFloat(8, 3, 2)
+        self.attr_grid.SetColFormatFloat(9, 3, 2)
 
         # CREATE SET BUTTON
         self.b_set_attr_button = wx.Button(self.input_panel, -1, "Set")
@@ -695,10 +724,12 @@ class AttributeEditor(wx.Frame):
             self.attr_grid.SetCellValue(i, 5, str(self.layer_list[i + 1].angle_b))
             self.attr_grid.SetCellValue(i, 6, str(self.layer_list[i + 1].angle_c))
             self.attr_grid.SetCellValue(i, 7, str(self.layer_list[i + 1].earth_field))
-            self.attr_grid.SetCellValue(i, 8, str(self.layer_list[i + 1].color))
+            self.attr_grid.SetCellValue(i, 8, extent_to_cell(getattr(self.layer_list[i + 1], 'y1', None)))
+            self.attr_grid.SetCellValue(i, 9, extent_to_cell(getattr(self.layer_list[i + 1], 'y2', None)))
+            self.attr_grid.SetCellValue(i, 10, str(self.layer_list[i + 1].color))
 
         # SET SIZER
-        for col in range(8):
+        for col in range(10):
             self.attr_grid.SetColSize(col, 12)
 
         self.attr_grid.AutoSize()
@@ -716,7 +747,7 @@ class AttributeEditor(wx.Frame):
 
     def open_colour_box(self, event):
         """IF THE ROW SELECTED IS 8 (THE LAYER COLOR) THEN OPEN THE COLOR SELECTION WIDGET"""
-        if event.GetCol() == 8:
+        if event.GetCol() == 10:
             row = event.GetRow()
             self.on_color_dlg(event, row)
         else:
@@ -818,7 +849,12 @@ class AttributeEditor(wx.Frame):
             self.layer_list[i + 1].angle_b = float(self.attr_grid.GetCellValue(i, 5))
             self.layer_list[i + 1].angle_c = float(self.attr_grid.GetCellValue(i, 6))
             self.layer_list[i + 1].earth_field = float(self.attr_grid.GetCellValue(i, 7))
-            self.layer_list[i + 1].color = str(self.attr_grid.GetCellValue(i, 8))
+            y1 = cell_to_extent(self.attr_grid.GetCellValue(i, 8))
+            y2 = cell_to_extent(self.attr_grid.GetCellValue(i, 9))
+            # AN EXTENT ONLY MEANS ANYTHING WHEN BOTH SIDES ARE GIVEN; OTHERWISE THE LAYER IS OF INFINITE EXTENT
+            self.layer_list[i + 1].y1 = y1 if (y1 is not None and y2 is not None) else None
+            self.layer_list[i + 1].y2 = y2 if (y1 is not None and y2 is not None) else None
+            self.layer_list[i + 1].color = str(self.attr_grid.GetCellValue(i, 10))
 
         # UPDATE MAIN FRAME
         self.parent.attribute_set(self.tree_items, self.layer_list)

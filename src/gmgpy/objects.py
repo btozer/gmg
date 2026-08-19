@@ -27,6 +27,10 @@ class Layer:
         self.angle_b = 0.
         self.angle_c = 0.
         self.earth_field = 0.
+        # OUT OF PLANE (STRIKE DIRECTION) EXTENTS IN km, MEASURED FROM THE MODEL SECTION. None MEANS THE LAYER IS OF
+        # INFINITE EXTENT, I.E. IT IS MODELLED IN 2D. SET BOTH TO MAKE THE LAYER 2.75D
+        self.y1 = None
+        self.y2 = None
         self.color = 'k'
         self.layer_transparency = 0.4
         self.pinched = False  # SWITCH DICTATING IF THE LAYER HSA ANY NODES PINCHED TO ANOTHER

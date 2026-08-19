@@ -113,6 +113,7 @@ import pygmt_plot_model as plot_model
 import bott
 import talwani_and_heirtzler
 import kim_and_wessel
+import rasmussen_and_pedersen
 from frames import *
 from dialogs import *
 from objects import *
@@ -1233,6 +1234,24 @@ class Gmg(wx.Frame):
         self.earth_field_input.SetFormat("%f")
         self.earth_field_input.SetDigits(1)
 
+        # MAKE THE OUT OF PLANE (2.75D) EXTENT CONTROLS. A FloatSpin CANNOT HOLD "INFINITE", SO A CHECKBOX CARRIES
+        # THAT STATE: UNCHECKED MEANS THE LAYER IS OF INFINITE EXTENT AND IS MODELLED IN 2D
+        self.finite_extent_input = wx.CheckBox(self.fold_panel_item1, -1, label=" Finite extent (2.5D)")
+
+        self.y1_text = wx.StaticText(self.fold_panel_item1, -1, label=" Y1 extent:", style=wx.ALIGN_LEFT)
+        self.y1_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-100000.0, max_val=100000.0, increment=1.0,
+                                     value=-10.0, style=wx.ALIGN_RIGHT)
+        self.y1_input.SetFormat("%f")
+        self.y1_input.SetDigits(2)
+        self.y1_input.Enable(False)
+
+        self.y2_text = wx.StaticText(self.fold_panel_item1, -1, label=" Y2 extent:", style=wx.ALIGN_LEFT)
+        self.y2_input = fs.FloatSpin(self.fold_panel_item1, -1, min_val=-100000.0, max_val=100000.0, increment=1.0,
+                                     value=10.0, style=wx.ALIGN_RIGHT)
+        self.y2_input.SetFormat("%f")
+        self.y2_input.SetDigits(2)
+        self.y2_input.Enable(False)
+
         # MAKE NODE X Y LABEL
         self.node_text = wx.StaticText(self.fold_panel_item1, -1, label=" Node Position:", style=wx.ALIGN_LEFT)
 
@@ -1293,14 +1312,16 @@ class Gmg(wx.Frame):
         _ui_font = get_font(size=12)
         for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
                       self.angle_a_text, self.angle_b_text, self.angle_c_text,
-                      self.earth_field_text, self.node_text, self.x_text, self.y_text,
+                      self.earth_field_text, self.y1_text, self.y2_text,
+                      self.node_text, self.x_text, self.y_text,
                       self.text_size_text):
             label.SetForegroundColour(wx_colour('fg_primary'))
             label.SetBackgroundColour(wx_colour('bg_sidebar'))
             label.SetFont(_ui_font)
         for spin in (self.density_input, self.ref_density_input, self.susceptibility_input,
                      self.angle_a_input, self.angle_b_input, self.angle_c_input,
-                     self.earth_field_input, self.x_input, self.y_input):
+                     self.earth_field_input, self.y1_input, self.y2_input,
+                     self.x_input, self.y_input):
             spin.SetBackgroundColour(wx_colour('bg_input'))
             spin.GetTextCtrl().SetBackgroundColour(wx_colour('bg_input'))
             spin.GetTextCtrl().SetForegroundColour(wx_colour('fg_input'))
@@ -1490,6 +1511,34 @@ class Gmg(wx.Frame):
                                 border=1)
         c += 1
         self.attributes_box.Add(self.earth_field_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+                                border=1)
+
+        # LINE SEP
+        r += 1
+        c = 0
+        line = wx.StaticLine(self.fold_panel_item1)
+        self.attributes_box.Add(line, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL, border=1)
+
+        # OUT OF PLANE (2.75D) EXTENT
+        r += 1
+        c = 0
+        self.attributes_box.Add(self.finite_extent_input, pos=(r, c), span=(1, 6), flag=wx.ALIGN_LEFT | wx.EXPAND |
+                                wx.ALL, border=1)
+
+        r += 1
+        c = 0
+        self.attributes_box.Add(self.y1_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+                                border=1)
+        c += 1
+        self.attributes_box.Add(self.y1_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+                                border=1)
+
+        r += 1
+        c = 0
+        self.attributes_box.Add(self.y2_text, pos=(r, c), span=(1, 1), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
+                                border=1)
+        c += 1
+        self.attributes_box.Add(self.y2_input, pos=(r, c), span=(1, 5), flag=wx.ALIGN_LEFT | wx.EXPAND | wx.ALL,
                                 border=1)
 
         # LINE SEP
@@ -2074,6 +2123,9 @@ class Gmg(wx.Frame):
         self.angle_b_input.Bind(fs.EVT_FLOATSPIN, self.set_angle_b)
         self.angle_c_input.Bind(fs.EVT_FLOATSPIN, self.set_angle_c)
         self.earth_field_input.Bind(fs.EVT_FLOATSPIN, self.set_earth_field)
+        self.finite_extent_input.Bind(wx.EVT_CHECKBOX, self.set_finite_extent)
+        self.y1_input.Bind(fs.EVT_FLOATSPIN, self.set_y1)
+        self.y2_input.Bind(fs.EVT_FLOATSPIN, self.set_y2)
         self.text_size_input.Bind(wx.EVT_SLIDER, self.set_text_size)
         self.node_set_button.Bind(wx.EVT_BUTTON, self.on_menu_set_button_press)
 
@@ -2426,14 +2478,16 @@ class Gmg(wx.Frame):
         _ui_font = get_font(size=12)
         for label in (self.density_text, self.ref_density_text, self.susceptibility_text,
                       self.angle_a_text, self.angle_b_text, self.angle_c_text,
-                      self.earth_field_text, self.node_text, self.x_text, self.y_text,
+                      self.earth_field_text, self.y1_text, self.y2_text,
+                      self.node_text, self.x_text, self.y_text,
                       self.text_size_text):
             label.SetForegroundColour(wx_colour('fg_primary'))
             label.SetBackgroundColour(wx_colour('bg_sidebar'))
             label.SetFont(_ui_font)
         for spin in (self.density_input, self.ref_density_input, self.susceptibility_input,
                      self.angle_a_input, self.angle_b_input, self.angle_c_input,
-                     self.earth_field_input, self.x_input, self.y_input):
+                     self.earth_field_input, self.y1_input, self.y2_input,
+                     self.x_input, self.y_input):
             spin.SetBackgroundColour(wx_colour('bg_input'))
             spin.GetTextCtrl().SetBackgroundColour(wx_colour('bg_input'))
             spin.GetTextCtrl().SetForegroundColour(wx_colour('fg_input'))
@@ -2651,6 +2705,13 @@ class Gmg(wx.Frame):
             self.gravity_frame_switch     = model_data.get('gravity_frame_switch',     True)
             self.vertical_gg_frame_switch = model_data.get('vertical_gg_frame_switch', True)
             self.magnetic_frame_switch    = model_data.get('magnetic_frame_switch',    True)
+
+            # .model FILES WRITTEN BEFORE 2.75D SUPPORT UNPICKLE INTO Layer OBJECTS WITH NO OUT OF PLANE EXTENTS AT
+            # ALL. DEFAULT THEM TO INFINITE EXTENT SO THAT THOSE MODELS REPRODUCE THEIR SAVED ANOMALIES EXACTLY
+            for layer in self.layer_list:
+                if not hasattr(layer, 'y1'):
+                    layer.y1 = None
+                    layer.y2 = None
 
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
@@ -6295,6 +6356,39 @@ class Gmg(wx.Frame):
         self.angle_c_input.SetValue(layer.angle_c)
         self.earth_field_input.SetValue(layer.earth_field)
 
+        # A LAYER WITH NO EXTENTS SET IS OF INFINITE EXTENT (2D), SO THE SPINNERS ARE DISABLED AND KEEP THE VALUES
+        # THEY WOULD TAKE IF THE USER SWITCHED THE LAYER TO 2.75D
+        is_finite = layer.y1 is not None and layer.y2 is not None
+        self.finite_extent_input.SetValue(is_finite)
+        self.y1_input.Enable(is_finite)
+        self.y2_input.Enable(is_finite)
+        if is_finite:
+            self.y1_input.SetValue(layer.y1)
+            self.y2_input.SetValue(layer.y2)
+
+    def set_finite_extent(self, value):
+        """SWITCH THE ACTIVE LAYER BETWEEN INFINITE EXTENT (2D) AND FINITE EXTENT (2.75D)"""
+        layer = self.layer_list[self.currently_active_layer_id]
+
+        if self.finite_extent_input.GetValue():
+            layer.y1 = float(self.y1_input.GetValue())
+            layer.y2 = float(self.y2_input.GetValue())
+        else:
+            layer.y1 = None
+            layer.y2 = None
+
+        self.y1_input.Enable(layer.y1 is not None)
+        self.y2_input.Enable(layer.y2 is not None)
+
+        self.run_algorithms()
+        self.draw()
+
+    def set_y1(self, value):
+        self.layer_list[self.currently_active_layer_id].y1 = float(self.y1_input.GetValue())
+
+    def set_y2(self, value):
+        self.layer_list[self.currently_active_layer_id].y2 = float(self.y2_input.GetValue())
+
     def set_density(self, value):
         self.layer_list[self.currently_active_layer_id].density = float(self.density_input.GetValue() * 1000.)
 
@@ -6450,6 +6544,8 @@ class Gmg(wx.Frame):
             self.layer_list[l].angle_b = new_layer_list[l].angle_b
             self.layer_list[l].angle_c = new_layer_list[l].angle_c
             self.layer_list[l].earth_field = new_layer_list[l].earth_field
+            self.layer_list[l].y1 = new_layer_list[l].y1
+            self.layer_list[l].y2 = new_layer_list[l].y2
             self.layer_list[l].color = new_layer_list[l].color
 
         # UPDATE LAYER ATTRIBUTE INPUTS
@@ -6599,6 +6695,29 @@ class Gmg(wx.Frame):
         # UPDATE GMG GRAPHICS
         self.draw()
 
+    @staticmethod
+    def layer_extents(layer):
+        """
+        RETURN A LAYER'S OUT OF PLANE EXTENTS IN METRES, OR (None, None) IF IT IS OF INFINITE EXTENT (I.E. 2D).
+
+        NB: .model FILES WRITTEN BEFORE 2.75D SUPPORT UNPICKLE INTO Layer OBJECTS WITH NO y1/y2 AT ALL, HENCE getattr
+        """
+        y1 = getattr(layer, 'y1', None)
+        y2 = getattr(layer, 'y2', None)
+
+        if y1 is None or y2 is None:
+            return None, None
+        else:
+            return 1000. * y1, 1000. * y2
+
+    def model_has_finite_extents(self):
+        """TRUE IF ANY LAYER INCLUDED IN THE CALCULATION HAS A FINITE OUT OF PLANE EXTENT SET"""
+        for layer in range(0, self.total_layer_count + 1):
+            if self.layer_list[layer].include_in_calculations_switch is True:
+                if self.layer_extents(self.layer_list[layer]) != (None, None):
+                    return True
+        return False
+
     def run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # --------------------------------------------------------------------------------------------------------------
@@ -6611,6 +6730,7 @@ class Gmg(wx.Frame):
         # CALCULATE GRAVITY
         polygons_to_use = []
         densities_to_use = []
+        extents_to_use = []
         if self.calc_grav_switch is True:
             # SELECT ONLY THOSE LAYERS THAT ARE CHECKED
             for layer in range(0, self.total_layer_count + 1):
@@ -6620,15 +6740,18 @@ class Gmg(wx.Frame):
                     # DETERMINE DENSITY CONTRASTS
                     densities_to_use.append((self.layer_list[layer].density -
                                              self.layer_list[layer].reference_density))
+                    # DETERMINE OUT OF PLANE EXTENTS
+                    extents_to_use.append(self.layer_extents(self.layer_list[layer]))
 
-            # PASS POLYGONS TO BOTT ALGORITHM AND RETURN THE PREDICTED VALUES
+            # PASS POLYGONS TO THE ALGORITHM AND RETURN THE PREDICTED VALUES
             bott_input_polygons = []
-            for p, d in zip(polygons_to_use, densities_to_use):
-                bott_input_polygons.append(Polygon(1000 * np.array(p), {'density': d}))
+            for p, d, (y1, y2) in zip(polygons_to_use, densities_to_use, extents_to_use):
+                bott_input_polygons.append(Polygon(1000 * np.array(p), {'density': d, 'y1': y1, 'y2': y2}))
 
-            # SET THE PREDICTED VALUES AS THE BOTT OUTPUT
+            # SET THE PREDICTED VALUES AS THE ALGORITHM OUTPUT. LAYERS OF INFINITE EXTENT ARE PASSED THROUGH TO BOTT
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
-            self.predicted_gravity = bott.gz(self.xp, self.gravity_observation_elv, bott_input_polygons) * -1
+            self.predicted_gravity = rasmussen_and_pedersen.gz(self.xp, self.gravity_observation_elv,
+                                                               bott_input_polygons) * -1
             # self.predicted_vgg = kim_and_wessel.gz(self.xp, self.gravity_observation_elv, bott_input_polygons)  * -1
         else:
             # SET THE PREDICTED VALUES AS ZEROS
@@ -6659,9 +6782,18 @@ class Gmg(wx.Frame):
             for p, d in zip(polygons_to_use, densities_to_use):
                 kim_input_polygons.append(Polygon(1000 * np.array(p), {'density': d}))
 
-            # SET THE PREDICTED VALUES AS THE BOTT OUTPUT
+            # SET THE PREDICTED VALUES AS THE KIM & WESSEL OUTPUT
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
             self.predicted_vgg = kim_and_wessel.gz(self.xp, self.vgg_observation_elv, kim_input_polygons)  * -1
+
+            # THERE IS NO 2.75D VGG ALGORITHM, SO THE VGG IGNORES ANY OUT OF PLANE EXTENTS THAT THE GRAVITY AND
+            # MAGNETIC ANOMALIES ARE HONOURING. SAY SO ON THE AXIS RATHER THAN LET THE USER FIT A MISLEADING CURVE
+            # NB: THE FRAME IS None WHILE THE VGG PANEL IS HIDDEN
+            if self.vertical_gg_frame is not None:
+                if self.model_has_finite_extents():
+                    self.vertical_gg_frame.set_ylabel("V (Eotvos)\n2D only")
+                else:
+                    self.vertical_gg_frame.set_ylabel("V (Eotvos)")
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_vgg = np.zeros_like(self.xp)
@@ -6681,6 +6813,7 @@ class Gmg(wx.Frame):
             angle_b_to_use = []
             angle_c_to_use = []
             earth_field_to_use = []
+            extents_to_use = []
             for layer in range(0, self.total_layer_count + 1):
                 if self.layer_list[layer].include_in_calculations_switch is True:
                     polygons_to_use.append(self.layer_list[layer].polygon)
@@ -6689,16 +6822,21 @@ class Gmg(wx.Frame):
                     angle_b_to_use.append(self.layer_list[layer].angle_b)
                     angle_c_to_use.append(self.layer_list[layer].angle_c)
                     earth_field_to_use.append(self.layer_list[layer].earth_field)
+                    extents_to_use.append(self.layer_extents(self.layer_list[layer]))
 
-            # PASS TO TALWANI & HEIRTZLER ALGORITHM
+            # PASS TO THE MAGNETIC ALGORITHM
             mag_input_polygons = []
-            for p, s, a, b, c, f, in zip(polygons_to_use, susceptibilities_to_use, angle_a_to_use, angle_b_to_use,
-                                         angle_c_to_use, earth_field_to_use):
+            for p, s, a, b, c, f, (y1, y2) in zip(polygons_to_use, susceptibilities_to_use, angle_a_to_use,
+                                                  angle_b_to_use, angle_c_to_use, earth_field_to_use,
+                                                  extents_to_use):
                 mag_input_polygons.append(Polygon(1000. * np.array(p), {'susceptibility': s, 'angle_a': a,
-                                                                        'angle_b': b, 'angle_c': c, 'f': f}))
-            # SET THE PREDICTED VALUES AS THE TALWANI & HEIRTZLER OUTPUT
+                                                                        'angle_b': b, 'angle_c': c, 'f': f,
+                                                                        'y1': y1, 'y2': y2}))
+            # SET THE PREDICTED VALUES AS THE ALGORITHM OUTPUT. LAYERS OF INFINITE EXTENT ARE PASSED THROUGH TO
+            # TALWANI & HEIRTZLER
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
-            self.predicted_nt = talwani_and_heirtzler.nt(self.xp, self.mag_observation_elv, mag_input_polygons) * -1
+            self.predicted_nt = rasmussen_and_pedersen.nt(self.xp, self.mag_observation_elv,
+                                                          mag_input_polygons) * -1
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_nt = np.zeros_like(self.xp)
