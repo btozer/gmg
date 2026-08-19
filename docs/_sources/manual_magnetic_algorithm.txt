@@ -125,6 +125,28 @@ magnetisation only* ticked, each layer's own **A** and **B** are used, which is 
         use Talwani and Heirtzler (1964) :cite:`talwani1964`.
 
 
+.. warning::
+
+    **The calculated anomaly is not valid at an observation point lying inside a magnetised layer.** This arises
+    whenever a magnetised layer crosses the calculation elevation, for instance an outcropping body modelled
+    with the elevation left at sea level: the observation points above the body then sit within it.
+
+    The angle subtended by a polygon side jumps by :math:`2\pi` where that side crosses the line of the
+    observation point. Around a closed polygon those jumps cancel when the point lies outside it, and do not
+    when it lies inside. Both of gmg's magnetic algorithms are affected, and they disagree with each other
+    there, so at least one is wrong whatever convention is adopted for the field inside a magnetised body.
+
+    gmg **marks** the affected samples with red crosses on the magnetic panel, and notes them on the panel's
+    axis label, rather than silently reporting them. It does not correct them.
+
+    A magnetometer is never inside the rock in a real survey, so the situation is avoided altogether by setting
+    the calculation elevation above the topography, from
+    **Magnetics -> Set Calculation Elevation...**, either as a constant or from a profile.
+
+    The gravity and vertical gravity gradient algorithms are **not** affected and are correct at interior
+    points.
+
+
 Talwani and Heirtzler (1964) method testing
 -------------------------------------------
 

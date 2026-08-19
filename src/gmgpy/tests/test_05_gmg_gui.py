@@ -298,6 +298,50 @@ def test_inducing_field_direction_changes_the_magnetic_anomaly(gmg_frame, gmg_mo
     np.testing.assert_array_equal(gmg_frame.predicted_nt, induced)
 
 
+def test_interior_observation_points_are_marked(gmg_frame):
+    """
+    Test observation points falling inside a magnetised layer are detected and marked
+
+    Both magnetic algorithms are wrong at such a point, which arises whenever a magnetised layer crosses the
+    calculation elevation. They are marked rather than corrected, so that a wrong value is never read as a good
+    one.
+    """
+    layer = gmg_frame.layer_list[gmg_frame.currently_active_layer_id]
+
+    # AS BUILT THE LAYER SITS WHOLLY BELOW THE CALCULATION ELEVATION, SO NOTHING IS INSIDE IT
+    assert not gmg_frame.observation_points_inside_magnetic_layers().any()
+    assert '2D only' not in gmg_frame.magnetic_frame.get_ylabel()
+    assert len(gmg_frame.untrusted_nt_plot.get_xdata()) == 0
+
+    # RAISE THE LAYER'S TOP ABOVE THE CALCULATION ELEVATION SO THAT IT STRADDLES IT.
+    # NB: THE NODES ARE EDITED IN PLACE BECAUSE gmg.current_y_nodes ALIASES THE SAME LIST AND update_layer_data
+    # WRITES IT BACK OVER THE LAYER, SO REBINDING layer.y_nodes ALONE WOULD BE UNDONE
+    layer.y_nodes[:] = [-2.0, -2.0, 15.0, 15.0]
+    gmg_frame.update_layer_data()
+    gmg_frame.run_algorithms()
+
+    inside = gmg_frame.observation_points_inside_magnetic_layers()
+    assert inside.any(), 'a layer crossing the calculation elevation must contain observation points'
+
+    # THE MARKED SAMPLES MUST BE EXACTLY THOSE DETECTED.
+    # NB: A LOOSE TOLERANCE, BECAUSE matplotlib STORES LINE DATA AS float32
+    marked = gmg_frame.untrusted_nt_plot.get_xdata()
+    detected = gmg_frame.xp[inside] * 0.001
+    np.testing.assert_allclose(marked, detected, rtol=1.0e-6)
+
+    # AND THEY MUST ALL LIE WITHIN THE LAYER'S HORIZONTAL SPAN.
+    # NB: COMPARED IN METRES, SINCE SCALING BY 0.001 IS NOT EXACT IN BINARY AND PUTS 60000 m JUST OVER 60 km
+    assert gmg_frame.xp[inside].min() >= 1000.0 * min(layer.x_nodes)
+    assert gmg_frame.xp[inside].max() <= 1000.0 * max(layer.x_nodes)
+    assert 'inside a layer' in gmg_frame.magnetic_frame.get_ylabel()
+
+    # A LAYER WITH NO SUSCEPTIBILITY CANNOT MAKE A MAGNETIC ANOMALY UNTRUSTWORTHY
+    layer.susceptibility = 0.0
+    gmg_frame.run_algorithms()
+    assert not gmg_frame.observation_points_inside_magnetic_layers().any()
+    assert 'inside a layer' not in gmg_frame.magnetic_frame.get_ylabel()
+
+
 def test_bulk_setters_reach_every_layer(gmg_frame, gmg_module, monkeypatch):
     """
     Test the bulk background density and out of plane extent setters apply to every layer

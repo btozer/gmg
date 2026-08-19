@@ -93,6 +93,7 @@ import matplotlib.cm as cm
 from matplotlib.ticker import FormatStrFormatter
 import matplotlib.colors as colors
 import matplotlib.image as mplimg
+from matplotlib.path import Path
 import wx.adv
 import wx.lib.agw.customtreectrl as ct
 import wx.py as py
@@ -1194,6 +1195,9 @@ class Gmg(wx.Frame):
         self.vgg_rms_plot, = self.vertical_gg_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
         self.predicted_nt_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_pred_mag'], linewidth=2, alpha=0.8)
         self.mag_rms_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
+        # SAMPLES LYING INSIDE A MAGNETISED LAYER, WHERE THE CALCULATED ANOMALY IS NOT TO BE TRUSTED
+        self.untrusted_nt_plot, = self.magnetic_frame.plot([], [], color='red', linewidth=3.5, alpha=0.9,
+                                                           linestyle='None', marker='x', markersize=5)
 
         # ADDITIONAL MAIN FRAME WIDGETS - PLACED ON LEFT HAND SIDE OF THE FRAME
 
@@ -1953,6 +1957,9 @@ class Gmg(wx.Frame):
         if self.magnetic_frame is not None:
             self.predicted_nt_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_pred_mag'], linewidth=2, alpha=0.8)
             self.mag_rms_plot, = self.magnetic_frame.plot([], [], color=THEME['plot_rms'], linewidth=1.5, alpha=0.8)
+            # SAMPLES LYING INSIDE A MAGNETISED LAYER, WHERE THE CALCULATED ANOMALY IS NOT TO BE TRUSTED
+            self.untrusted_nt_plot, = self.magnetic_frame.plot([], [], color='red', linewidth=3.5, alpha=0.9,
+                                                               linestyle='None', marker='x', markersize=5)
 
         # PLOT OBSERVED TOPO DATA
         if self.topography_frame is not None:
@@ -6826,6 +6833,45 @@ class Gmg(wx.Frame):
                     return True
         return False
 
+    def observation_points_inside_magnetic_layers(self):
+        """
+        RETURN A MASK OF THE OBSERVATION POINTS THAT LIE INSIDE A MAGNETISED LAYER.
+
+        BOTH MAGNETIC ALGORITHMS ARE WRONG AT SUCH A POINT. THE ANGLE SUBTENDED BY A POLYGON SIDE JUMPS BY 2 PI
+        WHERE THE SIDE CROSSES THE LINE OF THE OBSERVATION POINT, AND WHILE THOSE JUMPS CANCEL AROUND A CLOSED
+        POLYGON WHEN THE POINT IS OUTSIDE IT, THEY DO NOT WHEN IT IS INSIDE. THE TWO ALGORITHMS DISAGREE WITH EACH
+        OTHER THERE BY A CONSTANT OFFSET, SO AT LEAST ONE OF THEM IS WRONG WHATEVER CONVENTION IS ADOPTED FOR THE
+        FIELD INSIDE A MAGNETISED BODY.
+
+        THIS ARISES WHENEVER A MAGNETISED LAYER CROSSES THE CALCULATION ELEVATION, SINCE THE OBSERVATION POINTS
+        ABOVE THE BODY THEN SIT WITHIN IT. IT IS NOT A PHYSICAL SURVEY CONFIGURATION, A MAGNETOMETER NEVER BEING
+        INSIDE THE ROCK, SO THE SAMPLES ARE MARKED RATHER THAN CORRECTED. SETTING THE CALCULATION ELEVATION ABOVE
+        THE TOPOGRAPHY AVOIDS IT ENTIRELY.
+
+        NB: THE GRAVITY AND VGG ALGORITHMS ARE CORRECT AT INTERIOR POINTS AND ARE NOT AFFECTED.
+
+        :returns: 1D array (bool) : True where an observation point lies inside a magnetised layer
+        """
+        inside = np.zeros_like(self.xp, dtype=bool)
+
+        # THE OBSERVATION ELEVATION IS EITHER A SINGLE VALUE OR ONE PER OBSERVATION POINT
+        elevation = np.broadcast_to(np.asarray(self.mag_observation_elv, dtype=float), self.xp.shape)
+        points = np.column_stack((self.xp, elevation))
+
+        for layer in range(0, self.total_layer_count + 1):
+            if self.layer_list[layer].include_in_calculations_switch is not True:
+                continue
+            if self.layer_list[layer].susceptibility == 0.0:
+                continue
+            if self.layer_list[layer].polygon is None or len(self.layer_list[layer].polygon) < 3:
+                continue
+
+            # LAYER NODES ARE IN km AND THE OBSERVATION POINTS IN m, AS THEY ARE WHERE THE ALGORITHMS ARE CALLED
+            outline = Path(1000. * np.array(self.layer_list[layer].polygon))
+            inside = inside | outline.contains_points(points)
+
+        return inside
+
     def run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # --------------------------------------------------------------------------------------------------------------
@@ -6956,6 +7002,21 @@ class Gmg(wx.Frame):
 
         # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
         self.predicted_nt_plot.set_data(self.xp * 0.001, self.predicted_nt)
+
+        # MARK ANY SAMPLE LYING INSIDE A MAGNETISED LAYER, WHERE THE CALCULATED ANOMALY IS KNOWN TO BE WRONG, SO
+        # THAT IT IS NEVER READ AS A GOOD VALUE. NB: THE FRAME IS None WHILE THE MAGNETIC PANEL IS HIDDEN
+        if self.calc_mag_switch is True:
+            untrusted = self.observation_points_inside_magnetic_layers()
+        else:
+            untrusted = np.zeros_like(self.xp, dtype=bool)
+
+        self.untrusted_nt_plot.set_data(self.xp[untrusted] * 0.001, self.predicted_nt[untrusted])
+
+        if self.magnetic_frame is not None:
+            if untrusted.any():
+                self.magnetic_frame.set_ylabel("M (nT)\nred: inside a layer")
+            else:
+                self.magnetic_frame.set_ylabel("M (nT)")
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
