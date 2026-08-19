@@ -692,6 +692,114 @@ class SetBackgroundDensityDialog(wx.Dialog):
         self.EndModal(1)
 
 
+class SetInducingFieldDialog(wx.Dialog):
+    """
+    SET THE DIRECTION OF THE INDUCING (EARTH'S) FIELD FOR THE WHOLE MODEL.
+
+    THE TOTAL FIELD ANOMALY IS THE PROJECTION OF A BODY'S ANOMALOUS FIELD ONTO THIS DIRECTION, WHICH IS ONLY THE SAME
+    AS THE BODY'S MAGNETISATION DIRECTION (ANGLES A AND B) WHEN MAGNETISATION IS INDUCED ONLY
+    """
+
+    def __init__(self, parent, id, title, inclination=None, declination=None):
+        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+        induced_only = inclination is None or declination is None
+
+        # WHEN TICKED, EACH LAYER'S OWN ANGLES A AND B ARE USED, WHICH IS THE INDUCED ONLY CASE
+        self.induced_only_input = wx.CheckBox(input_panel, -1,
+                                              "Induced magnetisation only (use each layer's angles A and B)")
+        self.induced_only_input.SetValue(induced_only)
+        self.Bind(wx.EVT_CHECKBOX, self.on_induced_only, self.induced_only_input)
+
+        self.inclination_label = wx.StaticText(input_panel, -1, "Inducing field inclination (degrees):")
+        self.inclination_input = wx.TextCtrl(input_panel, -1, str(0.0 if induced_only else inclination),
+                                             size=(100, -1))
+        self.declination_label = wx.StaticText(input_panel, -1, "Inducing field declination (degrees):")
+        self.declination_input = wx.TextCtrl(input_panel, -1, str(0.0 if induced_only else declination),
+                                             size=(100, -1))
+        self.inclination_input.Enable(not induced_only)
+        self.declination_input.Enable(not induced_only)
+
+        # DEFINE SET BUTTON
+        self.b_apply = wx.Button(input_panel, -1, "Apply")
+        self.Bind(wx.EVT_BUTTON, self.set_inducing_field, self.b_apply)
+
+        # DEFINE SIZER
+        sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
+        sizer.AddMany([self.induced_only_input, (0, 0),
+                       self.inclination_label, self.inclination_input,
+                       self.declination_label, self.declination_input,
+                       self.b_apply])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def on_induced_only(self, event):
+        """GREY OUT THE ANGLES WHEN THE MODEL IS INDUCED ONLY"""
+        enabled = not self.induced_only_input.GetValue()
+        self.inclination_input.Enable(enabled)
+        self.declination_input.Enable(enabled)
+
+    def set_inducing_field(self, event):
+        if self.induced_only_input.GetValue():
+            self.inclination = None
+            self.declination = None
+        else:
+            self.inclination = float(self.inclination_input.GetValue())
+            self.declination = float(self.declination_input.GetValue())
+
+        # CLOSE
+        self.EndModal(1)
+
+
+class SetOutOfPlaneExtentDialog(wx.Dialog):
+    """SET THE OUT OF PLANE (STRIKE DIRECTION) EXTENT OF EVERY LAYER AT ONCE"""
+
+    def __init__(self, parent, id, title):
+        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+
+        # WHEN TICKED, EVERY LAYER IS RETURNED TO INFINITE EXTENT (I.E. MODELLED IN 2D)
+        self.infinite_input = wx.CheckBox(input_panel, -1, "Infinite extent (model every layer in 2D)")
+        self.Bind(wx.EVT_CHECKBOX, self.on_infinite, self.infinite_input)
+
+        self.y1_label = wx.StaticText(input_panel, -1, "Y1 extent (km):")
+        self.y1_input = wx.TextCtrl(input_panel, -1, "-10.0", size=(100, -1))
+        self.y2_label = wx.StaticText(input_panel, -1, "Y2 extent (km):")
+        self.y2_input = wx.TextCtrl(input_panel, -1, "10.0", size=(100, -1))
+
+        # DEFINE SET BUTTON
+        self.b_apply = wx.Button(input_panel, -1, "Apply")
+        self.Bind(wx.EVT_BUTTON, self.set_extent, self.b_apply)
+
+        # DEFINE SIZER
+        sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
+        sizer.AddMany([self.infinite_input, (0, 0),
+                       self.y1_label, self.y1_input,
+                       self.y2_label, self.y2_input,
+                       self.b_apply])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def on_infinite(self, event):
+        """GREY OUT THE EXTENTS WHEN EVERY LAYER IS TO BE MODELLED IN 2D"""
+        enabled = not self.infinite_input.GetValue()
+        self.y1_input.Enable(enabled)
+        self.y2_input.Enable(enabled)
+
+    def set_extent(self, event):
+        if self.infinite_input.GetValue():
+            self.y1 = None
+            self.y2 = None
+        else:
+            self.y1 = float(self.y1_input.GetValue())
+            self.y2 = float(self.y2_input.GetValue())
+
+        # CLOSE
+        self.EndModal(1)
+
+
 class BulkShiftDialog(wx.Dialog):
     """APPLY A BULK SHIFT OF A LAYER IN THE Z DIRECTION"""
 

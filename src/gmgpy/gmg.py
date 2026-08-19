@@ -537,6 +537,10 @@ class Gmg(wx.Frame):
         m_save_mag_submenu = self.magnetic_data.Append(-1, "&Save Predicted Anomaly...",
                                                        "Save Predicted Anomaly to Disc...")
         self.Bind(wx.EVT_MENU, self.save_modelled_mag, m_save_mag_submenu)
+        # SET THE INDUCING FIELD DIRECTION
+        m_set_inducing_field = self.magnetic_data.Append(-1, "Set Inducing Field Direction...",
+                                                         "Set the inclination and declination of Earth's field")
+        self.Bind(wx.EVT_MENU, self.set_inducing_field, m_set_inducing_field)
         # GENERATE REGIONAL FIELD
         m_regional_mag = self.magnetic_data.Append(-1, "Generate regional field...", "Generate regional field")
         self.Bind(wx.EVT_MENU, self.on_regional_field_mag, m_regional_mag)
@@ -667,6 +671,10 @@ class Gmg(wx.Frame):
         # BULK SHIFT
         self.m_bulk_shift = self.layer_file.Append(-1, "Bulk Shift...", "Bulk Shift...")
         self.Bind(wx.EVT_MENU, self.bulk_shift, self.m_bulk_shift)
+        # SET OUT OF PLANE EXTENT FOR EVERY LAYER
+        self.m_set_extent = self.layer_file.Append(-1, "Set Out Of Plane Extent...",
+                                                   "Set the 2.75D strike direction extent of every layer")
+        self.Bind(wx.EVT_MENU, self.set_out_of_plane_extent, self.m_set_extent)
         # PINCH/DEPINCH LAYER
         self.pinch_submenu = wx.Menu()
         self.layer_file.AppendSubMenu(self.pinch_submenu, "Pinch")
@@ -1000,6 +1008,10 @@ class Gmg(wx.Frame):
         # INITIALISE MODELLING MAGNETIC ATTRIBUTES
         self.calc_mag_switch = False
         self.earth_field = 0.
+        # DIRECTION OF THE INDUCING (EARTH'S) FIELD, ONTO WHICH THE TOTAL FIELD ANOMALY IS PROJECTED. None MEANS
+        # MAGNETISATION IS INDUCED ONLY, IN WHICH CASE EACH LAYER'S OWN ANGLES A AND B GIVE THE DIRECTION
+        self.inducing_field_inclination = None
+        self.inducing_field_declination = None
         self.obs_mag_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.magnetic_rms_value = None  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
         self.mag_residuals = []  # CALCULATED RESIDUAL
@@ -2623,6 +2635,7 @@ class Gmg(wx.Frame):
                   'calc_grav_switch', 'calc_vgg_switch', 'calc_mag_switch',
                   # PHYSICAL / DISPLAY SETTINGS
                   'earth_field', 'background_density', 'absolute_densities',
+                  'inducing_field_inclination', 'inducing_field_declination',
                   'layer_transparency', 'calc_padding', 'padding']
 
         model_params = [self.model_aspect, self.area, self.xp,
@@ -2648,6 +2661,7 @@ class Gmg(wx.Frame):
                         self.calc_grav_switch, self.calc_vgg_switch, self.calc_mag_switch,
                         # PHYSICAL / DISPLAY SETTINGS
                         self.earth_field, self.background_density, self.absolute_densities,
+                        self.inducing_field_inclination, self.inducing_field_declination,
                         self.layer_transparency, self.calc_padding, self.padding]
 
         for i in range(0, len(model_params)):
@@ -2708,6 +2722,11 @@ class Gmg(wx.Frame):
             self.gravity_frame_switch     = model_data.get('gravity_frame_switch',     True)
             self.vertical_gg_frame_switch = model_data.get('vertical_gg_frame_switch', True)
             self.magnetic_frame_switch    = model_data.get('magnetic_frame_switch',    True)
+
+            # OLDER .model FILES PREDATE THE SEPARATE INDUCING FIELD DIRECTION. DEFAULT TO None, WHICH MEANS EACH
+            # LAYER'S OWN ANGLES A AND B ARE USED, I.E. THE INDUCED ONLY CASE gmg ASSUMED BEFORE
+            self.inducing_field_inclination = model_data.get('inducing_field_inclination', None)
+            self.inducing_field_declination = model_data.get('inducing_field_declination', None)
 
             # .model FILES WRITTEN BEFORE 2.75D SUPPORT UNPICKLE INTO Layer OBJECTS WITH NO OUT OF PLANE EXTENTS AT
             # ALL. DEFAULT THEM TO INFINITE EXTENT SO THAT THOSE MODELS REPRODUCE THEIR SAVED ANOMALIES EXACTLY
@@ -2884,6 +2903,9 @@ class Gmg(wx.Frame):
                 self.update_layer_data()  # IF THE MODEL INCLUDES LAYERS THEN UPDATE
             self.run_algorithms()
             self.draw()
+            # TELL THE USER IF THIS MODEL'S MAGNETIC ANOMALY WILL DIFFER FROM THE ONE EARLIER VERSIONS CALCULATED
+            self.warn_if_magnetisation_directions_differ()
+
             self.Restore()  # FIX'S DISPLAY ISSUE
             self.fold_panel_item2.SetSize(200, 300)
             self.fold_panel_item3.SetSize(200, 300)
@@ -6411,12 +6433,72 @@ class Gmg(wx.Frame):
         answer = grav_box.ShowModal()
         self.background_density_upper = float(grav_box.background_density_upper)
 
-        for i in range(0, self.total_layer_count):
+        # NB: THE RANGE USED TO STOP AT total_layer_count, SO THE LAST LAYER KEPT ITS OLD REFERENCE DENSITY
+        for i in range(0, self.total_layer_count + 1):
             self.layer_list[i].reference_density = float(self.background_density_upper) * 1000.
         # self.background_density_upper = float((grav_box.background_density_lower))
         # self.background_density_upper = float((grav_box.background_density_lid))
         self.absolute_densities = True
+
+        # REFLECT THE CHANGE IN THE SIDEBAR AND RECALCULATE, AS THE OTHER BULK ATTRIBUTE ACTIONS DO. WITHOUT THIS
+        # THE PLOTTED ANOMALY STAYED ON THE OLD REFERENCE DENSITY UNTIL SOMETHING ELSE HAPPENED TO TRIGGER A RECALC
+        self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
+        self.run_algorithms()
         self.draw()
+
+    def set_inducing_field(self, event):
+        """SET THE DIRECTION OF THE INDUCING (EARTH'S) FIELD FOR THE WHOLE MODEL"""
+        dialog = SetInducingFieldDialog(self, -1, 'Set inducing field direction',
+                                        self.inducing_field_inclination, self.inducing_field_declination)
+        if dialog.ShowModal() != 1:
+            return  # USER CHANGED THEIR MIND
+
+        self.inducing_field_inclination = dialog.inclination
+        self.inducing_field_declination = dialog.declination
+
+        self.run_algorithms()
+        self.draw()
+
+    def set_out_of_plane_extent(self, event):
+        """SET THE OUT OF PLANE (STRIKE DIRECTION) EXTENT OF EVERY LAYER AT ONCE"""
+        dialog = SetOutOfPlaneExtentDialog(self, -1, 'Set out of plane extent')
+        if dialog.ShowModal() != 1:
+            return  # USER CHANGED THEIR MIND
+
+        for i in range(0, self.total_layer_count + 1):
+            self.layer_list[i].y1 = dialog.y1
+            self.layer_list[i].y2 = dialog.y2
+
+        # REFLECT THE CHANGE IN THE SIDEBAR FOR WHICHEVER LAYER IS ACTIVE
+        self.set_layer_attribute_spinners(self.layer_list[self.currently_active_layer_id])
+
+        self.run_algorithms()
+        self.draw()
+
+    def warn_if_magnetisation_directions_differ(self):
+        """
+        WARN THAT A LOADED MODEL'S MAGNETIC ANOMALY WILL DIFFER FROM THAT CALCULATED BY EARLIER VERSIONS OF gmg.
+
+        EARLIER VERSIONS PROJECTED THE TOTAL FIELD ANOMALY OF EVERY LAYER ONTO THE MAGNETISATION DIRECTION OF
+        WHICHEVER LAYER WAS PROCESSED LAST, SO THE RESULT BROKE SUPERPOSITION AND DEPENDED ON LAYER ORDER. THAT ONLY
+        SHOWED UP WHEN THE LAYERS DISAGREED ABOUT THEIR MAGNETISATION DIRECTION, WHICH IS EXACTLY THE CONDITION
+        TESTED HERE
+        """
+        directions = set()
+        for layer in self.layer_list:
+            if layer.include_in_calculations_switch and layer.susceptibility != 0.0:
+                directions.add((layer.angle_a, layer.angle_b))
+
+        if len(directions) > 1:
+            wx.MessageBox(
+                "This model has layers with differing magnetisation directions (angles A and B).\n\n"
+                "Earlier versions of gmg projected the total field anomaly onto the magnetisation direction of "
+                "whichever layer was processed last, so the calculated anomaly broke superposition and depended "
+                "on the order of the layers. It is now projected per layer onto the inducing field direction.\n\n"
+                "The magnetic anomaly for this model will therefore differ from the one you saw previously. If "
+                "the layers carry a remanent magnetisation, set the inducing field direction from "
+                "Magnetics -> Set Inducing Field Direction...",
+                "Magnetic anomaly has changed", wx.OK | wx.ICON_INFORMATION, self)
 
     def set_susceptibility(self, value):
         self.layer_list[self.currently_active_layer_id].susceptibility = float(self.susceptibility_input.GetValue())
@@ -6839,9 +6921,14 @@ class Gmg(wx.Frame):
             for p, s, a, b, c, f, (y1, y2) in zip(polygons_to_use, susceptibilities_to_use, angle_a_to_use,
                                                   angle_b_to_use, angle_c_to_use, earth_field_to_use,
                                                   extents_to_use):
-                mag_input_polygons.append(Polygon(1000. * np.array(p), {'susceptibility': s, 'angle_a': a,
-                                                                        'angle_b': b, 'angle_c': c, 'f': f,
-                                                                        'y1': y1, 'y2': y2}))
+                props = {'susceptibility': s, 'angle_a': a, 'angle_b': b, 'angle_c': c, 'f': f,
+                         'y1': y1, 'y2': y2}
+                # ONLY STATE THE INDUCING FIELD DIRECTION WHEN THE USER HAS SET ONE. LEFT OUT, THE ALGORITHM FALLS
+                # BACK TO THE LAYER'S OWN ANGLES A AND B, WHICH IS THE INDUCED ONLY CASE
+                if self.inducing_field_inclination is not None and self.inducing_field_declination is not None:
+                    props['inclination'] = self.inducing_field_inclination
+                    props['declination'] = self.inducing_field_declination
+                mag_input_polygons.append(Polygon(1000. * np.array(p), props))
             # SET THE PREDICTED VALUES AS THE ALGORITHM OUTPUT. LAYERS OF INFINITE EXTENT ARE PASSED THROUGH TO
             # TALWANI & HEIRTZLER
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
