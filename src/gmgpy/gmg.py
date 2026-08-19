@@ -2671,8 +2671,24 @@ class Gmg(wx.Frame):
                 print((header[i]))
         try:
             output_stream = save_file_dialog.GetPath()
-            with open(output_stream, 'wb') as output_file:
-                pickle.dump(self.save_dict, output_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+            # MATPLOTLIB ARTISTS ARE NOT WRITTEN TO THE FILE. load_model RECREATES EVERY ONE OF THEM FROM THE SAVED
+            # DATA, SO THEY CARRY NOTHING, AND PICKLING THEM TIES THE FILE TO THE MATPLOTLIB VERSION THAT WROTE IT.
+            # THAT IS WHY .model FILES WRITTEN BY OLDER GMG INSTALLS CAN FAIL TO OPEN AT ALL. THEY ARE PUT BACK
+            # AFTERWARDS SO THE LIVE MODEL IS UNTOUCHED, WHATEVER HAPPENS DURING THE WRITE
+            stripped = []
+            try:
+                for saved_value in self.save_dict.values():
+                    for saved_object in walk_objects(saved_value):
+                        stripped.append((saved_object, strip_mpl_artists(saved_object)))
+
+                with open(output_stream, 'wb') as output_file:
+                    pickle.dump(self.save_dict, output_file, protocol=pickle.HIGHEST_PROTOCOL)
+            finally:
+                for saved_object, removed in stripped:
+                    for name, value in removed.items():
+                        setattr(saved_object, name, value)
+
             self.model_saved = True
             self.update_layer_data()
 
