@@ -17,6 +17,13 @@ Python package for modeling and inversion in geophysics. figshare. doi:10.6084/m
 import numpy as np
 from numpy import arctan2, sin, cos, log
 
+# gmg.py PUTS ITS OWN DIRECTORY ON sys.path AND IMPORTS ITS MODULES FLAT, WHILE THE PACKAGED TESTS IMPORT gmgpy AS
+# A PACKAGE, SO THE SHARED HELPER HAS TO BE REACHABLE BOTH WAYS
+try:
+    from .polygon import vertex_pair
+except ImportError:
+    from polygon import vertex_pair
+
 # CONSTANTS
 SI2MGAL = 100000.0  # Conversion factor from SI units to mGal: :math:`1\ m/s^2 = 10^5\ mGal`
 G = 0.00000000006673  # The gravitational constant in :math:`m^3 kg^{-1} s^{-1}`
@@ -73,19 +80,8 @@ def gz(xp, zp, polygons):
 
         # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
         for v in range(nverts):
-            # SET THE CURRENT INPUT VERTEX
-            xv = x[v] - xp
-            zv = z[v] - zp
-
-            # SET THE SECOND VERTEX
-            if v == nverts - 1:
-                # PAIR THE LAST VERTEX WITH THE FIRST ONE
-                xvp1 = x[0] - xp
-                zvp1 = z[0] - zp
-            else:
-                # SET THE SECOND NODE
-                xvp1 = x[v + 1] - xp
-                zvp1 = z[v + 1] - zp
+            # SET THE VERTEX PAIR, RELATIVE TO THE OBSERVATION POINTS AND CLEAR OF ANY OF THEM
+            xv, zv, xvp1, zvp1 = vertex_pair(x, z, v, nverts, xp, zp)
 
             # RUN BOTT ALGORITHM
             theta = -1 * arctan2((zvp1 - zv), (xvp1 - xv))

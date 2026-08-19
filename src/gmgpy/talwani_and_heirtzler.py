@@ -19,6 +19,13 @@ for modeling and inversion in geophysics. figshare. doi:10.6084/m9.figshare.1115
 import numpy as np
 import math as m
 
+# gmg.py PUTS ITS OWN DIRECTORY ON sys.path AND IMPORTS ITS MODULES FLAT, WHILE THE PACKAGED TESTS IMPORT gmgpy AS
+# A PACKAGE, SO THE SHARED HELPER HAS TO BE REACHABLE BOTH WAYS
+try:
+    from .polygon import vertex_pair
+except ImportError:
+    from polygon import vertex_pair
+
 def nt(xp, zp, polygons):
     """
     Calculates the :math:`ntz` magnetic field strength in nT.
@@ -118,18 +125,8 @@ def nt(xp, zp, polygons):
 
             # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
             for v in range(0, nverts):
-                # SET THE CURRENT INPUT VERTEX
-                xv = x[v] - xp
-                zv = z[v] - zp
-
-                if v == nverts - 1:
-                    # SET THE SECOND VERTEX
-                    xv2 = x[0] - xp
-                    zv2 = z[0] - zp
-                else:
-                    # PAIR THE LAST VERTEX WITH THE FIRST ONE
-                    xv2 = x[v + 1] - xp
-                    zv2 = z[v + 1] - zp
+                # SET THE VERTEX PAIR, RELATIVE TO THE OBSERVATION POINTS AND CLEAR OF ANY OF THEM
+                xv, zv, xv2, zv2 = vertex_pair(x, z, v, nverts, xp, zp)
 
                 # RUN T&H ALGORITHM
                 R1s = (xv ** 2) + (zv ** 2)

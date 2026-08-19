@@ -42,9 +42,11 @@ import numpy as np
 try:
     from . import bott
     from . import talwani_and_heirtzler
+    from .polygon import SMALL, vertex_pair
 except ImportError:
     import bott
     import talwani_and_heirtzler
+    from polygon import SMALL, vertex_pair
 
 G = bott.G
 SI2MGAL = bott.SI2MGAL
@@ -52,10 +54,6 @@ SI2MGAL = bott.SI2MGAL
 # CONSTANTS
 MU0_NT = 400.0 * np.pi  # PERMEABILITY OF FREE SPACE IN nT m A^-1 (I.E. mu_0 SCALED FROM T TO nT)
 
-# THE SMALLEST SEPARATION, IN METRES, ALLOWED BETWEEN AN OBSERVATION POINT AND A POLYGON VERTEX. A VERTEX CLOSER THAN
-# THIS IS NUDGED AWAY, SINCE THE LOGARITHMS BELOW ARE SINGULAR THERE. THE TWO DIMENSIONAL KERNELS HAVE NO SUCH GUARD
-# AND RETURN inf/nan INSTEAD.
-SMALL = 1.0e-6
 
 
 def gz(xp, zp, polygons):
@@ -110,7 +108,7 @@ def gz(xp, zp, polygons):
 
         # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
         for v in range(nverts):
-            x1, z1, x2, z2 = _vertex_pair(x, z, v, nverts, xp, zp)
+            x1, z1, x2, z2 = vertex_pair(x, z, v, nverts, xp, zp)
 
             cos_phi, sin_phi, s, u1, u2, w = _rotated_frame(x1, z1, x2, z2)
             r1_y1, r1_y2, r2_y1, r2_y2, lor, difatan = _log_and_angle_terms(u1, u2, w, y1, y2)
@@ -212,7 +210,7 @@ def nt(xp, zp, polygons):
 
         # LOOP THROUGH THE VERTEX PAIRS FOR THE CURRENT POLYGON
         for v in range(nverts):
-            x1, z1, x2, z2 = _vertex_pair(x, z, v, nverts, xp, zp)
+            x1, z1, x2, z2 = vertex_pair(x, z, v, nverts, xp, zp)
 
             cos_phi, sin_phi, s, u1, u2, w = _rotated_frame(x1, z1, x2, z2)
             r1_y1, r1_y2, r2_y1, r2_y2, lor, difatan = _log_and_angle_terms(u1, u2, w, y1, y2)
@@ -284,42 +282,6 @@ def _extents(polygon):
         y2 = y1 + SMALL
 
     return y1, y2
-
-
-def _vertex_pair(x, z, v, nverts, xp, zp):
-    """
-    Return the v'th polygon side, as vertex coordinates relative to the observation points.
-
-    :param x: 1D array (float) : X coordinates of the polygon vertices
-    :param z: 1D array (float) : Z coordinates of the polygon vertices
-    :param v: int : Index of the first vertex of the side
-    :param nverts: int : Number of vertices in the polygon
-    :param xp: 1D array (float) : X coordinates of the observation points
-    :param zp: float or 1D array (float) : Z coordinates of the observation points
-
-    :returns: tuple of 1D arrays (float) : x1, z1, x2, z2
-    """
-    x1 = x[v] - xp
-    z1 = z[v] - zp
-
-    if v == nverts - 1:
-        # PAIR THE LAST VERTEX WITH THE FIRST ONE
-        x2 = x[0] - xp
-        z2 = z[0] - zp
-    else:
-        x2 = x[v + 1] - xp
-        z2 = z[v + 1] - zp
-
-    # NUDGE A VERTEX THAT SITS ON AN OBSERVATION POINT, WHERE THE LOGARITHMS BELOW ARE SINGULAR
-    on_point = (np.abs(x1) < SMALL) & (np.abs(z1) < SMALL)
-    x1 = np.where(on_point, SMALL, x1)
-    z1 = np.where(on_point, SMALL, z1)
-
-    on_point = (np.abs(x2) < SMALL) & (np.abs(z2) < SMALL)
-    x2 = np.where(on_point, SMALL, x2)
-    z2 = np.where(on_point, SMALL, z2)
-
-    return x1, z1, x2, z2
 
 
 def _rotated_frame(x1, z1, x2, z2):
