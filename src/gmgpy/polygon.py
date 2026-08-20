@@ -60,6 +60,59 @@ def vertex_pair(x, z, v, nverts, xp, zp):
     return x1, z1, x2, z2
 
 
+def self_intersects(x, z):
+    """
+    True if the closed polygon through the given nodes crosses itself.
+
+    A self crossing polygon is ambiguous input. Every forward kernel integrates around the outline with a signed
+    winding, so where the outline overlaps itself the lobes carry opposite signs and cancel, which is not what the
+    shape drawn on screen looks like it should do. A bow tie whose two halves are equal, for instance, has zero
+    signed area, yet still produces a large calculated anomaly. The kernels cannot resolve this, because the
+    shape itself does not say which region is meant to be the body, so gmg reports it rather than guessing.
+
+    Sides that share a node are skipped, since touching at a shared end is not a crossing.
+
+    :param x: 1D array (float) : X coordinates of the polygon nodes
+    :param z: 1D array (float) : Z coordinates of the polygon nodes
+
+    :returns: bool : True if any two sides cross
+    """
+    x = np.asarray(x, dtype=float)
+    z = np.asarray(z, dtype=float)
+    nverts = len(x)
+
+    if nverts < 4:
+        # A TRIANGLE OR SMALLER CANNOT CROSS ITSELF
+        return False
+
+    # THE SIDES, AS START POINTS AND DIRECTION VECTORS, WITH THE LAST NODE JOINED BACK TO THE FIRST
+    p = np.column_stack((x, z))
+    r = np.roll(p, -1, axis=0) - p
+
+    for i in range(nverts):
+        # ONLY SIDES AFTER THIS ONE, AND NOT THE TWO IT SHARES A NODE WITH
+        others = np.arange(i + 2, nverts if i > 0 else nverts - 1)
+        if len(others) == 0:
+            continue
+
+        q, s = p[others], r[others]
+        qp = q - p[i]
+
+        denominator = (r[i, 0] * s[:, 1]) - (r[i, 1] * s[:, 0])
+        parallel = (denominator == 0.0)
+        safe = np.where(parallel, 1.0, denominator)
+
+        # THE TWO SIDES CROSS WHERE BOTH PARAMETERS FALL STRICTLY WITHIN THEIR OWN SEGMENT
+        t = ((qp[:, 0] * s[:, 1]) - (qp[:, 1] * s[:, 0])) / safe
+        u = ((qp[:, 0] * r[i, 1]) - (qp[:, 1] * r[i, 0])) / safe
+
+        crossing = (~parallel) & (t > 0.0) & (t < 1.0) & (u > 0.0) & (u < 1.0)
+        if crossing.any():
+            return True
+
+    return False
+
+
 class GeometricElement(object):
     """
     Base class for all geometric elements.

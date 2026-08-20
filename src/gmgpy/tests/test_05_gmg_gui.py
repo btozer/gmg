@@ -309,7 +309,7 @@ def test_interior_observation_points_are_marked(gmg_frame):
     layer = gmg_frame.layer_list[gmg_frame.currently_active_layer_id]
 
     # AS BUILT THE LAYER SITS WHOLLY BELOW THE CALCULATION ELEVATION, SO NOTHING IS INSIDE IT
-    assert not gmg_frame.observation_points_inside_magnetic_layers().any()
+    assert not gmg_frame.unreliable_magnetic_observation_points().any()
     assert '2D only' not in gmg_frame.magnetic_frame.get_ylabel()
     assert len(gmg_frame.untrusted_nt_plot.get_xdata()) == 0
 
@@ -320,7 +320,7 @@ def test_interior_observation_points_are_marked(gmg_frame):
     gmg_frame.update_layer_data()
     gmg_frame.run_algorithms()
 
-    inside = gmg_frame.observation_points_inside_magnetic_layers()
+    inside = gmg_frame.unreliable_magnetic_observation_points()
     assert inside.any(), 'a layer crossing the calculation elevation must contain observation points'
 
     # THE MARKED SAMPLES MUST BE EXACTLY THOSE DETECTED.
@@ -333,13 +333,67 @@ def test_interior_observation_points_are_marked(gmg_frame):
     # NB: COMPARED IN METRES, SINCE SCALING BY 0.001 IS NOT EXACT IN BINARY AND PUTS 60000 m JUST OVER 60 km
     assert gmg_frame.xp[inside].min() >= 1000.0 * min(layer.x_nodes)
     assert gmg_frame.xp[inside].max() <= 1000.0 * max(layer.x_nodes)
-    assert 'inside a layer' in gmg_frame.magnetic_frame.get_ylabel()
+    assert 'unreliable' in gmg_frame.magnetic_frame.get_ylabel()
 
     # A LAYER WITH NO SUSCEPTIBILITY CANNOT MAKE A MAGNETIC ANOMALY UNTRUSTWORTHY
     layer.susceptibility = 0.0
     gmg_frame.run_algorithms()
-    assert not gmg_frame.observation_points_inside_magnetic_layers().any()
-    assert 'inside a layer' not in gmg_frame.magnetic_frame.get_ylabel()
+    assert not gmg_frame.unreliable_magnetic_observation_points().any()
+    assert 'unreliable' not in gmg_frame.magnetic_frame.get_ylabel()
+
+
+def test_a_node_on_an_observation_point_is_marked(gmg_frame):
+    """
+    Test an observation point coinciding with a layer node is marked as unreliable
+
+    The magnetic field at a corner of a uniformly magnetised body diverges logarithmically from every direction
+    of approach, so no finite value exists there. The kernels nudge the node clear so that the calculation
+    returns a number rather than nan, but that number is set by the size of the nudge and means nothing. A node
+    is on the boundary rather than inside it, so a point-in-polygon test alone does not catch this.
+    """
+    layer = gmg_frame.layer_list[gmg_frame.currently_active_layer_id]
+    assert not gmg_frame.unreliable_magnetic_observation_points().any()
+
+    # PUT THE LAYER'S TOP EDGE ON THE CALCULATION ELEVATION, WHICH LANDS ITS TWO TOP NODES ON OBSERVATION POINTS
+    # WITHOUT PUTTING ANY OBSERVATION POINT INSIDE THE LAYER
+    layer.y_nodes[:] = [0.0, 0.0, 15.0, 15.0]
+    gmg_frame.update_layer_data()
+    gmg_frame.run_algorithms()
+
+    unreliable = gmg_frame.unreliable_magnetic_observation_points()
+    assert unreliable.sum() == 2, 'exactly the two top nodes should be flagged'
+    np.testing.assert_allclose(np.sort(gmg_frame.xp[unreliable]),
+                               [1000.0 * min(layer.x_nodes), 1000.0 * max(layer.x_nodes)])
+    assert 'unreliable' in gmg_frame.magnetic_frame.get_ylabel()
+
+
+def test_self_intersecting_layers_are_reported(gmg_frame):
+    """
+    Test a layer whose outline crosses itself is detected and reported in the status bar
+
+    Such a layer is ambiguous input and every anomaly it contributes to is affected, not only the magnetic one,
+    so it is reported against the model rather than against any one panel.
+    """
+    layer = gmg_frame.layer_list[gmg_frame.currently_active_layer_id]
+    assert gmg_frame.self_intersecting_layers() == []
+
+    # DRAG ONE NODE PAST ANOTHER TO MAKE A BOW TIE, WHICH IS ALL IT TAKES
+    layer.x_nodes[:] = [20.0, 60.0, 20.0, 60.0]
+    gmg_frame.update_layer_data()
+    gmg_frame.run_algorithms()
+
+    assert gmg_frame.self_intersecting_layers() == [gmg_frame.currently_active_layer_id]
+    gmg_frame.display_info()
+    assert 'SELF-INTERSECTING' in gmg_frame.statusbar.GetStatusText(1)
+
+    # UNTANGLING IT CLEARS THE REPORT
+    layer.x_nodes[:] = list(LAYER_X_NODES)
+    gmg_frame.update_layer_data()
+    gmg_frame.run_algorithms()
+
+    assert gmg_frame.self_intersecting_layers() == []
+    gmg_frame.display_info()
+    assert 'SELF-INTERSECTING' not in gmg_frame.statusbar.GetStatusText(1)
 
 
 def test_bulk_setters_reach_every_layer(gmg_frame, gmg_module, monkeypatch):

@@ -109,7 +109,7 @@ import sys
 from sys import platform
 from obspy import read
 import pickle as pickle
-from polygon import Polygon
+from polygon import Polygon, SMALL, self_intersects
 import pygmt_plot_model as plot_model
 import bott
 import talwani_and_heirtzler
@@ -1011,6 +1011,7 @@ class Gmg(wx.Frame):
         self.earth_field = 0.
         # DIRECTION OF THE INDUCING (EARTH'S) FIELD, ONTO WHICH THE TOTAL FIELD ANOMALY IS PROJECTED. None MEANS
         # MAGNETISATION IS INDUCED ONLY, IN WHICH CASE EACH LAYER'S OWN ANGLES A AND B GIVE THE DIRECTION
+        self.crossed_layers = []  # LAYERS WHOSE OUTLINE CROSSES ITSELF, SET BY run_algorithms
         self.inducing_field_inclination = None
         self.inducing_field_declination = None
         self.obs_mag_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
@@ -2279,14 +2280,21 @@ class Gmg(wx.Frame):
         self.draw()
 
     def display_info(self):
+        # A LAYER THAT CROSSES ITSELF IS AMBIGUOUS AND MAKES EVERY ANOMALY IT CONTRIBUTES TO UNRELIABLE
+        crossed = getattr(self, 'crossed_layers', [])
+        warning = '' if not crossed else \
+            "  || SELF-INTERSECTING LAYER(S): %s - ANOMALIES UNRELIABLE" % \
+            ', '.join(str(layer) for layer in crossed)
+
         self.statusbar.SetStatusText(
             " || Currently Editing Layer: %s"
             "  || Model Aspect Ratio = %s:1.0"
             "  || GRAV RMS = %s"
-            "  || MAG RMS = %s  ||" % (self.currently_active_layer_id,
-                                       self.model_frame.get_aspect(),
-                                       self.gravity_rms_value,
-                                       self.magnetic_rms_value), 1)
+            "  || MAG RMS = %s  ||%s" % (self.currently_active_layer_id,
+                                         self.model_frame.get_aspect(),
+                                         self.gravity_rms_value,
+                                         self.magnetic_rms_value,
+                                         warning), 1)
         self.statusbar.Update()
 
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -6833,24 +6841,31 @@ class Gmg(wx.Frame):
                     return True
         return False
 
-    def observation_points_inside_magnetic_layers(self):
+    def unreliable_magnetic_observation_points(self):
         """
-        RETURN A MASK OF THE OBSERVATION POINTS THAT LIE INSIDE A MAGNETISED LAYER.
+        RETURN A MASK OF THE OBSERVATION POINTS WHERE THE CALCULATED MAGNETIC ANOMALY IS NOT TO BE TRUSTED.
 
-        BOTH MAGNETIC ALGORITHMS ARE WRONG AT SUCH A POINT. THE ANGLE SUBTENDED BY A POLYGON SIDE JUMPS BY 2 PI
-        WHERE THE SIDE CROSSES THE LINE OF THE OBSERVATION POINT, AND WHILE THOSE JUMPS CANCEL AROUND A CLOSED
-        POLYGON WHEN THE POINT IS OUTSIDE IT, THEY DO NOT WHEN IT IS INSIDE. THE TWO ALGORITHMS DISAGREE WITH EACH
+        TWO SITUATIONS, BOTH ARISING WHEN A MAGNETISED LAYER REACHES THE CALCULATION ELEVATION.
+
+        AN OBSERVATION POINT **INSIDE** A LAYER. THE ANGLE SUBTENDED BY A POLYGON SIDE JUMPS BY 2 PI WHERE THE
+        SIDE CROSSES THE LINE OF THE OBSERVATION POINT, AND WHILE THOSE JUMPS CANCEL AROUND A CLOSED POLYGON WHEN
+        THE POINT IS OUTSIDE IT, THEY DO NOT WHEN IT IS INSIDE. THE TWO MAGNETIC ALGORITHMS DISAGREE WITH EACH
         OTHER THERE BY A CONSTANT OFFSET, SO AT LEAST ONE OF THEM IS WRONG WHATEVER CONVENTION IS ADOPTED FOR THE
         FIELD INSIDE A MAGNETISED BODY.
 
-        THIS ARISES WHENEVER A MAGNETISED LAYER CROSSES THE CALCULATION ELEVATION, SINCE THE OBSERVATION POINTS
-        ABOVE THE BODY THEN SIT WITHIN IT. IT IS NOT A PHYSICAL SURVEY CONFIGURATION, A MAGNETOMETER NEVER BEING
-        INSIDE THE ROCK, SO THE SAMPLES ARE MARKED RATHER THAN CORRECTED. SETTING THE CALCULATION ELEVATION ABOVE
-        THE TOPOGRAPHY AVOIDS IT ENTIRELY.
+        AN OBSERVATION POINT **ON A NODE** OF A LAYER. THE MAGNETIC FIELD AT A CORNER OF A UNIFORMLY MAGNETISED
+        BODY DIVERGES LOGARITHMICALLY, FROM EVERY DIRECTION OF APPROACH, SO NO FINITE VALUE EXISTS THERE AT ALL.
+        THE KERNELS NUDGE A COINCIDENT NODE CLEAR OF THE OBSERVATION POINT SO THAT THE CALCULATION RETURNS A
+        NUMBER INSTEAD OF nan, BUT THAT NUMBER IS SET BY THE SIZE OF THE NUDGE AND MEANS NOTHING.
 
-        NB: THE GRAVITY AND VGG ALGORITHMS ARE CORRECT AT INTERIOR POINTS AND ARE NOT AFFECTED.
+        NEITHER IS A PHYSICAL SURVEY CONFIGURATION, A MAGNETOMETER NEVER BEING INSIDE THE ROCK OR AT A CORNER OF
+        IT, SO THE SAMPLES ARE MARKED RATHER THAN CORRECTED. SETTING THE CALCULATION ELEVATION ABOVE THE
+        TOPOGRAPHY AVOIDS BOTH ENTIRELY.
 
-        :returns: 1D array (bool) : True where an observation point lies inside a magnetised layer
+        NB: THE GRAVITY ALGORITHM IS CORRECT AT BOTH, AND THE VGG AT INTERIOR POINTS; SEE THE VGG'S OWN NOTE ON
+        WHAT IT RETURNS AT A NODE.
+
+        :returns: 1D array (bool) : True where the calculated magnetic anomaly is unreliable
         """
         inside = np.zeros_like(self.xp, dtype=bool)
 
@@ -6867,10 +6882,42 @@ class Gmg(wx.Frame):
                 continue
 
             # LAYER NODES ARE IN km AND THE OBSERVATION POINTS IN m, AS THEY ARE WHERE THE ALGORITHMS ARE CALLED
-            outline = Path(1000. * np.array(self.layer_list[layer].polygon))
-            inside = inside | outline.contains_points(points)
+            nodes = 1000. * np.array(self.layer_list[layer].polygon)
+
+            inside = inside | Path(nodes).contains_points(points)
+
+            # A NODE LANDING ON AN OBSERVATION POINT IS NOT "INSIDE" THE OUTLINE, SO IT HAS TO BE CAUGHT SEPARATELY.
+            # THE TOLERANCE IS THE ONE THE KERNELS THEMSELVES USE TO DECIDE THAT A NODE NEEDS NUDGING CLEAR
+            separation = np.hypot(points[:, 0][:, None] - nodes[:, 0][None, :],
+                                  points[:, 1][:, None] - nodes[:, 1][None, :])
+            inside = inside | (separation < SMALL).any(axis=1)
 
         return inside
+
+    def self_intersecting_layers(self):
+        """
+        RETURN THE IDS OF ANY LAYERS INCLUDED IN THE CALCULATION WHOSE OUTLINE CROSSES ITSELF.
+
+        SUCH A LAYER IS AMBIGUOUS INPUT AND EVERY ANOMALY IT CONTRIBUTES TO IS AFFECTED, NOT ONLY THE MAGNETIC
+        ONE. THE KERNELS INTEGRATE AROUND THE OUTLINE WITH A SIGNED WINDING, SO WHERE IT OVERLAPS ITSELF THE
+        LOBES CARRY OPPOSITE SIGNS AND CANCEL, WHICH IS NOT WHAT THE SHAPE ON SCREEN LOOKS LIKE IT SHOULD DO.
+        NOTHING IN THE SHAPE SAYS WHICH REGION IS MEANT TO BE THE BODY, SO IT IS REPORTED RATHER THAN GUESSED AT.
+
+        IT IS EASILY DONE BY DRAGGING ONE NODE PAST ANOTHER.
+
+        :returns: list of int : The ids of the offending layers, in order
+        """
+        offenders = []
+
+        for layer in range(0, self.total_layer_count + 1):
+            if self.layer_list[layer].include_in_calculations_switch is not True:
+                continue
+            if len(self.layer_list[layer].x_nodes) < 4:
+                continue
+            if self_intersects(self.layer_list[layer].x_nodes, self.layer_list[layer].y_nodes):
+                offenders.append(layer)
+
+        return offenders
 
     def run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
@@ -7006,7 +7053,7 @@ class Gmg(wx.Frame):
         # MARK ANY SAMPLE LYING INSIDE A MAGNETISED LAYER, WHERE THE CALCULATED ANOMALY IS KNOWN TO BE WRONG, SO
         # THAT IT IS NEVER READ AS A GOOD VALUE. NB: THE FRAME IS None WHILE THE MAGNETIC PANEL IS HIDDEN
         if self.calc_mag_switch is True:
-            untrusted = self.observation_points_inside_magnetic_layers()
+            untrusted = self.unreliable_magnetic_observation_points()
         else:
             untrusted = np.zeros_like(self.xp, dtype=bool)
 
@@ -7014,9 +7061,13 @@ class Gmg(wx.Frame):
 
         if self.magnetic_frame is not None:
             if untrusted.any():
-                self.magnetic_frame.set_ylabel("M (nT)\nred: inside a layer")
+                self.magnetic_frame.set_ylabel("M (nT)\nred: unreliable")
             else:
                 self.magnetic_frame.set_ylabel("M (nT)")
+
+        # A LAYER WHOSE OUTLINE CROSSES ITSELF MAKES EVERY ANOMALY UNRELIABLE, NOT ONLY THE MAGNETIC ONE, SO IT IS
+        # REPORTED IN THE STATUS BAR RATHER THAN AGAINST ANY ONE PANEL
+        self.crossed_layers = self.self_intersecting_layers()
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------

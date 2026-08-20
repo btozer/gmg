@@ -91,3 +91,20 @@ polygons with many nodes may be necessary.
     line-integral methods of Talwani et al., (1959) :cite:`talwani1959` and Bott (1969) :cite:`bott1969`. b) Model
     cylinder defined using 360 nodes, a radius of 5 :math:`km` and a density contrast of
     :math:`250` `kg` :math:`m^{-3}`.
+
+.. note::
+
+    **The vertical gravity gradient at a layer node.** The VGG is discontinuous across a body's surface, by
+    :math:`4 \pi G \rho`, and at a *corner* of a body its value depends on the direction from which the corner
+    is approached. For a rectangular body with its top edge on the calculation elevation, approaching a top
+    corner gives :math:`-25.4` Eotvos from the side, :math:`+79.4` from above and :math:`+27.0` along the
+    diagonal.
+
+    An observation point landing exactly on a node therefore has no single answer. gmg returns the **diagonal**
+    limit, which is what follows from nudging the node clear of the observation point equally in x and z, as the
+    kernels do to keep the logarithms finite. It is one defensible choice among many rather than *the* value.
+
+    Away from the nodes the VGG is well defined, and on a body's surface between them gmg returns the limit from
+    outside the body, which is the meaningful one for a surface observation.
+
+    The gravity anomaly itself is continuous at both, and is unaffected.

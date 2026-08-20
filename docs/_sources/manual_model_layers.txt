@@ -72,3 +72,13 @@ To delete a model layer, in the Menubar navigate to::
 
     Layers -> Delete Current Layer...
 
+.. warning::
+
+    **A layer whose outline crosses itself gives unreliable anomalies** - all of them, gravity and VGG as well as
+    magnetic. It is easily done by dragging one node past another.
+
+    Every algorithm integrates around the outline with a signed winding, so where the outline overlaps itself the
+    lobes carry opposite signs and cancel. A bow tie whose two halves are equal has zero signed area, for
+    instance, yet still produces a large calculated anomaly. Nothing in the shape says which region is meant to
+    be the body, so gmg cannot resolve it and reports it instead: the offending layer numbers appear in the
+    status bar. Untangle the nodes to clear the warning.
