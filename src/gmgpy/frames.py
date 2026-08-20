@@ -10,6 +10,13 @@ import wx.grid as gridlib
 import numpy as np
 import struct
 
+# gmg.py PUTS ITS OWN DIRECTORY ON sys.path AND IMPORTS ITS MODULES FLAT, WHILE THE PACKAGED TESTS IMPORT gmgpy AS
+# A PACKAGE, SO THE SHARED HELPER HAS TO BE REACHABLE BOTH WAYS
+try:
+    from .dialogs import save_xy_file
+except ImportError:
+    from dialogs import save_xy_file
+
 
 def extent_to_cell(extent):
     """
@@ -84,8 +91,9 @@ class CaptureCoordinates(wx.Frame):
             x.append(float(self.table.GetItem(itemIdx=i, col=0).GetText()))
             y.append(float(self.table.GetItem(itemIdx=i, col=1).GetText()))
 
-        # OUTPUT DATA
-        np.savetxt(output_stream, list(zip(x, y)), delimiter=' ', fmt='%0.6f %0.6f')
+        # OUTPUT DATA. NB: save_xy_file REPORTS WHAT HAPPENED. WRITING WITH np.savetxt DIRECTLY FAILED SILENTLY,
+        # SINCE wx SWALLOWS AN EXCEPTION RAISED IN AN EVENT HANDLER AND pythonw DISCARDS stderr
+        save_xy_file(self, output_stream, list(zip(x, y)), '%0.6f %0.6f')
 
     def on_close_button(self, event):
         self.parent.capture = False

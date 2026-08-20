@@ -57,6 +57,38 @@ class _AcceptingDialog(object):
         pass
 
 
+class _RecordingMessageDialog(object):
+    """
+    STANDS IN FOR THE MESSAGE DIALOG, RECORDING WHAT WAS REPORTED INSTEAD OF BLOCKING ON A MODAL.
+
+    The saves report both success and failure this way, so recording the text is how a test can tell which
+    happened, and lets a reported failure be asserted on rather than merely not crashing.
+    """
+    messages = []
+
+    def __init__(self, parent, id, message_text, title):
+        _RecordingMessageDialog.messages.append(message_text)
+
+    @classmethod
+    def reset(cls):
+        cls.messages = []
+
+    @classmethod
+    def said(cls, fragment):
+        """True if any recorded message contains the given text."""
+        return any(fragment in message for message in cls.messages)
+
+
+def _file_dialog_returning(path):
+    """BUILD A STAND IN FOR THE FILE DIALOG THAT ANSWERS WITH THE GIVEN PATH"""
+
+    class _FileDialog(_AcceptingDialog):
+        def GetPath(self):
+            return str(path)
+
+    return _FileDialog
+
+
 def _load_gmg():
     """
     Import gmg.py from its path, registering it under the name its own modules expect.
@@ -113,6 +145,41 @@ def gmg_module():
     gmg.NewModelDialog = _new_model_dialog(MODEL_X1, MODEL_X2, MODEL_Z1, MODEL_Z2)
 
     return gmg
+
+
+@pytest.fixture
+def reported(gmg_module, monkeypatch):
+    """Capture what the saves report, instead of letting a modal block the run."""
+    _RecordingMessageDialog.reset()
+
+    # save_xy_file LIVES IN dialogs, SO ITS MESSAGES GO THROUGH THAT MODULE'S NAME WHICHEVER CALLER USED IT.
+    # write_c_xy REPORTS THROUGH gmg'S OWN NAME, SO BOTH ARE REPLACED
+    monkeypatch.setattr(sys.modules['dialogs'], 'MessageDialog', _RecordingMessageDialog)
+    monkeypatch.setattr(gmg_module, 'MessageDialog', _RecordingMessageDialog)
+
+    return _RecordingMessageDialog
+
+
+def _capture_points(gmg_frame, points):
+    """Turn on coordinate capture and click the given (x, y) points through the real handler."""
+    from matplotlib.backend_bases import MouseEvent, MouseButton
+
+    gmg_frame.capture_coordinates(None)
+
+    for x, y in points:
+        event = MouseEvent('button_release_event', gmg_frame.fig.canvas, 100, 100, button=MouseButton.LEFT)
+        event.inaxes = gmg_frame.model_frame
+        event.xdata, event.ydata = x, y
+        gmg_frame.button_release(event)
+
+    return gmg_frame.capture_window
+
+
+def _press(button):
+    """Press a wx button the way a user would, rather than calling its handler directly."""
+    event = wx.CommandEvent(wx.EVT_BUTTON.typeId, button.GetId())
+    event.SetEventObject(button)
+    button.GetEventHandler().ProcessEvent(event)
 
 
 @pytest.fixture
@@ -394,6 +461,90 @@ def test_self_intersecting_layers_are_reported(gmg_frame):
     assert gmg_frame.self_intersecting_layers() == []
     gmg_frame.display_info()
     assert 'SELF-INTERSECTING' not in gmg_frame.statusbar.GetStatusText(1)
+
+
+def test_captured_coordinates_are_saved(gmg_frame, reported, tmp_path, monkeypatch):
+    """
+    Test clicking points in capture mode and pressing Save writes them to a file
+    """
+    target = tmp_path / 'captured.xy'
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(target))
+
+    window = _capture_points(gmg_frame, [(10.5, 3.25), (20.0, 7.5), (33.125, 12.0)])
+    assert window.table.GetItemCount() == 3
+
+    _press(window.save_btn)
+
+    assert target.exists()
+    assert target.read_text().split() == ['10.500000', '3.250000',
+                                          '20.000000', '7.500000',
+                                          '33.125000', '12.000000']
+    assert reported.said('Saved successfully')
+
+
+def test_saving_with_nothing_captured_writes_no_file(gmg_frame, reported, tmp_path, monkeypatch):
+    """
+    Test pressing Save before any point is captured says so, rather than leaving an empty file
+
+    numpy validates the format against the column count only after opening the file, so an empty dataset used to
+    raise ValueError and leave a 0 byte file behind, with the exception swallowed by wx.
+    """
+    target = tmp_path / 'nothing.xy'
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(target))
+
+    window = _capture_points(gmg_frame, [])
+    assert window.table.GetItemCount() == 0
+
+    _press(window.save_btn)
+
+    assert not target.exists(), 'an empty save must not leave a file behind'
+    assert reported.said('nothing to save')
+    assert not reported.said('Saved successfully')
+
+
+def test_saving_to_an_unwritable_path_is_reported(gmg_frame, reported, monkeypatch):
+    """
+    Test a path that cannot be written is reported rather than silently doing nothing
+
+    This is the case that produced no file at all, and no message, because wx swallows an exception raised in an
+    event handler and pythonw discards stderr.
+    """
+    unwritable = '/System/no/such/directory/coordinates.xy'
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(unwritable))
+
+    window = _capture_points(gmg_frame, [(1.0, 2.0)])
+    _press(window.save_btn)
+
+    assert not os.path.exists(unwritable)
+    assert reported.said('could not be written')
+    assert not reported.said('Saved successfully')
+
+
+def test_a_filename_without_a_suffix_gains_one(gmg_frame, reported, tmp_path, monkeypatch):
+    """
+    Test a name typed without an extension is written with the one the file dialog filtered on
+    """
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(tmp_path / 'no_suffix'))
+
+    window = _capture_points(gmg_frame, [(1.0, 2.0)])
+    _press(window.save_btn)
+
+    assert (tmp_path / 'no_suffix.xy').exists()
+    assert not (tmp_path / 'no_suffix').exists()
+
+
+def test_predicted_anomaly_save_reports_and_writes(gmg_frame, reported, tmp_path, monkeypatch):
+    """
+    Test the shared save helper is reached from gmg's own save routines, not only the capture window
+    """
+    target = tmp_path / 'predicted_gravity.txt'
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(target))
+
+    gmg_frame.save_modelled_grav(None)
+
+    assert target.exists()
+    assert len(target.read_text().splitlines()) == len(gmg_frame.xp)
+    assert reported.said('Saved successfully')
 
 
 def test_bulk_setters_reach_every_layer(gmg_frame, gmg_module, monkeypatch):

@@ -4,6 +4,8 @@ GMG EXTERNAL DIALOG BOXES GO HERE
 EACH DIALOG BOX IS DEFINED AS A CLASS
 """
 
+import os
+
 import wx
 import matplotlib
 matplotlib.use('WXAgg')
@@ -1021,6 +1023,46 @@ class MessageDialog(wx.MessageDialog):
         wx.MessageDialog.__init__(self, parent, message_text, title)
         dlg = wx.MessageDialog(self, message_text, title, wx.OK)
         answer = dlg.ShowModal()
+
+
+def save_xy_file(parent, path, data, fmt, extension='.xy'):
+    """
+    WRITE A COLUMNAR ASCII FILE AND TELL THE USER WHAT HAPPENED.
+
+    EVERY SAVE ROUTINE USED TO CALL np.savetxt BARE. THAT FAILS SILENTLY, BECAUSE wx SWALLOWS AN EXCEPTION RAISED
+    INSIDE AN EVENT HANDLER: THE TRACEBACK GOES TO stderr, WHICH IS DISCARDED WHEN gmg IS LAUNCHED WITH pythonw,
+    SO THE FILE DIALOG SIMPLY CLOSED AND NOTHING APPEARED. TWO WAYS IT WENT WRONG IN PRACTICE:
+
+    AN EMPTY DATASET. np.savetxt VALIDATES fmt AGAINST THE COLUMN COUNT ONLY AFTER OPENING THE FILE, SO A FORMAT
+    NAMING TWO COLUMNS AND NO DATA TO WRITE RAISED ValueError AND LEFT A ZERO BYTE FILE BEHIND.
+
+    A PATH THAT CANNOT BE WRITTEN, WHICH LEFT NO FILE AT ALL.
+
+    :param parent: the wx window to hang the message dialogs off
+    :param path: str : Full path chosen by the user
+    :param data: sequence : Rows to write, as accepted by np.savetxt
+    :param fmt: str : Format string passed to np.savetxt
+    :param extension: str : Appended to path when the chosen name carries no suffix of its own
+
+    :returns: str or None : The path actually written, or None if nothing was written
+    """
+    if len(data) == 0:
+        MessageDialog(parent, -1, "There is nothing to save.\n\nNo file has been written.", "Save")
+        return None
+
+    # HONOUR THE FILTER THE USER PICKED FROM, SO A NAME TYPED WITHOUT A SUFFIX IS STILL FOUND AFTERWARDS
+    if os.path.splitext(path)[1] == '':
+        path += extension
+
+    try:
+        np.savetxt(path, data, delimiter=' ', fmt=fmt)
+    except Exception as error:
+        MessageDialog(parent, -1, "The file could not be written.\n\n%s" % error, "Save")
+        return None
+
+    MessageDialog(parent, -1, "Saved successfully to:\n\n%s" % path, "Save")
+
+    return path
 
 
 class PlotFigureSettingsDialog(wx.Dialog):

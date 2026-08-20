@@ -3527,7 +3527,7 @@ class Gmg(wx.Frame):
             return  # THE USER CHANGED THEIR MIND
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
-        np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_gravity)), delimiter=' ', fmt='%.6f %.6f')
+        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_gravity)), '%.6f %.6f', '.txt')
 
     def filter_observed_gravity(self, event):
         """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
@@ -3796,7 +3796,7 @@ class Gmg(wx.Frame):
             return  # THE USER CHANGED THEIR MIND
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
-        np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_vgg)), delimiter=' ', fmt='%.6f %.6f')
+        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_vgg)), '%.6f %.6f', '.txt')
 
     def filter_observed_vgg(self, event):
         """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
@@ -4062,7 +4062,7 @@ class Gmg(wx.Frame):
 
         # SAVE TO DISC
         outputfile = save_file_dialog.GetPath()
-        np.savetxt(outputfile, list(zip((self.xp * 0.001), self.predicted_nt)), delimiter=' ', fmt='%.6f %.6f')
+        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_nt)), '%.6f %.6f', '.txt')
 
     def filter_observed_magnetic(self, event):
         """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
@@ -6086,6 +6086,23 @@ class Gmg(wx.Frame):
 
         # NOW WRITE OUT THE DATA
         output_stream = save_file_dialog.GetPath()
+
+        # HONOUR THE FILTER THE USER PICKED FROM, SO A NAME TYPED WITHOUT A SUFFIX IS STILL FOUND AFTERWARDS
+        if os.path.splitext(output_stream)[1] == '':
+            output_stream += '.in'
+
+        # NB: THIS STREAMS SEVERAL BLOCKS TO ONE OPEN HANDLE, SO IT CANNOT USE save_xy_file, BUT IT NEEDS THE SAME
+        # REPORTING. WITHOUT IT A FAILURE IS INVISIBLE, wx SWALLOWING THE EXCEPTION AND pythonw DISCARDING stderr
+        try:
+            self._write_c_in(output_stream)
+        except Exception as error:
+            MessageDialog(self, -1, "The file could not be written.\n\n%s" % error, "Save")
+            return
+
+        MessageDialog(self, -1, "Saved successfully to:\n\n%s" % output_stream, "Save")
+
+    def _write_c_in(self, output_stream):
+        """WRITE THE c.in BODY. SPLIT OUT SO THAT write_c_xy CAN REPORT A FAILURE RATHER THAN SWALLOW IT"""
         with open(output_stream, 'w') as f:
             # LAYER NODES
             for i in range(0, self.total_layer_count + 1):
