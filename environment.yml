@@ -21,6 +21,10 @@ dependencies:
   - matplotlib>=3.7.2
   - scipy>=1.10.1
   - obspy>=1.4.1
+  # NB: wxPython 4.2.5 (wxWidgets 3.2.9) carries a macOS regression that makes a save file dialog raise
+  # "wxArrayString: index out of bounds" from ShowModal when its wildcard has only one filter
+  # (wxWidgets #26148, Phoenix #2860). 4.2.4 is unaffected and a fix is on wxWidgets master awaiting
+  # backport. gmg works around it in dialogs.show_save_dialog, so the version is not pinned away from it.
   - wxpython>=4.2.0
   - pygmt>=0.9.0
   - netcdf4>=1.5.6

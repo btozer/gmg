@@ -1025,6 +1025,54 @@ class MessageDialog(wx.MessageDialog):
         answer = dlg.ShowModal()
 
 
+def show_save_dialog(parent, message, wildcard, default_file=''):
+    """
+    ASK THE USER WHERE TO SAVE, AND RETURN THE CHOSEN PATH, OR None IF THEY CANCELLED.
+
+    THIS EXISTS TO WORK AROUND A wxWidgets REGRESSION. ON macOS, wxWidgets 3.2.9 (wxPython 4.2.5) RAISES
+
+        C++ assertion "nIndex < m_nCount" failed at ./include/wx/arrstr.h(227) in Item():
+        wxArrayString: index out of bounds
+
+    FROM ShowModal ITSELF WHEN A SAVE DIALOG IS GIVEN A WILDCARD CARRYING ONLY **ONE** FILTER. WITH A SINGLE
+    FILTER macOS NEVER BUILDS THE FILE TYPE POPUP, SO THE FILTER INDEX IS NEVER VALIDLY SET, AND THAT IS THE
+    INDEX THAT GOES OUT OF BOUNDS WHEN THE DIALOG IS DISMISSED. SEE wxWidgets #26148 (DUPLICATE OF #26129,
+    INTRODUCED BY PR #25854) AND wxPython/Phoenix #2860. 3.2.8 AND wxPython 4.2.4 ARE UNAFFECTED, AND A FIX IS
+    ON wxWidgets master AWAITING BACKPORT.
+
+    TWO DEFENCES, BECAUSE THE FIRST CANNOT BE TESTED FROM A SCRIPT: A SECOND FILTER IS GUARANTEED, WHICH SHOULD
+    AVOID THE FAULT ALTOGETHER; AND THE ASSERTION IS CAUGHT, SINCE IT IS RAISED ONLY AFTER THE DIALOG HAS
+    RECORDED THE CHOSEN PATH, SO THE SAVE CAN STILL GO AHEAD.
+
+    :param parent: the wx window to hang the dialog off
+    :param message: str : Dialog title
+    :param wildcard: str : File type filters, "Description (*.ext)|*.ext" joined by pipes
+    :param default_file: str : Filename to offer
+
+    :returns: str or None : The chosen path, or None if the user cancelled
+    """
+    # GUARANTEE A SECOND FILTER, SO NO CALLER CAN REINTRODUCE THE FAULT. A SINGLE FILTER HAS ONE PIPE
+    if wildcard.count('|') < 3:
+        wildcard += '|All files (*.*)|*.*'
+
+    dialog = wx.FileDialog(parent, message, '', default_file, wildcard,
+                           wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+    try:
+        try:
+            answer = dialog.ShowModal()
+        except wx.wxAssertionError:
+            # THE REGRESSION ABOVE. THE PATH IS ALREADY RECORDED, SO RECOVER IT RATHER THAN LOSING THE SAVE.
+            # NOTHING COMES BACK IF THE USER CANCELLED, WHICH IS HOW THE TWO ARE TOLD APART
+            answer = wx.ID_OK if dialog.GetPath() else wx.ID_CANCEL
+
+        if answer == wx.ID_CANCEL:
+            return None
+
+        return dialog.GetPath()
+    finally:
+        dialog.Destroy()
+
+
 def save_xy_file(parent, path, data, fmt, extension='.xy'):
     """
     WRITE A COLUMNAR ASCII FILE AND TELL THE USER WHAT HAPPENED.

@@ -2619,9 +2619,9 @@ class Gmg(wx.Frame):
         TO ADD NEW OBJECTS ADD THE OBJECT NAME TO BOTH THE header AND model_params.
         THEN MODIFY THE load_model FUNCTION TO ALSO INLCUDE THE NEW ITEMS
         """
-        save_file_dialog = wx.FileDialog(self, "Save model file", "", "", "Model files (*.model)|*.model", 
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        output_stream = show_save_dialog(self, "Save model file",
+                                         "Model files (*.model)|*.model|All files (*.*)|*.*")
+        if output_stream is None:
             return  # USER CHANGED THEIR MIND
 
         # CREATE SAVE DICTIONARY
@@ -2685,7 +2685,7 @@ class Gmg(wx.Frame):
             except IOError:
                 print((header[i]))
         try:
-            output_stream = save_file_dialog.GetPath()
+            # NB: output_stream WAS CHOSEN BY show_save_dialog AT THE TOP OF THIS FUNCTION
 
             # MATPLOTLIB ARTISTS ARE NOT WRITTEN TO THE FILE. load_model RECREATES EVERY ONE OF THEM FROM THE SAVED
             # DATA, SO THEY CARRY NOTHING, AND PICKLING THEM TIES THE FILE TO THE MATPLOTLIB VERSION THAT WROTE IT.
@@ -3521,12 +3521,10 @@ class Gmg(wx.Frame):
 
     def save_modelled_grav(self, event):
         """SAVE PREDICTED GRAVITY TO EXTERNAL ASCII FILE"""
-        save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        outputfile = show_save_dialog(self, "Save Predicted Anomaly",
+                                      "Predicted Anomaly (*.txt)|*.txt|All files (*.*)|*.*")
+        if outputfile is None:
             return  # THE USER CHANGED THEIR MIND
-        # SAVE TO DISC
-        outputfile = save_file_dialog.GetPath()
         save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_gravity)), '%.6f %.6f', '.txt')
 
     def filter_observed_gravity(self, event):
@@ -3790,12 +3788,10 @@ class Gmg(wx.Frame):
 
     def save_modelled_vgg(self, event):
         """SAVE PREDICTED vgg TO EXTERNAL ASCII FILE"""
-        save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        outputfile = show_save_dialog(self, "Save Predicted Anomaly",
+                                      "Predicted Anomaly (*.txt)|*.txt|All files (*.*)|*.*")
+        if outputfile is None:
             return  # THE USER CHANGED THEIR MIND
-        # SAVE TO DISC
-        outputfile = save_file_dialog.GetPath()
         save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_vgg)), '%.6f %.6f', '.txt')
 
     def filter_observed_vgg(self, event):
@@ -4055,13 +4051,10 @@ class Gmg(wx.Frame):
     def save_modelled_mag(self, event):
         """SAVE THE MODELLED MAGNETIC ANOMALY TO DISC"""
 
-        save_file_dialog = wx.FileDialog(self, "Save Predicted Anomaly", "", "", "Predicted Anomaly (*.txt)|*.txt",
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        outputfile = show_save_dialog(self, "Save Predicted Anomaly",
+                                      "Predicted Anomaly (*.txt)|*.txt|All files (*.*)|*.*")
+        if outputfile is None:
             return  # THE USER CHANGED THEIR MIND
-
-        # SAVE TO DISC
-        outputfile = save_file_dialog.GetPath()
         save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_nt)), '%.6f %.6f', '.txt')
 
     def filter_observed_magnetic(self, event):
@@ -6029,7 +6022,8 @@ class Gmg(wx.Frame):
         """OUTPUT ALL LAYERS XY DATA TO INDIVIDUAL TEXT FILES"""
 
         # CREATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(self, "Save LAYER XY", "", "", "xy files (*.xy)|*.xy",
+        save_file_dialog = wx.FileDialog(self, "Save LAYER XY", "", "",
+                                         "xy files (*.xy)|*.xy|Text files (*.txt)|*.txt|All files (*.*)|*.*",
                                          wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if save_file_dialog.ShowModal() == wx.ID_CANCEL:
             return  # THE USER CHANGED THERE MIND
@@ -6079,13 +6073,10 @@ class Gmg(wx.Frame):
         """
         
         # CREATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(self, "Save c.in RayInvr file", "", "", "in files (*.in)|*.in",
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        output_stream = show_save_dialog(self, "Save c.in RayInvr file",
+                                         "in files (*.in)|*.in|Text files (*.txt)|*.txt|All files (*.*)|*.*")
+        if output_stream is None:
             return  # THE USER CHANGED THEIR MIND
-
-        # NOW WRITE OUT THE DATA
-        output_stream = save_file_dialog.GetPath()
 
         # HONOUR THE FILTER THE USER PICKED FROM, SO A NAME TYPED WITHOUT A SUFFIX IS STILL FOUND AFTERWARDS
         if os.path.splitext(output_stream)[1] == '':

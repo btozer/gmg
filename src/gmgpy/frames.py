@@ -13,9 +13,9 @@ import struct
 # gmg.py PUTS ITS OWN DIRECTORY ON sys.path AND IMPORTS ITS MODULES FLAT, WHILE THE PACKAGED TESTS IMPORT gmgpy AS
 # A PACKAGE, SO THE SHARED HELPER HAS TO BE REACHABLE BOTH WAYS
 try:
-    from .dialogs import save_xy_file
+    from .dialogs import save_xy_file, show_save_dialog
 except ImportError:
-    from dialogs import save_xy_file
+    from dialogs import save_xy_file, show_save_dialog
 
 
 def extent_to_cell(extent):
@@ -75,14 +75,12 @@ class CaptureCoordinates(wx.Frame):
 
     def on_save(self, event):
         # CREATE OUTPUT FILE
-        save_file_dialog = wx.FileDialog(self, "Save XY data", "", "", "xy files (*.xy)|*.xy",
-                                         wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        output_stream = show_save_dialog(self, "Save XY data",
+                                         "xy files (*.xy)|*.xy|"
+                                         "Text files (*.txt)|*.txt|"
+                                         "All files (*.*)|*.*")
+        if output_stream is None:
             return  # USER CHANGED THEIR MIND
-
-        # NOW WRITE OUT THE DATA
-        # GET OUTPUT FILENAME
-        output_stream = save_file_dialog.GetPath()
 
         # GET DATA
         x = []
@@ -667,13 +665,11 @@ class PlotSettingsDialog(wx.Frame):
         self.Destroy()
 
     def file_path(self, event):
-        self.save_file_dialog = wx.FileDialog(self, "Save As", "", "", "Figure files (*.*)|*.*",
-                                              wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
-        if self.save_file_dialog.ShowModal() == wx.ID_CANCEL:
+        chosen_path = show_save_dialog(self, "Save As", "Figure files (*.*)|*.*")
+        if chosen_path is None:
             return  # THE USER CHANGED IDEA...
-        self.chosen_path = self.save_file_dialog.GetPath()
+        self.chosen_path = chosen_path
         self.file_path_text.SetValue(str(self.chosen_path))
-        self.save_file_dialog.Destroy()
 
 
 class AttributeEditor(wx.Frame):
