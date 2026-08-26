@@ -1249,3 +1249,152 @@ def test_bulk_setters_reach_every_layer(gmg_frame, gmg_module, monkeypatch):
     gmg_frame.set_out_of_plane_extent(None)
     assert all(layer.y1 is None and layer.y2 is None for layer in gmg_frame.layer_list)
 
+
+def test_dc_shift_defaults_off_and_raw(gmg_frame):
+    """
+    Test the DC shift is off by default and the plotted curve is the raw forward calculation
+    """
+    assert (gmg_frame.gravity_dc_mode, gmg_frame.vgg_dc_mode, gmg_frame.magnetic_dc_mode) == ('off',) * 3
+    assert (gmg_frame.gravity_dc_value, gmg_frame.vgg_dc_value, gmg_frame.magnetic_dc_value) == (0.0,) * 3
+
+    # NB: A LOOSE TOLERANCE, BECAUSE matplotlib STORES LINE DATA AS float32
+    np.testing.assert_allclose(gmg_frame.pred_gravity_plot.get_ydata(), gmg_frame.predicted_gravity,
+                               rtol=1.0e-6)
+    assert 'DC' not in gmg_frame.gravity_frame.get_ylabel()
+
+
+def test_dc_shift_auto_zeroes_the_mean_residual(gmg_frame, reported, tmp_path, monkeypatch):
+    """
+    Test auto mode fits the constant that zeroes the mean residual against the RMS input
+
+    An observed dataset that is the calculated curve moved up by 5 must produce a DC of exactly +5, an RMS
+    of zero, and a plotted (and exported) curve lying on the observed data. The raw predicted values must
+    never change: the shift is applied at the points of consumption only.
+    """
+    raw = gmg_frame.predicted_gravity.copy()
+    gmg_frame.obs_gravity_data_for_rms = np.column_stack((gmg_frame.xp * 0.001, raw + 5.0))
+    gmg_frame.gravity_dc_mode = 'auto'
+    gmg_frame.run_algorithms()
+
+    assert abs(gmg_frame.gravity_dc_value - 5.0) < 1.0e-6
+    assert gmg_frame.gravity_rms_value < 1.0e-4  # rms() ROUNDS TO 4 D.P.
+    assert 'DC +5.00' in gmg_frame.gravity_frame.get_ylabel()
+    np.testing.assert_array_equal(gmg_frame.predicted_gravity, raw)
+    np.testing.assert_allclose(gmg_frame.pred_gravity_plot.get_ydata(), raw + 5.0, rtol=1.0e-6)
+
+    # THE EXPORT IS WYSIWYG, SO IT MUST CONTAIN THE SHIFTED VALUES
+    target = tmp_path / 'predicted_gravity.txt'
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(target))
+    gmg_frame.save_modelled_grav(None)
+    exported = np.loadtxt(str(target))
+    np.testing.assert_allclose(exported[:, 1], raw + 5.0, atol=1.0e-6)
+
+    # SWITCHING BACK OFF MUST RESTORE THE RAW CURVE EXACTLY
+    gmg_frame.gravity_dc_mode = 'off'
+    gmg_frame.run_algorithms()
+    assert gmg_frame.gravity_dc_value == 0.0
+    np.testing.assert_allclose(gmg_frame.pred_gravity_plot.get_ydata(), raw, rtol=1.0e-6)
+
+
+def test_dc_shift_manual_moves_curve_and_unreliable_markers(gmg_frame):
+    """
+    Test manual mode shifts the magnetic curve and the unreliable sample markers ride on it
+    """
+    raw = gmg_frame.predicted_nt.copy()
+    gmg_frame.magnetic_dc_mode = 'manual'
+    gmg_frame.magnetic_dc_manual = -12.5
+    gmg_frame.run_algorithms()
+
+    assert gmg_frame.magnetic_dc_value == -12.5
+    assert 'DC -12.50' in gmg_frame.magnetic_frame.get_ylabel()
+    np.testing.assert_allclose(gmg_frame.predicted_nt_plot.get_ydata(), raw - 12.5, rtol=1.0e-6)
+
+    # RAISE THE LAYER THROUGH THE CALCULATION ELEVATION SO SOME SAMPLES BECOME UNRELIABLE, AND CHECK
+    # THEIR MARKERS SIT ON THE SHIFTED CURVE (SEE test_interior_observation_points_are_marked)
+    layer = gmg_frame.layer_list[gmg_frame.currently_active_layer_id]
+    layer.y_nodes[:] = [-2.0, -2.0, 15.0, 15.0]
+    gmg_frame.update_layer_data()
+    gmg_frame.run_algorithms()
+
+    inside = gmg_frame.unreliable_magnetic_observation_points()
+    assert inside.any()
+    np.testing.assert_allclose(gmg_frame.untrusted_nt_plot.get_ydata(),
+                               (gmg_frame.predicted_nt + gmg_frame.magnetic_dc_value)[inside], rtol=1.0e-6)
+
+
+def test_dc_shift_auto_with_nothing_to_fit_behaves_as_off(gmg_frame):
+    """
+    Test auto mode with no RMS input, or with the calculation switched off, applies no shift
+
+    Fitting against an unset dataset is impossible, and fitting against the zero curve of a switched off
+    calculation would produce a spurious mean(obs) shift.
+    """
+    gmg_frame.gravity_dc_mode = 'auto'
+    gmg_frame.run_algorithms()
+    assert gmg_frame.gravity_dc_value == 0.0
+
+    raw = gmg_frame.predicted_gravity.copy()
+    gmg_frame.obs_gravity_data_for_rms = np.column_stack((gmg_frame.xp * 0.001, raw + 5.0))
+    gmg_frame.calc_grav_switch = False
+    gmg_frame.run_algorithms()
+    assert gmg_frame.gravity_dc_value == 0.0
+
+
+def test_dc_shift_round_trips_and_old_files_default_off(gmg_frame, model_path):
+    """
+    Test the DC settings survive a save and load, and files saved before the feature load with it off
+    """
+    gmg_frame.gravity_dc_mode = 'manual'
+    gmg_frame.gravity_dc_manual = 3.25
+    gmg_frame.magnetic_dc_mode = 'auto'
+    gmg_frame.run_algorithms()
+    gmg_frame.save_model(None)
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+    assert (gmg_frame.gravity_dc_mode, gmg_frame.gravity_dc_manual) == ('manual', 3.25)
+    assert gmg_frame.magnetic_dc_mode == 'auto'
+    assert gmg_frame.gravity_dc_value == 3.25  # REDERIVED BY run_algorithms DURING THE LOAD
+
+    # STRIP THE DC KEYS TO IMITATE A FILE WRITTEN BEFORE THE FEATURE EXISTED
+    with open(str(model_path), 'rb') as saved_file:
+        saved = pickle.load(saved_file)
+    for key in ('gravity_dc_mode', 'gravity_dc_manual', 'vgg_dc_mode', 'vgg_dc_manual',
+                'magnetic_dc_mode', 'magnetic_dc_manual'):
+        del saved[key]
+    with open(str(model_path), 'wb') as saved_file:
+        pickle.dump(saved, saved_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+    assert (gmg_frame.gravity_dc_mode, gmg_frame.vgg_dc_mode, gmg_frame.magnetic_dc_mode) == ('off',) * 3
+    assert (gmg_frame.gravity_dc_manual, gmg_frame.gravity_dc_value) == (0.0, 0.0)
+
+
+def test_dc_shift_dialog_applies_and_warns_without_rms_input(gmg_frame, gmg_module, monkeypatch):
+    """
+    Test the DC Shift dialog handler stores the answer, and warns when auto has nothing to fit to
+    """
+    class _DCShift(_AcceptingDialog):
+        mode, manual_value = 'auto', 0.0
+
+        def ShowModal(self):
+            return 1
+
+    warnings = []
+    monkeypatch.setattr(gmg_module, 'DCShiftDialog', _DCShift)
+    monkeypatch.setattr(wx, 'MessageBox', lambda text, *args, **kwargs: warnings.append(text) or wx.YES)
+
+    gmg_frame.set_gravity_dc_shift(None)
+
+    assert gmg_frame.gravity_dc_mode == 'auto'
+    assert gmg_frame.gravity_dc_value == 0.0  # NO RMS INPUT, SO NOTHING IS APPLIED
+    assert any('RMS input' in text for text in warnings)
+
+    # WITH AN RMS INPUT SET THERE IS NO WARNING AND THE SHIFT IS APPLIED
+    warnings.clear()
+    raw = gmg_frame.predicted_gravity.copy()
+    gmg_frame.obs_gravity_data_for_rms = np.column_stack((gmg_frame.xp * 0.001, raw - 2.0))
+    gmg_frame.set_gravity_dc_shift(None)
+    assert not warnings
+    assert abs(gmg_frame.gravity_dc_value - (-2.0)) < 1.0e-6

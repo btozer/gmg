@@ -843,6 +843,61 @@ class BulkShiftDialog(wx.Dialog):
         self.EndModal(1)
 
 
+class DCShiftDialog(wx.Dialog):
+    """
+    SET THE DC SHIFT APPLIED TO A CALCULATED ANOMALY. MODES:
+    off    = NO SHIFT, THE RAW FORWARD CALCULATION IS SHOWN (DEFAULT)
+    auto   = THE BEST FITTING CONSTANT AGAINST THE FIELD'S RMS INPUT DATASET, RECOMPUTED ON
+             EVERY CALCULATION (ZEROES THE MEAN RESIDUAL, GM-SYS STYLE)
+    manual = A USER ENTERED CONSTANT
+    """
+
+    MODES = ('off', 'auto', 'manual')
+
+    def __init__(self, parent, id, title, units, mode, manual_value, auto_value):
+        # units: e.g. 'mGal' | 'Eotvos' | 'nT'. auto_value: THE CURRENT BEST FIT SHIFT, OR None
+        # WHEN THERE IS NOTHING TO FIT TO (NO RMS INPUT SET, OR THE CALCULATION SWITCH IS OFF)
+        wx.Dialog.__init__(self, parent, id, title, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER
+                                                          | wx.MAXIMIZE_BOX | wx.MAXIMIZE_BOX)
+        input_panel = wx.Panel(self, -1)
+        self.mode_input = wx.RadioBox(input_panel, -1, "Mode", choices=['Off', 'Auto (best fit)', 'Manual'],
+                                      majorDimension=1, style=wx.RA_SPECIFY_COLS)
+        self.mode_input.SetSelection(self.MODES.index(mode))
+        self.Bind(wx.EVT_RADIOBOX, self.on_mode, self.mode_input)
+        if auto_value is not None:
+            auto_text = "%+.4f %s" % (auto_value, units)
+        else:
+            auto_text = "n/a (set an RMS input first)"
+        self.auto_value_label = wx.StaticText(input_panel, -1, "Current auto value:  %s" % auto_text)
+        self.manual_label = wx.StaticText(input_panel, -1, "Manual shift (%s):" % units)
+        self.manual_input = wx.TextCtrl(input_panel, -1, str(manual_value), size=(100, -1))
+        self.manual_input.SetInsertionPoint(0)
+        self.manual_input.Enable(mode == 'manual')
+        self.b_apply = wx.Button(input_panel, -1, "Apply")
+        self.Bind(wx.EVT_BUTTON, self.set_dc_shift, self.b_apply)
+        sizer = wx.FlexGridSizer(cols=2, hgap=8, vgap=8)
+        sizer.AddMany([self.mode_input, self.auto_value_label,
+                       self.manual_label, self.manual_input,
+                       self.b_apply])
+        input_panel.SetSizerAndFit(sizer)
+        sizer.Fit(self)
+
+    def on_mode(self, event):
+        """THE MANUAL VALUE INPUT IS ONLY RELEVANT IN MANUAL MODE"""
+        self.manual_input.Enable(self.mode_input.GetSelection() == 2)
+
+    def set_dc_shift(self, event):
+        """WHEN THE APPLY BUTTON IS PRESSED, STORE THE ANSWER AND CLOSE"""
+        self.mode = self.MODES[self.mode_input.GetSelection()]
+        try:
+            self.manual_value = float(self.manual_input.GetValue())
+        except ValueError:
+            wx.MessageBox("Please enter a valid number.", "Invalid input", wx.OK | wx.ICON_ERROR)
+            return
+        # CLOSE
+        self.EndModal(1)
+
+
 class SetObsRmsDialog(wx.Dialog):
     """SET THE DATASET TO USE FOR CALCULATING THE RMS MISFIT"""
 

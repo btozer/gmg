@@ -31,6 +31,28 @@ def rms(obs_x, obs_y, calc_x, calc_y):
     return rms_misfit, residuals
 
 
+def best_fit_dc(obs_x, obs_y, calc_x, calc_y):
+    """
+    CALCULATE THE CONSTANT (DC) SHIFT THAT ZEROES THE MEAN RESIDUAL WHEN ADDED TO THE CALCULATED
+    CURVE, I.E. mean(obs - calc) AT THE OBSERVED SAMPLE POINTS (GM-SYS STYLE AUTO DC SHIFT).
+    USES THE SAME CLIPPING AND INTERPOLATION AS rms()
+    """
+
+    # LIMIT OBSERVED VALUES TO THE X RANGE OF THE CALCULATED VALUES
+    obs = np.column_stack((obs_x, obs_y))
+    obs = obs[obs[:, 0] >= calc_x.min()]
+    obs = obs[obs[:, 0] <= calc_x.max()]
+
+    # NO OBSERVED POINTS IN RANGE MEANS THERE IS NOTHING TO FIT TO (AND mean([]) WOULD BE nan)
+    if len(obs) == 0:
+        return 0.0
+
+    # INTERPOLATE THE VALUES OF THE CALCULATED ANOMALY AT THE OBSERVED SAMPLE POINTS
+    f = interpolate.interp1d(calc_x, calc_y)
+
+    return float(mean(obs[:, 1] - f(obs[:, 0])))
+
+
 def chi_square(x, calc):
     """CALCULATE CHI-SQUARE MISFIT BETWEEN OBSERVED AND CALCULATED VALUES"""
     pass

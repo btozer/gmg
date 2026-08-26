@@ -448,6 +448,10 @@ class Gmg(wx.Frame):
         # SET RMS OBS ARRAYS
         grav_m_set_rms = self.gravity_data.Append(-1, "Set RMS Input...", "Set RMS Input...")
         self.Bind(wx.EVT_MENU, self.set_obs_grav_rms, grav_m_set_rms)
+        # SET DC SHIFT
+        grav_m_dc_shift = self.gravity_data.Append(-1, "DC Shift...",
+                                                   "Apply a DC shift to the calculated anomaly")
+        self.Bind(wx.EVT_MENU, self.set_gravity_dc_shift, grav_m_dc_shift)
         # SET ELEVATION FOR CALCULATIONS
         m_set_grav_elv_sub = wx.Menu()
         self.gravity_data.AppendSubMenu(m_set_grav_elv_sub, "&Set Calculation Elevation...")
@@ -486,6 +490,10 @@ class Gmg(wx.Frame):
         # SET RMS OBS ARRAYS
         vgg_m_set_rms = self.vgg_data.Append(-1, "Set RMS Input...", "Set RMS Input...")
         self.Bind(wx.EVT_MENU, self.set_obs_vgg_rms, vgg_m_set_rms)
+        # SET DC SHIFT
+        vgg_m_dc_shift = self.vgg_data.Append(-1, "DC Shift...",
+                                              "Apply a DC shift to the calculated anomaly")
+        self.Bind(wx.EVT_MENU, self.set_vgg_dc_shift, vgg_m_dc_shift)
         # SET ELEVATION FOR CALCULATIONS
         m_set_vgg_elv_sub = wx.Menu()
         self.vgg_data.AppendSubMenu(m_set_vgg_elv_sub, "&Set Calculation Elevation...")
@@ -525,6 +533,10 @@ class Gmg(wx.Frame):
         # SET RMS OBS ARRAYS
         mag_m_set_rms = self.magnetic_data.Append(-1, "Set RMS Input..", "Set RMS input..")
         self.Bind(wx.EVT_MENU, self.set_obs_mag_rms, mag_m_set_rms)
+        # SET DC SHIFT
+        mag_m_dc_shift = self.magnetic_data.Append(-1, "DC Shift...",
+                                                   "Apply a DC shift to the calculated anomaly")
+        self.Bind(wx.EVT_MENU, self.set_magnetic_dc_shift, mag_m_dc_shift)
         # SET MAG
         m_set_mag_elv_sub = wx.Menu()
         self.magnetic_data.AppendSubMenu(m_set_mag_elv_sub, "&Set Calculation Elevation...")
@@ -993,6 +1005,9 @@ class Gmg(wx.Frame):
         self.obs_gravity_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.gravity_rms_value = None  # TOTAL RMS MISFIT VALUE
         self.grav_residuals = []  # CALCULATED RESIDUAL
+        self.gravity_dc_mode = 'off'  # DC SHIFT MODE: 'off' | 'auto' (BEST FIT TO RMS INPUT) | 'manual'
+        self.gravity_dc_manual = 0.0  # USER ENTERED CONSTANT FOR 'manual' MODE (mGal)
+        self.gravity_dc_value = 0.0  # THE SHIFT CURRENTLY APPLIED. DERIVED EVERY run_algorithms; NOT SAVED
 
         # INITIALISE OBSERVED VGG ATTRIBUTES
         self.observed_vgg_switch = False
@@ -1005,6 +1020,9 @@ class Gmg(wx.Frame):
         self.obs_vgg_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.vgg_rms_value = None  # TOTAL RMS MISFIT VALUE
         self.vgg_residuals = []  # CALCULATED RESIDUAL
+        self.vgg_dc_mode = 'off'  # DC SHIFT MODE: 'off' | 'auto' (BEST FIT TO RMS INPUT) | 'manual'
+        self.vgg_dc_manual = 0.0  # USER ENTERED CONSTANT FOR 'manual' MODE (Eotvos)
+        self.vgg_dc_value = 0.0  # THE SHIFT CURRENTLY APPLIED. DERIVED EVERY run_algorithms; NOT SAVED
 
         # INITIALISE MODELLING MAGNETIC ATTRIBUTES
         self.calc_mag_switch = False
@@ -1017,6 +1035,9 @@ class Gmg(wx.Frame):
         self.obs_mag_data_for_rms = []  # OBSERVED DATA LIST TO BE COMPARED TO CALCULATED
         self.magnetic_rms_value = None  # TOTAL RMS MISFIT VALUE (SINGLE INTEGER)
         self.mag_residuals = []  # CALCULATED RESIDUAL
+        self.magnetic_dc_mode = 'off'  # DC SHIFT MODE: 'off' | 'auto' (BEST FIT TO RMS INPUT) | 'manual'
+        self.magnetic_dc_manual = 0.0  # USER ENTERED CONSTANT FOR 'manual' MODE (nT)
+        self.magnetic_dc_value = 0.0  # THE SHIFT CURRENTLY APPLIED. DERIVED EVERY run_algorithms; NOT SAVED
 
         # INITIALISE OBSERVED MAGNETIC ATTRIBUTES
         self.observed_magnetic_list = []
@@ -2389,15 +2410,25 @@ class Gmg(wx.Frame):
             "  || SELF-INTERSECTING LAYER(S): %s - ANOMALIES UNRELIABLE" % \
             ', '.join(str(layer) for layer in crossed)
 
+        # REPORT ANY ACTIVE DC SHIFTS NEXT TO THE RMS VALUES THEY AFFECT
+        dc_bits = ''
+        for label, field in (('GRAV', 'gravity'), ('VGG', 'vgg'), ('MAG', 'magnetic')):
+            if getattr(self, field + '_dc_mode', 'off') != 'off':
+                dc_bits += "  || %s DC (%s) = %+.2f" % (label, getattr(self, field + '_dc_mode'),
+                                                        getattr(self, field + '_dc_value', 0.0))
+
         self.statusbar.SetStatusText(
             " || Currently Editing Layer: %s"
             "  || Model Aspect Ratio = %s:1.0"
             "  || GRAV RMS = %s"
-            "  || MAG RMS = %s  ||%s" % (self.currently_active_layer_id,
-                                         self.model_frame.get_aspect(),
-                                         self.gravity_rms_value,
-                                         self.magnetic_rms_value,
-                                         warning), 1)
+            "  || VGG RMS = %s"
+            "  || MAG RMS = %s%s  ||%s" % (self.currently_active_layer_id,
+                                           self.model_frame.get_aspect(),
+                                           self.gravity_rms_value,
+                                           self.vgg_rms_value,
+                                           self.magnetic_rms_value,
+                                           dc_bits,
+                                           warning), 1)
         self.statusbar.Update()
 
     # FIGURE DISPLAY FUNCTIONS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2754,7 +2785,12 @@ class Gmg(wx.Frame):
                   # PHYSICAL / DISPLAY SETTINGS
                   'earth_field', 'background_density', 'absolute_densities',
                   'inducing_field_inclination', 'inducing_field_declination',
-                  'layer_transparency', 'calc_padding', 'padding']
+                  'layer_transparency', 'calc_padding', 'padding',
+                  # DC SHIFT SETTINGS. THE APPLIED *_dc_value IS DERIVED, RECOMPUTED BY run_algorithms ON LOAD,
+                  # SO ONLY THE MODE AND THE MANUAL CONSTANT ARE SAVED
+                  'gravity_dc_mode', 'gravity_dc_manual',
+                  'vgg_dc_mode', 'vgg_dc_manual',
+                  'magnetic_dc_mode', 'magnetic_dc_manual']
 
         model_params = [self.model_aspect, self.area, self.xp,
                         self.tree_items, self.fault_tree_items,
@@ -2780,7 +2816,11 @@ class Gmg(wx.Frame):
                         # PHYSICAL / DISPLAY SETTINGS
                         self.earth_field, self.background_density, self.absolute_densities,
                         self.inducing_field_inclination, self.inducing_field_declination,
-                        self.layer_transparency, self.calc_padding, self.padding]
+                        self.layer_transparency, self.calc_padding, self.padding,
+                        # DC SHIFT SETTINGS (SAME ORDER AS header ABOVE)
+                        self.gravity_dc_mode, self.gravity_dc_manual,
+                        self.vgg_dc_mode, self.vgg_dc_manual,
+                        self.magnetic_dc_mode, self.magnetic_dc_manual]
 
         for i in range(0, len(model_params)):
             try:
@@ -2861,6 +2901,15 @@ class Gmg(wx.Frame):
             # LAYER'S OWN ANGLES A AND B ARE USED, I.E. THE INDUCED ONLY CASE gmg ASSUMED BEFORE
             self.inducing_field_inclination = model_data.get('inducing_field_inclination', None)
             self.inducing_field_declination = model_data.get('inducing_field_declination', None)
+
+            # .model FILES WRITTEN BEFORE THE DC SHIFT FEATURE CARRY NO DC KEYS. DEFAULT TO OFF (RAW CURVES).
+            # THE APPLIED *_dc_value IS NOT SAVED; run_algorithms (VIA start() BELOW) DERIVES IT FROM THE MODE
+            self.gravity_dc_mode = model_data.get('gravity_dc_mode', 'off')
+            self.gravity_dc_manual = model_data.get('gravity_dc_manual', 0.0)
+            self.vgg_dc_mode = model_data.get('vgg_dc_mode', 'off')
+            self.vgg_dc_manual = model_data.get('vgg_dc_manual', 0.0)
+            self.magnetic_dc_mode = model_data.get('magnetic_dc_mode', 'off')
+            self.magnetic_dc_manual = model_data.get('magnetic_dc_manual', 0.0)
 
             # .model FILES WRITTEN BEFORE 2.75D SUPPORT UNPICKLE INTO Layer OBJECTS WITH NO OUT OF PLANE EXTENTS AT
             # ALL. DEFAULT THEM TO INFINITE EXTENT SO THAT THOSE MODELS REPRODUCE THEIR SAVED ANOMALIES EXACTLY
@@ -3765,7 +3814,8 @@ class Gmg(wx.Frame):
                                       "Predicted Anomaly (*.txt)|*.txt|All files (*.*)|*.*")
         if outputfile is None:
             return  # THE USER CHANGED THEIR MIND
-        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_gravity)), '%.6f %.6f', '.txt')
+        # NB: EXPORTS ARE WYSIWYG. ANY ACTIVE DC SHIFT IS INCLUDED, AS ON SCREEN
+        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.dc_shifted('gravity'))), '%.6f %.6f', '.txt')
 
     def filter_observed_gravity(self, event):
         """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
@@ -4048,7 +4098,8 @@ class Gmg(wx.Frame):
                                       "Predicted Anomaly (*.txt)|*.txt|All files (*.*)|*.*")
         if outputfile is None:
             return  # THE USER CHANGED THEIR MIND
-        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_vgg)), '%.6f %.6f', '.txt')
+        # NB: EXPORTS ARE WYSIWYG. ANY ACTIVE DC SHIFT IS INCLUDED, AS ON SCREEN
+        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.dc_shifted('vgg'))), '%.6f %.6f', '.txt')
 
     def filter_observed_vgg(self, event):
         """FILTER OBSERVED ANOMALY USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
@@ -4330,7 +4381,8 @@ class Gmg(wx.Frame):
                                       "Predicted Anomaly (*.txt)|*.txt|All files (*.*)|*.*")
         if outputfile is None:
             return  # THE USER CHANGED THEIR MIND
-        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.predicted_nt)), '%.6f %.6f', '.txt')
+        # NB: EXPORTS ARE WYSIWYG. ANY ACTIVE DC SHIFT IS INCLUDED, AS ON SCREEN
+        save_xy_file(self, outputfile, list(zip((self.xp * 0.001), self.dc_shifted('magnetic'))), '%.6f %.6f', '.txt')
 
     def filter_observed_magnetic(self, event):
         """FILTER OBSERVED MAGNETIC USING MEDIAN FILTER - CALLS class GaussianFilterDialog"""
@@ -7021,13 +7073,56 @@ class Gmg(wx.Frame):
         # UPDATE GMG
         self.run_algorithms()
         self.update_layer_data()
-        
+
+    def set_gravity_dc_shift(self, event):
+        """SET THE DC SHIFT FOR THE CALCULATED GRAVITY ANOMALY"""
+        self.set_dc_shift('gravity', 'mGal')
+
+    def set_vgg_dc_shift(self, event):
+        """SET THE DC SHIFT FOR THE CALCULATED VGG ANOMALY"""
+        self.set_dc_shift('vgg', 'Eotvos')
+
+    def set_magnetic_dc_shift(self, event):
+        """SET THE DC SHIFT FOR THE CALCULATED MAGNETIC ANOMALY"""
+        self.set_dc_shift('magnetic', 'nT')
+
+    def set_dc_shift(self, field, units):
+        """OPEN THE DC SHIFT DIALOG FOR ONE FIELD AND APPLY THE ANSWER"""
+        raw_attr, obs_attr, switch_attr = self.DC_FIELD_ATTRS[field]
+        obs = getattr(self, obs_attr)
+        raw = getattr(self, raw_attr)
+
+        # THE CURRENT AUTO (BEST FIT) VALUE, FOR THE READ ONLY DISPLAY IN THE DIALOG. None WHEN THERE
+        # IS NOTHING TO FIT TO (SAME GUARDS AS update_dc_value)
+        if len(obs) != 0 and getattr(self, switch_attr) is True and raw is not None:
+            auto_value = model_stats.best_fit_dc(obs[:, 0], obs[:, 1], self.xp * 0.001, raw)
+        else:
+            auto_value = None
+
+        dialog = DCShiftDialog(self, -1, 'DC Shift', units, getattr(self, field + '_dc_mode'),
+                               getattr(self, field + '_dc_manual'), auto_value)
+        if dialog.ShowModal() != 1:
+            return  # USER CHANGED THEIR MIND
+
+        setattr(self, field + '_dc_mode', dialog.mode)
+        setattr(self, field + '_dc_manual', dialog.manual_value)
+
+        # WARN ONCE, AT SELECTION TIME. AT COMPUTE TIME AUTO WITH NO RMS INPUT BEHAVES AS OFF
+        if dialog.mode == 'auto' and len(obs) == 0:
+            wx.MessageBox("No RMS input is set for this field, so no shift will be applied.\n"
+                          "Choose one with 'Set RMS Input...' and the best fit shift will then be "
+                          "applied automatically.", "DC Shift", wx.OK | wx.ICON_INFORMATION)
+
+        # UPDATE GMG
+        self.run_algorithms()
+        self.update_layer_data()
+
     def model_rms(self, xp):
         """CALCULATE RMS MISFIT OF OBSERVED VS CALCULATED"""
         # GRAVITY RMS
         if len(self.obs_gravity_data_for_rms) != 0 and self.calc_grav_switch is True:
             x = xp * 0.001
-            y = self.predicted_gravity
+            y = self.dc_shifted('gravity')  # RMS IS JUDGED AGAINST THE (DC SHIFTED) PLOTTED CURVE
             self.gravity_rms_value, self.grav_residuals = model_stats.rms(self.obs_gravity_data_for_rms[:, 0],
                                                                           self.obs_gravity_data_for_rms[:, 1], x, y)
         else:
@@ -7036,7 +7131,7 @@ class Gmg(wx.Frame):
         # VGG RMS
         if len(self.obs_vgg_data_for_rms) != 0 and self.calc_vgg_switch is True:
             x = self.xp * 0.001
-            y = self.predicted_vgg
+            y = self.dc_shifted('vgg')  # RMS IS JUDGED AGAINST THE (DC SHIFTED) PLOTTED CURVE
             self.vgg_rms_value, self.vgg_residuals = model_stats.rms(self.obs_vgg_data_for_rms[:, 0],
                                                                           self.obs_vgg_data_for_rms[:, 1], x, y)
         else:
@@ -7045,7 +7140,7 @@ class Gmg(wx.Frame):
         # MAGNETICS RMS
         if len(self.obs_mag_data_for_rms) != 0 and self.calc_mag_switch is True:
             x = self.xp * 0.001
-            y = self.predicted_nt
+            y = self.dc_shifted('magnetic')  # RMS IS JUDGED AGAINST THE (DC SHIFTED) PLOTTED CURVE
             self.magnetic_rms_value, self.mag_residuals = model_stats.rms(self.obs_mag_data_for_rms[:, 0],
                                                                           self.obs_mag_data_for_rms[:, 1], x, y)
         else:
@@ -7327,6 +7422,81 @@ class Gmg(wx.Frame):
 
         return offenders
 
+    # MAP EACH FIELD KEY TO (RAW PREDICTED ATTR, RMS DATASET ATTR, CALCULATION SWITCH ATTR)
+    DC_FIELD_ATTRS = {
+        'gravity': ('predicted_gravity', 'obs_gravity_data_for_rms', 'calc_grav_switch'),
+        'vgg': ('predicted_vgg', 'obs_vgg_data_for_rms', 'calc_vgg_switch'),
+        'magnetic': ('predicted_nt', 'obs_mag_data_for_rms', 'calc_mag_switch'),
+    }
+
+    def dc_shifted(self, field):
+        """
+        RETURN THE FIELD'S PREDICTED ANOMALY WITH ITS DC SHIFT APPLIED. THE RAW predicted_* ARRAYS ARE
+        NEVER MODIFIED, THE SHIFT IS ADDED AT THE POINTS OF CONSUMPTION (PLOTS, RMS, LIMITS, EXPORTS).
+        None PASSES THROUGH (predicted_* IS None UNTIL THE FIRST run_algorithms)
+        """
+        raw = getattr(self, self.DC_FIELD_ATTRS[field][0])
+        dc = getattr(self, field + '_dc_value', 0.0)
+        if raw is None or dc == 0.0:
+            return raw
+        return raw + dc
+
+    def update_dc_value(self, field):
+        """
+        RECOMPUTE THE APPLIED DC SHIFT FOR ONE FIELD FROM ITS MODE. MUST RUN AFTER THE FIELD'S RAW
+        ARRAY IS SET AND BEFORE ANYTHING CONSUMES THE SHIFTED CURVE. IN 'auto' MODE THE SHIFT IS THE
+        BEST FITTING CONSTANT AGAINST THE FIELD'S RMS INPUT DATASET (ZEROES THE MEAN RESIDUAL,
+        GM-SYS STYLE). AUTO WITH NOTHING TO FIT TO BEHAVES AS OFF: NO RMS INPUT SET, OR THE
+        CALCULATION SWITCH IS OFF (FITTING TO A ZERO CURVE WOULD PRODUCE A SPURIOUS mean(obs) SHIFT)
+        """
+        raw_attr, obs_attr, switch_attr = self.DC_FIELD_ATTRS[field]
+        mode = getattr(self, field + '_dc_mode', 'off')
+        if mode == 'manual':
+            value = getattr(self, field + '_dc_manual', 0.0)
+        elif mode == 'auto':
+            obs = getattr(self, obs_attr)
+            raw = getattr(self, raw_attr)
+            if len(obs) != 0 and getattr(self, switch_attr) is True and raw is not None:
+                value = model_stats.best_fit_dc(obs[:, 0], obs[:, 1], self.xp * 0.001, raw)
+            else:
+                value = 0.0
+        else:
+            value = 0.0
+        setattr(self, field + '_dc_value', value)
+
+    def update_field_ylabels(self, untrusted_mag):
+        """
+        COMPOSE EVERY DATA PANEL Y AXIS LABEL FROM ITS BASE UNIT PLUS ANY ADVISORY LINES. THE SINGLE
+        WRITER FOR THESE LABELS AFTER FRAME CREATION, SO THE MESSAGES COMPOSE INSTEAD OF CLOBBERING
+        EACH OTHER:
+        - VGG '2D only': THERE IS NO 2.75D VGG ALGORITHM, SO THE VGG IGNORES ANY OUT OF PLANE EXTENTS
+          THAT THE GRAVITY AND MAGNETIC ANOMALIES ARE HONOURING. SAY SO ON THE AXIS RATHER THAN LET
+          THE USER FIT A MISLEADING CURVE
+        - MAGNETIC 'red: unreliable': SAMPLES LYING INSIDE A MAGNETISED LAYER, WHERE THE CALCULATED
+          ANOMALY IS KNOWN TO BE WRONG
+        - 'DC ...': A NON ZERO DC SHIFT IS APPLIED TO THE PLOTTED CURVE
+        NB: THE FRAMES ARE None WHILE THEIR PANELS ARE HIDDEN
+        """
+        if self.gravity_frame is not None:
+            lines = ["G (mGal)"]
+            if self.gravity_dc_value != 0.0:
+                lines.append("DC %+.2f" % self.gravity_dc_value)
+            self.gravity_frame.set_ylabel("\n".join(lines))
+        if self.vertical_gg_frame is not None:
+            lines = ["V (Eotvos)"]
+            if self.calc_vgg_switch is True and self.model_has_finite_extents():
+                lines.append("2D only")
+            if self.vgg_dc_value != 0.0:
+                lines.append("DC %+.2f" % self.vgg_dc_value)
+            self.vertical_gg_frame.set_ylabel("\n".join(lines))
+        if self.magnetic_frame is not None:
+            lines = ["M (nT)"]
+            if untrusted_mag.any():
+                lines.append("red: unreliable")
+            if self.magnetic_dc_value != 0.0:
+                lines.append("DC %+.2f" % self.magnetic_dc_value)
+            self.magnetic_frame.set_ylabel("\n".join(lines))
+
     def run_algorithms(self):
         """RUN POTENTIAL FIELD CALCULATION ALGORITHMS"""
         # --------------------------------------------------------------------------------------------------------------
@@ -7367,8 +7537,11 @@ class Gmg(wx.Frame):
             self.predicted_gravity = np.zeros_like(self.xp)
             # self.predicted_vgg = np.zeros_like(self.xp)
 
+        # RECOMPUTE THE APPLIED DC SHIFT NOW THE RAW ARRAY IS SET, THEN PLOT THE SHIFTED CURVE
+        self.update_dc_value('gravity')
+
         # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
-        self.pred_gravity_plot.set_data(self.xp * 0.001, self.predicted_gravity)
+        self.pred_gravity_plot.set_data(self.xp * 0.001, self.dc_shifted('gravity'))
         # self.pred_vgg_plot.set_data(self.xp * 0.001, self.predicted_vgg)
         # --------------------------------------------------------------------------------------------------------------
 
@@ -7394,21 +7567,16 @@ class Gmg(wx.Frame):
             # SET THE PREDICTED VALUES AS THE KIM & WESSEL OUTPUT
             # NB: NODES ARE INPUT LEFT TO RIGHT SO WE MUST MULTIPLY BY -1 TO PRODUCE THE CORRECT SIGN AT OUTPUT
             self.predicted_vgg = kim_and_wessel.gz(self.xp, self.vgg_observation_elv, kim_input_polygons)  * -1
-
-            # THERE IS NO 2.75D VGG ALGORITHM, SO THE VGG IGNORES ANY OUT OF PLANE EXTENTS THAT THE GRAVITY AND
-            # MAGNETIC ANOMALIES ARE HONOURING. SAY SO ON THE AXIS RATHER THAN LET THE USER FIT A MISLEADING CURVE
-            # NB: THE FRAME IS None WHILE THE VGG PANEL IS HIDDEN
-            if self.vertical_gg_frame is not None:
-                if self.model_has_finite_extents():
-                    self.vertical_gg_frame.set_ylabel("V (Eotvos)\n2D only")
-                else:
-                    self.vertical_gg_frame.set_ylabel("V (Eotvos)")
         else:
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_vgg = np.zeros_like(self.xp)
 
+        # RECOMPUTE THE APPLIED DC SHIFT NOW THE RAW ARRAY IS SET, THEN PLOT THE SHIFTED CURVE
+        # NB: THE VGG '2D only' ADVISORY LABEL IS NOW WRITTEN BY update_field_ylabels BELOW
+        self.update_dc_value('vgg')
+
         # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
-        self.pred_vgg_plot.set_data(self.xp * 0.001, self.predicted_vgg)
+        self.pred_vgg_plot.set_data(self.xp * 0.001, self.dc_shifted('vgg'))
         # --------------------------------------------------------------------------------------------------------------
 
         # --------------------------------------------------------------------------------------------------------------
@@ -7455,17 +7623,21 @@ class Gmg(wx.Frame):
             # SET THE PREDICTED VALUES AS ZEROS
             self.predicted_nt = np.zeros_like(self.xp)
 
+        # RECOMPUTE THE APPLIED DC SHIFT NOW THE RAW ARRAY IS SET, THEN PLOT THE SHIFTED CURVE
+        self.update_dc_value('magnetic')
+
         # SET THE PREDICTED PLOT LINE WITH THE NEWLY CALCULATED VALUES
-        self.predicted_nt_plot.set_data(self.xp * 0.001, self.predicted_nt)
+        self.predicted_nt_plot.set_data(self.xp * 0.001, self.dc_shifted('magnetic'))
 
         # MARK ANY SAMPLE LYING INSIDE A MAGNETISED LAYER, WHERE THE CALCULATED ANOMALY IS KNOWN TO BE WRONG, SO
-        # THAT IT IS NEVER READ AS A GOOD VALUE. NB: THE FRAME IS None WHILE THE MAGNETIC PANEL IS HIDDEN
+        # THAT IT IS NEVER READ AS A GOOD VALUE. THE MARKERS RIDE ON THE (DC SHIFTED) PLOTTED CURVE.
+        # NB: THE FRAME IS None WHILE THE MAGNETIC PANEL IS HIDDEN
         if self.calc_mag_switch is True:
             untrusted = self.unreliable_magnetic_observation_points()
         else:
             untrusted = np.zeros_like(self.xp, dtype=bool)
 
-        self.untrusted_nt_plot.set_data(self.xp[untrusted] * 0.001, self.predicted_nt[untrusted])
+        self.untrusted_nt_plot.set_data(self.xp[untrusted] * 0.001, self.dc_shifted('magnetic')[untrusted])
 
         # COMPOSE THE DATA PANEL Y LABELS (BASE UNITS + '2D only' / 'red: unreliable' / 'DC ...')
         self.update_field_ylabels(untrusted)
@@ -7512,6 +7684,8 @@ class Gmg(wx.Frame):
         """SET FRAME X AND Y LIMITS AFTE MODEL UPDATES"""
         # --------------------------------------------------------------------------------------------------------------
         # SET GRAVITY DISPLAY BOX LIMITS
+        # NB: LIMITS ARE JUDGED AGAINST THE (DC SHIFTED) PLOTTED CURVE, NOT THE RAW PREDICTED VALUES
+        pred = self.dc_shifted('gravity')
         if self.observed_gravity_switch is True and len(self.grav_residuals) != 0:
             # CREATE EMPTY LIST
             ymin_list = []
@@ -7524,8 +7698,8 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED GRAVITY ANOMALY
-            ymin_list.append(self.predicted_gravity.min())
-            ymax_list.append(self.predicted_gravity.max())
+            ymin_list.append(pred.min())
+            ymax_list.append(pred.max())
 
             # # APPEND RMS GRAVITY ANOMALY
             ymin_list.append(self.grav_residuals[:, 1].min() - 2.0)
@@ -7548,17 +7722,17 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_gravity_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED GRAVITY ANOMALY
-            if self.predicted_gravity is not None:
-                ymin_list.append(self.predicted_gravity.min() - 2.0)
-                ymax_list.append(self.predicted_gravity.max() + 2.0)
+            if pred is not None:
+                ymin_list.append(pred.min() - 2.0)
+                ymax_list.append(pred.max() + 2.0)
 
             # SET YMIN AND YMAX
             ymin = min(ymin_list)
             ymax = max(ymax_list)
 
-        elif self.predicted_gravity is not None and self.observed_gravity_switch is False:
-            ymin = self.predicted_gravity.min() - 2.0
-            ymax = self.predicted_gravity.max() + 2.0
+        elif pred is not None and self.observed_gravity_switch is False:
+            ymin = pred.min() - 2.0
+            ymax = pred.max() + 2.0
         else:
             pass
 
@@ -7583,6 +7757,8 @@ class Gmg(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
         # SET VGG DISPLAY BOX LIMITS
+        # NB: LIMITS ARE JUDGED AGAINST THE (DC SHIFTED) PLOTTED CURVE, NOT THE RAW PREDICTED VALUES
+        pred = self.dc_shifted('vgg')
         if self.observed_vgg_switch is True and len(self.vgg_residuals) != 0:
             # CREATE EMPTY LIST
             ymin_list = []
@@ -7596,8 +7772,8 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_vgg_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED GRAVITY ANOMALY
-            ymin_list.append(self.predicted_vgg.min())
-            ymax_list.append(self.predicted_vgg.max())
+            ymin_list.append(pred.min())
+            ymax_list.append(pred.max())
 
             # # APPEND RMS GRAVITY ANOMALY
             ymin_list.append(self.vgg_residuals[:, 1].min() - 2.0)
@@ -7620,17 +7796,17 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_vgg_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED VGG ANOMALY
-            if self.predicted_vgg is not None:
-                ymin_list.append(self.predicted_vgg.min() - 2.0)
-                ymax_list.append(self.predicted_vgg.max() + 2.0)
+            if pred is not None:
+                ymin_list.append(pred.min() - 2.0)
+                ymax_list.append(pred.max() + 2.0)
 
             # SET YMIN AND YMAX
             ymin = min(ymin_list)
             ymax = max(ymax_list)
 
-        elif self.predicted_vgg is not None:
-            ymin = self.predicted_vgg.min() - 2.0
-            ymax = self.predicted_vgg.max() + 2.0
+        elif pred is not None:
+            ymin = pred.min() - 2.0
+            ymax = pred.max() + 2.0
         else:
             pass
 
@@ -7658,6 +7834,8 @@ class Gmg(wx.Frame):
         # --------------------------------------------------------------------------------------------------------------
         # --------------------------------------------------------------------------------------------------------------
         # SET MAGNETIC DISPLAY BOX LIMITS
+        # NB: LIMITS ARE JUDGED AGAINST THE (DC SHIFTED) PLOTTED CURVE, NOT THE RAW PREDICTED VALUES
+        pred = self.dc_shifted('magnetic')
         if self.observed_magnetic_switch is True and len(self.mag_residuals) != 0:
             # CREATE EMPTY LIST
             ymin_list = []
@@ -7671,8 +7849,8 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED GRAVITY ANOMALY
-            ymin_list.append(self.predicted_nt.min())
-            ymax_list.append(self.predicted_nt.max())
+            ymin_list.append(pred.min())
+            ymax_list.append(pred.max())
 
             # APPEND RMS GRAVITY ANOMALY
             ymin_list.append(self.mag_residuals[:, 1].min() - 2.0)
@@ -7694,17 +7872,18 @@ class Gmg(wx.Frame):
                     ymax_list.append(self.observed_magnetic_list[i].data[:, 1].max() + 2.0)
 
             # APPEND PREDICTED GRAVITY ANOMALY
-            ymin_list.append(self.predicted_nt.min() - 2.0)
-            ymax_list.append(self.predicted_nt.max() + 2.0)
+            if pred is not None:
+                ymin_list.append(pred.min() - 2.0)
+                ymax_list.append(pred.max() + 2.0)
 
             # SET YMIN AND YMAX
             ymin = min(ymin_list)
             ymax = max(ymax_list)
 
-        elif self.predicted_nt is not None:
+        elif pred is not None:
             # APPEND PREDICTED GRAVITY ANOMALY
-            ymin = self.predicted_nt.min() - 2.0
-            ymax = self.predicted_nt.max() + 2.0
+            ymin = pred.min() - 2.0
+            ymax = pred.max() + 2.0
         else:
             pass
 
@@ -7780,15 +7959,15 @@ class Gmg(wx.Frame):
                     topo_ylim=topo_ylim,
                     gravity_frame_visible=grav_visible,
                     observed_gravity_list=self.observed_gravity_list,
-                    predicted_gravity=self.predicted_gravity,
+                    predicted_gravity=self.dc_shifted('gravity'),  # WYSIWYG: DC SHIFT INCLUDED
                     gravity_ylim=grav_ylim,
                     vgg_frame_visible=vgg_visible,
                     observed_vgg_list=self.observed_vgg_list,
-                    predicted_vgg=self.predicted_vgg,
+                    predicted_vgg=self.dc_shifted('vgg'),  # WYSIWYG: DC SHIFT INCLUDED
                     vgg_ylim=vgg_ylim,
                     magnetic_frame_visible=mag_visible,
                     observed_magnetic_list=self.observed_magnetic_list,
-                    predicted_nt=self.predicted_nt,
+                    predicted_nt=self.dc_shifted('magnetic'),  # WYSIWYG: DC SHIFT INCLUDED
                     mag_ylim=mag_ylim,
                     model_xlim=self.model_frame.get_xlim(),
                     model_ylim=self.model_frame.get_ylim(),
