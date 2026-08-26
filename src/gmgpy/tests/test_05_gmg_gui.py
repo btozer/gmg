@@ -586,6 +586,33 @@ def test_modify_model_dimensions_carries_the_observation_profiles_over(gmg_modul
                                gmg_frame.xp[overlap] * 0.01, atol=1.0e-3)
 
 
+def test_model_with_observation_elevations_of_the_wrong_length_loads(gmg_frame, model_path, reported):
+    """
+    Test a model whose observation elevations do not match its calculation points is repaired on load
+
+    gmg wrote files in this state for as long as modify_model_dimensions left the profiles behind, and
+    every attempt to reopen one raised ValueError from the forward calculation.
+    """
+    gmg_frame.mag_observation_elv = np.full_like(gmg_frame.xp, -4000.0)
+    gmg_frame.save_model(None)
+
+    # IMITATE A FILE WRITTEN AFTER THE DIMENSIONS WERE CHANGED BUT BEFORE THE PROFILES WERE RESAMPLED
+    with open(str(model_path), 'rb') as saved_file:
+        saved = pickle.load(saved_file)
+    saved['mag_observation_elv'] = saved['mag_observation_elv'][::2]
+    with open(str(model_path), 'wb') as saved_file:
+        pickle.dump(saved, saved_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    assert gmg_frame.mag_observation_elv.shape == gmg_frame.xp.shape
+    np.testing.assert_allclose(gmg_frame.mag_observation_elv, -4000.0)
+
+    # THE REPAIR IS REPORTED RATHER THAN MADE QUIETLY, SINCE IT CHANGES WHAT THE MODEL CALCULATES FROM
+    assert reported.said('do not match its')
+
+
 def test_a_failed_load_reports_the_fault_and_leaves_gmg_usable(gmg_module, gmg_frame, reported, monkeypatch):
     """
     Test a load that fails part way reports it and leaves a model that can still be clicked on

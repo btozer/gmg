@@ -1454,6 +1454,8 @@ class Gmg(wx.Frame):
             result[mask_r] = zm[-1] + slope * (self.xp[mask_r] - xm[-1])
         return result.astype('f')
 
+    # THE THREE OBSERVATION LEVELS, EACH EITHER A SINGLE NUMBER OR ONE VALUE PER CALCULATION POINT
+    OBSERVATION_ELEVATIONS = ('gravity_observation_elv', 'vgg_observation_elv', 'mag_observation_elv')
 
     # THE MENU ID BASE OF EACH OBSERVED DATA LIST. AN OBJECT'S MENU ID IS ALWAYS base + object.id, AND object.id IS
     # ALWAYS THE BARE COUNTER. wx BINDS MENU IDs ON THE FRAME, SO THESE RANGES MUST NOT OVERLAP EACH OTHER OR THE
@@ -1480,6 +1482,44 @@ class Gmg(wx.Frame):
             for observed in getattr(self, list_name):
                 if observed is not None and observed.id is not None and observed.id >= base:
                     observed.id -= base
+
+    def resample_observation_elevations(self, previous_xp=None):
+        """
+        PUT THE OBSERVATION ELEVATION PROFILES BACK ONTO self.xp, AND SAY WHICH ONES HAD TO MOVE.
+
+        An observation level read from a profile holds one value per calculation point. Change the model
+        extent or the sample spacing and self.xp changes length, which leaves those profiles the wrong
+        length and makes every anomaly calculation raise 'operands could not be broadcast together'.
+
+        :param previous_xp: the sample points the profiles were built against, when they are known. Passing
+                            them makes the transfer exact; without them the values are spread evenly across
+                            the profile, which is exact for the constant levels this usually holds
+
+        :returns: list : the names of the profiles that were resampled, empty when nothing needed doing
+        """
+        resampled = []
+
+        for name in self.OBSERVATION_ELEVATIONS:
+            elevations = getattr(self, name)
+
+            # A SINGLE OBSERVATION LEVEL APPLIES AT EVERY POINT, WHATEVER xp IS
+            if np.ndim(elevations) == 0:
+                continue
+
+            elevations = np.asarray(elevations, dtype='f')
+            if elevations.shape == self.xp.shape:
+                continue
+
+            if previous_xp is not None and len(previous_xp) == len(elevations):
+                known_at = np.asarray(previous_xp, dtype='f')
+            else:
+                known_at = np.linspace(self.xp[0], self.xp[-1], len(elevations))
+
+            setattr(self, name, np.array(np.interp(self.xp, known_at, elevations), dtype='f'))
+            resampled.append(name)
+
+        return resampled
+
     def size_handler(self):
         """PLACE THE GUI FRAMES IN THE wxSIZER WINDOWS"""
 
@@ -2169,19 +2209,21 @@ class Gmg(wx.Frame):
         new_z1, new_z2 = float(modify_model_dialogbox.z1) * 1000., float(modify_model_dialogbox.z2) * 1000.
         xp_inc = float(modify_model_dialogbox.xp_inc) * 1000.
 
-        # SET NEW DIMENSION 
+        # SET NEW DIMENSION
         self.area = (new_x1, new_x2, new_z1, new_z2)
         self.model_frame.set_ylim(new_z2 / 1000., new_z1 / 1000.)
         self.model_frame.set_xlim(new_x1 / 1000., new_x2 / 1000.)
+        previous_xp = self.xp
         xp = np.arange(new_x1 - self.calc_padding, new_x2 + self.calc_padding, xp_inc)
         self.xp = np.array(xp, dtype='f')
 
-        # # UPDATE Zp
-        # zp = np.zeros_like(xp)
-        # self.gravity_observation_elv = np.array(zp, dtype='f')
-        # self.vgg_observation_elv = np.array(zp, dtype='f')
-        # self.mag_observation_elv = np.array(zp, dtype='f')
-        
+        # CARRY ANY OBSERVATION ELEVATION PROFILE OVER ONTO THE NEW SAMPLE POINTS.
+        # NB: THIS USED TO BE COMMENTED OUT, SO CHANGING THE DIMENSIONS OF A MODEL WHOSE OBSERVATION LEVEL CAME
+        # FROM A PROFILE LEFT THAT PROFILE AT ITS OLD LENGTH, AND EVERY LATER CALCULATION RAISED
+        # 'operands could not be broadcast together'. A MODEL SAVED IN THAT STATE COULD NOT BE REOPENED AT ALL.
+        # RESAMPLING RATHER THAN ZEROING KEEPS THE PROFILE THE USER LOADED
+        self.resample_observation_elevations(previous_xp)
+
         # UPDATE GMG
         self.update_layer_data()
         self.run_algorithms()
@@ -2859,13 +2901,6 @@ class Gmg(wx.Frame):
             # DRAW CANVAS
             self.start(self.area, self.xp, self.gravity_observation_elv)
 
-            # RESTORE FRAME LAYOUT to match the saved visibility switches
-            # (start() resets all four switches to True via __init__ defaults;
-            # calling frame_adjustment() with a dummy event-like object re-applies them)
-            class _FakeEvent:
-                Id = -1
-            self.frame_adjustment(_FakeEvent())
-
             # ----------------------------------------------------------------------------------------------------------
             # REGISTER THE LOADED OBSERVED DATA (MENUS, SWITCHES AND COUNTERS ONLY).
             # NB: THESE MUST RUN BEFORE THE FRAMES ARE REBUILT. rebuild_data_frames IS WHAT DRAWS THE DATA, AND IT
@@ -2975,31 +3010,15 @@ class Gmg(wx.Frame):
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
-            # LOAD OBSERVED WELL DATA
-            if len(self.well_data_list) > 0:
-                self.replot_well_data()
-
-            # LOAD OBSERVED XY DATA
-            if len(self.observed_xy_data_list) > 0:
-                self.replot_observed_xy_data()
-
-            # LOAD OUTCROP DATA
-            if len(self.outcrop_data_list) > 0:
-                self.replot_outcrop_data()
-
-            # LOAD SEGY DATA
-            if len(self.segy_data_list) > 0:
-                self.replot_segy_data()
-
-            # LOAD GRID DATA
-            if len(self.grid_data_list) > 0:
-                pass
-                # self.replot_grid_data()
-
-            # LOAD PNG DATA
-            if len(self.png_data_list) > 0:
-                pass
-                # self.replot_png_data()
+            # LOAD WELL, XY, OUTCROP, SEGY, GRID AND PNG DATA
+            # NB: EACH IS CALLED WHETHER OR NOT THERE IS ANY, BECAUSE IT ALSO CLEARS THE PREVIOUS MODEL'S MENU
+            # ENTRIES. THE MENUBAR IS BUILT IN __init__, NOT BY start(), SO IT OUTLIVES THE MODEL
+            self.replot_well_data()
+            self.replot_observed_xy_data()
+            self.replot_outcrop_data()
+            self.replot_segy_data()
+            self.replot_grid_data()
+            self.replot_png_data()
             # ----------------------------------------------------------------------------------------------------------
 
             # ----------------------------------------------------------------------------------------------------------
@@ -3026,15 +3045,17 @@ class Gmg(wx.Frame):
             # ----------------------------------------------------------------------------------------------------------
 
         # HANDLE MODEL LOAD ERRORS
-        except IOError:
-            error_message = "IO ERROR IN LOADING PROCESS - MODEL NOT LOADED"
-            MessageDialog(self, -1, error_message, "Load Error")
+        # NB: THIS USED TO CATCH ONLY IOError AND IndexError. ANY OTHER FAULT ESCAPED INTO THE wx EVENT HANDLER,
+        # WHICH SWALLOWS IT, LEAVING A FRAME WHOSE MODEL initalize_model HAD ALREADY WIPED AND WHOSE
+        # currently_active_layer WAS NEVER RECREATED, SO EVERY LATER CLICK IN THE MODEL FRAME RAISED TOO. THE
+        # EXCEPTION IS STILL RE-RAISED SO THE TRACEBACK REACHES stderr
+        except Exception as load_error:
+            MessageDialog(self, -1, "MODEL NOT LOADED\n\n%s: %s" % (type(load_error).__name__, load_error),
+                          "Load Error")
+            self.recover_from_failed_load()
             raise
-        except IndexError:
-            error_message = "INDEX ERROR IN LOADING PROCESS - MODEL NOT LOADED"
-            MessageDialog(self, -1, error_message, "Load Error")
-            raise
-        
+
+
         # MAXIMIZE FRAME
         self.Maximize(True)
         self.update_layer_data()  # UPDATE LAYER DATA
