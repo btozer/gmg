@@ -44,6 +44,18 @@ EXTENT_Y1, EXTENT_Y2 = -7.5, 32.5
 _APP = None
 
 
+class _SkippableEvent(object):
+    """
+    STANDS IN FOR A wx EVENT IN A HANDLER CALLED DIRECTLY.
+
+    The real event classes take constructor arguments that vary between wx versions, and none of the
+    handlers under test read anything from the event beyond skipping it.
+    """
+
+    def Skip(self):
+        pass
+
+
 class _AcceptingDialog(object):
     """A DIALOG THAT ACCEPTS ITSELF IMMEDIATELY, SO THE APPLICATION CAN BE DRIVEN WITHOUT A USER"""
 
@@ -179,6 +191,137 @@ def _capture_points(gmg_frame, points):
     return gmg_frame.capture_window
 
 
+
+
+def _scatters_in(axes):
+    """The scatter artists drawn on the given axes, ignoring the plotted anomaly and RMS lines."""
+    from matplotlib.collections import PathCollection
+
+    return [artist for artist in axes.collections if isinstance(artist, PathCollection)]
+
+
+def _write_png(tmp_path, name='figure.png'):
+    """Write a small PNG for the image loaders to read."""
+    from matplotlib.image import imsave
+
+    target = tmp_path / name
+    imsave(str(target), np.linspace(0.0, 1.0, 64).reshape(8, 8), cmap='gray')
+
+    return target
+
+
+def _write_grid(tmp_path, name='grid.txt'):
+    """Write a small whitespace delimited grid, the format load_grid_data reads."""
+    target = tmp_path / name
+    np.savetxt(str(target), np.arange(64, dtype=float).reshape(8, 8), delimiter=' ')
+
+    return target
+
+
+def _write_segy(tmp_path, name='line.segy'):
+    """Write a small SEG-Y, the format load_segy reads. gmg imports obspy already, so this is free."""
+    from obspy.core import Stream, Trace
+
+    traces = []
+    for _ in range(3):
+        trace = Trace(data=np.linspace(0.0, 1.0, 40).astype(np.float32))
+        trace.stats.delta = 0.004  # SEG-Y REJECTS THE 1.0 s DEFAULT
+        traces.append(trace)
+
+    target = tmp_path / name
+    Stream(traces).write(str(target), format='SEGY', data_encoding=5)
+
+    return target
+
+
+def _filter_dialog(name, data, color='green'):
+    """
+    BUILD A STAND IN FOR GaussianFilterDialog THAT ANSWERS AS IF 'Filter' HAD BEEN PRESSED.
+
+    The handlers read filtered_output, output_name and output_color off the dialog after ShowModal.
+    """
+
+    class _GaussianFilterDialog(_AcceptingDialog):
+        def __init__(self, *args, **kwargs):
+            self.filtered_output = np.array(data, dtype=float)
+            self.output_name = name
+            self.output_color = color
+
+    return _GaussianFilterDialog
+
+
+def _derivative_dialog(name, data, color='red'):
+    """
+    BUILD A STAND IN FOR HorizontalDerivative THAT ANSWERS AS IF 'Calculate' HAD BEEN PRESSED.
+
+    The handlers check hasattr(box, 'deriv') first, so a dialog without it stands for a cancelled one.
+    """
+
+    class _HorizontalDerivative(_AcceptingDialog):
+        def __init__(self, *args, **kwargs):
+            self.deriv = np.array(data, dtype=float)
+            self.output_name = name
+            self.output_color = color
+
+    return _HorizontalDerivative
+
+
+def _load_segy(gmg_module, gmg_frame, monkeypatch, segy_path, name='test segy'):
+    """Load a segy the way the menu item does, with both of its dialogs answered."""
+    monkeypatch.setattr(gmg_module, 'SeisDialog', _seis_dialog(name))
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(segy_path))
+
+    gmg_frame.segy_input(None)
+
+
+def _seis_dialog(name, dimensions=(0.0, 100.0, 0.0, 40.0)):
+    """
+    BUILD A STAND IN FOR SeisDialog THAT ANSWERS AS IF 'Set Coordinates' HAD BEEN PRESSED.
+
+    The real dialog assigns these two attributes only in that handler, which is why the loaders have
+    to check for them before reading.
+    """
+
+    class _SeisDialog(_AcceptingDialog):
+        def __init__(self, *args, **kwargs):
+            self.dimensions = list(dimensions)
+            self.segy_name_input = name
+
+    return _SeisDialog
+
+
+def _load_png(gmg_module, gmg_frame, monkeypatch, png_path, name='test png'):
+    """Load a PNG the way the menu item does, with both of its dialogs answered."""
+    monkeypatch.setattr(gmg_module, 'SeisDialog', _seis_dialog(name))
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(png_path))
+
+    gmg_frame.png_input(None)
+
+
+def _load_grid(gmg_module, gmg_frame, monkeypatch, grid_path, name='test grid'):
+    """Load a grid the way the menu item does, with both of its dialogs answered."""
+    monkeypatch.setattr(gmg_module, 'SeisDialog', _seis_dialog(name))
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(grid_path))
+
+    gmg_frame.grid_input(None)
+
+
+def _menu_labels(menu):
+    """The item labels of a wx menu, so a test can say what is listed rather than only how many."""
+    return [item.GetItemLabelText() for item in menu.GetMenuItems()]
+
+
+def _fire_menu(gmg_frame, menu_id):
+    """
+    Fire a menu item by ID, through the frame's own bindings.
+
+    NB: THIS IS DELIBERATELY NOT A DIRECT HANDLER CALL. THE MENU ID CLASH BEING GUARDED AGAINST LIVES IN
+    THE BINDING TABLE, AND CALLING THE HANDLER WOULD STEP STRAIGHT PAST IT
+    """
+    event = wx.CommandEvent(wx.EVT_MENU.typeId, menu_id)
+    gmg_frame.GetEventHandler().ProcessEvent(event)
+
+
 def _press(button):
     """Press a wx button the way a user would, rather than calling its handler directly."""
     event = wx.CommandEvent(wx.EVT_BUTTON.typeId, button.GetId())
@@ -309,6 +452,425 @@ def test_model_written_before_2_75d_still_loads(gmg_frame, model_path):
     assert all(layer.y1 is None and layer.y2 is None for layer in gmg_frame.layer_list)
     gmg_frame.run_algorithms()
     np.testing.assert_allclose(gmg_frame.predicted_gravity, expected)
+
+
+@pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+
+
+
+@pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+def test_loading_puts_derivative_data_in_the_d_dx_axis(gmg_module, gmg_frame, field):
+    """
+    Test a horizontal derivative loads into the d/dx twin axis, not over the observed data
+
+    replot_observed_*_data had no type check and always used the main axes, and ran last, so every
+    saved derivative came back plotted against the wrong y scale.
+    """
+    _list_name, frame_name, d_frame_name, _switch_name = OBSERVED_PANELS[field]
+    _attach_observed_data(gmg_module, gmg_frame, field, data_type='derivative')
+
+    gmg_frame.save_model(None)
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    assert len(_scatters_in(getattr(gmg_frame, d_frame_name))) == 1
+    assert len(_scatters_in(getattr(gmg_frame, frame_name))) == 0
+
+
+def test_modify_model_dimensions_carries_the_observation_profiles_over(gmg_module, gmg_frame, monkeypatch):
+    """
+    Test changing the model dimensions resamples the observation elevations onto the new sample points
+
+    An observation level read from a profile holds one value per calculation point. The three lines that
+    rebuilt them were commented out, so changing the dimensions left them at their old length and every
+    later calculation raised 'operands could not be broadcast together'. A model saved in that state
+    could not be reopened at all.
+    """
+    previous_xp = gmg_frame.xp.copy()
+    gmg_frame.mag_observation_elv = np.full_like(previous_xp, -4000.0)
+    gmg_frame.gravity_observation_elv = (previous_xp * 0.01).astype('f')  # VARYING, SO INTERPOLATION IS TESTED
+
+    # THE USER WIDENS THE MODEL, WHICH LENGTHENS xp
+    monkeypatch.setattr(gmg_module, 'NewModelDialog',
+                        _new_model_dialog(MODEL_X1, MODEL_X2 * 2, MODEL_Z1, MODEL_Z2))
+    gmg_frame.modify_model_dimensions(None)
+
+    assert len(gmg_frame.xp) > len(previous_xp)
+    assert gmg_frame.mag_observation_elv.shape == gmg_frame.xp.shape
+    assert gmg_frame.gravity_observation_elv.shape == gmg_frame.xp.shape
+
+    # A CONSTANT LEVEL IS UNCHANGED, AND A VARYING PROFILE IS CARRIED OVER RATHER THAN ZEROED
+    np.testing.assert_allclose(gmg_frame.mag_observation_elv, -4000.0)
+    overlap = gmg_frame.xp <= previous_xp[-1]
+    np.testing.assert_allclose(gmg_frame.gravity_observation_elv[overlap],
+                               gmg_frame.xp[overlap] * 0.01, atol=1.0e-3)
+
+
+def test_a_failed_load_reports_the_fault_and_leaves_gmg_usable(gmg_module, gmg_frame, reported, monkeypatch):
+    """
+    Test a load that fails part way reports it and leaves a model that can still be clicked on
+
+    load_model wipes the current model before it reads the file and used to catch only IOError and
+    IndexError. Any other fault escaped into the wx event handler, which swallows it, leaving a frame
+    with no currently_active_layer - so the next click raised AttributeError as well.
+    """
+    from matplotlib.backend_bases import MouseButton, MouseEvent
+
+    gmg_frame.save_model(None)
+    gmg_frame.model_saved = True
+
+    def _fail_to_read(*args, **kwargs):
+        raise RuntimeError('deliberate read failure')
+
+    monkeypatch.setattr(gmg_module.pickle, 'load', _fail_to_read)
+
+    with pytest.raises(RuntimeError):
+        gmg_frame.load_model(None)
+
+    assert reported.said('MODEL NOT LOADED')
+    assert reported.said('deliberate read failure')
+
+    # AN EMPTY BUT WORKING MODEL IS LEFT BEHIND, AND A CLICK IN THE MODEL FRAME NO LONGER RAISES
+    assert len(gmg_frame.layer_list) == 1
+    event = MouseEvent('button_press_event', gmg_frame.fig.canvas, 100, 100, button=MouseButton.LEFT)
+    event.inaxes = gmg_frame.model_frame
+    event.xdata, event.ydata = 50.0, 20.0
+    gmg_frame.button_press(event)
+
+
+@pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+def test_repeated_loads_do_not_pile_up_menu_entries(gmg_module, gmg_frame, field):
+    """
+    Test loading a model several times leaves one menu entry per dataset, not one more each time
+
+    The menubar is built in Gmg.__init__ and is not rebuilt by start(), so the data submenus outlive the
+    model they were filled for. Every replot_* function appended without clearing first.
+    """
+    menus = {'topography': 'm_topo_submenu', 'gravity': 'm_obs_g_submenu',
+             'vgg': 'm_obs_vgg_submenu', 'magnetic': 'm_obs_mag_submenu'}
+
+    _attach_observed_data(gmg_module, gmg_frame, field)
+    expected = _menu_labels(getattr(gmg_frame, menus[field]))
+    assert len(expected) == 1
+
+    gmg_frame.save_model(None)
+    for _ in range(3):
+        gmg_frame.model_saved = True
+        gmg_frame.load_model(None)
+        assert _menu_labels(getattr(gmg_frame, menus[field])) == expected
+
+
+def test_loading_a_png_draws_it_immediately_and_lists_it(gmg_module, gmg_frame, tmp_path, monkeypatch, reported):
+    """
+    Test loading a PNG draws it there and then, and puts its name in the PNG menu
+
+    load_png plotted the image but never repainted the canvas, so it only appeared once something else
+    redrew - in practice when the user clicked the model. Everything that registered the PNG was
+    commented out, so the 'PNGs...' menu stayed empty and there was no way to hide or delete one.
+    """
+    drawn = []
+    monkeypatch.setattr(gmg_frame, 'draw', lambda *args, **kwargs: drawn.append(1))
+
+    _load_png(gmg_module, gmg_frame, monkeypatch, _write_png(tmp_path), name='seismic line')
+
+    assert not reported.said('PNG LOAD ERROR')
+
+    # THE IMAGE IS ON THE MODEL FRAME, AND THE CANVAS WAS REPAINTED WITHOUT WAITING FOR A CLICK
+    assert len(gmg_frame.model_frame.images) == 1
+    assert drawn
+
+    # AND IT IS LISTED, WITH THE NAME THE DIALOG WAS GIVEN
+    assert len(gmg_frame.png_data_list) == 1
+    assert gmg_frame.png_data_list[0].name == 'seismic line'
+    assert _menu_labels(gmg_frame.m_png_submenu) == ['seismic line']
+
+
+def test_an_unnamed_png_still_gets_a_menu_entry(gmg_module, gmg_frame, tmp_path, monkeypatch):
+    """
+    Test a PNG loaded with the name box left empty is listed under a name of gmg's own
+    """
+    _load_png(gmg_module, gmg_frame, monkeypatch, _write_png(tmp_path), name='')
+
+    assert _menu_labels(gmg_frame.m_png_submenu) == ['PNG 0']
+
+
+def test_png_hide_show_toggles_the_image(gmg_module, gmg_frame, tmp_path, monkeypatch):
+    """
+    Test the PNG Hide/Show menu item hides the image and brings it back
+    """
+    _load_png(gmg_module, gmg_frame, monkeypatch, _write_png(tmp_path))
+    png = gmg_frame.png_data_list[0]
+    assert png.mpl_actor.get_visible()
+
+    _fire_menu(gmg_frame, png.id + 14500)
+    assert not png.mpl_actor.get_visible()
+
+    _fire_menu(gmg_frame, png.id + 14500)
+    assert png.mpl_actor.get_visible()
+
+
+def test_deleting_a_png_clears_the_image_and_the_menu(gmg_module, gmg_frame, tmp_path, monkeypatch):
+    """
+    Test 'delete png' takes the image off the model frame and the entry out of the menu
+    """
+    _load_png(gmg_module, gmg_frame, monkeypatch, _write_png(tmp_path))
+    png_id = gmg_frame.png_data_list[0].id
+
+    _fire_menu(gmg_frame, png_id + 14000)
+
+    assert len(gmg_frame.model_frame.images) == 0
+    assert gmg_frame.png_data_list[png_id] is None
+    assert _menu_labels(gmg_frame.m_png_submenu) == []
+
+
+def test_png_survives_a_save_and_load(gmg_module, gmg_frame, tmp_path, model_path, monkeypatch):
+    """
+    Test a PNG saved in a model is drawn and listed again on load, and does not double on a second load
+
+    load_model held 'pass  # self.replot_png_data()', so a saved PNG simply vanished. The equivalent
+    segy code appends to the list it is looping over, which doubles every entry; replot_png_data must
+    not do the same.
+    """
+    _load_png(gmg_module, gmg_frame, monkeypatch, _write_png(tmp_path), name='saved figure')
+
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(model_path))
+    gmg_frame.save_model(None)
+
+    for _ in range(2):
+        gmg_frame.model_saved = True
+        gmg_frame.load_model(None)
+
+        assert len(gmg_frame.png_data_list) == 1
+        assert len(gmg_frame.model_frame.images) == 1
+        assert _menu_labels(gmg_frame.m_png_submenu) == ['saved figure']
+
+
+def test_png_input_returns_quietly_when_the_dialog_is_dismissed(gmg_module, gmg_frame, monkeypatch):
+    """
+    Test dismissing the dimensions dialog without setting coordinates does nothing, rather than raising
+
+    SeisDialog only assigns dimensions and segy_name_input inside its 'Set Coordinates' handler, so
+    png_input raised AttributeError on the next line for any other way of closing it.
+    """
+    class _DismissedDialog(_AcceptingDialog):
+        """CLOSED WITHOUT PRESSING 'Set Coordinates', SO IT CARRIES NO dimensions"""
+
+    monkeypatch.setattr(gmg_module, 'SeisDialog', _DismissedDialog)
+
+    gmg_frame.png_input(None)
+
+    assert gmg_frame.png_data_list == []
+
+
+def test_segy_survives_a_save_and_load_without_doubling(gmg_module, gmg_frame, tmp_path, model_path, monkeypatch):
+    """
+    Test a segy saved in a model comes back once per load, however many times it is loaded
+
+    replot_segy_data appended to self.segy_data_list while looping over range(len()) of that same list,
+    so every load duplicated each segy - and its menu entry with it.
+    """
+    _load_segy(gmg_module, gmg_frame, monkeypatch, _write_segy(tmp_path), name='line 2')
+    assert len(gmg_frame.segy_data_list) == 1
+
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(model_path))
+    gmg_frame.save_model(None)
+
+    for _ in range(3):
+        gmg_frame.model_saved = True
+        gmg_frame.load_model(None)
+
+        assert len(gmg_frame.segy_data_list) == 1
+        assert len(gmg_frame.model_frame.images) == 1
+        assert _menu_labels(gmg_frame.m_segy_submenu) == ['line 2']
+
+
+def test_a_segy_that_will_not_read_does_not_stop_the_others(gmg_module, gmg_frame, tmp_path, model_path,
+                                                            monkeypatch, reported):
+    """
+    Test one unreadable segy is reported and skipped, leaving the rest of the model's segys plotted
+
+    replot_segy_data used to return out of the loop, so every segy after the bad one was abandoned.
+    """
+    _load_segy(gmg_module, gmg_frame, monkeypatch, _write_segy(tmp_path, 'first.segy'), name='first')
+    second = _write_segy(tmp_path, 'second.segy')
+    _load_segy(gmg_module, gmg_frame, monkeypatch, second, name='second')
+    assert len(gmg_frame.model_frame.images) == 2
+
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(model_path))
+    gmg_frame.save_model(None)
+
+    # THE FIRST FILE GOES MISSING, AS IT WOULD IF THE MODEL WERE MOVED TO ANOTHER MACHINE
+    os.remove(str(tmp_path / 'first.segy'))
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    assert reported.said('SEGY LOAD ERROR')
+    assert _menu_labels(gmg_frame.m_segy_submenu) == ['second']
+    assert len(gmg_frame.model_frame.images) == 1
+
+
+def test_grid_survives_a_save_and_load(gmg_module, gmg_frame, tmp_path, model_path, monkeypatch):
+    """
+    Test a grid saved in a model is drawn and listed again, and can then be deleted
+
+    load_model held 'pass  # self.replot_grid_data()' and the function did not exist, so a saved grid
+    simply vanished even though grid_data_list was being written to the file.
+    """
+    _load_grid(gmg_module, gmg_frame, monkeypatch, _write_grid(tmp_path), name='velocity model')
+
+    monkeypatch.setattr(wx, 'FileDialog', _file_dialog_returning(model_path))
+    gmg_frame.save_model(None)
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    assert len(gmg_frame.model_frame.images) == 1
+    assert _menu_labels(gmg_frame.m_grid_submenu) == ['velocity model']
+
+    # AND THE MENU ENTRY STILL WORKS AFTER THE LOAD
+    _fire_menu(gmg_frame, gmg_frame.grid_data_list[0].id + 5000)
+    assert gmg_frame.grid_data_list[0] is None
+    assert len(gmg_frame.model_frame.images) == 0
+    assert _menu_labels(gmg_frame.m_grid_submenu) == []
+
+
+def test_vgg_filter_and_derivative_are_listed_under_vgg(gmg_module, gmg_frame, monkeypatch):
+    """
+    Test VGG datasets go in the VGG menu, not the gravity one
+
+    filter_observed_vgg and take_vgg_horizontal_derivative appended to m_obs_g_submenu while binding
+    delete_obs_vgg, which calls DestroyItem on the VGG menu - so the entry showed up under Gravity and
+    could never be removed.
+    """
+    _attach_observed_data(gmg_module, gmg_frame, 'vgg')
+    gravity_before = _menu_labels(gmg_frame.m_obs_g_submenu)
+
+    monkeypatch.setattr(gmg_module, 'GaussianFilterDialog',
+                        _filter_dialog('vgg filtered', gmg_frame.observed_vgg_list[0].data))
+    gmg_frame.filter_observed_vgg(None)
+
+    monkeypatch.setattr(gmg_module, 'HorizontalDerivative',
+                        _derivative_dialog('vgg derivative', gmg_frame.observed_vgg_list[0].data))
+    gmg_frame.take_vgg_horizontal_derivative(None)
+
+    assert _menu_labels(gmg_frame.m_obs_vgg_submenu) == ['vgg test data', 'vgg filtered', 'vgg derivative']
+    assert _menu_labels(gmg_frame.m_obs_g_submenu) == gravity_before
+
+    # AND BOTH DELETE CLEANLY, WHICH THEY COULD NOT WHILE THEY SAT IN THE WRONG MENU
+    for observed in list(gmg_frame.observed_vgg_list[1:]):
+        _fire_menu(gmg_frame, observed.id + 15000)
+    assert _menu_labels(gmg_frame.m_obs_vgg_submenu) == ['vgg test data']
+
+
+def test_deleting_an_observed_vgg_dataset_after_a_load_does_not_raise(gmg_module, gmg_frame):
+    """
+    Test the VGG delete item is bound to delete_obs_vgg, not delete_obs_grav
+
+    replot_observed_vgg_data bound delete_obs_grav for a 15000 ID. That subtracts 11000, so deleting an
+    observed VGG dataset after a load indexed observed_gravity_list[4000 + id] and raised IndexError.
+    """
+    observed = _attach_observed_data(gmg_module, gmg_frame, 'vgg')
+
+    gmg_frame.save_model(None)
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    _fire_menu(gmg_frame, gmg_frame.observed_vgg_list[0].id + 15000)
+
+    assert gmg_frame.observed_vgg_list[0] is None
+    assert _menu_labels(gmg_frame.m_obs_vgg_submenu) == []
+
+
+@pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+def test_a_derivative_can_still_be_deleted_after_a_load(gmg_module, gmg_frame, field):
+    """
+    Test a horizontal derivative keeps a working delete item across a save and load
+
+    The derivative handlers stored object.id as base + counter - the menu ID rather than the object ID -
+    while every other handler stored the bare counter, so replot_* computed base + base + counter and
+    the delete item stopped matching its dataset.
+    """
+    base = dict(gmg_module.Gmg.OBSERVED_DATA_MENU_BASES)[OBSERVED_PANELS[field][0]]
+
+    _attach_observed_data(gmg_module, gmg_frame, field, data_type='derivative')
+
+    gmg_frame.save_model(None)
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    data_list = getattr(gmg_frame, OBSERVED_PANELS[field][0])
+    assert data_list[0].id == 0  # THE BARE COUNTER, NOT base + IT
+
+    _fire_menu(gmg_frame, data_list[0].id + base)
+    assert data_list[0] is None
+
+
+@pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+def test_a_model_saved_with_offset_ids_is_repaired_on_load(gmg_module, gmg_frame, model_path, field):
+    """
+    Test a .model file written when derivative IDs carried their menu base still deletes correctly
+
+    Those files are already on disc, so load_model takes the offset back off.
+    """
+    list_name = OBSERVED_PANELS[field][0]
+    base = dict(gmg_module.Gmg.OBSERVED_DATA_MENU_BASES)[list_name]
+
+    _attach_observed_data(gmg_module, gmg_frame, field, data_type='derivative')
+    gmg_frame.save_model(None)
+
+    # IMITATE A FILE WRITTEN BEFORE THE IDs WERE NORMALISED
+    with open(str(model_path), 'rb') as saved_file:
+        saved = pickle.load(saved_file)
+    for observed in saved[list_name]:
+        observed.id += base
+    with open(str(model_path), 'wb') as saved_file:
+        pickle.dump(saved, saved_file, protocol=pickle.HIGHEST_PROTOCOL)
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    data_list = getattr(gmg_frame, list_name)
+    assert data_list[0].id == 0
+
+    _fire_menu(gmg_frame, data_list[0].id + base)
+    assert data_list[0] is None
+
+
+def test_taking_a_topography_derivative_does_not_raise(gmg_module, gmg_frame, monkeypatch):
+    """
+    Test the topography derivative binds a handler that exists
+
+    It bound self.delete_obs_topo, which is not defined anywhere, so the Bind raised AttributeError -
+    and unlike its three siblings this handler has no try, so it never completed.
+    """
+    observed = _attach_observed_data(gmg_module, gmg_frame, 'topography')
+
+    monkeypatch.setattr(gmg_module, 'HorizontalDerivative',
+                        _derivative_dialog('topo derivative', observed.data))
+    gmg_frame.take_topography_horizontal_derivative(None)
+
+    assert _menu_labels(gmg_frame.m_topo_submenu) == ['topography test data', 'topo derivative']
+
+
+def test_the_image_loaders_do_not_share_menu_ids(gmg_module, gmg_frame, tmp_path, monkeypatch):
+    """
+    Test deleting a grid leaves a loaded PNG alone
+
+    Every image loader bound `counter + 1000`. wx binds menu IDs on the frame, so the later Bind won
+    and one loader's delete item called another loader's handler.
+    """
+    _load_png(gmg_module, gmg_frame, monkeypatch, _write_png(tmp_path))
+    _load_grid(gmg_module, gmg_frame, monkeypatch, _write_grid(tmp_path))
+
+    assert len(gmg_frame.model_frame.images) == 2
+
+    # DELETE THE GRID THROUGH ITS MENU ITEM, WHICH IS WHERE THE CLASH LIVED
+    _fire_menu(gmg_frame, gmg_frame.grid_data_list[0].id + 5000)
+
+    assert gmg_frame.grid_data_list[0] is None
+    assert gmg_frame.png_data_list[0] is not None
+    assert len(gmg_frame.model_frame.images) == 1
 
 
 def test_finite_extent_control_changes_the_anomaly(gmg_frame):
@@ -579,3 +1141,4 @@ def test_bulk_setters_reach_every_layer(gmg_frame, gmg_module, monkeypatch):
     _Extent.y1, _Extent.y2 = None, None
     gmg_frame.set_out_of_plane_extent(None)
     assert all(layer.y1 is None and layer.y2 is None for layer in gmg_frame.layer_list)
+

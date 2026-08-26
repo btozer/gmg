@@ -1032,8 +1032,11 @@ class Gmg(wx.Frame):
         self.well_counter = 0
 
         # INITIALISE SEISMIC ATTRIBUTES
+        # NB: THE THREE *_on SWITCHES ARE SET HERE RATHER THAN ONLY INSIDE THEIR LOADERS, SO THAT THE HANDLERS THAT
+        # READ THEM CANNOT RAISE AttributeError BEFORE ANYTHING HAS BEEN LOADED
         self.segy_data_list = []
         self.segy_counter = 0
+        self.segy_on = False
         self.segy_color_map = cm.gray
         # self.segy_gain_neg = -4.0
         # self.segy_gain_pos = 4.0
@@ -1043,11 +1046,15 @@ class Gmg(wx.Frame):
        # INITIALISE GRID ATTRIBUTES
         self.grid_data_list = []
         self.grid_counter = 0
+        self.grid_on = False
+        self.grid_name = None
         self.segy_color_map = cm.jet
 
        # INITIALISE PNG ATTRIBUTES
         self.png_data_list = []
         self.png_counter = 0
+        self.png_on = False
+        self.png_name = None
 
         # INITIALIZE COORDINATE CAPTURE
         self.capture = False
@@ -1447,6 +1454,32 @@ class Gmg(wx.Frame):
             result[mask_r] = zm[-1] + slope * (self.xp[mask_r] - xm[-1])
         return result.astype('f')
 
+
+    # THE MENU ID BASE OF EACH OBSERVED DATA LIST. AN OBJECT'S MENU ID IS ALWAYS base + object.id, AND object.id IS
+    # ALWAYS THE BARE COUNTER. wx BINDS MENU IDs ON THE FRAME, SO THESE RANGES MUST NOT OVERLAP EACH OTHER OR THE
+    # LOADERS' (segy 1000, wells 2000/3000, xy 4000, grid 5000, outcrop 13000, png 14000/14500)
+    OBSERVED_DATA_MENU_BASES = (('observed_topography_list', 10000),
+                                ('observed_gravity_list', 11000),
+                                ('observed_magnetic_list', 12000),
+                                ('observed_vgg_list', 15000))
+
+    def normalise_observed_data_ids(self):
+        """
+        STRIP THE MENU ID BASE OUT OF ANY OBSERVED DATA OBJECT THAT WAS SAVED CARRYING IT.
+
+        The four horizontal derivative handlers used to store object.id as base + counter, the menu ID rather than
+        the object ID, while every other handler stored the bare counter. The replot_* functions then computed
+        base + base + counter, so after a load the delete item no longer matched its dataset. Files written that
+        way are already on disc, so the offset is taken back off here.
+
+        A genuine bare ID cannot reach 10000 - it is a per field dataset count - so the test is unambiguous.
+        Nothing is reported: unlike the observation elevation repair this changes no modelled quantity, only
+        which menu item points at which dataset.
+        """
+        for list_name, base in self.OBSERVED_DATA_MENU_BASES:
+            for observed in getattr(self, list_name):
+                if observed is not None and observed.id is not None and observed.id >= base:
+                    observed.id -= base
     def size_handler(self):
         """PLACE THE GUI FRAMES IN THE wxSIZER WINDOWS"""
 
@@ -2766,6 +2799,26 @@ class Gmg(wx.Frame):
                     layer.y1 = None
                     layer.y2 = None
 
+            # REPAIR A FILE WHOSE OBSERVATION ELEVATION PROFILES DO NOT MATCH ITS SAMPLE POINTS. gmg USED TO WRITE
+            # THESE: modify_model_dimensions REBUILT xp AND LEFT THE PROFILES AT THEIR OLD LENGTH, AND THE MODEL
+            # COULD THEN NEVER BE REOPENED, EVERY ATTEMPT RAISING 'operands could not be broadcast together'.
+            # THE FILE DOES NOT RECORD THE SAMPLE POINTS THE PROFILES WERE BUILT AGAINST, SO THEY ARE SPREAD ACROSS
+            # THE PROFILE, WHICH IS EXACT FOR A CONSTANT LEVEL AND CLOSE FOR ANYTHING ELSE. SAY SO RATHER THAN
+            # QUIETLY CHANGE THE NUMBERS THE MODEL IS CALCULATED FROM
+            self.xp = np.array(self.xp, dtype='f')
+            repaired = self.resample_observation_elevations()
+            if repaired:
+                MessageDialog(self, -1,
+                              "This model was saved with observation elevations that do not match its\n"
+                              "calculation points (%s).\n\n"
+                              "They have been resampled onto the model's %d calculation points. Check the\n"
+                              "observation elevations before trusting the calculated anomalies, and save the\n"
+                              "model again to keep the repair." % (', '.join(repaired), len(self.xp)),
+                              "Model Repaired")
+
+            # REPAIR OBSERVED DATA OBJECTS SAVED WITH THEIR MENU ID BASE BAKED INTO object.id
+            self.normalise_observed_data_ids()
+
             # SAVE LOADED TREE ITEMS (WILL BE REMOVED BY self.start)
             self.loaded_tree_items = self.tree_items
             self.loaded_fault_tree_items = self.fault_tree_items
@@ -2960,6 +3013,8 @@ class Gmg(wx.Frame):
     
     def replot_observed_xy_data(self):
         """ADD LOADED OBSERVED XY DATA TO THE MODEL FRAME"""
+        self.clear_data_submenu(self.m_xy_submenu)
+
         for x in range(len(self.observed_xy_data_list)):
             if self.observed_xy_data_list[x] is not None:
                 # DRAW DATA IN MODEL FRAME
@@ -2986,12 +3041,6 @@ class Gmg(wx.Frame):
         """ADD LOADED OBSERVED TOPOGRAPHY TO THE MODEL FRAME"""
         for x in range(len(self.observed_topography_list)):
             if self.observed_topography_list[x] is not None:
-                # DRAW DATA IN MODEL FRAME
-                self.observed_topography_list[x].mpl_actor = self.topography_frame.scatter(
-                    self.observed_topography_list[x].data[:, 0], self.observed_topography_list[x].data[:, 1],
-                    marker='o', color=self.observed_topography_list[x].color, s=5,
-                    gid=self.observed_topography_list[x].id)
-
                 # ADD OBJECT TO MENUVAR
                 self.obs_submenu = wx.Menu()
                 self.m_topo_submenu.Append(10000 + self.observed_topography_list[x].id,
@@ -3010,11 +3059,6 @@ class Gmg(wx.Frame):
         """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
         for x in range(len(self.observed_gravity_list)):
             if self.observed_gravity_list[x] is not None:
-                # DRAW DATA IN MODEL FRAME
-                self.observed_gravity_list[x].mpl_actor = self.gravity_frame.scatter(
-                    self.observed_gravity_list[x].data[:, 0], self.observed_gravity_list[x].data[:, 1], marker='o',
-                    color=self.observed_gravity_list[x].color, s=5, gid=self.observed_gravity_list[x].id)
-
                 # ADD OBJECT TO MENUVAR
                 self.obs_submenu = wx.Menu()
                 self.m_obs_g_submenu.Append(11000 + self.observed_gravity_list[x].id,
@@ -3033,18 +3077,15 @@ class Gmg(wx.Frame):
         """ADD LOADED OBSERVED VGG TO THE MODEL FRAME"""
         for x in range(len(self.observed_vgg_list)):
             if self.observed_vgg_list[x] is not None:
-                # DRAW DATA IN MODEL FRAME
-                self.observed_vgg_list[x].mpl_actor = self.vertical_gg_frame.scatter(
-                    self.observed_vgg_list[x].data[:, 0], self.observed_vgg_list[x].data[:, 1], marker='o',
-                    color=self.observed_vgg_list[x].color, s=5, gid=self.observed_vgg_list[x].id)
-
                 # ADD OBJECT TO MENUVAR
                 self.obs_submenu = wx.Menu()
                 self.m_obs_vgg_submenu.Append(15000 + self.observed_vgg_list[x].id,
                                             self.observed_vgg_list[x].name,
                                             self.obs_submenu)
                 self.obs_submenu.Append(15000 + self.observed_vgg_list[x].id, 'delete observed data')
-                self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=15000 + self.observed_vgg_list[x].id)
+                # NB: THIS USED TO BIND delete_obs_grav, WHICH SUBTRACTS 11000, SO AFTER A LOAD DELETING AN OBSERVED
+                # VGG DATASET INDEXED observed_gravity_list[4000 + id] AND RAISED IndexError
+                self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + self.observed_vgg_list[x].id)
 
                 # TURN ON OBSERVED vgg SWITCH
                 self.observed_vgg_switch = True
@@ -3056,14 +3097,6 @@ class Gmg(wx.Frame):
         """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
         for x in range(len(self.observed_magnetic_list)):
             if self.observed_magnetic_list[x] is not None:
-                # DRAW DATA IN MODEL FRAME
-                self.observed_magnetic_list[x].mpl_actor = self.magnetic_frame.scatter(
-                    self.observed_magnetic_list[x].data[:, 0],
-                    self.observed_magnetic_list[x].data[:, 1],
-                    marker='o',
-                    color=self.observed_magnetic_list[x].color,
-                    s=5, gid=self.observed_magnetic_list[x].id)
-
                 # ADD OBJECT TO MENUVAR
                 self.mag_submenu = wx.Menu()
                 self.m_obs_mag_submenu.Append(12000 + self.observed_magnetic_list[x].id,
@@ -3080,6 +3113,8 @@ class Gmg(wx.Frame):
 
     def replot_well_data(self):
         """ADD LOADED WELL DATA TO THE MODEL FRAME"""
+        self.clear_data_submenu(self.m_wells_submenu)
+
         for x in range(len(self.well_data_list)):
             if self.well_data_list[x] is not None:
 
@@ -3153,6 +3188,8 @@ class Gmg(wx.Frame):
 
     def replot_outcrop_data(self):
         """ADD LOADED OUTCROP DATA TO THE MODEL FRAME"""
+        self.clear_data_submenu(self.m_outcrop_submenu)
+
         for x in range(len(self.outcrop_data_list)):
             if self.outcrop_data_list[x] is not None:
 
@@ -3213,50 +3250,126 @@ class Gmg(wx.Frame):
 
     def replot_segy_data(self):
         """ PLOT SEGY DATA"""
-        for x in range(len(self.segy_data_list)):
-            if self.segy_data_list[x] is not None:
+        self.clear_data_submenu(self.m_segy_submenu)
 
-                # SET CURRENT SEGY OBJECT
-                segy = self.segy_data_list[x]
+        for segy in self.segy_data_list:
+            if segy is None:
+                continue
 
-                # LOAD SEGY DATA
-                try:
-                    section = read(segy.file, unpack_trace_headers=False)
-                except IOError:
-                    load_error = MessageDialog(self, -1, "SEGY LOAD ERROR: FILE NOT FOOUND", "Segy load error")
-                    return
+            # LOAD SEGY DATA
+            # NB: THE except USED TO BE IOError AND TO return, WHICH ABANDONED EVERY SEGY AFTER THE BAD ONE. obspy
+            # ALSO RAISES ITS OWN ERRORS FOR A FILE THAT IS PRESENT BUT NOT READABLE AS SEG-Y
+            try:
+                section = read(segy.file, unpack_trace_headers=False)
+            except Exception:
+                MessageDialog(self, -1, "SEGY LOAD ERROR: COULD NOT READ\n\n%s" % segy.file, "Segy load error")
+                continue
 
-                nsamples = len(section.traces[0].data)
-                ntraces = len(section.traces)
-                seis_data = plt.zeros((nsamples, ntraces))
-                for i, tr in enumerate(section.traces):
-                    seis_data[:, i] = tr.data
-                del section
+            nsamples = len(section.traces[0].data)
+            ntraces = len(section.traces)
+            seis_data = plt.zeros((nsamples, ntraces))
+            for i, tr in enumerate(section.traces):
+                seis_data[:, i] = tr.data
+            del section
 
-                # SET AXIS
-                segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
+            # SET AXIS
+            segy.axis = [segy.dimensions[0], segy.dimensions[1], segy.dimensions[3], segy.dimensions[2]]
 
-                # PLOT SEGY DATA ON MODEL
-                segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
-                                                         aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
-                                                         alpha=0.75)
-                # REMOVE SEGY DATA
-                del seis_data
+            # PLOT SEGY DATA ON MODEL
+            segy.mpl_actor = self.model_frame.imshow(seis_data, vmin=self.segy_gain_neg, vmax=self.segy_gain_pos,
+                                                     aspect='auto', extent=segy.axis, cmap=self.segy_color_map,
+                                                     alpha=0.75)
+            # REMOVE SEGY DATA
+            del seis_data
 
-                # SET SEGY ON SWTICH
-                self.segy_on = True
+            # SET SEGY ON SWTICH
+            self.segy_on = True
 
-                # APPEND NEW SEGY TO THE SEGY DATA LIST
-                self.segy_data_list.append(segy)
+            # NB: THIS USED TO APPEND segy TO segy_data_list, THE VERY LIST IT IS LOOPING OVER, SO EVERY LOAD
+            # DOUBLED THE MODEL'S SEGY DATA. THE OBJECTS ARE ALREADY IN THE LIST; ONLY THEIR ARTISTS NEEDED REBUILDING
 
-                # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
-                self.segy_name_submenu = wx.Menu()
-                self.m_segy_submenu.Append(segy.id + 1000, segy.name, self.segy_name_submenu)
-                self.segy_name_submenu.Append(segy.id + 1000, 'delete segy')
-                self.Bind(wx.EVT_MENU, self.remove_segy, id=segy.id + 1000)
+            # ADD SEGY_NAME TO SEGY MENU
+            self.register_segy_menu_entry(segy)
 
-            # INCREMENT COUNTER
-            self.segy_counter = len(self.segy_data_list)
+        # SET COUNTER
+        self.segy_counter = len(self.segy_data_list)
+
+    def replot_grid_data(self):
+        """
+        REDRAW THE GRIDS HELD IN A LOADED MODEL, AND PUT THEM BACK IN THE 'Grids...' MENU.
+
+        Saving strips the matplotlib artists out of the objects it writes, so the grid itself is not in the
+        .model file; it is read again here from the file path the object carries.
+
+        NB: THIS DID NOT EXIST. load_model HELD 'pass  # self.replot_grid_data()', SO A GRID SAVED IN A MODEL
+        NEVER CAME BACK, EVEN THOUGH grid_data_list WAS BEING WRITTEN TO THE FILE
+        """
+        self.clear_data_submenu(self.m_grid_submenu)
+
+        for grid in self.grid_data_list:
+            if grid is None:
+                continue
+
+            try:
+                grid_data = np.genfromtxt(grid.file, dtype=np.float32, delimiter=" ")
+            except Exception:
+                MessageDialog(self, -1, "GRID LOAD ERROR: COULD NOT READ\n\n%s" % grid.file, "grid load error")
+                continue
+
+            # SET AXIS
+            grid.axis = [grid.dimensions[0], grid.dimensions[1], grid.dimensions[3], grid.dimensions[2]]
+
+            # PLOT GRID DATA ON MODEL
+            grid.mpl_actor = self.model_frame.imshow(grid_data, vmin=1.5, vmax=8.5,
+                                                     aspect='auto', extent=grid.axis, cmap=self.segy_color_map,
+                                                     alpha=0.75)
+            del grid_data
+
+            # SET GRID ON SWITCH
+            self.grid_on = True
+
+            # ADD GRID_NAME TO GRID MENU
+            self.register_grid_menu_entry(grid)
+
+        # SET COUNTER
+        self.grid_counter = len(self.grid_data_list)
+
+    def replot_png_data(self):
+        """
+        REDRAW THE PNGs HELD IN A LOADED MODEL, AND PUT THEM BACK IN THE 'PNGs...' MENU.
+
+        Saving strips the matplotlib artists out of the objects it writes, so the image itself is not in the
+        .model file; it is read again here from the file path the object carries.
+
+        NB: replot_segy_data APPENDS TO THE LIST IT IS LOOPING OVER, WHICH DOUBLES EVERY ENTRY, AND RETURNS OUT OF
+        THE LOOP ON A MISSING FILE, ABANDONING THE REST. NEITHER IS COPIED HERE
+        """
+        self.clear_data_submenu(self.m_png_submenu)
+
+        for png in self.png_data_list:
+            if png is None:
+                continue
+
+            try:
+                png_figure = mplimg.imread(png.file)
+            except (IOError, OSError):
+                MessageDialog(self, -1, "PNG LOAD ERROR: FILE NOT FOUND\n\n%s" % png.file, "png load error")
+                continue
+
+            # SET AXIS
+            png.axis = [png.dimensions[0], png.dimensions[1], png.dimensions[3], png.dimensions[2]]
+
+            # PLOT PNG ON MODEL
+            png.mpl_actor = self.model_frame.imshow(png_figure, extent=png.axis, aspect='auto')
+
+            # SET PNG ON SWITCH
+            self.png_on = True
+
+            # ADD PNG_NAME TO PNG MENU
+            self.register_png_menu_entry(png)
+
+        # SET COUNTER
+        self.png_counter = len(self.png_data_list)
 
     # TOPOGRAPHY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3382,7 +3495,10 @@ class Gmg(wx.Frame):
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 10000 + self.observed_topography_counter
+        # NB: THE BARE COUNTER, AS EVERY OTHER HANDLER STORES. THIS USED TO BE 10000 + THE COUNTER, WHICH IS THE
+        # MENU ID RATHER THAN THE OBJECT ID, SO replot_observed_topography_data LATER COMPUTED 10000 + THAT AND
+        # THE DELETE ITEM NO LONGER MATCHED THE DATASET
+        new_derivative.id = int(self.observed_topography_counter)
         new_derivative.type = str('derivative')
         new_derivative.mpl_actor = self.topography_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                              marker='o', color=new_derivative.color, s=5,
@@ -3391,16 +3507,18 @@ class Gmg(wx.Frame):
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_topography_list.append(new_derivative)
 
-        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
+        #  APPEND NEW MENUBAR TO THE TOPOGRAPHY MENUBAR
         self.topo_submenu = wx.Menu()
-        self.m_topo_submenu.Append(10000 + self.observed_topography_counter, new_derivative.name,
+        self.m_topo_submenu.Append(10000 + new_derivative.id, new_derivative.name,
                                    self.topo_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.topo_submenu.Append(10000 + self.observed_topography_counter, 'delete observed data')
+        self.topo_submenu.Append(10000 + new_derivative.id, 'delete observed data')
 
         # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_topo, id=10000 + self.observed_topography_counter)
+        # NB: THIS USED TO BIND self.delete_obs_topo, WHICH DOES NOT EXIST, SO TAKING A TOPOGRAPHY HORIZONTAL
+        # DERIVATIVE RAISED AttributeError HERE - AND THIS HANDLER HAS NO try, SO IT NEVER COMPLETED
+        self.Bind(wx.EVT_MENU, self.delete_observed_topography, id=10000 + new_derivative.id)
 
         # INCREMENT TOPO DERIV COUNTER
         self.observed_topography_counter += 1
@@ -3649,7 +3767,8 @@ class Gmg(wx.Frame):
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 11000 + self.observed_gravity_counter
+        # NB: THE BARE COUNTER. SEE take_topography_horizontal_derivative
+        new_derivative.id = int(self.observed_gravity_counter)
         new_derivative.type = str('derivative')
         new_derivative.mpl_actor = self.gravity_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                                 marker='o', color=new_derivative.color, s=5,
@@ -3660,13 +3779,13 @@ class Gmg(wx.Frame):
 
         #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
         self.grav_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(11000 + self.observed_gravity_counter, new_derivative.name, self.grav_submenu)
+        self.m_obs_g_submenu.Append(11000 + new_derivative.id, new_derivative.name, self.grav_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.grav_submenu.Append(11000 + self.observed_gravity_counter, 'delete observed data')
+        self.grav_submenu.Append(11000 + new_derivative.id, 'delete observed data')
 
         # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + self.observed_gravity_counter)
+        self.Bind(wx.EVT_MENU, self.delete_obs_grav, id=11000 + new_derivative.id)
 
         # INCREMENT GRAV DERIV COUNTER
         self.observed_gravity_counter += 1
@@ -3912,7 +4031,8 @@ class Gmg(wx.Frame):
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 15000 + self.observed_vgg_counter
+        # NB: THE BARE COUNTER. SEE take_topography_horizontal_derivative
+        new_derivative.id = int(self.observed_vgg_counter)
         new_derivative.type = str('derivative')
         new_derivative.mpl_actor = self.vertical_gg_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                                 marker='o', color=new_derivative.color, s=5,
@@ -3922,14 +4042,16 @@ class Gmg(wx.Frame):
         self.observed_vgg_list.append(new_derivative)
 
         #  APPEND NEW MENUBAR TO THE vgg MENUBAR
+        # NB: THIS USED TO APPEND TO m_obs_g_submenu, THE GRAVITY MENU, WHILE BINDING delete_obs_vgg, WHICH CALLS
+        # DestroyItem ON THE VGG MENU. THE ENTRY THEREFORE APPEARED UNDER GRAVITY AND COULD NEVER BE REMOVED
         self.vgg_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(15000 + self.observed_vgg_counter, new_derivative.name, self.vgg_submenu)
+        self.m_obs_vgg_submenu.Append(15000 + new_derivative.id, new_derivative.name, self.vgg_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.vgg_submenu.Append(15000 + self.observed_vgg_counter, 'delete observed data')
+        self.vgg_submenu.Append(15000 + new_derivative.id, 'delete observed data')
 
         # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + self.observed_vgg_counter)
+        self.Bind(wx.EVT_MENU, self.delete_obs_vgg, id=15000 + new_derivative.id)
 
         # INCREMENT vgg DERIV COUNTER
         self.observed_vgg_counter += 1
@@ -4169,7 +4291,8 @@ class Gmg(wx.Frame):
         new_derivative.data = horizontal_derivative_box.deriv
         new_derivative.name = horizontal_derivative_box.output_name
         new_derivative.color = horizontal_derivative_box.output_color
-        new_derivative.id = 12000 + self.observed_magnetic_counter
+        # NB: THE BARE COUNTER. SEE take_topography_horizontal_derivative
+        new_derivative.id = int(self.observed_magnetic_counter)
         new_derivative.type = str('derivative')
         if self.magnetic_d_frame is not None:
             new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
@@ -4182,16 +4305,19 @@ class Gmg(wx.Frame):
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_magnetic_list.append(new_derivative)
 
-        #  APPEND NEW MENUBAR TO THE GRAVITY MENUBAR
+        #  APPEND NEW MENUBAR TO THE MAGNETIC MENUBAR
+        # NB: THESE USED THE BASE 12500 WHILE delete_obs_mag SUBTRACTS 12000, SO THE INDEX IT COMPUTED WAS 500 TOO
+        # HIGH AND DELETING A MAGNETIC DERIVATIVE WAS BROKEN EVEN IN A LIVE SESSION. THE SEPARATE BASE IS NOT
+        # NEEDED: observed_magnetic_counter INCREMENTS FOR EVERY DATASET, WHATEVER ITS TYPE, SO THE IDs ARE UNIQUE
         self.mag_submenu = wx.Menu()
-        self.m_obs_mag_submenu.Append(12500 + self.observed_magnetic_counter, new_derivative.name,
+        self.m_obs_mag_submenu.Append(12000 + new_derivative.id, new_derivative.name,
                                       self.mag_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
-        self.mag_submenu.Append(12500 + self.observed_magnetic_counter, 'delete observed data')
+        self.mag_submenu.Append(12000 + new_derivative.id, 'delete observed data')
 
         # BIND TO DEL FUNC
-        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12500 + self.observed_magnetic_counter)
+        self.Bind(wx.EVT_MENU, self.delete_obs_mag, id=12000 + new_derivative.id)
 
         # INCREMENT MAG DERIV COUNTER
         self.observed_magnetic_counter += 1
@@ -4205,13 +4331,71 @@ class Gmg(wx.Frame):
 
     def png_input(self, event):
         png_data_box = SeisDialog(self, -1, 'PNG Fig Dimensions', self.area)
-        answer = png_data_box.ShowModal()
+        png_data_box.ShowModal()
+
+        # SeisDialog ONLY SETS THESE WHEN 'Set Coordinates' IS PRESSED, SO A DIALOG DISMISSED ANY OTHER WAY USED TO
+        # RAISE AttributeError ON THE NEXT LINE
+        if not hasattr(png_data_box, 'dimensions'):
+            png_data_box.Destroy()
+            return  # THE USER CHANGED THEIR MIND
+
         self.d = png_data_box.dimensions
         self.png_name = png_data_box.segy_name_input
         self.sx1, self.sx2, self.sz1, self.sz2 = self.d
+        png_data_box.Destroy()
+
         self.load_png(self)
 
+    def clear_data_submenu(self, submenu):
+        """
+        EMPTY ONE OF THE 'X Data...' SUBMENUS BEFORE A LOADED MODEL REFILLS IT.
+
+        The menubar is built once in __init__ and is not rebuilt by start(), so these submenus outlive the model
+        they were filled for. Every replot_* function appended to them without clearing first, so loading a model
+        left the previous model's entries in place and added its own underneath, one more set per load.
+
+        :param submenu: the wx.Menu to empty
+        """
+        for menu_item in list(submenu.GetMenuItems()):
+            submenu.DestroyItem(menu_item)
+
+    def register_png_menu_entry(self, png):
+        """
+        ADD ONE PNG TO THE 'PNGs...' MENU, WITH ITS HIDE/SHOW AND DELETE ITEMS.
+
+        NB: THE PARENT ITEM AND THE DELETE ITEM SHARE AN ID, AS THE SEGY AND WELL MENUS DO. ONLY THE LEAF FIRES,
+        AND DestroyItem ON THAT ID THEN TAKES THE WHOLE ENTRY AWAY.
+        NB: PNG IDs MUST NOT OVERLAP ANY OTHER LOADER'S. wx BINDS MENU IDs ON THE FRAME, SO A SHARED ID MEANS THE
+        LATER Bind WINS AND ONE LOADER'S DELETE CALLS ANOTHER'S HANDLER
+        """
+        png_name_submenu = wx.Menu()
+        self.m_png_submenu.Append(png.id + 14000, png.name, png_name_submenu)
+        png_name_submenu.Append(png.id + 14500, 'Hide/Show')
+        png_name_submenu.Append(png.id + 14000, 'delete png')
+        self.Bind(wx.EVT_MENU, self.show_hide_png, id=png.id + 14500)
+        self.Bind(wx.EVT_MENU, self.remove_png, id=png.id + 14000)
+
+    def register_segy_menu_entry(self, segy):
+        """
+        ADD ONE SEGY TO THE 'SEGY Data...' MENU, WITH ITS DELETE ITEM. IDs BEGIN AT 1000.
+
+        NB: BOTH load_segy AND replot_segy_data GO THROUGH HERE. THEY USED TO HOLD SEPARATE COPIES OF THIS BLOCK,
+        WHICH IS HOW THE TWO CAME TO DIFFER
+        """
+        segy_name_submenu = wx.Menu()
+        self.m_segy_submenu.Append(segy.id + 1000, segy.name, segy_name_submenu)
+        segy_name_submenu.Append(segy.id + 1000, 'delete segy')
+        self.Bind(wx.EVT_MENU, self.remove_segy, id=segy.id + 1000)
+
+    def register_grid_menu_entry(self, grid):
+        """ADD ONE GRID TO THE 'Grids...' MENU, WITH ITS DELETE ITEM. IDs BEGIN AT 5000"""
+        grid_name_submenu = wx.Menu()
+        self.m_grid_submenu.Append(grid.id + 5000, grid.name, grid_name_submenu)
+        grid_name_submenu.Append(grid.id + 5000, 'delete grid')
+        self.Bind(wx.EVT_MENU, self.remove_grid, id=grid.id + 5000)
+
     def load_png(self, event):
+        """LOAD A PNG IMAGE INTO THE MODEL FRAME. IDs BEGIN AT 14000, HIDE/SHOW TOGGLE IDs AT 14500"""
         try:
             open_file_dialog = wx.FileDialog(self, "Open Observed file", "", "", "All files (*.*)|*.*",
                                              wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
@@ -4221,53 +4405,31 @@ class Gmg(wx.Frame):
             # PARSE INPUT FILE
             file_in = open_file_dialog.GetPath()
 
-            # CREATE NEW SEGY OBJECT
+            # CREATE NEW PNG OBJECT
             png = SegyData()
 
             # ASSIGN ATTRIBUTES
-            #png.id = self.png_counter
+            png.id = self.png_counter
             png.file = file_in
-            #png.name = self.segy_name
+            # NB: THIS USED TO READ self.segy_name, WHICH BELONGS TO A DIFFERENT LOADER AND DOES NOT EXIST UNTIL A
+            # SEGY HAS BEEN LOADED. FALL BACK TO A NAME OF OUR OWN SO THE MENU ENTRY IS NEVER BLANK
+            png.name = self.png_name if self.png_name else 'PNG %d' % png.id
             png.dimensions = self.d
-            print(png.dimensions)
-            # PLOT PNG ON MODEL
-            ## USING WX
-            # Load the image from file
-            # png_figure = wx.Image(file_in, wx.BITMAP_TYPE_ANY)
-            # # Convert the image to a bitmap
-            # png_bitmap = wx.Bitmap(png_figure)
-            # # Create a wx.StaticBitmap widget to display the image
-            # png.mpl_actor = wx.StaticBitmap(self, wx.ID_ANY, png_bitmap)
-            
-            # self.model_frame.sizer.Add(png.mpl_actor, 1, wx.EXPAND | wx.ALL, 5)
 
-            # png_sizer = wx.BoxSizer(wx.VERTICAL)
-            # png_sizer.Add(png.mpl_actor, 1, wx.EXPAND | wx.ALL, 5)
-            # png_sizer.SetSizer(png_sizer)
-
-            # # LOAD SEGY DATA
-            png_figure = mplimg.imread(file_in)
-
-            # # SET AXIS
+            # SET AXIS
             png.axis = [png.dimensions[0], png.dimensions[1], png.dimensions[3], png.dimensions[2]]
 
-            # # USING MPL
-            png.mpl_actor = self.model_frame.imshow(png_figure, extent=png.axis, aspect='auto')
-            
-            # REMOVE SEGY DATA
-            # del png_figure
+            # PLOT PNG ON MODEL
+            png.mpl_actor = self.model_frame.imshow(mplimg.imread(file_in), extent=png.axis, aspect='auto')
 
-            # # SET SEGY ON SWTICH
-            # self.png_on = True
+            # SET PNG ON SWITCH
+            self.png_on = True
 
-            # # APPEND NEW SEGY TO THE SEGY DATA LIST
-            # self.png_data_list.append(png)
+            # APPEND NEW PNG TO THE PNG DATA LIST
+            self.png_data_list.append(png)
 
-            # # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
-            # self.png_name_submenu = wx.Menu()
-            # self.m_png_submenu.Append(self.png_counter + 1000, png.name, self.grid_png_submenu)
-            # self.png_name_submenu.Append(self.png_counter + 1000, 'delete png')
-            # self.Bind(wx.EVT_MENU, self.remove_png, id=self.png_counter + 1000)
+            # ADD PNG_NAME TO PNG MENU
+            self.register_png_menu_entry(png)
 
             # INCREMENT COUNTER
             self.png_counter += 1
@@ -4276,18 +4438,62 @@ class Gmg(wx.Frame):
             load_error = MessageDialog(self, -1, "PNG LOAD ERROR", "png load error")
 
         # REPLOT MODEL
-        # self.update_layer_data()
-        # self.draw()
+        # NB: WITHOUT THIS THE IMAGE SAT ON THE AXES UNDRAWN UNTIL SOMETHING ELSE REPAINTED THE CANVAS, SO IT ONLY
+        # APPEARED AFTER THE USER CLICKED THE MODEL
+        self.update_layer_data()
+        self.draw()
 
+    def show_hide_png(self, event):
+        """SHOW OR HIDE A PNG. NB 14500 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH OTHER EVENT.IDS"""
+        obj_id = event.Id - 14500
+        png = self.png_data_list[obj_id]
+        if png is None:
+            return
+
+        # NB: A PNG'S mpl_actor IS A SINGLE AxesImage, NOT THE LIST plot() RETURNS, SO IT IS SET DIRECTLY
+        png.mpl_actor.set_visible(not png.mpl_actor.get_visible())
+
+        # REDRAW MODEL
+        self.draw()
+
+    def remove_png(self, event):
+        """DELETE A PNG. NB 14000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH OTHER EVENT.IDS"""
+        obj_id = event.Id - 14000
+        png = self.png_data_list[obj_id]
+        if png is None:
+            return  # ALREADY DELETED
+
+        # REMOVE THE IMAGE FROM THE MODEL FRAME
+        png.mpl_actor.set_visible(False)
+        png.mpl_actor.remove()
+
+        # NB: THE ENTRY IS LEFT AS None RATHER THAN REMOVED, SO THAT png.id STAYS USABLE AS THE LIST INDEX
+        self.png_data_list[obj_id] = None
+
+        # REMOVE MENUBAR ENTRY
+        self.m_png_submenu.DestroyItem(event.Id)
+
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
 
     # GRID DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def grid_input(self, event):
         grid_data_box = SeisDialog(self, -1, 'Grid Dimensions', self.area)
-        answer = grid_data_box.ShowModal()
+        grid_data_box.ShowModal()
+
+        # SeisDialog ONLY SETS THESE WHEN 'Set Coordinates' IS PRESSED. SEE png_input
+        if not hasattr(grid_data_box, 'dimensions'):
+            grid_data_box.Destroy()
+            return  # THE USER CHANGED THEIR MIND
+
         self.d = grid_data_box.dimensions
         self.grid_name = grid_data_box.segy_name_input
         self.sx1, self.sx2, self.sz1, self.sz2 = self.d
+        grid_data_box.Destroy()
+
         self.load_grid_data(self)
 
     def load_grid_data(self, event):
@@ -4300,39 +4506,40 @@ class Gmg(wx.Frame):
             # PARSE INPUT FILE
             file_in = open_file_dialog.GetPath()
 
-            # CREATE NEW SEGY OBJECT
+            # CREATE NEW GRID OBJECT
             grid = SegyData()
 
             # ASSIGN ATTRIBUTES
-            grid.id = self.segy_counter
+            # NB: THESE TWO USED TO READ self.segy_counter AND self.segy_name, WHICH BELONG TO THE SEGY LOADER.
+            # self.segy_name DOES NOT EVEN EXIST UNTIL A SEGY HAS BEEN LOADED, SO LOADING A GRID FIRST ALWAYS
+            # FAILED WITH "GRID LOAD ERROR"
+            grid.id = self.grid_counter
             grid.file = file_in
-            grid.name = self.segy_name
+            grid.name = self.grid_name if self.grid_name else 'Grid %d' % grid.id
             grid.dimensions = self.d
 
-            # LOAD SEGY DATA
+            # LOAD GRID DATA
             grid_data = np.genfromtxt(file_in, dtype=np.float32, delimiter=" ")
 
             # SET AXIS
             grid.axis = [grid.dimensions[0], grid.dimensions[1], grid.dimensions[3], grid.dimensions[2]]
 
-            # PLOT SEGY DATA ON MODEL
+            # PLOT GRID DATA ON MODEL
             grid.mpl_actor = self.model_frame.imshow(grid_data, vmin=1.5, vmax=8.5,
                                                      aspect='auto', extent=grid.axis, cmap=self.segy_color_map,
                                                      alpha=0.75)
-            # REMOVE SEGY DATA
+            # REMOVE GRID DATA
             del grid_data
 
-            # SET SEGY ON SWTICH
+            # SET GRID ON SWTICH
             self.grid_on = True
 
-            # APPEND NEW SEGY TO THE SEGY DATA LIST
+            # APPEND NEW GRID TO THE GRID DATA LIST
             self.grid_data_list.append(grid)
 
-            # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
-            self.grid_name_submenu = wx.Menu()
-            self.m_grid_submenu.Append(self.grid_counter + 1000, grid.name, self.grid_name_submenu)
-            self.grid_name_submenu.Append(self.grid_counter + 1000, 'delete grid')
-            self.Bind(wx.EVT_MENU, self.remove_grid, id=self.grid_counter + 1000)
+            # ADD GRID_NAME TO GRID MENU. NB: ID's START AT 5000, NOT 1000, WHICH THE SEGY MENU USES. SHARING THE
+            # BASE MEANT THE LATER Bind WON AND DELETING A SEGY CALLED remove_grid
+            self.register_grid_menu_entry(grid)
 
             # INCREMENT COUNTER
             self.grid_counter += 1
@@ -4344,14 +4551,49 @@ class Gmg(wx.Frame):
         self.update_layer_data()
         self.draw()
 
+    def remove_grid(self, event):
+        """
+        DELETE GRID DATA. NB 5000 IS TAKEN FROM EVENT.ID TO PREVENT OVERLAP WITH OTHER EVENT.IDS.
+
+        NB: THIS WAS BOUND BY load_grid_data BUT NEVER DEFINED, SO THE Bind ITSELF RAISED AttributeError AND THE
+        BARE except IN THAT FUNCTION TURNED IT INTO "GRID LOAD ERROR"
+        """
+        obj_id = event.Id - 5000
+        grid = self.grid_data_list[obj_id]
+        if grid is None:
+            return  # ALREADY DELETED
+
+        # REMOVE THE IMAGE FROM THE MODEL FRAME
+        grid.mpl_actor.set_visible(False)
+        grid.mpl_actor.remove()
+
+        # NB: THE ENTRY IS LEFT AS None RATHER THAN REMOVED, SO THAT grid.id STAYS USABLE AS THE LIST INDEX
+        self.grid_data_list[obj_id] = None
+
+        # REMOVE MENUBAR ENTRY
+        self.m_grid_submenu.DestroyItem(event.Id)
+
+        # UPDATE MODEL
+        self.update_layer_data()
+        self.set_frame_limits()
+        self.draw()
+
     # SEGY DATA~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     def segy_input(self, event):
         seismic_data_box = SeisDialog(self, -1, 'Segy Dimensions', self.area)
-        answer = seismic_data_box.ShowModal()
+        seismic_data_box.ShowModal()
+
+        # SeisDialog ONLY SETS THESE WHEN 'Set Coordinates' IS PRESSED. SEE png_input
+        if not hasattr(seismic_data_box, 'dimensions'):
+            seismic_data_box.Destroy()
+            return  # THE USER CHANGED THEIR MIND
+
         self.d = seismic_data_box.dimensions
         self.segy_name = seismic_data_box.segy_name_input
         self.sx1, self.sx2, self.sz1, self.sz2 = self.d
+        seismic_data_box.Destroy()
+
         self.load_segy(self)
 
     def load_segy(self, event):
@@ -4398,11 +4640,8 @@ class Gmg(wx.Frame):
             # APPEND NEW SEGY TO THE SEGY DATA LIST
             self.segy_data_list.append(segy)
 
-            # ADD SEGY_NAME TO SEGY MENU. NB: ID's START AT 1000
-            self.segy_name_submenu = wx.Menu()
-            self.m_segy_submenu.Append(self.segy_counter + 1000, segy.name, self.segy_name_submenu)
-            self.segy_name_submenu.Append(self.segy_counter + 1000, 'delete segy')
-            self.Bind(wx.EVT_MENU, self.remove_segy, id=self.segy_counter + 1000)
+            # ADD SEGY_NAME TO SEGY MENU
+            self.register_segy_menu_entry(segy)
 
             # INCREMENT COUNTER
             self.segy_counter += 1
