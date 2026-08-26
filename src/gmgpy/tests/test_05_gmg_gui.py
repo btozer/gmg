@@ -40,6 +40,7 @@ ANGLE_A, ANGLE_B, ANGLE_C = 60.0, 10.0, 45.0
 # DELIBERATELY ASYMMETRIC, SO THAT A SIGN ERROR IN THE STRIKE DIRECTION WOULD SHOW
 EXTENT_Y1, EXTENT_Y2 = -7.5, 32.5
 
+# THE FOUR DATA PANELS, EACH AS (data list, main axes, d/dx twin axes, visibility switch).
 # ALL FOUR BEHAVE IDENTICALLY ON SAVE AND LOAD, SO THE TESTS BELOW RUN OVER EVERY ONE OF THEM
 OBSERVED_PANELS = {
     'topography': ('observed_topography_list', 'topography_frame', 'topography_d_frame',
@@ -1398,3 +1399,368 @@ def test_dc_shift_dialog_applies_and_warns_without_rms_input(gmg_frame, gmg_modu
     gmg_frame.set_gravity_dc_shift(None)
     assert not warnings
     assert abs(gmg_frame.gravity_dc_value - (-2.0)) < 1.0e-6
+
+
+def _logo_bitmap(gmg_module):
+    """
+    The logo show_splash() puts in the splash, read straight from disc.
+
+    NB: DELIBERATELY NOT wx.StaticBitmap.GetBitmap(). ON wxOSX THAT ROUND TRIP RETURNS THE BITMAP THE
+    NATIVE CONTROL HOLDS, PROMOTED TO THE DISPLAY'S BACKING SCALE, SO WHAT COMES BACK DEPENDS ON WHICH
+    MONITOR THE SUITE IS RUN ON
+    """
+    icons_dir = os.path.join(os.path.dirname(os.path.abspath(gmg_module.__file__)), 'icons')
+    return wx.Bitmap(os.path.join(icons_dir, 'gmg_logo_scaled.png'))
+
+
+def test_splash_is_a_plain_frame_and_not_created_during_the_frame_build(gmg_frame, gmg_module):
+    """
+    Test the splash screen is an ordinary frame, decoupled from the main frame build
+
+    It used to be created inside Gmg.__init__, and used to be a wx.adv.SplashScreen, which on wxOSX
+    3.2.9 would not appear at all until the user clicked the application.
+    """
+    # BUILDING THE FRAME (THE gmg_frame FIXTURE) MUST NOT HAVE CREATED A SPLASH
+    assert not any(isinstance(window, gmg_module.SplashFrame) for window in wx.GetTopLevelWindows())
+
+    splash = gmg_module.show_splash(timeout_ms=200)
+    try:
+        assert isinstance(splash, wx.Frame)
+        assert splash.IsShown()
+        assert splash.timeout_ms == 200
+        # THE LOGO MUST HAVE REACHED THE CONTROL, AND THE FRAME BE SIZED TO IT.
+        # NB: THE SIZE IS CHECKED AGAINST THE LOGO ON DISC, IN LOGICAL UNITS, BECAUSE THAT IS WHAT
+        # SetClientSize TAKES. THIS USED TO COMPARE THE CLIENT SIZE WITH GetBitmap().GetWidth(), WHICH
+        # IS PHYSICAL PIXELS READ BACK THROUGH THE NATIVE CONTROL: IT AGREED ON AN ORDINARY MONITOR
+        # AND FAILED ON A RETINA ONE, WHERE THE BITMAP CAME BACK AT 2928 PIXELS AGAINST A 1464 UNIT
+        # CLIENT SIZE. SIZING FOR A LOGO THAT REALLY IS 2x IS COVERED BY THE NEXT TEST
+        assert splash.image.GetBitmap().IsOk()
+        assert splash.GetClientSize() == _logo_bitmap(gmg_module).GetLogicalSize()
+    finally:
+        splash.dismiss()
+
+
+def test_splash_is_sized_for_a_high_dpi_logo(gmg_module):
+    """
+    Test the splash is sized in logical units, so a 2x logo does not double the frame
+
+    It used to size itself from wx.Bitmap.GetWidth(), which is physical pixels, against SetClientSize,
+    which takes logical units. The two agree only while the bitmap's scale factor is 1, so the fault
+    was invisible on an ordinary monitor. The scale factor is set explicitly here rather than left to
+    the display, so the case is covered wherever the suite runs.
+    """
+    bitmap = _logo_bitmap(gmg_module)
+    physical = bitmap.GetSize()
+    bitmap.SetScaleFactor(2.0)
+
+    # SANITY: THE SAME PIXELS NOW DESCRIBE A LOGO OF HALF THE LOGICAL SIZE.
+    # NB: THE WIDTH IS CHECKED RATHER THAN THE WHOLE SIZE BECAUSE THE LOGO'S HEIGHT IS ODD AND wx
+    # ROUNDS THE HALVED VALUE UP
+    assert bitmap.GetSize() == physical
+    assert bitmap.GetLogicalWidth() == physical.GetWidth() / 2.0
+
+    splash = gmg_module.SplashFrame(bitmap, timeout_ms=200)
+    try:
+        assert splash.GetClientSize() == bitmap.GetLogicalSize()
+    finally:
+        splash.dismiss()
+
+
+def test_splash_counts_its_time_from_the_first_paint(gmg_module, monkeypatch):
+    """
+    Test the visible time is measured from when the logo is drawn, not from construction
+
+    wx.adv.SplashScreen counted from construction, so time spent shown but unpainted was deducted from
+    the timeout: the logo could flash up for under a second, or never be seen at all.
+    """
+    scheduled = []
+    monkeypatch.setattr(wx, 'CallLater',
+                        lambda delay, callback, *args: scheduled.append((delay, callback, args)))
+
+    splash = gmg_module.show_splash(timeout_ms=1234)
+    try:
+        # ONLY THE BACKSTOP IS SET AT CONSTRUCTION, NOT THE COUNTDOWN
+        assert [delay for delay, _callback, _args in scheduled] == [gmg_module.SPLASH_MAX_MS]
+        assert not splash.countdown_started
+
+        splash.on_paint(_SkippableEvent())
+        assert splash.countdown_started
+        assert [delay for delay, _callback, _args in scheduled] == [gmg_module.SPLASH_MAX_MS, 1234]
+
+        # A REPAINT MUST NOT RESTART THE COUNTDOWN
+        splash.on_paint(_SkippableEvent())
+        assert [delay for delay, _callback, _args in scheduled] == [gmg_module.SPLASH_MAX_MS, 1234]
+    finally:
+        splash.dismiss()
+
+
+def test_splash_is_dismissed_by_a_click(gmg_module):
+    """
+    Test clicking the splash closes it early, as wx.adv.SplashScreen did for free
+    """
+    splash = gmg_module.show_splash(timeout_ms=200)
+    assert splash.IsShown()
+
+    splash.on_click(_SkippableEvent())
+
+    # NB: Destroy() ON A TOP LEVEL WINDOW IS DEFERRED UNTIL THE LOOP PROCESSES PENDING DELETES, WHICH
+    # IS WHY dismiss() HIDES IT TOO, AND WHY THE WRAPPER IS STILL USABLE HERE
+    assert splash.dismissed
+    assert not splash.IsShown()
+
+    # THE COUNTDOWN AND THE BACKSTOP STILL FIRE AFTERWARDS, SO A SECOND DISMISS MUST NOT RAISE
+    splash.dismiss()
+
+
+def test_splash_hands_the_front_back_exactly_once(gmg_module):
+    """
+    Test dismissing the splash calls back, once, whichever of the three routes took it
+
+    The splash is wx.STAY_ON_TOP and is the last window raised at startup, so nothing comes forward by
+    itself when it goes. A click, the countdown and the backstop all funnel through dismiss(), and all
+    three still fire even after the first one has run, so the callback has to be idempotent.
+    """
+    called = []
+    splash = gmg_module.show_splash(timeout_ms=200, on_dismiss=lambda: called.append(1))
+
+    splash.on_click(_SkippableEvent())
+    assert called == [1]
+
+    # THE COUNTDOWN AND THE BACKSTOP ARRIVE AFTERWARDS AND MUST NOT CALL BACK AGAIN
+    splash.dismiss()
+    splash.dismiss()
+    assert called == [1]
+
+
+def test_splash_dismissal_survives_a_callback_that_raises(gmg_module):
+    """
+    Test a failing hand over still leaves the splash dismissed
+
+    dismiss() is teardown. If the callback were allowed to propagate, the splash would be hidden but
+    the application never told it had gone, and the countdown and backstop would keep raising.
+    """
+    def _boom():
+        raise RuntimeError('hand over failed')
+
+    splash = gmg_module.show_splash(timeout_ms=200, on_dismiss=_boom)
+    splash.dismiss()
+
+    assert splash.dismissed
+    assert not splash.IsShown()
+
+
+def test_activate_application_is_a_no_op_off_mac(gmg_module, monkeypatch):
+    """
+    Test the macOS activation is skipped, not attempted, on other platforms
+
+    It reaches into the Objective C runtime through ctypes, so it must not run anywhere there is no
+    Objective C runtime to reach into.
+    """
+    monkeypatch.setattr(wx, 'Platform', '__WXGTK__')
+    assert gmg_module.activate_application() is False
+
+
+def test_bring_to_front_raises_focuses_and_activates(gmg_module, monkeypatch):
+    """
+    Test the hand over de-iconises, raises, focuses and then activates the application
+
+    Raise() and SetFocus() only order a window inside its application. gmg is launched by launcher.py
+    as a pythonw child of a terminal command, so it is not a bundled application and macOS leaves it in
+    the background: measured with NSWorkspace.frontmostApplication, the frontmost process was still the
+    other application after both calls, and only activateIgnoringOtherApps: moved it. So the activation
+    is the part that matters, and it must actually be reached.
+    """
+    done = []
+
+    class _Frame(object):
+        def __bool__(self):
+            return True
+
+        def IsIconized(self):
+            return True
+
+        def Iconize(self, on):
+            done.append('iconize %s' % on)
+
+        def Raise(self):
+            done.append('raise')
+
+        def SetFocus(self):
+            done.append('focus')
+
+    monkeypatch.setattr(gmg_module, 'activate_application',
+                        lambda: done.append('activate'))
+
+    gmg_module.bring_to_front(_Frame())
+    assert done == ['iconize False', 'raise', 'focus', 'activate']
+
+    # A WINDOW THAT HAS ALREADY GONE MUST BE LEFT ALONE, NOT RAISED FROM THE DEAD
+    done[:] = []
+
+    class _Dead(_Frame):
+        def __bool__(self):
+            return False
+
+    gmg_module.bring_to_front(_Dead())
+    assert done == []
+
+
+def test_launch_brings_the_main_frame_to_the_front_when_the_splash_goes(gmg_module, monkeypatch):
+    """
+    Test startup wires the splash's dismissal to the main frame taking the front
+
+    Without this the splash is the last window raised and gmg is left behind whatever the user was
+    looking at. The frame is also registered as the application's top window, which is what the dock
+    icon reopens.
+    """
+    deferred = []
+    fronted = []
+    dismissed = []
+
+    class _StubApp(object):
+        def __init__(self, *args, **kwargs):
+            self.top = None
+
+        def SetTopWindow(self, window):
+            self.top = window
+
+        def MainLoop(self):
+            while deferred:
+                callback, args = deferred.pop(0)
+                callback(*args)
+
+    class _StubGmg(object):
+        pass
+
+    class _StubSplash(object):
+        def __init__(self, on_dismiss):
+            self.on_dismiss = on_dismiss
+
+        def __bool__(self):
+            return True
+
+        def Raise(self):
+            pass
+
+        def dismiss(self):
+            dismissed.append(1)
+            self.on_dismiss()
+
+    holder = {}
+
+    def _stub_show_splash(timeout_ms=None, on_dismiss=None):
+        holder['splash'] = _StubSplash(on_dismiss)
+        return holder['splash']
+
+    monkeypatch.setattr(wx, 'App', _StubApp)
+    monkeypatch.setattr(gmg_module, 'Gmg', _StubGmg)
+    monkeypatch.setattr(gmg_module, 'show_splash', _stub_show_splash)
+    monkeypatch.setattr(gmg_module, 'bring_to_front', lambda frame: fronted.append(frame))
+    monkeypatch.setattr(wx, 'CallLater',
+                        lambda _delay, callback, *args: deferred.append((callback, args)))
+
+    gmg_module.launch_gui()
+
+    # THE FRAME WAS BUILT AND REGISTERED, AND NOTHING WAS BROUGHT FORWARD WHILE THE SPLASH WAS UP
+    assert fronted == []
+
+    holder['splash'].dismiss()
+
+    # THE SPLASH GOING AWAY IS WHAT PUTS THE MAIN FRAME IN FRONT
+    assert len(fronted) == 1
+    assert isinstance(fronted[0], _StubGmg)
+
+
+def test_launch_fronts_the_frame_when_the_splash_went_first(gmg_module, monkeypatch):
+    """
+    Test a splash clicked away mid build still ends with the main frame in front
+
+    The hand over runs when the splash goes, which can be before there is any frame to hand over to.
+    The frame build has to notice it missed its turn and take the front itself.
+    """
+    deferred = []
+    fronted = []
+
+    class _StubApp(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def SetTopWindow(self, window):
+            pass
+
+        def MainLoop(self):
+            while deferred:
+                callback, args = deferred.pop(0)
+                callback(*args)
+
+    class _StubGmg(object):
+        pass
+
+    # A SPLASH THAT IS ALREADY GONE BY THE TIME THE FRAME IS BUILT
+    def _stub_show_splash(timeout_ms=None, on_dismiss=None):
+        on_dismiss()          # AS A CLICK DURING THE BUILD WOULD
+        return None
+
+    monkeypatch.setattr(wx, 'App', _StubApp)
+    monkeypatch.setattr(gmg_module, 'Gmg', _StubGmg)
+    monkeypatch.setattr(gmg_module, 'show_splash', _stub_show_splash)
+    monkeypatch.setattr(gmg_module, 'bring_to_front', lambda frame: fronted.append(frame))
+    monkeypatch.setattr(wx, 'CallLater',
+                        lambda _delay, callback, *args: deferred.append((callback, args)))
+
+    gmg_module.launch_gui()
+
+    # THE FIRST CALL FOUND NO FRAME; THE BUILD MADE UP FOR IT
+    assert fronted[0] is None
+    assert isinstance(fronted[-1], _StubGmg)
+
+
+def test_launch_shows_the_splash_first_then_builds_the_frame_on_the_loop(gmg_module, monkeypatch):
+    """
+    Test startup shows the splash before the loop, then builds the slow main frame from within it
+
+    Both halves are load bearing. The splash must exist before MainLoop, because MainLoop returns
+    immediately if no top level window exists when it starts - scheduling the splash onto the loop
+    instead exits the application before it draws anything. The frame build must be deferred onto the
+    loop, so that the loop has a moment to draw the splash before Gmg.__init__ blocks the thread.
+    """
+    order = []
+    deferred = []
+
+    class _StubApp(object):
+        """STANDS IN FOR THE APPLICATION, SO THE TEST CAN SEE WHEN THE LOOP WOULD START"""
+
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def SetTopWindow(self, window):
+            pass
+
+        def MainLoop(self):
+            order.append('main loop')
+            # SERVE THE DEFERRED CALLBACKS, AS THE RUNNING LOOP WOULD
+            while deferred:
+                callback, args = deferred.pop(0)
+                callback(*args)
+
+    class _StubGmg(object):
+        def __init__(self):
+            order.append('frame build')
+
+    def _stub_show_splash(*args, **kwargs):
+        order.append('splash')
+        return None  # build_frame TOLERATES A SPLASH THAT IS ALREADY GONE
+
+    monkeypatch.setattr(wx, 'App', _StubApp)
+    monkeypatch.setattr(gmg_module, 'Gmg', _StubGmg)
+    monkeypatch.setattr(gmg_module, 'show_splash', _stub_show_splash)
+    monkeypatch.setattr(gmg_module, 'bring_to_front', lambda _frame: order.append('front'))
+    monkeypatch.setattr(wx, 'CallLater',
+                        lambda _delay, callback, *args: deferred.append((callback, args)))
+
+    gmg_module.launch_gui()
+
+    # THE SPLASH EXISTS BEFORE THE LOOP STARTS, THE SLOW FRAME BUILD HAPPENS INSIDE IT, AND THE FRAME
+    # TAKES THE FRONT LAST. NB: THIS STUB SPLASH IS ALREADY GONE BY THE TIME THE FRAME IS BUILT, SO
+    # THE FRONT IS TAKEN FROM THE BUILD RATHER THAN FROM THE DISMISSAL
+    assert order == ['splash', 'main loop', 'frame build', 'front']

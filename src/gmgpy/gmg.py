@@ -103,6 +103,8 @@ import wx.lib.agw.foldpanelbar as fpb
 import pylab as plt
 import numpy as np
 import csv
+import ctypes
+import ctypes.util
 import math as m
 import os
 import sys
@@ -165,17 +167,12 @@ class Gmg(wx.Frame):
         # DEFINE ICONS SOURCE DIRECTORY
         self.gui_icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
 
-        # SET AND SHOW SPLASH SCREEN
-        bitmap = wx.Bitmap(self.gui_icons_dir + "gmg_logo_scaled.png")
-        splash = wx.adv.SplashScreen(bitmap, wx.adv.SPLASH_CENTER_ON_SCREEN | 
-                                     wx.adv.SPLASH_TIMEOUT, 3000,
-                                     self, id=wx.ID_ANY, size=(1, 1),
-                                     style=wx.BORDER_SIMPLE | wx.FRAME_NO_TASKBAR)
+        # NB: THE SPLASH SCREEN IS NO LONGER SHOWN HERE. IT USED TO BE, BUT ITS TIMEOUT TIMER STARTS AT
+        # CONSTRUCTION AND ONLY FIRES ONCE THE MAIN LOOP RUNS, SO THE REST OF THIS (LONG) __init__ ATE THE
+        # WHOLE TIMEOUT BEFORE THE SPLASH COULD EVEN PAINT AND IT DIED AS A FLICKER. IT IS NOW SHOWN BY
+        # show_splash() FROM THE STARTUP CODE, SEE launch_gui()
         self.Show(True)
-        self.Raise()
-        self.SetFocus()
-        splash.Show()
-        
+
         # START AUI WINDOW MANAGER
         self.mgr = aui.AuiManager()
 
@@ -361,6 +358,12 @@ class Gmg(wx.Frame):
 
         # Sync statusbar pane-0 width with the Controls panel after layout
         wx.CallAfter(self._sync_statusbar_width)
+
+        # TAKE THE FRONT AND THE KEYBOARD ONLY NOW THAT THERE IS A BUILT WINDOW TO HAND OVER TO.
+        # NB: DONE LAST ON PURPOSE. RAISING AND FOCUSING AT THE TOP OF __init__ PUT A HALF BUILT WINDOW
+        # IN FRONT OF, AND TOOK FOCUS FROM, THE SPLASH SCREEN FOR THE WHOLE OF THIS METHOD
+        self.Raise()
+        self.SetFocus()
 
         # # MAXIMIZE FRAME
         # self.Maximize(True)
@@ -8026,8 +8029,204 @@ class Gmg(wx.Frame):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+SPLASH_TIMEOUT_MS = 5000  # HOW LONG THE SPLASH SCREEN IS VISIBLE FOR, MEASURED FROM ITS FIRST PAINT
+SPLASH_PAINT_MS = 150  # HOW LONG THE EVENT LOOP IS GIVEN TO PAINT THE SPLASH BEFORE THE FRAME IS BUILT
+SPLASH_MAX_MS = 20000  # BACKSTOP: THE SPLASH CLOSES AFTER THIS EVEN IF IT IS NEVER PAINTED
+
+
+class SplashFrame(wx.Frame):
+    """
+    THE STARTUP SPLASH SCREEN: A BORDERLESS, ALWAYS ON TOP FRAME HOLDING THE GMG LOGO.
+
+    NB: THIS IS DELIBERATELY A PLAIN wx.Frame RATHER THAN wx.adv.SplashScreen. ON wxOSX 3.2.9 THE
+    SplashScreen WOULD NOT APPEAR UNTIL THE USER CLICKED THE APPLICATION, WHILE ORDINARY FRAMES (THE
+    MAIN WINDOW AMONG THEM) DRAW WITHOUT ONE.
+
+    THE VISIBLE TIME IS COUNTED FROM THE FIRST PAINT, NOT FROM CONSTRUCTION. SplashScreen's OWN
+    SPLASH_TIMEOUT COUNTED FROM CONSTRUCTION, SO ANY TIME SPENT UNPAINTED WAS DEDUCTED FROM IT AND
+    THE LOGO COULD FLASH UP FOR UNDER A SECOND, OR NEVER BE SEEN AT ALL
+    """
+
+    def __init__(self, bitmap, timeout_ms=SPLASH_TIMEOUT_MS, on_dismiss=None):
+        wx.Frame.__init__(self, None, wx.ID_ANY, 'gmgpy',
+                          style=wx.FRAME_NO_TASKBAR | wx.STAY_ON_TOP | wx.BORDER_NONE)
+        self.timeout_ms = timeout_ms
+        self.countdown_started = False
+        self.dismissed = False
+        # CALLED ONCE WHEN THE SPLASH GOES AWAY, WHICHEVER OF THE THREE ROUTES TOOK IT. THE SPLASH IS
+        # wx.STAY_ON_TOP, SO WHATEVER WAS BEHIND IT DOES NOT COME FORWARD BY ITSELF
+        self.on_dismiss = on_dismiss
+
+        self.image = wx.StaticBitmap(self, wx.ID_ANY, bitmap)
+        # SIZE THE FRAME FROM THE LOGO'S *LOGICAL* SIZE. SetClientSize TAKES LOGICAL UNITS, WHILE
+        # wx.Bitmap.GetWidth() REPORTS PHYSICAL PIXELS, SO PASSING THAT WOULD MAKE THE SPLASH TWICE
+        # TOO BIG FOR ANY BITMAP CARRYING A 2x SCALE FACTOR, AS A RETINA LOGO WOULD
+        self.SetClientSize(bitmap.GetLogicalSize())
+        self.Centre(wx.BOTH)
+
+        # A CLICK DISMISSES IT EARLY, AS wx.adv.SplashScreen DID FOR FREE. THE BITMAP COVERS THE WHOLE
+        # FRAME, SO IT HAS TO BE BOUND TOO OR IT WOULD SWALLOW THE CLICK
+        self.Bind(wx.EVT_PAINT, self.on_paint)
+        self.Bind(wx.EVT_LEFT_DOWN, self.on_click)
+        self.image.Bind(wx.EVT_LEFT_DOWN, self.on_click)
+
+        # BACKSTOP, IN CASE THE FIRST PAINT NEVER ARRIVES. WITHOUT IT A SPLASH THAT IS NEVER DRAWN
+        # WOULD HAVE NOTHING TO START ITS COUNTDOWN AND WOULD SIT THERE FOR THE WHOLE SESSION
+        wx.CallLater(SPLASH_MAX_MS, self.dismiss)
+
+    def on_paint(self, event):
+        """START THE COUNTDOWN THE FIRST TIME THE LOGO IS ACTUALLY DRAWN"""
+        event.Skip()
+        if not self.countdown_started:
+            self.countdown_started = True
+            wx.CallLater(self.timeout_ms, self.dismiss)
+
+    def on_click(self, event):
+        self.dismiss()
+
+    def dismiss(self):
+        """
+        TAKE THE SPLASH OFF THE SCREEN. ANY OF THREE THINGS CAN ASK FOR THIS (A CLICK, THE COUNTDOWN,
+        THE BACKSTOP) AND THE LATER ONES STILL FIRE AFTERWARDS, SO IT HAS TO BE IDEMPOTENT.
+        NB: Hide() FIRST, BECAUSE Destroy() ON A TOP LEVEL WINDOW IS DEFERRED UNTIL THE EVENT LOOP
+        PROCESSES PENDING DELETES, WHICH WOULD LEAVE THE LOGO ON SCREEN UNTIL THEN
+        """
+        if self.dismissed or not self:
+            return
+        self.dismissed = True
+        self.Hide()
+        self.Destroy()
+
+        # HAND THE FRONT BACK NOW THE SPLASH IS OFF THE SCREEN. NOTHING ELSE WILL: THE SPLASH IS THE
+        # LAST WINDOW TO HAVE BEEN RAISED, AND ORDINARY WINDOWS DO NOT COME FORWARD WHEN A STAY ON TOP
+        # ONE IS DESTROYED. GUARDED BECAUSE THIS IS TEARDOWN, AND A CALLBACK THAT RAISES HERE WOULD
+        # LEAVE THE SPLASH HIDDEN BUT THE APPLICATION NEVER TOLD IT HAD GONE
+        if self.on_dismiss is not None:
+            try:
+                self.on_dismiss()
+            except Exception:
+                pass
+
+
+def show_splash(timeout_ms=SPLASH_TIMEOUT_MS, on_dismiss=None):
+    """
+    CREATE AND SHOW THE SPLASH SCREEN. IT CLOSES ITSELF timeout_ms AFTER IT IS FIRST DRAWN, OR ON A
+    CLICK, AND CALLS on_dismiss ONCE IT HAS. CALL THIS FROM INSIDE THE RUNNING EVENT LOOP, SEE
+    launch_gui()
+    """
+    icons_dir = os.path.dirname(os.path.abspath(__file__)) + "/icons/"
+    bitmap = wx.Bitmap(icons_dir + "gmg_logo_scaled.png")
+    splash = SplashFrame(bitmap, timeout_ms, on_dismiss=on_dismiss)
+    splash.Show()
+    splash.Raise()
+    splash.Update()  # ASK FOR THE PAINT NOW RATHER THAN WAIT FOR THE LOOP TO GET AROUND TO IT
+    return splash
+
+
+def activate_application():
+    """
+    BRING THE APPLICATION ITSELF TO THE FRONT. macOS ONLY; A NO OP EVERYWHERE ELSE.
+
+    NB: wx CANNOT DO THIS, AND Raise() PLUS SetFocus() IS NOT ENOUGH. THEY ORDER A WINDOW WITHIN ITS
+    APPLICATION, BUT launcher.py STARTS gmg AS A pythonw CHILD OF A TERMINAL COMMAND, SO IT IS NOT A
+    BUNDLED APPLICATION AND macOS NEVER MAKES IT FRONTMOST. THE WINDOW IS THEN ORDERED FRONT INSIDE AN
+    APPLICATION THAT IS ITSELF IN THE BACKGROUND, AND ALL THE USER SEES IS A DOCK ICON.
+
+    MEASURED WITH NSWorkspace.frontmostApplication: AFTER Show(), AND AGAIN AFTER Raise() PLUS
+    SetFocus(), THE FRONTMOST PROCESS WAS STILL THE OTHER APPLICATION. ONLY
+    activateIgnoringOtherApps: MOVED IT.
+    NB: wx.App.IsActive() REPORTS True THE WHOLE TIME AND CANNOT BE USED TO TEST ANY OF THIS.
+
+    GOES THROUGH THE OBJECTIVE C RUNTIME WITH ctypes RATHER THAN pyobjc, WHICH gmg DOES NOT DEPEND ON.
+    EVERY FAILURE IS SWALLOWED: A WINDOW IN THE WRONG ORDER IS NOT WORTH FAILING A STARTUP OVER
+    """
+    if wx.Platform != '__WXMAC__':
+        return False
+    try:
+        objc = ctypes.cdll.LoadLibrary(ctypes.util.find_library('objc'))
+        ctypes.cdll.LoadLibrary(ctypes.util.find_library('AppKit'))  # REGISTERS THE NSApplication CLASS
+        objc.objc_getClass.restype = ctypes.c_void_p
+        objc.objc_getClass.argtypes = [ctypes.c_char_p]
+        objc.sel_registerName.restype = ctypes.c_void_p
+        objc.sel_registerName.argtypes = [ctypes.c_char_p]
+
+        # NB: objc_msgSend MUST BE CAST TO THE SIGNATURE OF THE MESSAGE BEING SENT. IT IS VARIADIC, AND
+        # CALLING IT THROUGH ONE ctypes PROTOTYPE FOR TWO DIFFERENT SIGNATURES PASSES THE ARGUMENTS IN
+        # THE WRONG REGISTERS
+        shared = ctypes.cast(objc.objc_msgSend,
+                             ctypes.CFUNCTYPE(ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p))
+        ns_app = shared(objc.objc_getClass(b'NSApplication'),
+                        objc.sel_registerName(b'sharedApplication'))
+        if not ns_app:
+            return False
+
+        activate = ctypes.cast(objc.objc_msgSend,
+                               ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p,
+                                                ctypes.c_bool))
+        activate(ns_app, objc.sel_registerName(b'activateIgnoringOtherApps:'), True)
+        return True
+    except Exception:
+        return False
+
+
+def bring_to_front(frame):
+    """PUT frame IN FRONT OF EVERYTHING, GIVE IT THE KEYBOARD, AND ACTIVATE THE APPLICATION"""
+    # NB: bool(window) IS False ONCE THE C++ WINDOW IS GONE
+    if not frame:
+        return
+    if frame.IsIconized():
+        frame.Iconize(False)
+    frame.Raise()
+    frame.SetFocus()
+    activate_application()
+
+
+def launch_gui():
+    """
+    START GMG: SPLASH SCREEN FIRST, THEN THE MAIN FRAME.
+
+    THE ORDERING HERE IS LOAD BEARING, AND WAS ARRIVED AT THE HARD WAY:
+
+    1. THE SPLASH IS CREATED BEFORE MainLoop(). IT HAS TO BE: MainLoop() RETURNS IMMEDIATELY IF NO TOP
+       LEVEL WINDOW EXISTS WHEN IT STARTS, SO SCHEDULING THE SPLASH ONTO THE LOOP INSTEAD MEANS THE
+       APPLICATION EXITS BEFORE IT DRAWS ANYTHING AT ALL
+    2. BECAUSE OF (1) THE SPLASH IS SHOWN BEFORE ANY EVENT LOOP CAN DRAW IT, AND A wx WINDOW IS ONLY
+       DRAWN WHEN ITS PAINT EVENT IS SERVED. SO SplashFrame COUNTS ITS VISIBLE TIME FROM ITS FIRST
+       PAINT RATHER THAN FROM CONSTRUCTION, AND CANNOT BE ROBBED OF ITS TIME BY A LATE FIRST DRAW
+    3. THE SLOW FRAME BUILD IS DEFERRED ONTO THE LOOP, SO THE LOOP HAS A MOMENT TO DRAW THE SPLASH
+       BEFORE Gmg.__init__ (AUI, PANELS, MENUS, THE MATPLOTLIB FIGURE) BLOCKS THE THREAD
+    4. THE MAIN FRAME SHOWS ITSELF WHILE BEING BUILT, SO THE SPLASH IS RAISED AGAIN AFTERWARDS TO
+       BACK UP ITS wx.STAY_ON_TOP STYLE. THE FRAME TAKES THE FRONT AND THE FOCUS ONLY AT THE END OF
+       ITS OWN __init__
+    5. AND BECAUSE OF (4) THE SPLASH, NOT THE FRAME, IS THE LAST WINDOW RAISED. SO THE FRONT HAS TO BE
+       HANDED BACK WHEN THE SPLASH GOES, OR gmg IS LEFT BEHIND WHATEVER THE USER WAS LOOKING AT, ON
+       macOS WITH NOTHING BUT A DOCK ICON TO SHOW FOR ITSELF. SEE bring_to_front()
+    """
+    app = wx.App(False)
+
+    def hand_over():
+        """THE SPLASH HAS GONE. PUT THE MAIN WINDOW IN FRONT, IF IT HAS BEEN BUILT YET"""
+        bring_to_front(getattr(app, 'frame', None))
+
+    splash = show_splash(on_dismiss=hand_over)
+
+    def build_frame():
+        app.frame = Gmg()
+        # SO THAT wx, AND THE DOCK ICON THROUGH IT, KNOW WHICH WINDOW IS THE APPLICATION'S
+        app.SetTopWindow(app.frame)
+        # NB: bool(window) IS False ONCE THE C++ WINDOW IS GONE, WHICH IT WILL BE IF THE USER CLICKED
+        # THE SPLASH AWAY WHILE THE FRAME WAS BUILDING. IN THAT CASE hand_over() HAS ALREADY RUN, WITH
+        # NO FRAME TO HAND OVER TO, SO THE FRAME TAKES THE FRONT HERE INSTEAD
+        if splash:
+            splash.Raise()
+        else:
+            bring_to_front(app.frame)
+
+    # HAND CONTROL TO THE EVENT LOOP FIRST, SO THE SPLASH IS DRAWN, THEN BUILD THE FRAME
+    wx.CallLater(SPLASH_PAINT_MS, build_frame)
+    app.MainLoop()
+
+
 # START SOFTWARE
 if __name__ == "__main__":
-    app = wx.App(False)
-    app.frame = Gmg()
-    app.MainLoop()
+    launch_gui()
