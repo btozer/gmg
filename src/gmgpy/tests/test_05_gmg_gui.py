@@ -40,6 +40,18 @@ ANGLE_A, ANGLE_B, ANGLE_C = 60.0, 10.0, 45.0
 # DELIBERATELY ASYMMETRIC, SO THAT A SIGN ERROR IN THE STRIKE DIRECTION WOULD SHOW
 EXTENT_Y1, EXTENT_Y2 = -7.5, 32.5
 
+# ALL FOUR BEHAVE IDENTICALLY ON SAVE AND LOAD, SO THE TESTS BELOW RUN OVER EVERY ONE OF THEM
+OBSERVED_PANELS = {
+    'topography': ('observed_topography_list', 'topography_frame', 'topography_d_frame',
+                   'topography_frame_switch'),
+    'gravity': ('observed_gravity_list', 'gravity_frame', 'gravity_d_frame',
+                'gravity_frame_switch'),
+    'vgg': ('observed_vgg_list', 'vertical_gg_frame', 'vertical_gg_d_frame',
+            'vertical_gg_frame_switch'),
+    'magnetic': ('observed_magnetic_list', 'magnetic_frame', 'magnetic_d_frame',
+                 'magnetic_frame_switch'),
+}
+
 # THE wx APPLICATION, KEPT ALIVE FOR THE WHOLE SESSION BY THE gmg_module FIXTURE
 _APP = None
 
@@ -191,6 +203,28 @@ def _capture_points(gmg_frame, points):
     return gmg_frame.capture_window
 
 
+def _attach_observed_data(gmg_module, gmg_frame, field, data_type='observed'):
+    """
+    Give the named panel one observed dataset, the way loading a data file does.
+
+    The real handler reads a file through a modal dialog, so the object is built here directly and then
+    registered through the same replot_* function the load path uses.
+    """
+    list_name, _frame_name, _d_frame_name, _switch_name = OBSERVED_PANELS[field]
+
+    observed = gmg_module.ObservedData()
+    observed.id = 0
+    observed.type = str(data_type)
+    observed.name = '%s test data' % field
+    observed.color = 'black'
+    observed.data = np.column_stack((np.linspace(MODEL_X1, MODEL_X2, 25), np.arange(25, dtype=float)))
+    observed.mpl_actor = None
+
+    getattr(gmg_frame, list_name).append(observed)
+    getattr(gmg_frame, 'replot_observed_%s_data' % field)()
+    gmg_frame.rebuild_data_frames()
+
+    return observed
 
 
 def _scatters_in(axes):
@@ -455,7 +489,53 @@ def test_model_written_before_2_75d_still_loads(gmg_frame, model_path):
 
 
 @pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+def test_model_with_a_hidden_panel_holding_data_loads(gmg_module, gmg_frame, field):
+    """
+    Test a model whose data panel is saved hidden still loads when that panel holds observed data
 
+    Hiding a panel leaves its axes as None. load_model replotted the observed data unconditionally,
+    gated only on the data list being non-empty, so the load died on None.scatter() and left gmg with
+    a wiped model and no currently_active_layer, at which point clicking the model frame raised too.
+    """
+    list_name, frame_name, _d_frame_name, switch_name = OBSERVED_PANELS[field]
+    _attach_observed_data(gmg_module, gmg_frame, field)
+
+    # THE USER CLOSES THE PANEL, THEN SAVES
+    setattr(gmg_frame, switch_name, False)
+    gmg_frame.save_model(None)
+
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    # THE SAVED LAYOUT IS HONOURED: THE PANEL COMES BACK CLOSED, HOLDING ITS DATA
+    assert getattr(gmg_frame, switch_name) is False
+    assert getattr(gmg_frame, frame_name) is None
+    assert len(getattr(gmg_frame, list_name)) == 1
+
+    # AND THE DATA IS DRAWN THE MOMENT THE PANEL IS REOPENED
+    gmg_frame.ensure_data_frame_shown(field)
+    assert getattr(gmg_frame, frame_name) is not None
+    assert len(_scatters_in(getattr(gmg_frame, frame_name))) == 1
+
+
+@pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))
+def test_loading_draws_each_observed_dataset_once(gmg_module, gmg_frame, field):
+    """
+    Test loading draws one artist per observed dataset, not two
+
+    rebuild_data_frames already replots the observed data into the panels it recreates. load_model then
+    called replot_observed_*_data, which drew a second set over the top and overwrote mpl_actor, so the
+    first set was orphaned but still on the axes and 'delete observed data' left it behind.
+    """
+    _list_name, frame_name, _d_frame_name, _switch_name = OBSERVED_PANELS[field]
+    _attach_observed_data(gmg_module, gmg_frame, field)
+
+    gmg_frame.save_model(None)
+    gmg_frame.model_saved = True
+    gmg_frame.load_model(None)
+
+    frame = getattr(gmg_frame, frame_name)
+    assert len(_scatters_in(frame)) == 1
 
 
 @pytest.mark.parametrize('field', sorted(OBSERVED_PANELS))

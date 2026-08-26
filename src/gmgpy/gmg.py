@@ -1764,10 +1764,6 @@ class Gmg(wx.Frame):
 
     def frame_adjustment(self, event):
         """FIND WHICH FRAME IS REFERENCED & CHANGE SWITCH"""
-        # GET CURRENT FRAME X LIMITS
-        self.current_xlim = self.model_frame.get_xlim()
-        self.current_ylim = self.model_frame.get_ylim()
-
         # SWITCH CALLBACKS — axes are deleted and recreated each toggle,
         # so only the boolean flag needs to change here
         if event.Id == 601:
@@ -1782,6 +1778,38 @@ class Gmg(wx.Frame):
         if event.Id == 603:
             self.magnetic_frame_switch = not self.magnetic_frame_switch
 
+        self.rebuild_data_frames()
+
+    def ensure_data_frame_shown(self, field):
+        """
+        OPEN THE NAMED DATA PANEL IF IT IS CLOSED.
+
+        Data cannot be drawn into a panel that is not there: while a panel is hidden its axes are None,
+        and every attempt to plot into it raises. Asking to load or derive observed data is an implicit
+        request to see it, so the panel is opened rather than the data quietly dropped.
+
+        NB: LOADING A MODEL DOES NOT USE THIS. THERE THE SAVED LAYOUT IS THE USER'S STATED PREFERENCE AND
+        A HIDDEN PANEL STAYS HIDDEN, ITS DATA APPEARING WHEN THE PANEL IS REOPENED
+        """
+        switch = {'topography': 'topography_frame_switch',
+                  'gravity': 'gravity_frame_switch',
+                  'vgg': 'vertical_gg_frame_switch',
+                  'magnetic': 'magnetic_frame_switch'}[field]
+
+        if getattr(self, switch) is not True:
+            setattr(self, switch, True)
+            self.rebuild_data_frames()
+
+    def rebuild_data_frames(self):
+        """
+        REBUILD THE DATA PANELS TO MATCH THE FOUR VISIBILITY SWITCHES.
+
+        Every data axes is deleted and only the shown ones are recreated, so this is also the one place
+        that redraws the observed data and the calculated anomaly lines into them.
+        """
+        # GET CURRENT FRAME X LIMITS
+        self.current_xlim = self.model_frame.get_xlim()
+        self.current_ylim = self.model_frame.get_ylim()
 
         # ADJUST FRAME SIZING AND SET PROGRAM WINDOW --------------------------------
 
@@ -2839,22 +2867,22 @@ class Gmg(wx.Frame):
             self.frame_adjustment(_FakeEvent())
 
             # ----------------------------------------------------------------------------------------------------------
-            # LOAD OBSERVED TOPOGRAPHY DATA
-            if len(self.observed_topography_list) > 0:
-                self.replot_observed_topography_data()
-
-            # LOAD OBSERVED GRAVITY DATA
-            if len(self.observed_gravity_list) > 0:
-                self.replot_observed_gravity_data()
-
-            # LOAD OBSERVED VGG DATA
-            if len(self.observed_vgg_list) > 0:
-                self.replot_observed_vgg_data()
-
-            # LOAD OBSERVED MAGNETIC DATA
-            if len(self.observed_magnetic_list) > 0:
-                self.replot_observed_magnetic_data()
+            # REGISTER THE LOADED OBSERVED DATA (MENUS, SWITCHES AND COUNTERS ONLY).
+            # NB: THESE MUST RUN BEFORE THE FRAMES ARE REBUILT. rebuild_data_frames IS WHAT DRAWS THE DATA, AND IT
+            # JUDGES THE PANEL Y LIMITS FROM THE observed_*_switch FLAGS THAT THESE SET
+            # NB: EACH IS CALLED WHETHER OR NOT THERE IS ANY DATA, BECAUSE IT ALSO CLEARS THE PREVIOUS MODEL'S MENU
+            # ENTRIES. THE MENUBAR IS BUILT IN __init__ AND OUTLIVES THE MODEL
+            self.replot_observed_topography_data()
+            self.replot_observed_gravity_data()
+            self.replot_observed_vgg_data()
+            self.replot_observed_magnetic_data()
             # ----------------------------------------------------------------------------------------------------------
+
+            # RESTORE FRAME LAYOUT TO MATCH THE SAVED VISIBILITY SWITCHES, AND DRAW THE OBSERVED DATA INTO WHICHEVER
+            # PANELS THAT LEAVES SHOWN.
+            # NB: start() RESETS ALL FOUR SWITCHES TO True VIA THE __init__ DEFAULTS, SO THIS RE-APPLIES THEM. A PANEL
+            # SAVED HIDDEN STAYS HIDDEN, AND ITS DATA IS DRAWN WHEN THE USER REOPENS THE PANEL
+            self.rebuild_data_frames()
 
             # ----------------------------------------------------------------------------------------------------------
             # SET VARIABLE VALUES FROM LOADED DATA - USING LAYER 1
@@ -3010,7 +3038,37 @@ class Gmg(wx.Frame):
         # MAXIMIZE FRAME
         self.Maximize(True)
         self.update_layer_data()  # UPDATE LAYER DATA
-    
+
+    def recover_from_failed_load(self):
+        """
+        LEAVE A USABLE, EMPTY MODEL BEHIND WHEN A LOAD FAILS PART WAY THROUGH.
+
+        load_model wipes the current model before it reads the file, so a failure half way through leaves gmg
+        with no layers and, worse, without currently_active_layer or current_node, at which point every mouse
+        click in the model frame raises as well. An empty model is something the user can work from; that state
+        is not.
+        """
+        # THE FAILURE MAY HAVE COME BEFORE EITHER OF THESE WAS READ FROM THE FILE
+        area = getattr(self, 'area', (0., 100000., 0., 50000.))
+        xp = getattr(self, 'xp', np.arange(area[0], area[1] + 1000., 1000.))
+
+        self.initalize_model()
+        self.model_aspect = 1.
+
+        # AN EMPTY MODEL HAS NOTHING TO HIDE, SO SHOW EVERY PANEL RATHER THAN INHERIT THE PART LOADED LAYOUT
+        self.topography_frame_switch = True
+        self.gravity_frame_switch = True
+        self.vertical_gg_frame_switch = True
+        self.magnetic_frame_switch = True
+
+        # start() BUILDS THE PLACEHOLDER LAYER 0, currently_active_layer AND current_node WHEN newmodel IS SET
+        self.newmodel = True
+        try:
+            self.start(area, xp, self.gravity_observation_elv)
+        except Exception:
+            # NOTHING FURTHER CAN BE DONE HERE, AND THE ORIGINAL LOAD ERROR IS THE ONE WORTH REPORTING
+            pass
+
     def replot_observed_xy_data(self):
         """ADD LOADED OBSERVED XY DATA TO THE MODEL FRAME"""
         self.clear_data_submenu(self.m_xy_submenu)
@@ -3038,7 +3096,16 @@ class Gmg(wx.Frame):
         self.observed_xy_data_counter = len(self.observed_xy_data_list)
 
     def replot_observed_topography_data(self):
-        """ADD LOADED OBSERVED TOPOGRAPHY TO THE MODEL FRAME"""
+        """
+        PUT THE LOADED OBSERVED TOPOGRAPHY BACK IN THE MENUBAR.
+
+        NB: THIS DOES NOT DRAW ANYTHING. rebuild_data_frames IS THE ONE PLACE THAT PLOTS OBSERVED DATA, BECAUSE
+        IT IS WHAT DELETES AND RECREATES THE AXES. DRAWING HERE AS WELL PUT A SECOND SET OF ARTISTS OVER THE TOP
+        ON EVERY LOAD, WHICH 'delete observed data' THEN LEFT BEHIND, AND SENT DERIVATIVE CURVES TO THE MAIN AXES
+        RATHER THAN THE d/dx TWIN. IT ALSO CRASHED OUTRIGHT WHEN A PANEL WAS SAVED HIDDEN, SINCE ITS AXES IS None
+        """
+        self.clear_data_submenu(self.m_topo_submenu)
+
         for x in range(len(self.observed_topography_list)):
             if self.observed_topography_list[x] is not None:
                 # ADD OBJECT TO MENUVAR
@@ -3056,7 +3123,13 @@ class Gmg(wx.Frame):
         self.observed_topography_counter = len(self.observed_topography_list)
 
     def replot_observed_gravity_data(self):
-        """ADD LOADED OBSERVED GRAVITY TO THE MODEL FRAME"""
+        """
+        PUT THE LOADED OBSERVED GRAVITY BACK IN THE MENUBAR.
+
+        NB: DRAWING IS LEFT TO rebuild_data_frames. SEE replot_observed_topography_data
+        """
+        self.clear_data_submenu(self.m_obs_g_submenu)
+
         for x in range(len(self.observed_gravity_list)):
             if self.observed_gravity_list[x] is not None:
                 # ADD OBJECT TO MENUVAR
@@ -3074,7 +3147,13 @@ class Gmg(wx.Frame):
         self.observed_gravity_counter = len(self.observed_gravity_list)
 
     def replot_observed_vgg_data(self):
-        """ADD LOADED OBSERVED VGG TO THE MODEL FRAME"""
+        """
+        PUT THE LOADED OBSERVED VGG BACK IN THE MENUBAR.
+
+        NB: DRAWING IS LEFT TO rebuild_data_frames. SEE replot_observed_topography_data
+        """
+        self.clear_data_submenu(self.m_obs_vgg_submenu)
+
         for x in range(len(self.observed_vgg_list)):
             if self.observed_vgg_list[x] is not None:
                 # ADD OBJECT TO MENUVAR
@@ -3094,7 +3173,13 @@ class Gmg(wx.Frame):
         self.observed_vgg_counter = len(self.observed_vgg_list)
 
     def replot_observed_magnetic_data(self):
-        """ADD LOADED OBSERVED MAGNETIC DATA TO THE MODEL FRAME"""
+        """
+        PUT THE LOADED OBSERVED MAGNETIC DATA BACK IN THE MENUBAR.
+
+        NB: DRAWING IS LEFT TO rebuild_data_frames. SEE replot_observed_topography_data
+        """
+        self.clear_data_submenu(self.m_obs_mag_submenu)
+
         for x in range(len(self.observed_magnetic_list)):
             if self.observed_magnetic_list[x] is not None:
                 # ADD OBJECT TO MENUVAR
@@ -3396,6 +3481,10 @@ class Gmg(wx.Frame):
         observed_topography.name = self.load_window.observed_name
         observed_topography.color = self.load_window.color_picked
         observed_topography.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('topography')
+
         observed_topography.mpl_actor = self.topography_frame.scatter(observed_topography.data[:, 0],
                                                                 observed_topography.data[:, 1], marker='o',
                                                                 color=observed_topography.color, s=5,
@@ -3455,6 +3544,10 @@ class Gmg(wx.Frame):
         observed.name = gaussian_filter_box.output_name
         observed.color = gaussian_filter_box.output_color
         observed.data = gaussian_filter_box.filtered_output
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('topography')
+
         observed.mpl_actor = self.topography_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
                                                      color=observed.color, s=5, gid=observed.id)
 
@@ -3500,6 +3593,10 @@ class Gmg(wx.Frame):
         # THE DELETE ITEM NO LONGER MATCHED THE DATASET
         new_derivative.id = int(self.observed_topography_counter)
         new_derivative.type = str('derivative')
+
+        # THE DERIVATIVE CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('topography')
+
         new_derivative.mpl_actor = self.topography_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                              marker='o', color=new_derivative.color, s=5,
                                                              gid=10000 + self.observed_topography_counter)
@@ -3554,6 +3651,10 @@ class Gmg(wx.Frame):
         observed_gravity.name = self.load_window.observed_name
         observed_gravity.color = self.load_window.color_picked
         observed_gravity.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('gravity')
+
         observed_gravity.mpl_actor = self.gravity_frame.scatter(observed_gravity.data[:, 0],
                                                                 observed_gravity.data[:, 1], marker='o',
                                                                 color=observed_gravity.color, s=5,
@@ -3661,6 +3762,10 @@ class Gmg(wx.Frame):
         observed.name = gaussian_filter_box.output_name
         observed.color = gaussian_filter_box.output_color
         observed.data = gaussian_filter_box.filtered_output
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('gravity')
+
         observed.mpl_actor = self.gravity_frame.scatter(observed.data[:, 0],
                                                         observed.data[:, 1], marker='o',
                                                         color=observed.color, s=5,
@@ -3702,6 +3807,9 @@ class Gmg(wx.Frame):
             return
         dlg = RegionalFieldDialog(self, -1, "Regional Field", self.observed_gravity_list)
         if dlg.ShowModal() == wx.ID_OK:
+            # THE RESULT CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+            self.ensure_data_frame_shown('gravity')
+
             regional_y = self._compute_regional_field(
                 dlg.input_data[:, 0], dlg.input_data[:, 1], dlg.poly_order)
             regional_data = np.column_stack((dlg.input_data[:, 0], regional_y))
@@ -3770,6 +3878,10 @@ class Gmg(wx.Frame):
         # NB: THE BARE COUNTER. SEE take_topography_horizontal_derivative
         new_derivative.id = int(self.observed_gravity_counter)
         new_derivative.type = str('derivative')
+
+        # THE DERIVATIVE CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('gravity')
+
         new_derivative.mpl_actor = self.gravity_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                                 marker='o', color=new_derivative.color, s=5,
                                                                 gid=11000 + self.observed_gravity_counter)
@@ -3822,6 +3934,10 @@ class Gmg(wx.Frame):
         observed_vgg.name = self.load_window.observed_name
         observed_vgg.color = self.load_window.color_picked
         observed_vgg.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('vgg')
+
         observed_vgg.mpl_actor = self.vertical_gg_frame.scatter(observed_vgg.data[:, 0],
                                                                 observed_vgg.data[:, 1], marker='o',
                                                                 color=observed_vgg.color, s=5,
@@ -3929,6 +4045,10 @@ class Gmg(wx.Frame):
         observed.name = gaussian_filter_box.output_name
         observed.color = gaussian_filter_box.output_color
         observed.data = gaussian_filter_box.filtered_output
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('vgg')
+
         observed.mpl_actor = self.vertical_gg_frame.scatter(
                             observed.data[:, 0],
                             observed.data[:, 1], marker='o',
@@ -3942,8 +4062,9 @@ class Gmg(wx.Frame):
         self.observed_vgg_switch = True
 
         # APPEND NEW DATA MENU TO 'vgg data MENU'
+        # NB: THIS USED TO APPEND TO m_obs_g_submenu, THE GRAVITY MENU. SEE take_vgg_horizontal_derivative
         self.vgg_submenu = wx.Menu()
-        self.m_obs_g_submenu.Append(15000 + observed.id, observed.name, self.vgg_submenu)
+        self.m_obs_vgg_submenu.Append(15000 + observed.id, observed.name, self.vgg_submenu)
 
         # APPEND DELETE DATA OPTION TO THE NEW DATA MENU
         self.vgg_submenu.Append(15000 + observed.id, 'delete observed data')
@@ -3966,6 +4087,9 @@ class Gmg(wx.Frame):
             return
         dlg = RegionalFieldDialog(self, -1, "Regional Field", self.observed_vgg_list)
         if dlg.ShowModal() == wx.ID_OK:
+            # THE RESULT CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+            self.ensure_data_frame_shown('vgg')
+
             regional_y = self._compute_regional_field(
                 dlg.input_data[:, 0], dlg.input_data[:, 1], dlg.poly_order)
             regional_data = np.column_stack((dlg.input_data[:, 0], regional_y))
@@ -4034,6 +4158,10 @@ class Gmg(wx.Frame):
         # NB: THE BARE COUNTER. SEE take_topography_horizontal_derivative
         new_derivative.id = int(self.observed_vgg_counter)
         new_derivative.type = str('derivative')
+
+        # THE DERIVATIVE CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('vgg')
+
         new_derivative.mpl_actor = self.vertical_gg_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
                                                                 marker='o', color=new_derivative.color, s=5,
                                                                 gid=15000 + self.observed_vgg_counter)
@@ -4085,6 +4213,10 @@ class Gmg(wx.Frame):
         observed_magnetic.name = self.load_window.observed_name
         observed_magnetic.color = self.load_window.color_picked
         observed_magnetic.data = np.genfromtxt(input_file, delimiter=' ', dtype=float)
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('magnetic')
+
         observed_magnetic.mpl_actor = self.magnetic_frame.scatter(observed_magnetic.data[:, 0],
                                                                   observed_magnetic.data[:, 1], marker='o',
                                                                   color=observed_magnetic.color, s=5,
@@ -4195,6 +4327,10 @@ class Gmg(wx.Frame):
         observed.name = gaussian_filter_box.output_name
         observed.color = gaussian_filter_box.output_color
         observed.data = gaussian_filter_box.filtered_output
+
+        # THE DATA CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+        self.ensure_data_frame_shown('magnetic')
+
         observed.mpl_actor = self.magnetic_frame.scatter(observed.data[:, 0], observed.data[:, 1], marker='o',
                                                          color=observed.color, s=5, gid=observed.id)
 
@@ -4226,6 +4362,9 @@ class Gmg(wx.Frame):
             return
         dlg = RegionalFieldDialog(self, -1, "Regional Field", self.observed_magnetic_list)
         if dlg.ShowModal() == wx.ID_OK:
+            # THE RESULT CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE
+            self.ensure_data_frame_shown('magnetic')
+
             regional_y = self._compute_regional_field(
                 dlg.input_data[:, 0], dlg.input_data[:, 1], dlg.poly_order)
             regional_data = np.column_stack((dlg.input_data[:, 0], regional_y))
@@ -4294,13 +4433,14 @@ class Gmg(wx.Frame):
         # NB: THE BARE COUNTER. SEE take_topography_horizontal_derivative
         new_derivative.id = int(self.observed_magnetic_counter)
         new_derivative.type = str('derivative')
-        if self.magnetic_d_frame is not None:
-            new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
-                                                                     marker='o', color=new_derivative.color, s=5,
-                                                                     gid=12000 + self.observed_magnetic_counter)
-        else:
-            new_derivative.mpl_actor = None
-            wx.MessageBox("Magnetic frame is closed. Cannot plot horizontal derivative.", "Warning", wx.OK | wx.ICON_WARNING)
+
+        # THE DERIVATIVE CANNOT BE DRAWN INTO A PANEL THAT IS NOT THERE.
+        # NB: THIS USED TO REFUSE TO PLOT AND WARN INSTEAD. OPENING THE PANEL IS WHAT THE USER ASKED FOR
+        self.ensure_data_frame_shown('magnetic')
+
+        new_derivative.mpl_actor = self.magnetic_d_frame.scatter(new_derivative.data[:, 0], new_derivative.data[:, 1],
+                                                                 marker='o', color=new_derivative.color, s=5,
+                                                                 gid=12000 + self.observed_magnetic_counter)
 
         # APPEND NEW DATA TO THE OBSERVED GRAVITY GMG LIST
         self.observed_magnetic_list.append(new_derivative)
@@ -7306,11 +7446,8 @@ class Gmg(wx.Frame):
 
         self.untrusted_nt_plot.set_data(self.xp[untrusted] * 0.001, self.predicted_nt[untrusted])
 
-        if self.magnetic_frame is not None:
-            if untrusted.any():
-                self.magnetic_frame.set_ylabel("M (nT)\nred: unreliable")
-            else:
-                self.magnetic_frame.set_ylabel("M (nT)")
+        # COMPOSE THE DATA PANEL Y LABELS (BASE UNITS + '2D only' / 'red: unreliable' / 'DC ...')
+        self.update_field_ylabels(untrusted)
 
         # A LAYER WHOSE OUTLINE CROSSES ITSELF MAKES EVERY ANOMALY UNRELIABLE, NOT ONLY THE MAGNETIC ONE, SO IT IS
         # REPORTED IN THE STATUS BAR RATHER THAN AGAINST ANY ONE PANEL
